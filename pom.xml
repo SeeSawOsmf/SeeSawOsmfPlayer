@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>uk.co.vodco</groupId>
+    <artifactId>player</artifactId>
+    <packaging>pom</packaging>
+    <version>7.0.0-SNAPSHOT</version>
+    <name>player</name>
+    <url>http://www.ioko365.com/</url>
+    <description>The SeeSaw player</description>
+
+    <modules>
+        <!-- Note this set of modules is only those projects actively being developed all others are in the stable profile below.
+                      Projects in stable should NOT have snapshot dependencies.
+                  -->
+        <module>OsmfBasedPlayer</module>
+        <module>ControlBarPlugin</module>
+        <module>ChromeLibrary</module>
+        <module>DebugProxyPlugin</module>
+
+    </modules>
+
+    <developers>
+        <developer>
+            <id>bgidley</id>
+            <name>Ben Gidley</name>
+            <url>http://www.gidley.co.uk/</url>
+        </developer>
+
+    </developers>
+
+    <issueManagement>
+        <system>Jira</system>
+        <url>http://kgd-devtools02.dev.vodco.co.uk/jira/</url>
+    </issueManagement>
+
+    <ciManagement>
+        <system>TeamCity</system>
+        <url>http://kgd-devtools02.dev.vodco.co.uk/TeamCity</url>
+    </ciManagement>
+
+    <scm>
+        <connection>
+            scm:svn:http://readonly:23read0n1y@kgd-devtools03.dev.vodco.co.uk/svn/seesaw/trunk/sherbet/player/
+        </connection>
+        <url>
+            scm:svn:http://kgd-devtools03.dev.vodco.co.uk/svn/seesaw/trunk/sherbet/player/
+        </url>
+    </scm>
+
+    <distributionManagement>
+        <site>
+            <id>kgd-devtools02.dev.vodco.co.uk</id>
+            <url>scpexe://webdist@kgd-devtools02.dev.vodco.co.uk/var/apache2/player</url>
+        </site>
+        <repository>
+            <id>sherbet-nexus</id>
+            <url>http://kgd-devtools02.dev.vodco.co.uk/nexus/content/repositories/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>sherbet-nexus</id>
+            <url>http://kgd-devtools02.dev.vodco.co.uk/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Multiproject Deps -->
+            <dependency>
+                <artifactId>ChromeLibrary</artifactId>
+                <groupId>uk.co.vodco</groupId>
+                <version>${pom.version}</version>
+                <type>swc</type>
+            </dependency>
+
+            <dependency>
+                <artifactId>ControlBarPlugin</artifactId>
+                <groupId>uk.co.vodco</groupId>
+                <version>${pom.version}</version>
+                <type>swc</type>
+            </dependency>
+
+             <dependency>
+                <artifactId>DebugProxyPlugin</artifactId>
+                <groupId>uk.co.vodco</groupId>
+                <version>${pom.version}</version>
+                <type>swc</type>
+            </dependency>
+
+            
+            <dependency>
+                <groupId>org.as3commons</groupId>
+                <artifactId>as3commons-logging</artifactId>
+                <version>1.1.1</version>
+                <type>swc</type>
+            </dependency>
+
+            <dependency>
+                <groupId>org.osmf</groupId>
+                <artifactId>osmf</artifactId>
+                <version>1.0</version>
+                <type>swc</type>
+            </dependency>
+        </dependencies>
+
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <!-- This has to be here for maven to find flexmojos: at root project level -->
+            <plugin>
+                <groupId>org.sonatype.flexmojos</groupId>
+                <artifactId>flexmojos-maven-plugin</artifactId>
+            </plugin>
+
+        </plugins>
+        <pluginManagement>
+            <plugins>
+
+                <plugin>
+                    <groupId>org.sonatype.flexmojos</groupId>
+                    <artifactId>flexmojos-maven-plugin</artifactId>
+                    <version>3.6</version>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <sourcePaths>
+                            <path>${basedir}/src/main/flex</path>
+                            <path>${basedir}/src/main/resources</path>
+                        </sourcePaths>
+                        <configurationReport>true</configurationReport>
+                        <accessible>true</accessible>
+                        <locales>
+                            <locale>en_US</locale>
+                        </locales>
+                        <headlessServer>true</headlessServer>
+                        <fonts>
+                            <advancedAntiAliasing>true</advancedAntiAliasing>
+                            <maxCachedFonts>20</maxCachedFonts>
+                            <maxGlyphsPerFace>1000</maxGlyphsPerFace>
+                            <managers>
+                                <!-- Here we enforce using the Adobe Font Manager -->
+                                <manager>flash.fonts.AFEFontManager</manager>
+                                <!--<manager>flash.fonts.BatikFontManager</manager>-->
+                                <!--<manager>flash.fonts.JREFontManager</manager>-->
+                            </managers>
+                        </fonts>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.adobe.flex</groupId>
+                            <artifactId>compiler</artifactId>
+                            <version>${flex.sdk.version}</version>
+                            <type>pom</type>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+    <reporting>
+        <plugins>
+        </plugins>
+    </reporting>
+
+    <properties>
+        <flex.sdk.version>4.0.0.14159</flex.sdk.version>
+    </properties>
+
+</project>

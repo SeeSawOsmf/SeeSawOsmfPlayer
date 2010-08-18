@@ -1,0 +1,52 @@
+<html>
+<head>
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+        google.load("prototype", "1");
+        google.load("swfobject", "2");
+        
+    </script>
+    <title>${title}</title>
+</head>
+<body>
+
+<p>OSMF based test player</p>
+
+<div id="myContent">
+    <p>There should be a video here</p>
+
+    <script type="text/javascript">
+        var flashvars = {
+            url: "rtmp://cp67126.edgefcs.net/ondemand/mediapm/strobe/content/test/SpaceAloneHD_sounas_640_500_short"
+        };
+        var params = {
+            allowFullScreen: "true",
+            allowScriptAccess: "always"
+        };
+        var attributes = {
+
+        };
+
+        swfobject.embedSWF("${swf}.swf?name4=bob", "myContent", "640", "480", "10.1.53", "playerProductInstall.swf", flashvars, params, attributes);
+    </script>
+
+
+</div>
+
+<script type="text/javascript">
+
+
+    function playVideo(){
+        $(myContent).url=$F(url);
+    }
+    
+</script>
+<form id="urlForm" onsubmit="playVideo">
+
+        <label for="url">URL</label>
+        <input type="text" id="url"/>
+        <input type="submit" id="submit"/>
+    </form>
+    
+</body>
+</html>
