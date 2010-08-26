@@ -21,7 +21,11 @@
 *****************************************************/
 package
 {
-	import org.osmf.chrome.assets.AssetsManager;
+import controls.seesaw.widget.PlayableButton;
+
+import flash.utils.Dictionary;
+
+import org.osmf.chrome.assets.AssetsManager;
 	import org.osmf.chrome.configuration.LayoutAttributesParser;
 	import org.osmf.chrome.configuration.WidgetsParser;
 	import org.osmf.chrome.widgets.Widget;
@@ -31,6 +35,8 @@ package
 	import org.osmf.metadata.Metadata;
 	import org.osmf.traits.DisplayObjectTrait;
 	import org.osmf.traits.MediaTraitType;
+    import controls.seesaw.widget.ScrubBar;
+    import flash.utils.getDefinitionByName;
 
 	public class ControlBarElement extends MediaElement
 	{
@@ -46,13 +52,13 @@ package
 		[Embed(source="/backDrop.png")]
 		private static const BACKDROP:Class;
 		
-		[Embed(source="/pause_disabled.png")]
+		[Embed(source="/blank.png")]
 		private static const PAUSE_DISABLED:Class;
-		[Embed(source="/pause_up.png")]
+		[Embed(source="/pauseOver.png")]
 		private static const PAUSE_UP:Class;
-		[Embed(source="/pause_down.png")]
+		[Embed(source="/pause.png")]
 		private static const PAUSE_DOWN:Class;
-		
+
 		[Embed(source="/stop_disabled.png")]
 		private static const STOP_DISABLED:Class;
 		[Embed(source="/stop_up.png")]
@@ -60,22 +66,40 @@ package
 		[Embed(source="/stop_down.png")]
 		private static const STOP_DOWN:Class;
 		
-		[Embed(source="/play_disabled.png")]
+		[Embed(source="/blank.png")]
 		private static const PLAY_DISABLED:Class;
-		[Embed(source="/play_up.png")]
+		[Embed(source="/playOver.png")]
 		private static const PLAY_UP:Class;
-		[Embed(source="/play_down.png")]
+		[Embed(source="/play.png")]
 		private static const PLAY_DOWN:Class;
 		
 		[Embed(source="/scrubber_disabled.png")]
 		private static const SCRUBBER_DISABLED:Class;
-		[Embed(source="/scrubber_up.png")]
+		[Embed(source="/scrubberButton.png")]
 		private static const SCRUBBER_UP:Class;
-		[Embed(source="/scrubber_down.png")]
+		[Embed(source="/scrubberButton.png")]
 		private static const SCRUBBER_DOWN:Class;
+
+        [Embed(source="/scrubBarTrail.png")]
+		private static const TRACK_TRAIL:Class;
+
 		[Embed(source="/scrubBarTrack.png")]
 		private static const SCRUB_BAR_TRACK:Class;
-		
+
+
+        [Embed(source="/volume.png")]
+		private static const VOLUME_UP:Class;
+
+        [Embed(source="/volumeOff.png")]
+		private static const VOLUME_DISABLED:Class;
+
+
+
+       
+
+
+       
+                              
 		// Public interface
 		//
 		
@@ -91,6 +115,7 @@ package
 		
 		private function processTarget():void
 		{
+            
 			if (target != null && settings != null)
 			{
 				// We use the NS_CONTROL_BAR_TARGET namespaced metadata in order
@@ -155,9 +180,12 @@ package
 		
 		// Internals
 		//
-		
+		               
 		private function setupControlBar():void
 		{
+
+            addSeesawWidgets();
+            
 			try
 			{
 				var configuration:XML = XML(new CONFIGURATION_XML());
@@ -167,6 +195,24 @@ package
 				assetsManager.load();
 				
 				var widgetsParser:WidgetsParser = new WidgetsParser()
+
+
+                for(var i:* in customWidgetList){
+
+                    var widgetInstance:* = new customWidgetList[i];
+                    var qualifiedDefinition:String = widgetInstance.classDefinition;
+                    var newDefinition:String = qualifiedDefinition.toLocaleLowerCase();
+
+                    // Qualify the class and type
+                    var type:Class = getDefinitionByName(qualifiedDefinition) as Class;
+                    
+                    // Pass a new definition and the qualified type to the widget registry
+                    widgetsParser.registerWidgetType(newDefinition, type);
+
+                }
+
+
+                
 				widgetsParser.parse(configuration.widgets.*, assetsManager);
 				
 				controlBar = widgetsParser.getWidget("controlBar");
@@ -176,13 +222,25 @@ package
 				trace("WARNING: failed setting up control bar:", error.message);
 			}
 		}
-		
+
+
+        // IMPORTANT
+	    // We need to define the custom wigdets and the instantiation of their classes
+		// So these can be registered to the chrome library
+
+        private function addSeesawWidgets():void{
+            customWidgetList["controls.seesaw.widget.scrubbar"] = ScrubBar;
+            customWidgetList["controls.seesaw.widget.playablebutton"] = PlayableButton;
+        }
+
 		private var settings:Metadata;
-		
+
 		private var target:MediaElement;
 		private var controlBar:Widget;
 		private var viewable:DisplayObjectTrait;
-		
+
+        private var customWidgetList:Dictionary = new Dictionary();
+        
 		/* static */
 		
 		private static const ID:String = "ID";

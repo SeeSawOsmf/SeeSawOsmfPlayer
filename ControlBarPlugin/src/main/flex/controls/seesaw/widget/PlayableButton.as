@@ -23,6 +23,9 @@
 package controls.seesaw.widget
 {
 import controls.seesaw.widget.interfaces.IWidget;
+
+import flash.events.MouseEvent;
+
 import org.osmf.chrome.widgets.*;
 	import __AS3__.vec.Vector;
 	
@@ -31,7 +34,8 @@ import org.osmf.chrome.widgets.*;
 	import org.osmf.events.PlayEvent;
 	import org.osmf.media.MediaElement;
 	import org.osmf.traits.MediaTraitType;
-	import org.osmf.traits.PlayTrait;
+import org.osmf.traits.PlayState;
+import org.osmf.traits.PlayTrait;
 	
 	public class PlayableButton extends ButtonWidget implements IWidget
 	{
@@ -71,12 +75,20 @@ import org.osmf.chrome.widgets.*;
 			
 			visibilityDeterminingEventHandler();
 		}
+
+        override protected function onMouseClick(event:MouseEvent):void
+		{
+			var playable:PlayTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
+			playable.pause();
+		}
+
 		
 		// Stubs
 		//
 		
 		protected function visibilityDeterminingEventHandler(event:Event = null):void
-		{	
+		{
+            visible = playable && playable.playState != PlayState.PAUSED && playable.canPause;
 		}
 
         public function get classDefinition() : String{

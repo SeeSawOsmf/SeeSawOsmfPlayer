@@ -1,38 +1,20 @@
 package uk.co.vodco.osmfPlayer {
-import flash.display.Graphics;
-import flash.display.LoaderInfo;
 import flash.display.Sprite;
-import flash.events.MouseEvent;
-
 import flash.external.ExternalInterface;
-import flash.media.Video;
-import flash.system.Security;
-import flash.ui.ContextMenu;
-
-import mx.containers.ControlBar;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
-import org.osmf.containers.MediaContainer;
-import org.osmf.elements.ParallelElement;
-import org.osmf.events.MediaFactoryEvent;
-import org.osmf.layout.HorizontalAlign;
-import org.osmf.layout.LayoutMetadata;
-import org.osmf.layout.VerticalAlign;
 import org.osmf.logging.Log;
-import org.osmf.media.DefaultMediaFactory;
-import org.osmf.media.MediaElement;
-import org.osmf.media.MediaFactory;
-import org.osmf.media.MediaPlayer;
 import org.osmf.media.MediaResourceBase;
-import org.osmf.media.MediaResourceBase;
-import org.osmf.media.PluginInfoResource;
 import org.osmf.media.URLResource;
 import org.osmf.metadata.Metadata;
 
-import uk.co.vodco.osmfPlayer.logger.TraceAndArthropodLoggerFactory;
 import uk.co.vodco.osmfPlayer.logger.CommonsOsmfLoggerFactory;
+import uk.co.vodco.osmfPlayer.logger.TraceAndArthropodLoggerFactory;
 import uk.co.vodco.osmfPlayer.ui.VersionedContextMenu;
+
+import flash.text.TextField;
+import flash.text.TextFieldType;
 
 /**
  * Wrapper for player
@@ -57,8 +39,15 @@ public class Player extends Sprite {
     private static const PLAYER_HEIGHT:int = PLAYER::Height;
     private static const PARAM_URL:String = "url";
     private static const PARAM_PROGRAMME:String = "programme";
-    private static const VIDEO_URL:String = "rtmp://cp67126.edgefcs.net/ondemand/mediapm/strobe/content/test/SpaceAloneHD_sounas_640_500_short";
-
+  ///  private static const VIDEO_URL:String = "http://mediapm.edgesuite.net/osmf/content/test/logo_animated.flv";
+  //  private static const VIDEO_URL:String = "rtmp://cp67126.edgefcs.net/ondemand/mediapm/strobe/content/test/SpaceAloneHD_sounas_640_500_short";
+ // private static const VIDEO_URL:String = "rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703/e5/test/ccp/p/LOW_RES/test/mp4:test_asset.mp4";
+  private static const VIDEO_URL:String = "rtmp://almer.rtmphost.com/osmfplayer/mp4:sample5.mp4";
+  private static const VIDEO_ARRAY:Array = [
+      "http://mediapm.edgesuite.net/osmf/content/test/logo_animated.flv",
+       "rtmp://almer.rtmphost.com/osmfplayer/mp4:sample5.mp4",
+      "http://mediapm.edgesuite.net/osmf/content/test/logo_animated.flv"
+  ];
     private static var loggerSetup:* = (LoggerFactory.loggerFactory = new TraceAndArthropodLoggerFactory());
 
 
@@ -79,7 +68,7 @@ public class Player extends Sprite {
         setupGlobalExternalInterface();
 
         loadVideo(content);
-
+       
     }
 
     private function setupGlobalExternalInterface():void {
@@ -128,6 +117,20 @@ public class Player extends Sprite {
             urlResource = new URLResource(VIDEO_URL);
         }
         return urlResource;
+    }
+
+    private function loadText():void{
+
+        var txtInput:TextField = new TextField();
+         txtInput.selectable = true;
+        txtInput.text = ""
+            txtInput.width = 200;
+            txtInput.height = 60;
+            txtInput.border = true;
+            txtInput.type = TextFieldType.INPUT;
+            txtInput.background = true;
+            trace("ddddddddddddddddddddd")
+            addChild(txtInput);
     }
 
 

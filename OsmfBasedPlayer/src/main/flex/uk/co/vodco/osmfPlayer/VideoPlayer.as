@@ -1,6 +1,4 @@
 package uk.co.vodco.osmfPlayer {
-import com.carlcalderon.arthropod.Debug;
-
 import flash.display.Sprite;
 
 import org.as3commons.logging.ILogger;
@@ -41,7 +39,7 @@ public class VideoPlayer extends Sprite {
 
     private static const ID:String = "ID";
 
-    private static const VIDEO_URL:String = "rtmp://cp67126.edgefcs.net/ondemand/mediapm/strobe/content/test/SpaceAloneHD_sounas_640_500_short";
+ ///   private static const VIDEO_URL:String = "rtmp://cp67126.edgefcs.net/ondemand/mediapm/strobe/content/test/SpaceAloneHD_sounas_640_500_short";
 
     private static const MAINCONTENT_ID:String = "mainContent";
 
@@ -80,7 +78,7 @@ public class VideoPlayer extends Sprite {
         // Set a player up to control the wrapper element
         mediaPlayer = new MediaPlayer();
         mediaPlayer.media = rootElement;
-        mediaPlayer.autoPlay = false;
+        mediaPlayer.autoPlay = true;
 
         // Display the wrapper element
         mediaContainer = new MediaContainer();
@@ -135,7 +133,8 @@ public class VideoPlayer extends Sprite {
         controlBarTarget.addValue(ID, "mainContent");
 
         // Construct a video element:
-        var video:MediaElement = mediaFactory.createMediaElement(maincontent);
+       var video:MediaElement = mediaFactory.createMediaElement(maincontent);
+        
 
         // Add the metadata to the video's metadata:
         video.addMetadata(ControlBarPlugin.NS_CONTROL_BAR_TARGET, controlBarTarget);
