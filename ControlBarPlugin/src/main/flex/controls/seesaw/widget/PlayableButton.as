@@ -34,9 +34,10 @@ import org.osmf.chrome.widgets.*;
 	import org.osmf.events.PlayEvent;
 	import org.osmf.media.MediaElement;
 	import org.osmf.traits.MediaTraitType;
-import org.osmf.traits.PlayState;
-import org.osmf.traits.PlayTrait;
-	
+    import org.osmf.traits.PlayState;
+    import org.osmf.traits.PlayTrait;
+    import org.osmf.chrome.widgets.ButtonWidget;
+
 	public class PlayableButton extends ButtonWidget implements IWidget
 	{
 		// Protected

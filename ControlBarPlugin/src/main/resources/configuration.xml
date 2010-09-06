@@ -76,25 +76,29 @@
                 trackTrail="trackTrail"
 				/>
             <widget
-				id="SoundLessButton"
-				type="SoundLessButton"
+				id="controls.seesaw.widget.Volume"
+				type="controls.seesaw.widget.Volume"
 	            upFace="volumeUp"
                 downFace="volumeUp"
 			    disabledFace="volumeDisabled"
                 left="550"
                 top="30"
 				/>
-                <widget
-				id="SoundMoreButton"
-				type="SoundMoreButton"
-	            upFace="volumeDisabled"
-                downFace="volumeDisabled"
-			    disabledFace="volumeUp"
-                left="570"
-                top="30"
+             <widget
+				id="controls.seesaw.widget.VolumeScrubBar"
+				type="controls.seesaw.widget.VolumeScrubBar"
+	            timeFieldsWidth="90"
+				timeFieldsHeight="15"
+				timeFieldSpacing="1"
+				right="25"
+				top="37"
+                width="45"
+				scrubberUp="scrubberUp"
+				scrubberDown="scrubberDown"
+				scrubberDisabled="scrubberDisabled"
+				track="scrubBarTrack"
+                trackTrail="trackTrail"
 				/>
-
-			
 		</widget>
 	</widgets>
 		

@@ -39,10 +39,10 @@ public class Player extends Sprite {
     private static const PLAYER_HEIGHT:int = PLAYER::Height;
     private static const PARAM_URL:String = "url";
     private static const PARAM_PROGRAMME:String = "programme";
-  ///  private static const VIDEO_URL:String = "http://mediapm.edgesuite.net/osmf/content/test/logo_animated.flv";
-  //  private static const VIDEO_URL:String = "rtmp://cp67126.edgefcs.net/ondemand/mediapm/strobe/content/test/SpaceAloneHD_sounas_640_500_short";
+ //  private static const VIDEO_URL:String = "http://mediapm.edgesuite.net/osmf/content/test/logo_animated.flv";
+   private static const VIDEO_URL:String = "rtmp://cp67126.edgefcs.net/ondemand/mediapm/strobe/content/test/SpaceAloneHD_sounas_640_500_short";
  // private static const VIDEO_URL:String = "rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703/e5/test/ccp/p/LOW_RES/test/mp4:test_asset.mp4";
-  private static const VIDEO_URL:String = "rtmp://almer.rtmphost.com/osmfplayer/mp4:sample5.mp4";
+ // private static const VIDEO_URL:String = "rtmp://almer.rtmphost.com/osmfplayer/mp4:sample5.mp4";
   private static const VIDEO_ARRAY:Array = [
       "http://mediapm.edgesuite.net/osmf/content/test/logo_animated.flv",
        "rtmp://almer.rtmphost.com/osmfplayer/mp4:sample5.mp4",
@@ -106,6 +106,13 @@ public class Player extends Sprite {
 
         if (parameters[PARAM_URL]) {
             urlResource = new URLResource(parameters[PARAM_URL]);
+
+               /*      var Params:Object = {
+            autoPlay:parameters[AUTOPLAY]
+}
+            urlResource.addMetadataValue("Params", Params);       */
+
+            
         } else if (parameters[PARAM_PROGRAMME]) {
             // TODO this would be replaced with a ProgrammeResource so our own plugin can resolve what to do about it
             urlResource = new URLResource(VIDEO_URL);
@@ -118,21 +125,6 @@ public class Player extends Sprite {
         }
         return urlResource;
     }
-
-    private function loadText():void{
-
-        var txtInput:TextField = new TextField();
-         txtInput.selectable = true;
-        txtInput.text = ""
-            txtInput.width = 200;
-            txtInput.height = 60;
-            txtInput.border = true;
-            txtInput.type = TextFieldType.INPUT;
-            txtInput.background = true;
-            trace("ddddddddddddddddddddd")
-            addChild(txtInput);
-    }
-
 
 }
 }

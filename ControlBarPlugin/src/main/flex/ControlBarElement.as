@@ -21,7 +21,7 @@
 *****************************************************/
 package
 {
-import controls.seesaw.widget.PlayableButton;
+
 
 import flash.utils.Dictionary;
 
@@ -35,7 +35,7 @@ import org.osmf.chrome.assets.AssetsManager;
 	import org.osmf.metadata.Metadata;
 	import org.osmf.traits.DisplayObjectTrait;
 	import org.osmf.traits.MediaTraitType;
-    import controls.seesaw.widget.ScrubBar;
+    import controls.seesaw.widget.*;
     import flash.utils.getDefinitionByName;
 
 	public class ControlBarElement extends MediaElement
@@ -54,9 +54,9 @@ import org.osmf.chrome.assets.AssetsManager;
 		
 		[Embed(source="/blank.png")]
 		private static const PAUSE_DISABLED:Class;
-		[Embed(source="/pauseOver.png")]
-		private static const PAUSE_UP:Class;
 		[Embed(source="/pause.png")]
+		private static const PAUSE_UP:Class;
+		[Embed(source="/pauseOver.png")]
 		private static const PAUSE_DOWN:Class;
 
 		[Embed(source="/stop_disabled.png")]
@@ -68,9 +68,9 @@ import org.osmf.chrome.assets.AssetsManager;
 		
 		[Embed(source="/blank.png")]
 		private static const PLAY_DISABLED:Class;
-		[Embed(source="/playOver.png")]
-		private static const PLAY_UP:Class;
 		[Embed(source="/play.png")]
+		private static const PLAY_UP:Class;
+		[Embed(source="/playOver.png")]
 		private static const PLAY_DOWN:Class;
 		
 		[Embed(source="/scrubber_disabled.png")]
@@ -225,12 +225,20 @@ import org.osmf.chrome.assets.AssetsManager;
 
 
         // IMPORTANT
-	    // We need to define the custom wigdets and the instantiation of their classes
+	    // We need to define the custom wigdets and instantiate the super class
 		// So these can be registered to the chrome library
 
         private function addSeesawWidgets():void{
             customWidgetList["controls.seesaw.widget.scrubbar"] = ScrubBar;
             customWidgetList["controls.seesaw.widget.playablebutton"] = PlayableButton;
+        //    customWidgetList["controls.seesaw.widget.fullscreen"] = FullScreen;
+            customWidgetList["controls.seesaw.widget.volume"] = Volume;
+      customWidgetList["controls.seesaw.widget.volumescrubbar"] = VolumeScrubBar;
+         //   customWidgetList["controls.seesaw.widget.lights"] = Lights;
+         //   customWidgetList["controls.seesaw.widget.subtitles"] = SubTitles;
+         //   customWidgetList["controls.seesaw.widget.tooltips"] = ToolTips;
+         //   customWidgetList["controls.seesaw.widget.adblip"] = AdBlip;
+         //   customWidgetList["controls.seesaw.widget.streamsense"] = StreamSense;
         }
 
 		private var settings:Metadata;
