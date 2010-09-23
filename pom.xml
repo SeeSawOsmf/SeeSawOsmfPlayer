@@ -18,6 +18,7 @@
         <module>ControlBarPlugin</module>
         <module>ChromeLibrary</module>
         <module>DebugProxyPlugin</module>
+        <module>CanvasPoc</module>
 
     </modules>
 
