@@ -101,7 +101,7 @@
             <dependency>
                 <groupId>org.osmf</groupId>
                 <artifactId>osmf</artifactId>
-                <version>1.5</version>
+                <version>1.0</version>
                 <type>swc</type>
             </dependency>
         </dependencies>
