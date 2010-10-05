@@ -16,6 +16,7 @@ activemq-data*
 *.log.zip
 .actionScriptProperties
 .flexProperties
+.flexLibProperties
 *.local.properties
 *temp_flex_main_class_config.xml
 *temp_flexunit_config.xml
