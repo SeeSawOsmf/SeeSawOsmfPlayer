@@ -6,7 +6,7 @@
     <artifactId>player</artifactId>
     <packaging>pom</packaging>
     <version>7.0.0-SNAPSHOT</version>
-    <name>player</name>
+    <name>Player</name>
     <url>http://www.ioko365.com/</url>
     <description>The SeeSaw player</description>
 
@@ -14,9 +14,10 @@
         <!-- Note this set of modules is only those projects actively being developed all others are in the stable profile below.
                       Projects in stable should NOT have snapshot dependencies.
                   -->
-        <module>OsmfBasedPlayer</module>
+        <module>CorePlayer</module>
         <module>ControlBarPlugin</module>
         <module>DebugProxyPlugin</module>
+        <module>LiverailPlugin</module>
         <module>CanvasPoc</module>
     </modules>
 
@@ -67,6 +68,13 @@
     <dependencyManagement>
         <dependencies>
             <!-- Multiproject Deps -->
+           <dependency>
+                <artifactId>LiverailPlugin</artifactId>
+                <groupId>uk.co.vodco</groupId>
+                <version>${pom.version}</version>
+                <type>swc</type>
+            </dependency>
+
             <dependency>
                 <artifactId>ControlBarPlugin</artifactId>
                 <groupId>uk.co.vodco</groupId>
@@ -80,7 +88,7 @@
                 <version>${pom.version}</version>
                 <type>swc</type>
             </dependency>
-            
+
             <dependency>
                 <groupId>org.as3commons</groupId>
                 <artifactId>as3commons-logging</artifactId>
@@ -101,6 +109,8 @@
                 <version>${osmf.version}</version>
                 <type>swc</type>
             </dependency>
+
+         
         </dependencies>
     </dependencyManagement>
 

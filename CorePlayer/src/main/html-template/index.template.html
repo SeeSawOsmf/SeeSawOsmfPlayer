@@ -7,13 +7,15 @@
         var swf = "_Player.swf";
         
         var flashvars = {
-            url: "rtmp://cp67126.edgefcs.net/ondemand/mediapm/strobe/content/test/SpaceAloneHD_sounas_640_500_short",
-			showPreplay: "/i/ccp/00000035/3535.jpg"
-
+          url: "http://preview.seesaw.co.uk/clips/MTV/the_hills_audrina_interview_5.mp4",
+         /*   url: "http://mediapm.edgesuite.net/osmf/content/test/logo_animated.flv",*/
+			showPreplay: "/i/ccp/00000035/3535.jpg",
+			autoPlay: "false"
         };
         var params = {
             allowFullScreen: "true",
-            allowScriptAccess: "always"
+            allowScriptAccess: "always",
+			autoPlay: "false"
         };
         var attributes = {
 
@@ -24,7 +26,7 @@
     <title>${title}</title>
 </head>
 <body>
-
+<!--
 <p>OSMF based test player</p>
           'Contains some strong language and some scenes of a sexual nature. ', '', '18', '',
 '18',
@@ -61,7 +63,7 @@
 			ageBlockURL: ageBlockURL,
 			unavailableUrl: unavailableUrl
 
-
+-->
 <div id="myContent">
     <p>There should be a video here</p>
 
@@ -78,12 +80,12 @@
     }
     
 </script>
-<form id="urlForm" onsubmit="playVideo">
+<!--<form id="urlForm" onsubmit="playVideo">
 
         <label for="url">URL</label>
         <input type="text" id="url"/>
         <input type="submit" id="submit"/>
     </form>
-    
+    -->
 </body>
 </html>

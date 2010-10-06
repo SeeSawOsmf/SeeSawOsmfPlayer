@@ -23,6 +23,8 @@ import flash.display.Sprite;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.containers.MediaContainer;
+import org.osmf.elements.DurationElement;
+import org.osmf.elements.ImageElement;
 import org.osmf.elements.ParallelElement;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.layout.HorizontalAlign;
@@ -36,7 +38,15 @@ import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
 import org.osmf.metadata.Metadata;
 
+
 import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
+import uk.vodco.livrail.LiverailPlugin;
+import org.osmf.elements.VideoElement;
+import org.osmf.media.MediaPlayer;
+import org.osmf.media.MediaPlayerSprite;
+import org.osmf.media.URLResource;
+import org.osmf.net.DynamicStreamingItem;
+import org.osmf.net.DynamicStreamingResource;
 
 /**
  * This is the main player object and it is responsible for the video player.
@@ -51,22 +61,20 @@ import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
  */
 public class VideoPlayer extends Sprite {
 
-    private var mediaFactory:MediaFactory;
+    private var mediaFactory:DefaultMediaFactory;
     private var mediaPlayer:MediaPlayer;
     private var mediaContainer:MediaContainer;
     private var rootElement:ParallelElement;
+    private var dynamicStreaming:Boolean = false;
 
     private static const ID:String = "ID";
-
- ///   private static const VIDEO_URL:String = "rtmp://cp67126.edgefcs.net/ondemand/mediapm/strobe/content/test/SpaceAloneHD_sounas_640_500_short";
 
     private static const MAINCONTENT_ID:String = "mainContent";
 
 
     private var logger:ILogger = LoggerFactory.getClassLogger(VideoPlayer);
 
-    public function VideoPlayer(mainContent:MediaResourceBase, width:int, height:int)
-    {
+    public function VideoPlayer(mainContent:MediaResourceBase, width:int, height:int) {
         logger.info("Initialising Video Player to play");
 
         mediaFactory = new DefaultMediaFactory();
@@ -79,14 +87,18 @@ public class VideoPlayer extends Sprite {
         // Load our 'normal' plugins here - control bar is a bit special
         // TODO review if Adobe's sample way of initialising the control bar is a 'good' idea
         mediaFactory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
-
-
         // As we are going to have controls we have a parallel elements
         // One item is the video
         // The other item (added once the plugin loads) is the control bar
         rootElement = createParallelElement(width, height);
-        rootElement.addChild(constructVideoElement(mainContent));
 
+      
+        rootElement.addChild(constructVideoElement(mainContent));
+        rootElement.addChild(new DurationElement(20,new ImageElement(new URLResource("http://kgd-red-test-zxtm01.dev.vodco.co.uk/i/ccp/00000180/18055.jpg"))));
+
+
+
+ 
         // Load our control bar plugin here
         // The control bar will 'bind' to whatever controls the main content based on metadata
         var controlBarPlugin:ControlBarPlugin = new ControlBarPlugin();
@@ -94,8 +106,12 @@ public class VideoPlayer extends Sprite {
         mediaFactory.loadPlugin(controlBarPluginInfo);
 
 
+        var liverailPlugin:LiverailPlugin  = new LiverailPlugin();
+
+
         // Set a player up to control the wrapper element
         mediaPlayer = new MediaPlayer();
+     /// dynamicStreaming =  mediaPlayer.isDynamicStream;
         mediaPlayer.media = rootElement;
         mediaPlayer.autoPlay = true;
 
@@ -152,12 +168,16 @@ public class VideoPlayer extends Sprite {
         controlBarTarget.addValue(ID, "mainContent");
 
         // Construct a video element:
-       var video:MediaElement = mediaFactory.createMediaElement(maincontent);
+
+
+
+        var  dynamicVideo:DynamicStream = new DynamicStream();
         
+     //   var video:MediaElement = mediaFactory.createMediaElement(maincontent);
+         var video:MediaElement = mediaFactory.createMediaElement(dynamicVideo.DynamicResource);
 
         // Add the metadata to the video's metadata:
         video.addMetadata(ControlBarPlugin.NS_CONTROL_BAR_TARGET, controlBarTarget);
-
         return video;
     }
 
