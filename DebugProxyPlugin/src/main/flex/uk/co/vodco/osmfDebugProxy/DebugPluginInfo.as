@@ -67,10 +67,14 @@ public class DebugPluginInfo extends PluginInfo {
 
     private static var _mediaFactoryItem:MediaFactoryItem
             = new MediaFactoryItem
-            ("uk.co.vodco.osmfDebugProxy.DebugPluginInfo"
+            (         ID
                     , canHandleResourceFunction
                     , mediaElementCreationFunction
                     , MediaFactoryItemType.PROXY
                     );
+
+		public static const ID:String = "uk.co.vodco.osmfDebugProxy.DebugPluginInfo";
+		public static const PLUGIN_OBJECT:Object = {a:1, b:2, c:3};
 }
+
 }
