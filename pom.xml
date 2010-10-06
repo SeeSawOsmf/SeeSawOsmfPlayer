@@ -19,7 +19,7 @@
         <module>ChromeLibrary</module>
         <module>DebugProxyPlugin</module>
         <module>LiverailPlugin</module>
-
+        <module>CanvasPoc</module>
 
     </modules>
 
