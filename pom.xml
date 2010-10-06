@@ -16,10 +16,8 @@
                   -->
         <module>OsmfBasedPlayer</module>
         <module>ControlBarPlugin</module>
-        <module>ChromeLibrary</module>
         <module>DebugProxyPlugin</module>
         <module>CanvasPoc</module>
-
     </modules>
 
     <developers>
@@ -70,13 +68,6 @@
         <dependencies>
             <!-- Multiproject Deps -->
             <dependency>
-                <artifactId>ChromeLibrary</artifactId>
-                <groupId>uk.co.vodco</groupId>
-                <version>${pom.version}</version>
-                <type>swc</type>
-            </dependency>
-
-            <dependency>
                 <artifactId>ControlBarPlugin</artifactId>
                 <groupId>uk.co.vodco</groupId>
                 <version>${pom.version}</version>
@@ -89,7 +80,6 @@
                 <version>${pom.version}</version>
                 <type>swc</type>
             </dependency>
-
             
             <dependency>
                 <groupId>org.as3commons</groupId>
@@ -101,11 +91,17 @@
             <dependency>
                 <groupId>org.osmf</groupId>
                 <artifactId>osmf</artifactId>
-                <version>1.0</version>
+                <version>${osmf.version}</version>
+                <type>swc</type>
+            </dependency>
+            
+            <dependency>
+                <groupId>org.osmf</groupId>
+                <artifactId>chrome</artifactId>
+                <version>${osmf.version}</version>
                 <type>swc</type>
             </dependency>
         </dependencies>
-
     </dependencyManagement>
 
     <build>
@@ -167,6 +163,7 @@
 
     <properties>
         <flex.sdk.version>4.0.0.14159</flex.sdk.version>
+        <osmf.version>1.0</osmf.version>
     </properties>
 
 </project>
