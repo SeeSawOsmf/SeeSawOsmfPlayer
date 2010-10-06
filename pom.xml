@@ -14,10 +14,12 @@
         <!-- Note this set of modules is only those projects actively being developed all others are in the stable profile below.
                       Projects in stable should NOT have snapshot dependencies.
                   -->
-        <module>OsmfBasedPlayer</module>
+        <module>CorePlayer</module>
         <module>ControlBarPlugin</module>
         <module>ChromeLibrary</module>
         <module>DebugProxyPlugin</module>
+        <module>LiverailPlugin</module>
+
 
     </modules>
 
@@ -74,7 +76,14 @@
                 <version>${pom.version}</version>
                 <type>swc</type>
             </dependency>
-
+           <dependency>
+                <artifactId>LiverailPlugin</artifactId>
+                <groupId>uk.co.vodco</groupId>
+                <version>${pom.version}</version>
+                <type>swc</type>
+            </dependency>
+            
+            
             <dependency>
                 <artifactId>ControlBarPlugin</artifactId>
                 <groupId>uk.co.vodco</groupId>
@@ -88,7 +97,7 @@
                 <version>${pom.version}</version>
                 <type>swc</type>
             </dependency>
-
+            
             
             <dependency>
                 <groupId>org.as3commons</groupId>
@@ -103,6 +112,8 @@
                 <version>1.0</version>
                 <type>swc</type>
             </dependency>
+
+         
         </dependencies>
 
     </dependencyManagement>
