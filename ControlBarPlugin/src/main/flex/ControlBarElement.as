@@ -95,7 +95,9 @@ import org.osmf.chrome.assets.AssetsManager;
 
 
 
-       
+         public function ControlBarElement() {
+
+         }
 
 
        
