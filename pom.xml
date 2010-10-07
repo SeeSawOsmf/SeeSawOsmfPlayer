@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>uk.co.vodco</groupId>
     <artifactId>player</artifactId>
@@ -11,15 +12,15 @@
 
     <modules>
         <!-- Note this set of modules is only those projects actively being developed all others are in the stable profile below.
-                      Projects in stable should NOT have snapshot dependencies.
-                  -->
+                      Projects in stable should NOT have snapshot dependencies. -->
         <module>CorePlayer</module>
         <module>ControlBarPlugin</module>
         <module>DebugProxyPlugin</module>
         <module>LiverailPlugin</module>
         <module>CanvasPoc</module>
-    <module>PlayerControlsPlugin</module>
-  </modules>
+        <module>PlayerControlsPlugin</module>
+        <module>PlayerLogging</module>
+    </modules>
 
     <developers>
         <developer>
@@ -27,7 +28,6 @@
             <name>Ben Gidley</name>
             <url>http://www.gidley.co.uk/</url>
         </developer>
-
     </developers>
 
     <issueManagement>
@@ -64,11 +64,12 @@
         </snapshotRepository>
     </distributionManagement>
 
-
     <dependencyManagement>
         <dependencies>
-            <!-- Multiproject Deps -->
-           <dependency>
+
+            <!-- Multi-project Dependencies -->
+
+            <dependency>
                 <artifactId>LiverailPlugin</artifactId>
                 <groupId>uk.co.vodco</groupId>
                 <version>${pom.version}</version>
@@ -89,10 +90,33 @@
                 <type>swc</type>
             </dependency>
 
-             <dependency>
+            <dependency>
                 <artifactId>DebugProxyPlugin</artifactId>
                 <groupId>uk.co.vodco</groupId>
                 <version>${pom.version}</version>
+                <type>swc</type>
+            </dependency>
+
+            <dependency>
+                <artifactId>PlayerLogging</artifactId>
+                <groupId>com.seesaw</groupId>
+                <version>${pom.version}</version>
+                <type>swc</type>
+            </dependency>
+
+            <!-- 3rd Party Dependencies -->
+
+            <dependency>
+                <groupId>org.osmf</groupId>
+                <artifactId>osmf</artifactId>
+                <version>${osmf.version}</version>
+                <type>swc</type>
+            </dependency>
+
+            <dependency>
+                <groupId>org.osmf</groupId>
+                <artifactId>chrome</artifactId>
+                <version>${osmf.version}</version>
                 <type>swc</type>
             </dependency>
 
@@ -104,20 +128,26 @@
             </dependency>
 
             <dependency>
-                <groupId>org.osmf</groupId>
-                <artifactId>osmf</artifactId>
-                <version>${osmf.version}</version>
-                <type>swc</type>
-            </dependency>
-            
-            <dependency>
-                <groupId>org.osmf</groupId>
-                <artifactId>chrome</artifactId>
-                <version>${osmf.version}</version>
-                <type>swc</type>
+                <groupId>com.adobe.flex.framework</groupId>
+                <artifactId>flex-framework</artifactId>
+                <version>${flex.sdk.version}</version>
+                <type>pom</type>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.adobe.flex.framework</groupId>
+                        <artifactId>osmf</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
-         
+            <dependency>
+                <groupId>com.adobe.flexunit</groupId>
+                <artifactId>flexunit</artifactId>
+                <version>4.0-rc-1</version>
+                <type>swc</type>
+                <scope>test</scope>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -128,11 +158,9 @@
                 <groupId>org.sonatype.flexmojos</groupId>
                 <artifactId>flexmojos-maven-plugin</artifactId>
             </plugin>
-
         </plugins>
         <pluginManagement>
             <plugins>
-
                 <plugin>
                     <groupId>org.sonatype.flexmojos</groupId>
                     <artifactId>flexmojos-maven-plugin</artifactId>
@@ -173,6 +201,7 @@
             </plugins>
         </pluginManagement>
     </build>
+
     <reporting>
         <plugins>
         </plugins>

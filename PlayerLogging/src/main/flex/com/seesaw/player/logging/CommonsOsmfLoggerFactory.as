@@ -17,17 +17,18 @@
  *   Incorporated. All Rights Reserved.
  */
 
-package uk.co.vodco.osmfPlayer.logger {
+package com.seesaw.player.logging {
 import org.osmf.logging.Logger;
 import org.osmf.logging.LoggerFactory;
 
 public class CommonsOsmfLoggerFactory extends LoggerFactory {
-    public function CommonsOsmfLoggerFactory() {
 
+    public function CommonsOsmfLoggerFactory() {
     }
 
     override public function getLogger(category:String):Logger {
         return new CommonsOsmfLogger(category);
     }
 }
+
 }

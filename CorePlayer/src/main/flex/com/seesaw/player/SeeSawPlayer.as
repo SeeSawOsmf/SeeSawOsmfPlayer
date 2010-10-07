@@ -18,56 +18,66 @@
  */
 
 package com.seesaw.player {
+import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
+import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 
-    import flash.display.Sprite;
-    import flash.display.Stage;
-    import flash.events.Event;
+import flash.display.Sprite;
+import flash.display.Stage;
+import flash.events.Event;
 
-    import org.osmf.containers.MediaContainer;
-    import org.osmf.media.MediaElement;
-    import org.osmf.media.MediaFactory;
-    import org.osmf.media.MediaPlayer;
-    import org.osmf.media.URLResource;
+import org.as3commons.logging.ILogger;
+import org.as3commons.logging.LoggerFactory;
+import org.osmf.logging.Log;
 
-    public class SeeSawPlayer extends Sprite {
+import org.osmf.containers.MediaContainer;
+import org.osmf.media.MediaElement;
+import org.osmf.media.MediaFactory;
+import org.osmf.media.MediaPlayer;
+import org.osmf.media.URLResource;
 
-        private var mediaFactory:MediaFactory;
-        private var mediaElement:MediaElement;
-        private var mediaPlayer:MediaPlayer;
-        private var mediaContainer:MediaContainer;
+public class SeeSawPlayer extends Sprite {
 
-        public function SeeSawPlayer() {
-            super();
+    private static var loggerSetup:* = (LoggerFactory.loggerFactory = new TraceAndArthropodLoggerFactory());
+    private static var osmfLoggerSetup:* = (Log.loggerFactory = new CommonsOsmfLoggerFactory());
 
-			addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
-        }
+    private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
 
-        public function initialise(parameters:Object, stage:Stage = null):void
-        {
-            removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+    private var mediaFactory:MediaFactory;
+    private var mediaElement:MediaElement;
+    private var mediaPlayer:MediaPlayer;
+    private var mediaContainer:MediaContainer;
 
-            mediaFactory = new SeeSawMediaFactory();
-            mediaElement = mediaFactory.createMediaElement(new URLResource(VIDEO_URL));
-            mediaPlayer = new SeeSawMediaPlayer();
-            mediaPlayer.media = mediaElement;
+    public function SeeSawPlayer() {
+        super();
 
-            initialiseContainer();
-        }
-
-        private function initialiseContainer():void {
-            mediaContainer = new MediaContainer();
-            mediaContainer.addMediaElement(mediaElement);
-            addChild(mediaContainer);
-        }
-
-        private function onAddedToStage(event:Event):void
-		{
-			removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
-			initialise(loaderInfo.parameters, stage);
-		}
-
-        // TODO: this must come from initialiser
-        private static const VIDEO_URL:String
-            = "rtmp://cp67126.edgefcs.net/ondemand/mp4:mediapm/osmf/content/test/sample1_700kbps.f4v";
+        logger.debug("HELLO!")
+        addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
     }
+
+    public function initialise(parameters:Object, stage:Stage = null):void {
+        removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+
+        mediaFactory = new SeeSawMediaFactory();
+        mediaElement = mediaFactory.createMediaElement(new URLResource(VIDEO_URL));
+        mediaPlayer = new SeeSawMediaPlayer();
+        mediaPlayer.media = mediaElement;
+
+        initialiseContainer();
+    }
+
+    private function initialiseContainer():void {
+        mediaContainer = new MediaContainer();
+        mediaContainer.addMediaElement(mediaElement);
+        addChild(mediaContainer);
+    }
+
+    private function onAddedToStage(event:Event):void {
+        removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+        initialise(loaderInfo.parameters, stage);
+    }
+
+    // TODO: this must come from initialiser
+    private static const VIDEO_URL:String
+            = "rtmp://cp67126.edgefcs.net/ondemand/mp4:mediapm/osmf/content/test/sample1_700kbps.f4v";
+}
 }

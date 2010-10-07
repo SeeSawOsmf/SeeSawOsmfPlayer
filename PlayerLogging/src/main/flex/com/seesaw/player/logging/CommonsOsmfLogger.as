@@ -16,9 +16,9 @@
  *   Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
  *   Incorporated. All Rights Reserved.
  */
- 
 
-package uk.co.vodco.osmfPlayer.logger {
+
+package com.seesaw.player.logging {
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -61,4 +61,5 @@ public class CommonsOsmfLogger extends Logger {
         logger.fatal(message,rest);
     }
 }
+
 }

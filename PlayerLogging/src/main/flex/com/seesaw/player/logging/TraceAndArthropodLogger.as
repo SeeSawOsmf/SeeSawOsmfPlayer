@@ -17,7 +17,7 @@
  *   Incorporated. All Rights Reserved.
  */
 
-package uk.co.vodco.osmfPlayer.logger {
+package com.seesaw.player.logging {
 import com.carlcalderon.arthropod.Debug;
 
 import org.as3commons.logging.LogLevel;
@@ -27,15 +27,13 @@ import org.as3commons.logging.util.MessageUtil;
 /**
  * A commons logging logger that traces and feeds to Arthopod
  */
-public class TraceAndArthorpodLogger extends AbstractLogger {
-    public function TraceAndArthorpodLogger(name:String) {
-
-        super(name);
-
-    }
+public class TraceAndArthropodLogger extends AbstractLogger {
 
     private var _level:int;
 
+    public function TraceAndArthropodLogger(name:String) {
+        super(name);
+    }
 
     public function set level(value:int):void {
         _level = value;
@@ -107,4 +105,5 @@ public class TraceAndArthorpodLogger extends AbstractLogger {
         return (_level <= LogLevel.FATAL);
     }
 }
+
 }

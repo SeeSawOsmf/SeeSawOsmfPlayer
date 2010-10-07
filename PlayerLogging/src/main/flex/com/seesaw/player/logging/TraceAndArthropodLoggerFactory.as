@@ -17,18 +17,19 @@
  *   Incorporated. All Rights Reserved.
  */
 
-package uk.co.vodco.osmfPlayer.logger {
+package com.seesaw.player.logging {
+
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.ILoggerFactory;
 
 public class TraceAndArthropodLoggerFactory  implements ILoggerFactory{
+
     public function TraceAndArthropodLoggerFactory(){
     }
 
-
     public function getLogger(name:String):ILogger {
-        return new TraceAndArthorpodLogger(name);
-        
+        return new TraceAndArthropodLogger(name);
     }
 }
+
 }
