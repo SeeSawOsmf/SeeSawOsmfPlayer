@@ -7,37 +7,35 @@ import org.osmf.media.PluginInfo;
 
 public class LiverailPluginInfo extends PluginInfo {
     public function LiverailPluginInfo() {
-             var items:Vector.<MediaFactoryItem> = new Vector.<MediaFactoryItem>();
+        var items:Vector.<MediaFactoryItem> = new Vector.<MediaFactoryItem>();
         items.push(mediaFactoryItem);
 
         super(items, mediaElementCreationNotificationFunction);
     }
-    public static function get mediaFactoryItem():MediaFactoryItem
-    {
+
+    public static function get mediaFactoryItem():MediaFactoryItem {
         return _mediaFactoryItem;
     }
 
-    private static function canHandleResourceFunction(resource:MediaResourceBase):Boolean
-    {
+    private static function canHandleResourceFunction(resource:MediaResourceBase):Boolean {
         return true;
     }
 
-    private static function mediaElementCreationFunction():MediaElement
-    {
-       
+    private static function mediaElementCreationFunction():MediaElement {
+
         return new LiverailElement();
     }
 
     private static var _mediaFactoryItem:MediaFactoryItem
             = new MediaFactoryItem
-            (         ID
+            (ID
                     , canHandleResourceFunction
                     , mediaElementCreationFunction
                     , MediaFactoryItemType.STANDARD
                     );
 
-		public static const ID:String = "uk.co.vodco.liverail.LiverailPluginInfo";
-		
+    public static const ID:String = "uk.co.vodco.liverail.LiverailPluginInfo";
+
 
 }
 }

@@ -18,56 +18,53 @@
  */
 
 package com.seesaw.player {
+import flash.display.Sprite;
+import flash.display.Stage;
+import flash.events.Event;
 
-    import flash.display.Sprite;
-    import flash.display.Stage;
-    import flash.events.Event;
+import org.osmf.containers.MediaContainer;
+import org.osmf.media.MediaElement;
+import org.osmf.media.MediaFactory;
+import org.osmf.media.MediaPlayer;
+import org.osmf.media.URLResource;
 
-    import org.osmf.containers.MediaContainer;
-    import org.osmf.media.MediaElement;
-    import org.osmf.media.MediaFactory;
-    import org.osmf.media.MediaPlayer;
-    import org.osmf.media.URLResource;
+public class SeeSawPlayer extends Sprite {
 
-    public class SeeSawPlayer extends Sprite {
+    private var mediaFactory:MediaFactory;
+    private var mediaElement:MediaElement;
+    private var mediaPlayer:MediaPlayer;
+    private var mediaContainer:MediaContainer;
 
-        private var mediaFactory:MediaFactory;
-        private var mediaElement:MediaElement;
-        private var mediaPlayer:MediaPlayer;
-        private var mediaContainer:MediaContainer;
+    public function SeeSawPlayer() {
+        super();
 
-        public function SeeSawPlayer() {
-            super();
-
-			addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
-        }
-
-        public function initialise(parameters:Object, stage:Stage = null):void
-        {
-            removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
-
-            mediaFactory = new SeeSawMediaFactory();
-            mediaElement = mediaFactory.createMediaElement(new URLResource(VIDEO_URL));
-            mediaPlayer = new SeeSawMediaPlayer();
-            mediaPlayer.media = mediaElement;
-
-            initialiseContainer();
-        }
-
-        private function initialiseContainer():void {
-            mediaContainer = new MediaContainer();
-            mediaContainer.addMediaElement(mediaElement);
-            addChild(mediaContainer);
-        }
-
-        private function onAddedToStage(event:Event):void
-		{
-			removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
-			initialise(loaderInfo.parameters, stage);
-		}
-
-        // TODO: this must come from initialiser
-        private static const VIDEO_URL:String
-            = "rtmp://cp67126.edgefcs.net/ondemand/mp4:mediapm/osmf/content/test/sample1_700kbps.f4v";
+        addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
     }
+
+    public function initialise(parameters:Object, stage:Stage = null):void {
+        removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+
+        mediaFactory = new SeeSawMediaFactory();
+        mediaElement = mediaFactory.createMediaElement(new URLResource(VIDEO_URL));
+        mediaPlayer = new SeeSawMediaPlayer();
+        mediaPlayer.media = mediaElement;
+
+        initialiseContainer();
+    }
+
+    private function initialiseContainer():void {
+        mediaContainer = new MediaContainer();
+        mediaContainer.addMediaElement(mediaElement);
+        addChild(mediaContainer);
+    }
+
+    private function onAddedToStage(event:Event):void {
+        removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+        initialise(loaderInfo.parameters, stage);
+    }
+
+    // TODO: this must come from initialiser
+    private static const VIDEO_URL:String
+            = "rtmp://cp67126.edgefcs.net/ondemand/mp4:mediapm/osmf/content/test/sample1_700kbps.f4v";
+}
 }

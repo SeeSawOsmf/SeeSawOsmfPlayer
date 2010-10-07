@@ -80,7 +80,7 @@
             <groupId>uk.co.vodco</groupId>
             <type>swc</type>
         </dependency>
-      <dependency>
+        <dependency>
             <groupId>uk.co.vodco</groupId>
             <artifactId>LiverailPlugin</artifactId>
             <type>swc</type>

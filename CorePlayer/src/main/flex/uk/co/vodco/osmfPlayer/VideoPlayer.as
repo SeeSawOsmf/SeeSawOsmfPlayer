@@ -32,21 +32,14 @@ import org.osmf.layout.LayoutMetadata;
 import org.osmf.layout.VerticalAlign;
 import org.osmf.media.DefaultMediaFactory;
 import org.osmf.media.MediaElement;
-import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaPlayer;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
+import org.osmf.media.URLResource;
 import org.osmf.metadata.Metadata;
-
 
 import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
 import uk.vodco.livrail.LiverailPlugin;
-import org.osmf.elements.VideoElement;
-import org.osmf.media.MediaPlayer;
-import org.osmf.media.MediaPlayerSprite;
-import org.osmf.media.URLResource;
-import org.osmf.net.DynamicStreamingItem;
-import org.osmf.net.DynamicStreamingResource;
 
 /**
  * This is the main player object and it is responsible for the video player.
@@ -92,13 +85,11 @@ public class VideoPlayer extends Sprite {
         // The other item (added once the plugin loads) is the control bar
         rootElement = createParallelElement(width, height);
 
-      
+
         rootElement.addChild(constructVideoElement(mainContent));
-        rootElement.addChild(new DurationElement(20,new ImageElement(new URLResource("http://kgd-red-test-zxtm01.dev.vodco.co.uk/i/ccp/00000180/18055.jpg"))));
+        rootElement.addChild(new DurationElement(20, new ImageElement(new URLResource("http://kgd-red-test-zxtm01.dev.vodco.co.uk/i/ccp/00000180/18055.jpg"))));
 
 
-
- 
         // Load our control bar plugin here
         // The control bar will 'bind' to whatever controls the main content based on metadata
         var controlBarPlugin:ControlBarPlugin = new ControlBarPlugin();
@@ -106,13 +97,13 @@ public class VideoPlayer extends Sprite {
         mediaFactory.loadPlugin(controlBarPluginInfo);
 
 
-        var liverailModPlugin:LiverailPlugin  = new LiverailPlugin();
+        var liverailModPlugin:LiverailPlugin = new LiverailPlugin();
         var liverailPluginInfo:PluginInfoResource = new PluginInfoResource(liverailModPlugin.pluginInfo);
         mediaFactory.loadPlugin(liverailPluginInfo);
 
         // Set a player up to control the wrapper element
         mediaPlayer = new MediaPlayer();
-     /// dynamicStreaming =  mediaPlayer.isDynamicStream;
+        /// dynamicStreaming =  mediaPlayer.isDynamicStream;
         mediaPlayer.media = rootElement;
         mediaPlayer.autoPlay = true;
 
@@ -124,8 +115,7 @@ public class VideoPlayer extends Sprite {
 
     }
 
-    private function onPluginLoaded(event:MediaFactoryEvent):void
-    {
+    private function onPluginLoaded(event:MediaFactoryEvent):void {
         logger.info("Plugin loaded");
 
         // A plugin loaded successfully.
@@ -145,8 +135,7 @@ public class VideoPlayer extends Sprite {
         }
     }
 
-    private function onPluginLoadError(event:MediaFactoryEvent):void
-    {
+    private function onPluginLoadError(event:MediaFactoryEvent):void {
         logger.error("ERROR: the control bar plugin failed to load.");
     }
 
@@ -160,8 +149,7 @@ public class VideoPlayer extends Sprite {
         return _rootElement;
     }
 
-    private function constructVideoElement(maincontent:MediaResourceBase):MediaElement
-    {
+    private function constructVideoElement(maincontent:MediaResourceBase):MediaElement {
         // Construct a metadata object that we can append to the video's collection
         // of metadata. The control bar plug-in will use the metadata to identify
         // the video element as its target:
@@ -171,19 +159,17 @@ public class VideoPlayer extends Sprite {
         // Construct a video element:
 
 
+        var dynamicVideo:DynamicStream = new DynamicStream();
 
-        var  dynamicVideo:DynamicStream = new DynamicStream();
-        
-     //   var video:MediaElement = mediaFactory.createMediaElement(maincontent);
-         var video:MediaElement = mediaFactory.createMediaElement(dynamicVideo.DynamicResource);
+        //   var video:MediaElement = mediaFactory.createMediaElement(maincontent);
+        var video:MediaElement = mediaFactory.createMediaElement(dynamicVideo.DynamicResource);
 
         // Add the metadata to the video's metadata:
         video.addMetadata(ControlBarPlugin.NS_CONTROL_BAR_TARGET, controlBarTarget);
         return video;
     }
 
-    private function constructControlBarElement():MediaElement
-    {
+    private function constructControlBarElement():MediaElement {
         // Construct a metadata object that we'll send to the media factory on
         // requesting a control bar element to be instantiated. The factory
         // will use it to parameterize the element. Specifically, the ID field
@@ -205,8 +191,7 @@ public class VideoPlayer extends Sprite {
         // Set some layout properties on the control bar. Specifically, have it
         // appear at the bottom of the parallel element, horizontally centererd:
         var layout:LayoutMetadata = controlBar.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
-        if (layout == null)
-        {
+        if (layout == null) {
             layout = new LayoutMetadata();
             controlBar.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
         }
