@@ -18,12 +18,20 @@
  */
 
 package com.seesaw.player {
+import org.osmf.media.DefaultMediaFactory;
 
-    import org.osmf.media.DefaultMediaFactory;
+public class SeeSawMediaFactory extends DefaultMediaFactory {
+    public function SeeSawMediaFactory() {
+        super();
 
-    public class SeeSawMediaFactory extends DefaultMediaFactory {
-        public function SeeSawMediaFactory() {
-            super();
-        }
+        this.loadPlugins();
     }
+
+    /*
+     * Loads plugins associated with the player.
+     */
+    private function loadPlugins():void {
+
+    }
+}
 }

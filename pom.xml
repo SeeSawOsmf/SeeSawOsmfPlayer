@@ -19,7 +19,7 @@
         <module>DebugProxyPlugin</module>
         <module>LiverailPlugin</module>
         <module>CanvasPoc</module>
-        <module>PlayerInitialisation</module>
+        <module>PlayerControlsPlugin</module>
     </modules>
 
     <developers>
@@ -84,14 +84,14 @@
             </dependency>
 
             <dependency>
-                <artifactId>DebugProxyPlugin</artifactId>
+                <artifactId>PlayerControlsPlugin</artifactId>
                 <groupId>uk.co.vodco</groupId>
                 <version>${pom.version}</version>
                 <type>swc</type>
             </dependency>
 
             <dependency>
-                <artifactId>PlayerInitialisation</artifactId>
+                <artifactId>DebugProxyPlugin</artifactId>
                 <groupId>uk.co.vodco</groupId>
                 <version>${pom.version}</version>
                 <type>swc</type>
@@ -117,6 +117,7 @@
                 <version>${osmf.version}</version>
                 <type>swc</type>
             </dependency>
+
 
         </dependencies>
     </dependencyManagement>
