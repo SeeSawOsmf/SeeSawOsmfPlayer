@@ -18,9 +18,16 @@
  */
 
 package com.seesaw.player {
+import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
+import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
+
 import flash.display.Sprite;
 import flash.display.Stage;
 import flash.events.Event;
+
+import org.as3commons.logging.ILogger;
+import org.as3commons.logging.LoggerFactory;
+import org.osmf.logging.Log;
 
 import org.osmf.containers.MediaContainer;
 import org.osmf.media.MediaElement;
@@ -30,6 +37,11 @@ import org.osmf.media.URLResource;
 
 public class SeeSawPlayer extends Sprite {
 
+    private static var loggerSetup:* = (LoggerFactory.loggerFactory = new TraceAndArthropodLoggerFactory());
+    private static var osmfLoggerSetup:* = (Log.loggerFactory = new CommonsOsmfLoggerFactory());
+
+    private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
+
     private var mediaFactory:MediaFactory;
     private var mediaElement:MediaElement;
     private var mediaPlayer:MediaPlayer;
@@ -38,6 +50,7 @@ public class SeeSawPlayer extends Sprite {
     public function SeeSawPlayer() {
         super();
 
+        logger.debug("HELLO!")
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
     }
 

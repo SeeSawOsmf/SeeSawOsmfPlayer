@@ -1,4 +1,7 @@
 package uk.co.vodco.osmfPlayer {
+import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
+import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
+
 import flash.display.Sprite;
 import flash.external.ExternalInterface;
 
@@ -9,12 +12,7 @@ import org.osmf.media.MediaResourceBase;
 import org.osmf.media.URLResource;
 import org.osmf.metadata.Metadata;
 
-import uk.co.vodco.osmfPlayer.logger.CommonsOsmfLoggerFactory;
-import uk.co.vodco.osmfPlayer.logger.TraceAndArthropodLoggerFactory;
 import uk.co.vodco.osmfPlayer.ui.VersionedContextMenu;
-
-import flash.text.TextField;
-import flash.text.TextFieldType;
 
 /**
  * Wrapper for player
@@ -53,6 +51,7 @@ public class Player extends Sprite {
 
     private static var loggerSetup:* = (LoggerFactory.loggerFactory = new TraceAndArthropodLoggerFactory());
     private static var osmfLoggerSetup:* = (Log.loggerFactory = new CommonsOsmfLoggerFactory());
+
     private var logger:ILogger = LoggerFactory.getClassLogger(Player);
     
     private var versionedContextMenu:VersionedContextMenu;
