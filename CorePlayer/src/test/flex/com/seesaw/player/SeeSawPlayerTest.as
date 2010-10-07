@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Adobe Systems Incorporated.  All Rights Reserved.
+ * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
  *
  *   The contents of this file are subject to the Mozilla Public License
  *   Version 1.1 (the "License"); you may not use this file except in
@@ -12,26 +12,22 @@
  *   under the License.
  *
  *
- *   The Initial Developer of the Original Code is Adobe Systems Incorporated.
- *   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe Systems
+ *   The Initial Developer of the Original Code is ioko365 Ltd.
+ *   Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
  *   Incorporated. All Rights Reserved.
  */
 
-package org.osmf.chrome.assets
-{
-	public class SymbolAsset extends Asset
-	{
-		public function SymbolAsset(type:Class)
-		{
-			_type = type;
-			super();
-		}
-		
-		public function get type():Class
-		{
-			return _type;
-		}
-		
-		private var _type:Class;
-	}
+package com.seesaw.player {
+
+    import org.flexunit.assertThat;
+    import org.hamcrest.object.notNullValue;
+
+    public class SeeSawPlayerTest {
+
+        [Test]
+        public function playerCanInitialise():void{
+            var player:SeeSawPlayer = new SeeSawPlayer();
+            assertThat(player, notNullValue());
+        }
+    }
 }

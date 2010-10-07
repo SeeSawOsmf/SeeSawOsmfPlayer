@@ -62,6 +62,7 @@ public class Player extends Sprite {
     public function Player()
     {
         logger.info("Initialising Player at {0} x {1}", PLAYER_WIDTH, PLAYER_HEIGHT);
+
         versionedContextMenu = new VersionedContextMenu(this);
 
         var content:MediaResourceBase = configure();
@@ -69,7 +70,6 @@ public class Player extends Sprite {
         setupGlobalExternalInterface();
 
         loadVideo(content);
-       
     }
 
     private function setupGlobalExternalInterface():void {

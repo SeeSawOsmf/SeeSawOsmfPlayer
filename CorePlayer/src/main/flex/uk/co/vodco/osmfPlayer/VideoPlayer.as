@@ -106,8 +106,9 @@ public class VideoPlayer extends Sprite {
         mediaFactory.loadPlugin(controlBarPluginInfo);
 
 
-        var liverailPlugin:LiverailPlugin  = new LiverailPlugin();
-
+        var liverailModPlugin:LiverailPlugin  = new LiverailPlugin();
+        var liverailPluginInfo:PluginInfoResource = new PluginInfoResource(liverailModPlugin.pluginInfo);
+        mediaFactory.loadPlugin(liverailPluginInfo);
 
         // Set a player up to control the wrapper element
         mediaPlayer = new MediaPlayer();

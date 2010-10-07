@@ -20,9 +20,6 @@
             <plugin>
                 <groupId>org.sonatype.flexmojos</groupId>
                 <artifactId>flexmojos-maven-plugin</artifactId>
-                <configuration>
-
-                </configuration>
             </plugin>
         </plugins>
     </build>
@@ -47,6 +44,11 @@
             <type>swc</type>
         </dependency>
 
+        <dependency>
+            <groupId>org.osmf</groupId>
+            <artifactId>chrome</artifactId>
+            <type>swc</type>
+        </dependency>
 
         <dependency>
             <groupId>com.adobe.flexunit</groupId>
@@ -54,13 +56,5 @@
             <version>4.0-rc-1</version>
             <type>swc</type>
         </dependency>
-
-        <dependency>
-            <groupId>uk.co.vodco</groupId>
-            <artifactId>ChromeLibrary</artifactId>
-            <type>swc</type>
-        </dependency>
     </dependencies>
-
-
 </project>

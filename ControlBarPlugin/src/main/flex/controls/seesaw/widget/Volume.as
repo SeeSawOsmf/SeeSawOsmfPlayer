@@ -37,6 +37,9 @@ import controls.seesaw.widget.interfaces.IWidget;
 	
 	public class Volume extends controls.seesaw.widget.ButtonWidget implements IWidget
 	{
+        public function Volume() {    
+        }
+
 		// Overrides
 		//
 		

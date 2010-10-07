@@ -40,6 +40,10 @@ import org.osmf.chrome.widgets.*;
 
 	public class PlayableButton extends ButtonWidget implements IWidget
 	{
+        public function PlayableButton() {
+        
+        }
+
 		// Protected
 		//
 		
