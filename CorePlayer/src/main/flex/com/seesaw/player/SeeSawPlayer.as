@@ -18,22 +18,30 @@
  */
 
 package com.seesaw.player {
+import com.seesaw.player.components.ControlBarBuilder;
+
 import flash.display.Sprite;
 import flash.display.Stage;
 import flash.events.Event;
 
 import org.osmf.containers.MediaContainer;
+import org.osmf.elements.ParallelElement;
+import org.osmf.events.MediaFactoryEvent;
+import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaPlayer;
 import org.osmf.media.URLResource;
 
+[SWF(width=640, height=400)]
 public class SeeSawPlayer extends Sprite {
 
+    private var rootElement:ParallelElement;
     private var mediaFactory:MediaFactory;
-    private var mediaElement:MediaElement;
     private var mediaPlayer:MediaPlayer;
     private var mediaContainer:MediaContainer;
+
+    private var builders:Vector.<MediaElementBuilder>;
 
     public function SeeSawPlayer() {
         super();
@@ -45,22 +53,69 @@ public class SeeSawPlayer extends Sprite {
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 
         mediaFactory = new SeeSawMediaFactory();
-        mediaElement = mediaFactory.createMediaElement(new URLResource(VIDEO_URL));
-        mediaPlayer = new SeeSawMediaPlayer();
-        mediaPlayer.media = mediaElement;
 
-        initialiseContainer();
+        initialiseMediaPlayer();
+
+        addEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
+        addEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadError);
     }
 
-    private function initialiseContainer():void {
+    private function initialiseMediaPlayer():void {
+        mediaPlayer = new SeeSawMediaPlayer();
+        mediaPlayer.media = createRootElement();
+
         mediaContainer = new MediaContainer();
-        mediaContainer.addMediaElement(mediaElement);
+        mediaContainer.addMediaElement(rootElement);
         addChild(mediaContainer);
     }
+
+    private function createRootElement():MediaElement {
+        rootElement = new ParallelElement();
+
+        rootElement.addChild(createVideoElement());
+
+        var rootElementLayout:LayoutMetadata = new LayoutMetadata();
+        rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, rootElementLayout);
+
+        rootElementLayout.width = stage.stageWidth;
+        rootElementLayout.height = stage.stageHeight;
+
+        return rootElement;
+    }
+
+    private function createVideoElement():MediaElement {
+        var video:MediaElement = mediaFactory.createMediaElement(new URLResource(VIDEO_URL));
+        for (var builder in builders) {
+            builder.applyMetadataToElement(video);
+        }
+
+        return video;
+    }
+
+    private function createPluginBuilders() {
+        builders = new Vector.<MediaElementBuilder>();
+        builders.push(new ControlBarBuilder(mediaFactory));
+    }
+
+    // Event Handlers
 
     private function onAddedToStage(event:Event):void {
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
         initialise(loaderInfo.parameters, stage);
+    }
+
+    private function onPluginLoaded(event:MediaFactoryEvent):void {
+        for (var builder in builders) {
+            if (builder.isSourceOf(event)) {
+                var mediaElement:MediaElement = builder.newInstance(PlayerConstants.MAIN_CONTENT_ID);
+                if (mediaElement != null) {
+                    rootElement.addChild(mediaElement);
+                }
+            }
+        }
+    }
+
+    private function onPluginLoadError(event:MediaFactoryEvent):void {
     }
 
     // TODO: this must come from initialiser
