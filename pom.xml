@@ -18,7 +18,6 @@
         <module>DebugProxyPlugin</module>
         <module>LiverailPlugin</module>
         <module>CanvasPoc</module>
-    <module>InitialiserPlugin</module>
   </modules>
 
     <developers>
