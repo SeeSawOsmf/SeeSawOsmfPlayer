@@ -24,6 +24,15 @@ package com.seesaw.player {
     public class SeeSawMediaFactory extends DefaultMediaFactory {
         public function SeeSawMediaFactory() {
             super();
+            
+            this.loadPlugins();            
+        }
+
+        /*
+        * Loads plugins associated with the player.
+        */
+        private function loadPlugins ():void {
+
         }
     }
 }

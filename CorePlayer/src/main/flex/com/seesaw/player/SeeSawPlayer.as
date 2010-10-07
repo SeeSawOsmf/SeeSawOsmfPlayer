@@ -54,7 +54,7 @@ package com.seesaw.player {
             initialiseContainer();
         }
 
-        private function initialiseContainer() {
+        private function initialiseContainer():void {
             mediaContainer = new MediaContainer();
             mediaContainer.addMediaElement(mediaElement);
             addChild(mediaContainer);
