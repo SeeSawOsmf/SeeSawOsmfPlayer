@@ -18,6 +18,7 @@
         <module>DebugProxyPlugin</module>
         <module>LiverailPlugin</module>
         <module>CanvasPoc</module>
+    <module>PlayerControlsPlugin</module>
   </modules>
 
     <developers>
@@ -76,6 +77,13 @@
 
             <dependency>
                 <artifactId>ControlBarPlugin</artifactId>
+                <groupId>uk.co.vodco</groupId>
+                <version>${pom.version}</version>
+                <type>swc</type>
+            </dependency>
+
+            <dependency>
+                <artifactId>PlayerControlsPlugin</artifactId>
                 <groupId>uk.co.vodco</groupId>
                 <version>${pom.version}</version>
                 <type>swc</type>
