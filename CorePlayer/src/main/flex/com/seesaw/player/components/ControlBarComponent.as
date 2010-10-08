@@ -38,6 +38,8 @@ public class ControlBarComponent implements PluginLifecycle {
 
     private var player:SeeSawPlayer;
 
+    private var loaded:Boolean;
+
     public function ControlBarComponent(player:SeeSawPlayer) {
         this.player = player;
     }
@@ -51,12 +53,13 @@ public class ControlBarComponent implements PluginLifecycle {
     public function pluginLoaded(event:MediaFactoryEvent):void {
         logger.debug("plugin loaded");
 
-        if (event.resource is PluginInfoResource) {
+        if (!this.loaded && event.resource is PluginInfoResource) {
             var pluginInfo:PluginInfoResource = PluginInfoResource(event.resource);
 
             if (pluginInfo.pluginInfo.numMediaFactoryItems > 0) {
                 if (pluginInfo.pluginInfo.getMediaFactoryItemAt(0).id == ControlBarPlugin.ID) {
                     player.element.addChild(constructControlBarElement());
+                    this.loaded = true;
                 }
             }
         }
