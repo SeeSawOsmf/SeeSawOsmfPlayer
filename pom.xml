@@ -8,7 +8,8 @@
     <version>7.0.0-SNAPSHOT</version>
     <name>Player</name>
     <url>http://www.ioko365.com/</url>
-    <description>The SeeSaw player and related projects</description>
+    <description>The SeeSaw player and related projectsHello from SAM!
+    </description>
 
     <modules>
         <!-- Note this set of modules is only those projects actively being developed all others are in the stable profile below.
