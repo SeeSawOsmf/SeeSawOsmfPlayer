@@ -63,27 +63,35 @@ public class SeeSawPlayer extends Sprite {
 
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 
-        mediaFactory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
-        mediaFactory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadError);
-
         initialiseMediaPlayer();
         createComponents();
     }
 
     private function initialiseMediaPlayer():void {
+        logger.debug("initialising media player");
+
         mediaFactory = new SeeSawMediaFactory();
+        mediaFactory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
+        mediaFactory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadError);
+
         mediaPlayer = new SeeSawMediaPlayer();
         mediaPlayer.media = createRootElement();
+
         mediaContainer = new MediaContainer();
         mediaContainer.addMediaElement(rootElement);
         addChild(mediaContainer);
     }
 
     private function createComponents():void {
+        logger.debug("creating components");
+
         controlBar = new ControlBarComponent(this);
+        mediaFactory.loadPlugin(controlBar.info);
     }
 
     private function createRootElement():MediaElement {
+        logger.debug("creating root element");
+
         rootElement = new ParallelElement();
 
         rootElement.addChild(createVideoElement());
@@ -98,6 +106,8 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function createVideoElement():MediaElement {
+        logger.debug("creating video element");
+
         var video:MediaElement = mediaFactory.createMediaElement(new URLResource(VIDEO_URL));
         return video;
     }
@@ -112,10 +122,14 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onPluginLoaded(event:MediaFactoryEvent):void {
+        logger.debug("plugin loaded");
+
         controlBar.pluginLoaded(event);
     }
 
     private function onPluginLoadError(event:MediaFactoryEvent):void {
+        logger.debug("plugin error");
+
         controlBar.pluginLoadError(event);
     }
 
