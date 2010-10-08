@@ -19,13 +19,8 @@
 
 package com.seesaw.player {
 import com.seesaw.player.components.ControlBarComponent;
-import com.seesaw.player.components.resourceBase.SeeSawMediaResource;
-import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
-import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 
 import flash.display.Sprite;
-import flash.display.Stage;
-import flash.events.Event;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -33,17 +28,15 @@ import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.layout.LayoutMetadata;
-import org.osmf.logging.Log;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaPlayer;
 import org.osmf.media.MediaResourceBase;
 
-[SWF(width=640, height=400)]
 public class SeeSawPlayer extends Sprite {
 
-    private static var loggerSetup:* = (LoggerFactory.loggerFactory = new TraceAndArthropodLoggerFactory());
-    private static var osmfLoggerSetup:* = (Log.loggerFactory = new CommonsOsmfLoggerFactory());
+    private static const PLAYER_WIDTH:int = PLAYER::Width;
+    private static const PLAYER_HEIGHT:int = PLAYER::Height;
 
     private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
 
@@ -52,27 +45,23 @@ public class SeeSawPlayer extends Sprite {
     private var mediaContainer:MediaContainer;
     private var rootElement:ParallelElement;
     private var controlBar:ControlBarComponent;
-    private var parameters:Object;
+    private var mainContent:MediaResourceBase;
 
-    // MediaResource Construction
-    private var seeSawMediaResource:SeeSawMediaResource = new SeeSawMediaResource();
+    private var playerWidth:int;
+    private var playerHeight:int;
 
-    public function SeeSawPlayer() {
-        super();
+    public function SeeSawPlayer(mainContent:MediaResourceBase, width:int, height:int) {
+        logger.debug("creating player");
 
-        addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
-    }
+        this.mainContent = mainContent;
+        playerWidth = width;
+        playerHeight = height;
 
-    public function initialise(parameters:Object, stage:Stage = null):void {
-        logger.debug("initialising player");
-
-        removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
-
-        initialiseMediaPlayer();
+        initialisePlayer();
         createComponents();
     }
 
-    private function initialiseMediaPlayer():void {
+    private function initialisePlayer():void {
         logger.debug("initialising media player");
 
         mediaFactory = new SeeSawMediaFactory();
@@ -104,37 +93,27 @@ public class SeeSawPlayer extends Sprite {
         var rootElementLayout:LayoutMetadata = new LayoutMetadata();
         rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, rootElementLayout);
 
-        rootElementLayout.width = stage.stageWidth;
-        rootElementLayout.height = stage.stageHeight;
+        rootElementLayout.width = playerWidth;
+        rootElementLayout.height = playerHeight;
 
         return rootElement;
     }
 
     private function createVideoElement():MediaElement {
         logger.debug("creating video element");
-        var content:MediaResourceBase = seeSawMediaResource.newResourceBase(parameters, VIDEO_URL);
-        var video:MediaElement = mediaFactory.createMediaElement(content);
+        var video:MediaElement = mediaFactory.createMediaElement(mainContent);
         return video;
     }
 
     // Event Handlers
 
-    private function onAddedToStage(event:Event):void {
-        logger.debug("added to stage");
-
-        removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
-        initialise(loaderInfo.parameters, stage);
-    }
-
     private function onPluginLoaded(event:MediaFactoryEvent):void {
         logger.debug("plugin loaded");
-
         controlBar.pluginLoaded(event);
     }
 
     private function onPluginLoadError(event:MediaFactoryEvent):void {
         logger.debug("plugin error");
-
         controlBar.pluginLoadError(event);
     }
 
@@ -145,9 +124,5 @@ public class SeeSawPlayer extends Sprite {
     public function get element():ParallelElement {
         return rootElement;
     }
-
-    // TODO: this must come from initialiser
-    private static const VIDEO_URL:String
-            = "rtmp://cp67126.edgefcs.net/ondemand/mp4:mediapm/osmf/content/test/sample1_700kbps.f4v";
 }
 }
