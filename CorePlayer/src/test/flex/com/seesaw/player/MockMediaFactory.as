@@ -1,5 +1,7 @@
 package com.seesaw.player {
-public class MockMediaFactory {
+import org.osmf.media.DefaultMediaFactory;
+
+public class MockMediaFactory extends DefaultMediaFactory {
     public function MockMediaFactory() {
 
     }
