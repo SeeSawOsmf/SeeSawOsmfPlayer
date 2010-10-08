@@ -1,105 +1,105 @@
 <chrome>
 
-	<assets baseURL="ControlBarElement_">
-		<asset id="defaultFont" type="embeddedFont" url="DEFAULT_FONT" fontSize="8"/>
-		<asset id="backdrop" type="embeddedBitmap" url="BACKDROP" scale9="15,15,290,18"/>
-		<asset id="pauseDisabled" type="embeddedBitmap" url="PAUSE_DISABLED"/>
-		<asset id="pauseUp" type="embeddedBitmap" url="PAUSE_UP"/>
-		<asset id="pauseDown" type="embeddedBitmap" url="PAUSE_DOWN"/>
-		<asset id="stopDisabled" type="embeddedBitmap" url="STOP_DISABLED"/>
-		<asset id="stopUp" type="embeddedBitmap" url="STOP_UP"/>
-		<asset id="stopDown" type="embeddedBitmap" url="STOP_DOWN"/>
-		<asset id="playDisabled" type="embeddedBitmap" url="PLAY_DISABLED"/>
-		<asset id="playUp" type="embeddedBitmap" url="PLAY_UP"/>
-		<asset id="playDown" type="embeddedBitmap" url="PLAY_DOWN"/>
-		<asset id="scrubberDisabled" type="embeddedBitmap" url="SCRUBBER_DISABLED"/>
-		<asset id="scrubberUp" type="embeddedBitmap" url="SCRUBBER_UP"/>
-		<asset id="scrubberDown" type="embeddedBitmap" url="SCRUBBER_DOWN"/>
-		<asset id="scrubBarTrack" type="embeddedBitmap" url="SCRUB_BAR_TRACK"/>
+    <assets baseURL="ControlBarElement_">
+        <asset id="defaultFont" type="embeddedFont" url="DEFAULT_FONT" fontSize="8"/>
+        <asset id="backdrop" type="embeddedBitmap" url="BACKDROP" scale9="15,15,290,18"/>
+        <asset id="pauseDisabled" type="embeddedBitmap" url="PAUSE_DISABLED"/>
+        <asset id="pauseUp" type="embeddedBitmap" url="PAUSE_UP"/>
+        <asset id="pauseDown" type="embeddedBitmap" url="PAUSE_DOWN"/>
+        <asset id="stopDisabled" type="embeddedBitmap" url="STOP_DISABLED"/>
+        <asset id="stopUp" type="embeddedBitmap" url="STOP_UP"/>
+        <asset id="stopDown" type="embeddedBitmap" url="STOP_DOWN"/>
+        <asset id="playDisabled" type="embeddedBitmap" url="PLAY_DISABLED"/>
+        <asset id="playUp" type="embeddedBitmap" url="PLAY_UP"/>
+        <asset id="playDown" type="embeddedBitmap" url="PLAY_DOWN"/>
+        <asset id="scrubberDisabled" type="embeddedBitmap" url="SCRUBBER_DISABLED"/>
+        <asset id="scrubberUp" type="embeddedBitmap" url="SCRUBBER_UP"/>
+        <asset id="scrubberDown" type="embeddedBitmap" url="SCRUBBER_DOWN"/>
+        <asset id="scrubBarTrack" type="embeddedBitmap" url="SCRUB_BAR_TRACK"/>
         <asset id="trackTrail" type="embeddedBitmap" url="TRACK_TRAIL"/>
         <asset id="volumeUp" type="embeddedBitmap" url="VOLUME_UP"/>
         <asset id="volumeDisabled" type="embeddedBitmap" url="VOLUME_DISABLED"/>
-	</assets>
-	
-	<widgets>
-		<widget
-			id="controlBar"
-			type="autoHideWidget"
-			face="backdrop"
-			fadeSteps="15"
-			width="650"
-			height="100"
-			horizontalAlign="center"
-			bottom="20"
-			>
-			
-			<widget
-				layoutMode="horizontal"
-				horizontalAlign="left"
-				top="20"
-                left="20"
-				>
-                <widget
-                id="qualityLabel"
-                type="qualityLabel"
-                input="Low res"
-                />
-				<widget
-					id="playButton"
-					type="playButton"
-					upFace="playUp"
-					downFace="playDown"
-					disabledFace="playDisabled"
-					/>
-				<widget
-					id="controls.seesaw.widget.PlayableButton"
-					type="controls.seesaw.widget.PlayableButton"
-					upFace="pauseUp"
-					downFace="pauseDown"
-					disabledFace="pauseDisabled"
-					/>
-			</widget>
-			
-			<widget
-				id="controls.seesaw.widget.ScrubBar"
-				type="controls.seesaw.widget.ScrubBar"
-				timeFieldsWidth="90"
-				timeFieldsHeight="15"
-				timeFieldSpacing="1"
-				left="42"
-				right="120"
-				top="35"
-				scrubberUp="scrubberUp"
-				scrubberDown="scrubberDown"
-				scrubberDisabled="scrubberDisabled"
-				track="scrubBarTrack"
-                trackTrail="trackTrail"
-				/>
+    </assets>
+
+    <widgets>
+        <widget
+                id="controlBar"
+                type="autoHideWidget"
+                face="backdrop"
+                fadeSteps="15"
+                width="650"
+                height="100"
+                horizontalAlign="center"
+                bottom="20"
+                >
+
             <widget
-				id="controls.seesaw.widget.Volume"
-				type="controls.seesaw.widget.Volume"
-	            upFace="volumeUp"
-                downFace="volumeUp"
-			    disabledFace="volumeDisabled"
-                left="550"
-                top="30"
-				/>
-             <widget
-				id="controls.seesaw.widget.VolumeScrubBar"
-				type="controls.seesaw.widget.VolumeScrubBar"
-	            timeFieldsWidth="90"
-				timeFieldsHeight="15"
-				timeFieldSpacing="1"
-				right="25"
-				top="37"
-                width="45"
-				scrubberUp="scrubberUp"
-				scrubberDown="scrubberDown"
-				scrubberDisabled="scrubberDisabled"
-				track="scrubBarTrack"
-                trackTrail="trackTrail"
-				/>
-		</widget>
-	</widgets>
-		
+                    layoutMode="horizontal"
+                    horizontalAlign="left"
+                    top="20"
+                    left="20"
+                    >
+                <widget
+                        id="qualityLabel"
+                        type="qualityLabel"
+                        input="Low res"
+                        />
+                <widget
+                        id="playButton"
+                        type="playButton"
+                        upFace="playUp"
+                        downFace="playDown"
+                        disabledFace="playDisabled"
+                        />
+                <widget
+                        id="controls.seesaw.widget.PlayableButton"
+                        type="controls.seesaw.widget.PlayableButton"
+                        upFace="pauseUp"
+                        downFace="pauseDown"
+                        disabledFace="pauseDisabled"
+                        />
+            </widget>
+
+            <widget
+                    id="controls.seesaw.widget.ScrubBar"
+                    type="controls.seesaw.widget.ScrubBar"
+                    timeFieldsWidth="90"
+                    timeFieldsHeight="15"
+                    timeFieldSpacing="1"
+                    left="42"
+                    right="120"
+                    top="35"
+                    scrubberUp="scrubberUp"
+                    scrubberDown="scrubberDown"
+                    scrubberDisabled="scrubberDisabled"
+                    track="scrubBarTrack"
+                    trackTrail="trackTrail"
+                    />
+            <widget
+                    id="controls.seesaw.widget.Volume"
+                    type="controls.seesaw.widget.Volume"
+                    upFace="volumeUp"
+                    downFace="volumeUp"
+                    disabledFace="volumeDisabled"
+                    left="550"
+                    top="30"
+                    />
+            <widget
+                    id="controls.seesaw.widget.VolumeScrubBar"
+                    type="controls.seesaw.widget.VolumeScrubBar"
+                    timeFieldsWidth="90"
+                    timeFieldsHeight="15"
+                    timeFieldSpacing="1"
+                    right="25"
+                    top="37"
+                    width="45"
+                    scrubberUp="scrubberUp"
+                    scrubberDown="scrubberDown"
+                    scrubberDisabled="scrubberDisabled"
+                    track="scrubBarTrack"
+                    trackTrail="trackTrail"
+                    />
+        </widget>
+    </widgets>
+
 </chrome>
