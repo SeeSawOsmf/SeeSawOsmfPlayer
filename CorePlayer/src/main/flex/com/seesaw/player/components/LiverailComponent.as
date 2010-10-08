@@ -14,6 +14,8 @@ import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
 import org.osmf.metadata.Metadata;
 
+import uk.vodco.livrail.LiverailPlugin;
+
 public class LiverailComponent implements PluginLifecycle {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(ControlBarComponent);
@@ -22,16 +24,17 @@ public class LiverailComponent implements PluginLifecycle {
 
     private var loaded:Boolean;
 
+    private var qualifiedDefinition:String;
+
     public function LiverailComponent(player:SeeSawPlayer) {
         this.player = player;
-
     }
 
 
     public function get info():PluginInfoResource {
-        var controlBarPlugin:ControlBarPlugin = new ControlBarPlugin();
-        var controlBarPluginInfo:PluginInfoResource = new PluginInfoResource(controlBarPlugin.pluginInfo);
-        return controlBarPluginInfo;
+        var plugin:LiverailPlugin = new LiverailPlugin();
+        var pluginInfo:PluginInfoResource = new PluginInfoResource(plugin.pluginInfo);
+        return pluginInfo;
     }
 
     public function pluginLoaded(event:MediaFactoryEvent):void {
@@ -54,25 +57,25 @@ public class LiverailComponent implements PluginLifecycle {
     }
 
     private function constructPlugInElement():MediaElement {
-        var controlBarSettings:Metadata = new Metadata();
-        controlBarSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
+        var pluginSettings:Metadata = new Metadata();
+        pluginSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
 
         var resource:MediaResourceBase = new MediaResourceBase();
-        resource.addMetadataValue(ControlBarPlugin.NS_CONTROL_BAR_SETTINGS, controlBarSettings);
+        resource.addMetadataValue(ControlBarPlugin.NS_CONTROL_BAR_SETTINGS, pluginSettings);
 
-        var controlBar:MediaElement = player.factory.createMediaElement(resource);
+        var plugin:MediaElement = player.factory.createMediaElement(resource);
 
-        var layout:LayoutMetadata = controlBar.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
+        var layout:LayoutMetadata = plugin.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
         if (layout == null) {
             layout = new LayoutMetadata();
-            controlBar.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+            plugin.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
         }
         layout.verticalAlign = VerticalAlign.BOTTOM;
         layout.horizontalAlign = HorizontalAlign.CENTER;
 
         layout.index = 1;
 
-        return controlBar;
+        return plugin;
     }
 }
 }

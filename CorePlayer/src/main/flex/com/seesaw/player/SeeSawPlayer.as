@@ -19,6 +19,7 @@
 
 package com.seesaw.player {
 import com.seesaw.player.components.ControlBarComponent;
+import com.seesaw.player.components.LiverailComponent;
 
 import flash.display.Sprite;
 
@@ -45,6 +46,7 @@ public class SeeSawPlayer extends Sprite {
     private var mediaContainer:MediaContainer;
     private var rootElement:ParallelElement;
     private var controlBar:ControlBarComponent;
+    private var liverail:LiverailComponent;
     private var mainContent:MediaResourceBase;
 
     private var playerWidth:int;
@@ -81,6 +83,11 @@ public class SeeSawPlayer extends Sprite {
 
         controlBar = new ControlBarComponent(this);
         mediaFactory.loadPlugin(controlBar.info);
+
+
+        liverail = new LiverailComponent(this);
+        mediaFactory.loadPlugin(liverail.info);
+
     }
 
     private function createRootElement():MediaElement {
