@@ -26,7 +26,7 @@ public class Player extends Sprite {
     private var logger:ILogger = LoggerFactory.getClassLogger(Player);
     private var parameters:Object;
 
-    // MetaData COnstruction
+    // MediaResource Construction
     private var seeSawMediaResource:SeeSawMediaResource = new SeeSawMediaResource();
     private var videoPlayer:SeeSawPlayer;
 
