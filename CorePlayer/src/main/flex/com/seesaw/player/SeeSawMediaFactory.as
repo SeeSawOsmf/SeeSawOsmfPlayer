@@ -21,17 +21,17 @@ package com.seesaw.player {
 import org.osmf.media.DefaultMediaFactory;
 
 public class SeeSawMediaFactory extends DefaultMediaFactory {
+
     public function SeeSawMediaFactory() {
         super();
 
-        this.loadPlugins();
+        loadPlugins();
     }
 
     /*
      * Loads plugins associated with the player.
      */
     private function loadPlugins():void {
-
     }
 }
 }

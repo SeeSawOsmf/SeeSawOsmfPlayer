@@ -19,7 +19,6 @@
 
 
 package com.seesaw.player.logging {
-
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.logging.Logger;
@@ -36,29 +35,24 @@ public class CommonsOsmfLogger extends Logger {
         logger = LoggerFactory.getLogger(name);
     }
 
-    override public function debug(message:String, ...rest):void
-    {
+    override public function debug(message:String, ...rest):void {
         logger.debug(message, rest);
     }
 
-    override public function info(message:String, ...rest):void
-    {
-        logger.info(message,rest);
+    override public function info(message:String, ...rest):void {
+        logger.info(message, rest);
     }
 
-    override public function warn(message:String, ...rest):void
-    {
-        logger.warn(message,rest);
+    override public function warn(message:String, ...rest):void {
+        logger.warn(message, rest);
     }
 
-    override public function error(message:String, ...rest):void
-    {
-        logger.error(message,rest);
+    override public function error(message:String, ...rest):void {
+        logger.error(message, rest);
     }
 
-    override public function fatal(message:String, ...rest):void
-    {
-        logger.fatal(message,rest);
+    override public function fatal(message:String, ...rest):void {
+        logger.fatal(message, rest);
     }
 }
 

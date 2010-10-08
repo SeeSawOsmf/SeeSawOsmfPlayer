@@ -18,6 +18,7 @@
  */
 
 package com.seesaw.player {
+import com.seesaw.player.components.ControlBarComponent;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 
@@ -27,14 +28,16 @@ import flash.events.Event;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
-import org.osmf.logging.Log;
-
 import org.osmf.containers.MediaContainer;
+import org.osmf.elements.ParallelElement;
+import org.osmf.layout.LayoutMetadata;
+import org.osmf.logging.Log;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaPlayer;
 import org.osmf.media.URLResource;
 
+[SWF(width=640, height=400)]
 public class SeeSawPlayer extends Sprite {
 
     private static var loggerSetup:* = (LoggerFactory.loggerFactory = new TraceAndArthropodLoggerFactory());
@@ -43,37 +46,73 @@ public class SeeSawPlayer extends Sprite {
     private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
 
     private var mediaFactory:MediaFactory;
-    private var mediaElement:MediaElement;
     private var mediaPlayer:MediaPlayer;
     private var mediaContainer:MediaContainer;
+    private var rootElement:ParallelElement;
+    private var controlBar:ControlBarComponent;
 
     public function SeeSawPlayer() {
         super();
 
-        logger.debug("HELLO!")
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
     }
 
     public function initialise(parameters:Object, stage:Stage = null):void {
+        logger.debug("initialising player");
+
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 
-        mediaFactory = new SeeSawMediaFactory();
-        mediaElement = mediaFactory.createMediaElement(new URLResource(VIDEO_URL));
-        mediaPlayer = new SeeSawMediaPlayer();
-        mediaPlayer.media = mediaElement;
-
-        initialiseContainer();
+        initialiseMediaPlayer();
+        createComponents();
     }
 
-    private function initialiseContainer():void {
+    private function initialiseMediaPlayer():void {
+        mediaFactory = new SeeSawMediaFactory();
+        mediaPlayer = new SeeSawMediaPlayer();
+        mediaPlayer.media = createRootElement();
         mediaContainer = new MediaContainer();
-        mediaContainer.addMediaElement(mediaElement);
+        mediaContainer.addMediaElement(rootElement);
         addChild(mediaContainer);
     }
 
+    private function createComponents():void {
+        controlBar = new ControlBarComponent(this);
+    }
+
+    private function createRootElement():MediaElement {
+        rootElement = new ParallelElement();
+
+        rootElement.addChild(createVideoElement());
+
+        var rootElementLayout:LayoutMetadata = new LayoutMetadata();
+        rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, rootElementLayout);
+
+        rootElementLayout.width = stage.stageWidth;
+        rootElementLayout.height = stage.stageHeight;
+
+        return rootElement;
+    }
+
+    private function createVideoElement():MediaElement {
+        var video:MediaElement = mediaFactory.createMediaElement(new URLResource(VIDEO_URL));
+        return video;
+    }
+
+    // Event Handlers
+
     private function onAddedToStage(event:Event):void {
+        logger.debug("added to stage");
+
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
         initialise(loaderInfo.parameters, stage);
+    }
+
+    public function get factory():MediaFactory {
+        return mediaFactory;
+    }
+
+    public function get element():ParallelElement {
+        return rootElement;
     }
 
     // TODO: this must come from initialiser

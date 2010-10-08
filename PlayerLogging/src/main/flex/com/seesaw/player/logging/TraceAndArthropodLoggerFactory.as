@@ -18,13 +18,12 @@
  */
 
 package com.seesaw.player.logging {
-
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.ILoggerFactory;
 
-public class TraceAndArthropodLoggerFactory  implements ILoggerFactory{
+public class TraceAndArthropodLoggerFactory  implements ILoggerFactory {
 
-    public function TraceAndArthropodLoggerFactory(){
+    public function TraceAndArthropodLoggerFactory() {
     }
 
     public function getLogger(name:String):ILogger {
