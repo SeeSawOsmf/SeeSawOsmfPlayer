@@ -58,7 +58,7 @@ public class ControlBarComponent implements PluginLifecycle {
 
             if (pluginInfo.pluginInfo.numMediaFactoryItems > 0) {
                 if (pluginInfo.pluginInfo.getMediaFactoryItemAt(0).id == ControlBarPlugin.ID) {
-                    player.element.addChild(constructControlBarElement());
+                    player.rootElement.addChild(constructControlBarElement());
                     this.loaded = true;
                 }
             }
@@ -69,13 +69,6 @@ public class ControlBarComponent implements PluginLifecycle {
         logger.error("plugin load error");
     }
 
-    public function applyMetadata(target:MediaElement):void {
-        logger.debug("applying metadata: " + target);
-        var controlBarTarget:Metadata = new Metadata();
-        controlBarTarget.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
-        target.addMetadata(ControlBarPlugin.NS_CONTROL_BAR_TARGET, controlBarTarget);
-    }
-
     private function constructControlBarElement():MediaElement {
         var controlBarSettings:Metadata = new Metadata();
         controlBarSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
@@ -83,7 +76,7 @@ public class ControlBarComponent implements PluginLifecycle {
         var resource:MediaResourceBase = new MediaResourceBase();
         resource.addMetadataValue(ControlBarPlugin.NS_CONTROL_BAR_SETTINGS, controlBarSettings);
 
-        var controlBar:MediaElement = player.factory.createMediaElement(resource);
+        var controlBar:MediaElement = player.config.factory.createMediaElement(resource);
 
         var layout:LayoutMetadata = controlBar.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
         if (layout == null) {

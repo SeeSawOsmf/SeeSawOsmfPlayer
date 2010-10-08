@@ -19,20 +19,15 @@
 
 package com.seesaw.player {
 import com.seesaw.player.components.ControlBarComponent;
-import com.seesaw.player.components.LiverailComponent;
 
 import flash.display.Sprite;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
-import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
-import org.osmf.media.MediaFactory;
-import org.osmf.media.MediaPlayer;
-import org.osmf.media.MediaResourceBase;
 
 public class SeeSawPlayer extends Sprite {
 
@@ -41,24 +36,15 @@ public class SeeSawPlayer extends Sprite {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
 
-    private var mediaFactory:MediaFactory;
-    private var mediaPlayer:MediaPlayer;
-    private var mediaContainer:MediaContainer;
-    private var rootElement:ParallelElement;
     private var controlBar:ControlBarComponent;
-    private var liverail:LiverailComponent;
-    private var mainContent:MediaResourceBase;
-    private var mediaElement:MediaElement
 
-    private var playerWidth:int;
-    private var playerHeight:int;
+    private var _config:PlayerConfiguration;
+    private var _rootElement:ParallelElement;
 
-    public function SeeSawPlayer(mainContent:MediaResourceBase, width:int, height:int) {
+    public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
 
-        this.mainContent = mainContent;
-        playerWidth = width;
-        playerHeight = height;
+        config = playerConfig;
 
         initialisePlayer();
         createComponents();
@@ -67,53 +53,35 @@ public class SeeSawPlayer extends Sprite {
     private function initialisePlayer():void {
         logger.debug("initialising media player");
 
-        mediaFactory = new SeeSawMediaFactory();
-        mediaFactory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
-        mediaFactory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadError);
+        config.factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
+        config.factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadError);
 
-        mediaPlayer = new SeeSawMediaPlayer();
-        mediaPlayer.media = createRootElement();
+        config.player.media = createRootElement();
 
-        mediaContainer = new MediaContainer();
-        mediaContainer.addMediaElement(rootElement);
-        addChild(mediaContainer);
+        config.container.addMediaElement(rootElement);
+        addChild(config.container);
     }
 
     private function createComponents():void {
         logger.debug("creating components");
 
         controlBar = new ControlBarComponent(this);
-        controlBar.applyMetadata(mediaElement);
-
-        mediaFactory.loadPlugin(controlBar.info);
-
-
-        liverail = new LiverailComponent(this);
-        mediaFactory.loadPlugin(liverail.info);
-
+        config.factory.loadPlugin(controlBar.info);
     }
 
     private function createRootElement():MediaElement {
         logger.debug("creating root element");
 
         rootElement = new ParallelElement();
-
-        mediaElement = createVideoElement();
-        rootElement.addChild(mediaElement);
+        rootElement.addChild(config.element);
 
         var rootElementLayout:LayoutMetadata = new LayoutMetadata();
         rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, rootElementLayout);
 
-        rootElementLayout.width = playerWidth;
-        rootElementLayout.height = playerHeight;
+        rootElementLayout.width = config.width;
+        rootElementLayout.height = config.height;
 
         return rootElement;
-    }
-
-    private function createVideoElement():MediaElement {
-        logger.debug("creating video element");
-        var video:MediaElement = mediaFactory.createMediaElement(mainContent);
-        return video;
     }
 
     // Event Handlers
@@ -128,12 +96,20 @@ public class SeeSawPlayer extends Sprite {
         controlBar.pluginLoadError(event);
     }
 
-    public function get factory():MediaFactory {
-        return mediaFactory;
+    public function get rootElement():ParallelElement {
+        return _rootElement;
     }
 
-    public function get element():ParallelElement {
-        return rootElement;
+    public function set rootElement(value:ParallelElement):void {
+        _rootElement = value;
+    }
+
+    public function get config():PlayerConfiguration {
+        return _config;
+    }
+
+    public function set config(value:PlayerConfiguration):void {
+        _config = value;
     }
 }
 }
