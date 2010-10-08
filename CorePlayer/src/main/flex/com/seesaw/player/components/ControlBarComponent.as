@@ -91,5 +91,9 @@ public class ControlBarComponent implements PluginLifecycle {
         return controlBar;
     }
 
+    public function applyMetadata(target:MediaElement):void {
+
+    }
+
 }
 }
