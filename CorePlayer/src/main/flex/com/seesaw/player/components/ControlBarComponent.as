@@ -21,6 +21,8 @@ package com.seesaw.player.components {
 import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.SeeSawPlayer;
 
+import org.as3commons.logging.ILogger;
+import org.as3commons.logging.LoggerFactory;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.layout.HorizontalAlign;
 import org.osmf.layout.LayoutMetadata;
@@ -30,22 +32,25 @@ import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
 import org.osmf.metadata.Metadata;
 
-public class ControlBarComponent {
+public class ControlBarComponent implements PluginLifecycle {
+
+    private var logger:ILogger = LoggerFactory.getClassLogger(ControlBarComponent);
 
     private var player:SeeSawPlayer;
 
     public function ControlBarComponent(player:SeeSawPlayer) {
         this.player = player;
-
-        player.factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
-        player.factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadError);
-
-        var controlBarPlugin:ControlBarPlugin = new ControlBarPlugin();
-        var controlBarPluginInfo:PluginInfoResource = new PluginInfoResource(controlBarPlugin.pluginInfo);
-        player.factory.loadPlugin(controlBarPluginInfo);
     }
 
-    private function onPluginLoaded(event:MediaFactoryEvent):void {
+    public function get info():PluginInfoResource {
+        var controlBarPlugin:ControlBarPlugin = new ControlBarPlugin();
+        var controlBarPluginInfo:PluginInfoResource = new PluginInfoResource(controlBarPlugin.pluginInfo);
+        return controlBarPluginInfo;
+    }
+
+    public function pluginLoaded(event:MediaFactoryEvent):void {
+        logger.debug("plugin loaded");
+
         if (event.resource is PluginInfoResource) {
             var pluginInfo:PluginInfoResource = PluginInfoResource(event.resource);
 
@@ -57,7 +62,8 @@ public class ControlBarComponent {
         }
     }
 
-    private function onPluginLoadError(event:MediaFactoryEvent):void {
+    public function pluginLoadError(event:MediaFactoryEvent):void {
+        logger.error("plugin load error");
     }
 
     private function constructControlBarElement():MediaElement {
