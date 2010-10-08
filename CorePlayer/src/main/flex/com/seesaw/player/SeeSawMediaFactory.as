@@ -24,14 +24,6 @@ public class SeeSawMediaFactory extends DefaultMediaFactory {
 
     public function SeeSawMediaFactory() {
         super();
-
-        loadPlugins();
-    }
-
-    /*
-     * Loads plugins associated with the player.
-     */
-    private function loadPlugins():void {
     }
 }
 }

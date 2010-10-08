@@ -30,22 +30,19 @@ import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
 import org.osmf.metadata.Metadata;
 
-public class ControlBarComponent {
+public class ControlBarComponent implements ComponentLifecycle {
 
     private var player:SeeSawPlayer;
 
     public function ControlBarComponent(player:SeeSawPlayer) {
         this.player = player;
 
-        player.factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
-        player.factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadError);
-
         var controlBarPlugin:ControlBarPlugin = new ControlBarPlugin();
         var controlBarPluginInfo:PluginInfoResource = new PluginInfoResource(controlBarPlugin.pluginInfo);
         player.factory.loadPlugin(controlBarPluginInfo);
     }
 
-    private function onPluginLoaded(event:MediaFactoryEvent):void {
+    public function pluginLoaded(event:MediaFactoryEvent):void {
         if (event.resource is PluginInfoResource) {
             var pluginInfo:PluginInfoResource = PluginInfoResource(event.resource);
 
@@ -57,7 +54,7 @@ public class ControlBarComponent {
         }
     }
 
-    private function onPluginLoadError(event:MediaFactoryEvent):void {
+    public function pluginLoadError(event:MediaFactoryEvent):void {
     }
 
     private function constructControlBarElement():MediaElement {

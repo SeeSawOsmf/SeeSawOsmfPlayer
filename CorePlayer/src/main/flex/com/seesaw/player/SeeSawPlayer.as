@@ -30,6 +30,7 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
+import org.osmf.events.MediaFactoryEvent;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.logging.Log;
 import org.osmf.media.MediaElement;
@@ -61,6 +62,9 @@ public class SeeSawPlayer extends Sprite {
         logger.debug("initialising player");
 
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+
+        mediaFactory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
+        mediaFactory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadError);
 
         initialiseMediaPlayer();
         createComponents();
@@ -105,6 +109,14 @@ public class SeeSawPlayer extends Sprite {
 
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
         initialise(loaderInfo.parameters, stage);
+    }
+
+    private function onPluginLoaded(event:MediaFactoryEvent):void {
+        controlBar.pluginLoaded(event);
+    }
+
+    private function onPluginLoadError(event:MediaFactoryEvent):void {
+        controlBar.pluginLoadError(event);
     }
 
     public function get factory():MediaFactory {
