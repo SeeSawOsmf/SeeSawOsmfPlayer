@@ -18,6 +18,7 @@
  */
 
 package com.seesaw.player {
+import com.seesaw.player.components.resourceBase.SeeSawMediaResource;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 
@@ -28,7 +29,6 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.logging.Log;
 import org.osmf.media.MediaResourceBase;
-import org.osmf.media.URLResource;
 
 [SWF(width=PLAYER::Width, height=PLAYER::Height)]
 public class Player extends Sprite {
@@ -44,7 +44,8 @@ public class Player extends Sprite {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(Player);
 
-    var videoPlayer:SeeSawPlayer;
+    private var videoPlayer:SeeSawPlayer;
+    private var seeSawMediaResource:SeeSawMediaResource = new SeeSawMediaResource();
 
     public function Player() {
         super();
@@ -73,8 +74,7 @@ public class Player extends Sprite {
 
     private function createMediaResource():MediaResourceBase {
         logger.debug("creating media");
-        var urlResource:MediaResourceBase = new URLResource(VIDEO_URL);
-        // TODO: add programme id as metadata to video
+        var urlResource:MediaResourceBase = seeSawMediaResource.newResourceBase(this.loaderInfo.parameters, VIDEO_URL);
         return urlResource;
     }
 }
