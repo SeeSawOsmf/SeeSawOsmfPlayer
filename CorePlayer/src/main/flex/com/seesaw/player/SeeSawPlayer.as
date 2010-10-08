@@ -58,7 +58,7 @@ public class SeeSawPlayer extends Sprite {
     }
 
     public function initialise(parameters:Object, stage:Stage = null):void {
-        //logger.info("initialising player");
+        logger.debug("initialising player");
 
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 
@@ -101,6 +101,8 @@ public class SeeSawPlayer extends Sprite {
     // Event Handlers
 
     private function onAddedToStage(event:Event):void {
+        logger.debug("added to stage");
+
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
         initialise(loaderInfo.parameters, stage);
     }
