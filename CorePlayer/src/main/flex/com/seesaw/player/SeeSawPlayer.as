@@ -18,7 +18,7 @@
  */
 
 package com.seesaw.player {
-import com.seesaw.player.components.ControlBarBuilder;
+import com.seesaw.player.components.ControlBarComponent;
 
 import flash.display.Sprite;
 import flash.display.Stage;
@@ -26,7 +26,6 @@ import flash.events.Event;
 
 import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
-import org.osmf.events.MediaFactoryEvent;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
@@ -41,7 +40,7 @@ public class SeeSawPlayer extends Sprite {
     private var mediaPlayer:MediaPlayer;
     private var mediaContainer:MediaContainer;
 
-    private var builders:Vector.<MediaElementBuilder>;
+    private var controlBar:ControlBarComponent;
 
     public function SeeSawPlayer() {
         super();
@@ -55,9 +54,7 @@ public class SeeSawPlayer extends Sprite {
         mediaFactory = new SeeSawMediaFactory();
 
         initialiseMediaPlayer();
-
-        addEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
-        addEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadError);
+        createComponents();
     }
 
     private function initialiseMediaPlayer():void {
@@ -67,6 +64,10 @@ public class SeeSawPlayer extends Sprite {
         mediaContainer = new MediaContainer();
         mediaContainer.addMediaElement(rootElement);
         addChild(mediaContainer);
+    }
+
+    private function createComponents():void {
+        controlBar = new ControlBarComponent(this);
     }
 
     private function createRootElement():MediaElement {
@@ -85,16 +86,7 @@ public class SeeSawPlayer extends Sprite {
 
     private function createVideoElement():MediaElement {
         var video:MediaElement = mediaFactory.createMediaElement(new URLResource(VIDEO_URL));
-        for (var builder in builders) {
-            builder.applyMetadataToElement(video);
-        }
-
         return video;
-    }
-
-    private function createPluginBuilders() {
-        builders = new Vector.<MediaElementBuilder>();
-        builders.push(new ControlBarBuilder(mediaFactory));
     }
 
     // Event Handlers
@@ -104,18 +96,12 @@ public class SeeSawPlayer extends Sprite {
         initialise(loaderInfo.parameters, stage);
     }
 
-    private function onPluginLoaded(event:MediaFactoryEvent):void {
-        for (var builder in builders) {
-            if (builder.isSourceOf(event)) {
-                var mediaElement:MediaElement = builder.newInstance(PlayerConstants.MAIN_CONTENT_ID);
-                if (mediaElement != null) {
-                    rootElement.addChild(mediaElement);
-                }
-            }
-        }
+    public function get factory():MediaFactory {
+        return mediaFactory;
     }
 
-    private function onPluginLoadError(event:MediaFactoryEvent):void {
+    public function get element():ParallelElement {
+        return rootElement;
     }
 
     // TODO: this must come from initialiser

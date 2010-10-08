@@ -19,7 +19,6 @@
 
 package com.seesaw.player {
 import org.osmf.media.DefaultMediaFactory;
-import org.osmf.media.PluginInfoResource;
 
 public class SeeSawMediaFactory extends DefaultMediaFactory {
 
@@ -33,9 +32,6 @@ public class SeeSawMediaFactory extends DefaultMediaFactory {
      * Loads plugins associated with the player.
      */
     private function loadPlugins():void {
-        var controlBarPlugin:ControlBarPlugin = new ControlBarPlugin();
-        var controlBarPluginInfo:PluginInfoResource = new PluginInfoResource(controlBarPlugin.pluginInfo);
-        loadPlugin(controlBarPluginInfo);
     }
 }
 }
