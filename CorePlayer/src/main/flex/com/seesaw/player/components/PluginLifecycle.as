@@ -19,12 +19,15 @@
 
 package com.seesaw.player.components {
 import org.osmf.events.MediaFactoryEvent;
+import org.osmf.media.MediaElement;
 import org.osmf.media.PluginInfoResource;
 
 public interface PluginLifecycle {
     function pluginLoaded(event:MediaFactoryEvent):void;
 
     function pluginLoadError(event:MediaFactoryEvent):void;
+
+    function applyMetadata(target:MediaElement):void;
 
     function get info():PluginInfoResource;
 }

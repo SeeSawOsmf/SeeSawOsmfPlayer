@@ -23,6 +23,8 @@ package {
 import flash.display.Sprite;
 import flash.system.Security;
 
+import org.as3commons.logging.ILogger;
+import org.as3commons.logging.LoggerFactory;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactoryItem;
 import org.osmf.media.MediaResourceBase;
@@ -30,6 +32,8 @@ import org.osmf.media.PluginInfo;
 import org.osmf.metadata.Metadata;
 
 public class ControlBarPlugin extends Sprite {
+    private var logger:ILogger = LoggerFactory.getClassLogger(ControlBarPlugin);
+
     /**
      * Constructor
      */
@@ -45,6 +49,7 @@ public class ControlBarPlugin extends Sprite {
      * Gives the player the PluginInfo.
      */
     public function get pluginInfo():PluginInfo {
+        logger.debug("pluginInfo");
         if (_pluginInfo == null) {
             var item:MediaFactoryItem
                     = new MediaFactoryItem
@@ -73,7 +78,10 @@ public class ControlBarPlugin extends Sprite {
     private var controlBarElement:ControlBarElement;
     private var targetElement:MediaElement;
 
+    private var controlsUpdated:Boolean;
+
     private function canHandleResourceCallback(resource:MediaResourceBase):Boolean {
+        logger.debug("canHandleResourceCallback");
         var result:Boolean;
 
         if (resource != null) {
@@ -87,6 +95,7 @@ public class ControlBarPlugin extends Sprite {
     }
 
     private function mediaElementCreationCallback():MediaElement {
+        logger.debug("mediaElementCreationCallback");
         controlBarElement = new ControlBarElement();
 
         updateControls();
@@ -96,13 +105,18 @@ public class ControlBarPlugin extends Sprite {
 
     private function mediaElementCreationNotificationCallback(target:MediaElement):void {
         // If the control bar has been created, notify it about the just-created element.
-        targetElement = target;
+
+        logger.debug("mediaElementCreationNotificationCallback");
+
+        this.targetElement = target;
 
         updateControls();
     }
 
     private function updateControls():void {
+        logger.debug("updateControls");
         if (controlBarElement != null && targetElement != null && controlBarElement != targetElement) {
+            logger.debug("addReference" + targetElement);
             controlBarElement.addReference(targetElement);
         }
     }
