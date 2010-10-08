@@ -48,6 +48,7 @@ public class SeeSawPlayer extends Sprite {
     private var controlBar:ControlBarComponent;
     private var liverail:LiverailComponent;
     private var mainContent:MediaResourceBase;
+    private var mediaElement:MediaElement
 
     private var playerWidth:int;
     private var playerHeight:int;
@@ -82,6 +83,8 @@ public class SeeSawPlayer extends Sprite {
         logger.debug("creating components");
 
         controlBar = new ControlBarComponent(this);
+        controlBar.applyMetadata(mediaElement);
+
         mediaFactory.loadPlugin(controlBar.info);
 
 
@@ -95,7 +98,8 @@ public class SeeSawPlayer extends Sprite {
 
         rootElement = new ParallelElement();
 
-        rootElement.addChild(createVideoElement());
+        mediaElement = createVideoElement();
+        rootElement.addChild(mediaElement);
 
         var rootElementLayout:LayoutMetadata = new LayoutMetadata();
         rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, rootElementLayout);
