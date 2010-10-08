@@ -19,14 +19,19 @@
 
 package com.seesaw.player {
 import com.seesaw.player.components.ControlBarComponent;
+import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
+import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 
 import flash.display.Sprite;
 import flash.display.Stage;
 import flash.events.Event;
 
+import org.as3commons.logging.ILogger;
+import org.as3commons.logging.LoggerFactory;
 import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
 import org.osmf.layout.LayoutMetadata;
+import org.osmf.logging.Log;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaPlayer;
@@ -35,11 +40,15 @@ import org.osmf.media.URLResource;
 [SWF(width=640, height=400)]
 public class SeeSawPlayer extends Sprite {
 
-    private var rootElement:ParallelElement;
+    private static var loggerSetup:* = (LoggerFactory.loggerFactory = new TraceAndArthropodLoggerFactory());
+    private static var osmfLoggerSetup:* = (Log.loggerFactory = new CommonsOsmfLoggerFactory());
+
+    private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
+
     private var mediaFactory:MediaFactory;
     private var mediaPlayer:MediaPlayer;
     private var mediaContainer:MediaContainer;
-
+    private var rootElement:ParallelElement;
     private var controlBar:ControlBarComponent;
 
     public function SeeSawPlayer() {
@@ -49,18 +58,18 @@ public class SeeSawPlayer extends Sprite {
     }
 
     public function initialise(parameters:Object, stage:Stage = null):void {
-        removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+        //logger.info("initialising player");
 
-        mediaFactory = new SeeSawMediaFactory();
+        removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 
         initialiseMediaPlayer();
         createComponents();
     }
 
     private function initialiseMediaPlayer():void {
+        mediaFactory = new SeeSawMediaFactory();
         mediaPlayer = new SeeSawMediaPlayer();
         mediaPlayer.media = createRootElement();
-
         mediaContainer = new MediaContainer();
         mediaContainer.addMediaElement(rootElement);
         addChild(mediaContainer);
