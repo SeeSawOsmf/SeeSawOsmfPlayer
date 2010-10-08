@@ -18,16 +18,22 @@
  */
 
 package com.seesaw.player {
+import org.flexunit.assertThat;
+import org.hamcrest.object.notNullValue;
+import org.osmf.media.URLResource;
 
-    import org.flexunit.assertThat;
-    import org.hamcrest.object.notNullValue;
+public class SeeSawPlayerTest {
 
-    public class SeeSawPlayerTest {
+    private static const VIDEO_URL:String
+            = "rtmp://cp67126.edgefcs.net/ondemand/mp4:mediapm/osmf/content/test/sample1_700kbps.f4v";
 
-        [Test]
-        public function playerCanInitialise():void{
-            var player:SeeSawPlayer = new SeeSawPlayer();
-            assertThat(player, notNullValue());
-        }
+    private static const PLAYER_WIDTH:int = 600;
+    private static const PLAYER_HEIGHT:int = 400;
+
+    [Test]
+    public function playerCanInitialise():void {
+        var player:SeeSawPlayer = new SeeSawPlayer(new URLResource(VIDEO_URL), PLAYER_WIDTH, PLAYER_HEIGHT);
+        assertThat(player, notNullValue());
     }
+}
 }
