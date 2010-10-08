@@ -17,13 +17,15 @@
  *   Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.player {
-import org.osmf.media.DefaultMediaFactory;
+package com.seesaw.player.components {
+import org.osmf.events.MediaFactoryEvent;
+import org.osmf.media.PluginInfoResource;
 
-public class SeeSawMediaFactory extends DefaultMediaFactory {
+public interface PluginLifecycle {
+    function pluginLoaded(event:MediaFactoryEvent):void;
 
-    public function SeeSawMediaFactory() {
-        super();
-    }
+    function pluginLoadError(event:MediaFactoryEvent):void;
+
+    function get info():PluginInfoResource;
 }
 }
