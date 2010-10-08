@@ -19,6 +19,7 @@
 
 package com.seesaw.player {
 import com.seesaw.player.components.ControlBarComponent;
+import com.seesaw.player.components.resourceBase.SeeSawMediaResource;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 
@@ -36,7 +37,7 @@ import org.osmf.logging.Log;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaPlayer;
-import org.osmf.media.URLResource;
+import org.osmf.media.MediaResourceBase;
 
 [SWF(width=640, height=400)]
 public class SeeSawPlayer extends Sprite {
@@ -51,6 +52,10 @@ public class SeeSawPlayer extends Sprite {
     private var mediaContainer:MediaContainer;
     private var rootElement:ParallelElement;
     private var controlBar:ControlBarComponent;
+    private var parameters:Object;
+
+    // MediaResource Construction
+    private var seeSawMediaResource:SeeSawMediaResource = new SeeSawMediaResource();
 
     public function SeeSawPlayer() {
         super();
@@ -107,8 +112,8 @@ public class SeeSawPlayer extends Sprite {
 
     private function createVideoElement():MediaElement {
         logger.debug("creating video element");
-
-        var video:MediaElement = mediaFactory.createMediaElement(new URLResource(VIDEO_URL));
+        var content:MediaResourceBase = seeSawMediaResource.newResourceBase(parameters, VIDEO_URL);
+        var video:MediaElement = mediaFactory.createMediaElement(content);
         return video;
     }
 
