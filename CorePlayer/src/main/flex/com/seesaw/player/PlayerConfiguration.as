@@ -62,7 +62,7 @@ public class PlayerConfiguration {
     }
 
     /**
-     * Override this to construct a differed factory instance.
+     * Override this to construct a different factory instance.
      * @return the factory
      */
     protected function constructFactory():MediaFactory {
