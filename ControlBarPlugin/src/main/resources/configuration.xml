@@ -45,6 +45,13 @@
                         input="Low res"
                         />
                 <widget
+                        id="playButton"
+                        type="playButton"
+                        upFace="playUp"
+                        downFace="playDown"
+                        disabledFace="playDisabled"
+                        />
+                <widget
                         id="controls.seesaw.widget.PlayableButton"
                         type="controls.seesaw.widget.PlayableButton"
                         upFace="pauseUp"

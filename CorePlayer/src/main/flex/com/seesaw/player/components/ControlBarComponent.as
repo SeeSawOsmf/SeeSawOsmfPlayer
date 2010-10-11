@@ -54,24 +54,20 @@ public class ControlBarComponent implements PluginLifecycle {
         logger.debug("plugin loaded");
 
         if (!this.loaded && event.resource is PluginInfoResource) {
-            var pluginInfo:PluginInfoResource = PluginInfoResource(event.resource);
-
-            if (pluginInfo.pluginInfo.numMediaFactoryItems > 0) {
-                if (pluginInfo.pluginInfo.getMediaFactoryItemAt(0).id == ControlBarPlugin.ID) {
-                    player.rootElement.addChild(constructControlBarElement());
-                    var controlBarTarget:Metadata = new Metadata();
-                    controlBarTarget.addValue("ID", "mainContent");
-
-                    // Add the metadata to the video's metadata:
-                    player.config.element.addMetadata(ControlBarPlugin.NS_CONTROL_BAR_TARGET, controlBarTarget);
-                    this.loaded = true;
-                }
-            }
+            player.rootElement.addChild(constructControlBarElement());
+            this.loaded = true;
         }
     }
 
     public function pluginLoadError(event:MediaFactoryEvent):void {
         logger.error("plugin load error");
+    }
+
+    public function applyMetadata(target:MediaElement):void {
+        logger.debug("applying metadata: " + target);
+        var controlBarTarget:Metadata = new Metadata();
+        controlBarTarget.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
+        target.addMetadata(ControlBarPlugin.NS_CONTROL_BAR_TARGET, controlBarTarget);
     }
 
     private function constructControlBarElement():MediaElement {
@@ -94,10 +90,6 @@ public class ControlBarComponent implements PluginLifecycle {
         layout.index = 1;
 
         return controlBar;
-    }
-
-    public function applyMetadata(target:MediaElement):void {
-
     }
 
 }

@@ -30,24 +30,18 @@ import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.media.PluginInfoResource;
 
-import uk.vodco.livrail.LiverailPluginInfo;
-
 public class SeeSawPlayer extends Sprite {
-
-    private static const PLAYER_WIDTH:int = PLAYER::Width;
-    private static const PLAYER_HEIGHT:int = PLAYER::Height;
 
     private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
 
-    private var controlBar:ControlBarComponent;
-
+    private var _controlBar:ControlBarComponent;
     private var _config:PlayerConfiguration;
     private var _rootElement:ParallelElement;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
 
-        config = playerConfig;
+        _config = playerConfig;
 
         initialisePlayer();
         createComponents();
@@ -56,45 +50,57 @@ public class SeeSawPlayer extends Sprite {
     private function initialisePlayer():void {
         logger.debug("initialising media player");
 
-        config.factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
-        config.factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadError);
+        _config.factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
+        _config.factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadError);
 
-        config.player.media = createRootElement();
+        _config.player.media = createRootElement();
 
-        config.container.addMediaElement(rootElement);
-        addChild(config.container);
+        _config.container.addMediaElement(_rootElement);
+        addChild(_config.container);
     }
 
     private function createComponents():void {
         logger.debug("creating components");
 
-        controlBar = new ControlBarComponent(this);
-        config.factory.loadPlugin(controlBar.info);
-
-
-        config.factory.loadPlugin(new PluginInfoResource(new LiverailPluginInfo()));
+        _controlBar = new ControlBarComponent(this);
+        _config.factory.loadPlugin(_controlBar.info);
     }
 
     private function createRootElement():MediaElement {
         logger.debug("creating root element");
 
-        rootElement = new ParallelElement();
-        rootElement.addChild(config.element);
+        _rootElement = new ParallelElement();
+        _rootElement.addChild(_config.element);
 
         var rootElementLayout:LayoutMetadata = new LayoutMetadata();
-        rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, rootElementLayout);
+        _rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, rootElementLayout);
 
-        rootElementLayout.width = config.width;
-        rootElementLayout.height = config.height;
+        rootElementLayout.width = _config.width;
+        rootElementLayout.height = _config.height;
 
-        return rootElement;
+        return _rootElement;
     }
-
-    // Event Handlers
 
     private function onPluginLoaded(event:MediaFactoryEvent):void {
         logger.debug("plugin loaded");
-        controlBar.pluginLoaded(event);
+
+
+        if (event.resource is PluginInfoResource) {
+            // We can now construct a control
+
+            var pluginInfo:PluginInfoResource = PluginInfoResource(event.resource);
+
+            if (pluginInfo.pluginInfo.numMediaFactoryItems > 0) {
+                switch (pluginInfo.pluginInfo.getMediaFactoryItemAt(0).id) {
+                    case ControlBarPlugin.ID:
+                        controlBar.pluginLoaded(event);
+                        break;
+
+
+                }
+
+            }
+        }
     }
 
     private function onPluginLoadError(event:MediaFactoryEvent):void {
@@ -116,6 +122,14 @@ public class SeeSawPlayer extends Sprite {
 
     public function set config(value:PlayerConfiguration):void {
         _config = value;
+    }
+
+    public function get controlBar():ControlBarComponent {
+        return _controlBar;
+    }
+
+    public function set controlBar(value:ControlBarComponent):void {
+        _controlBar = value;
     }
 }
 }
