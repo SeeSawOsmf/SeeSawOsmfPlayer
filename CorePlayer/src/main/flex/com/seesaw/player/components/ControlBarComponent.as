@@ -59,6 +59,11 @@ public class ControlBarComponent implements PluginLifecycle {
             if (pluginInfo.pluginInfo.numMediaFactoryItems > 0) {
                 if (pluginInfo.pluginInfo.getMediaFactoryItemAt(0).id == ControlBarPlugin.ID) {
                     player.rootElement.addChild(constructControlBarElement());
+                    var controlBarTarget:Metadata = new Metadata();
+                    controlBarTarget.addValue("ID", "mainContent");
+
+                    // Add the metadata to the video's metadata:
+                    player.config.element.addMetadata(ControlBarPlugin.NS_CONTROL_BAR_TARGET, controlBarTarget);
                     this.loaded = true;
                 }
             }

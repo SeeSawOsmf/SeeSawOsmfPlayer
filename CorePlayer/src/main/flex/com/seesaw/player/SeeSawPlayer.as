@@ -28,6 +28,9 @@ import org.osmf.elements.ParallelElement;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
+import org.osmf.media.PluginInfoResource;
+
+import uk.vodco.livrail.LiverailPluginInfo;
 
 public class SeeSawPlayer extends Sprite {
 
@@ -67,6 +70,9 @@ public class SeeSawPlayer extends Sprite {
 
         controlBar = new ControlBarComponent(this);
         config.factory.loadPlugin(controlBar.info);
+
+
+        config.factory.loadPlugin(new PluginInfoResource(new LiverailPluginInfo()));
     }
 
     private function createRootElement():MediaElement {
