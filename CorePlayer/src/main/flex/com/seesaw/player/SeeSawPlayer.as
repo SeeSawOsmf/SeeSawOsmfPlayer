@@ -31,13 +31,9 @@ import org.osmf.media.MediaElement;
 
 public class SeeSawPlayer extends Sprite {
 
-    private static const PLAYER_WIDTH:int = PLAYER::Width;
-    private static const PLAYER_HEIGHT:int = PLAYER::Height;
-
     private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
 
     private var controlBar:ControlBarComponent;
-
     private var _config:PlayerConfiguration;
     private var _rootElement:ParallelElement;
 
@@ -83,8 +79,6 @@ public class SeeSawPlayer extends Sprite {
 
         return rootElement;
     }
-
-    // Event Handlers
 
     private function onPluginLoaded(event:MediaFactoryEvent):void {
         logger.debug("plugin loaded");
