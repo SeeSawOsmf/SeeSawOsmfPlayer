@@ -2,13 +2,9 @@ package com.seesaw.player.components {
 import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.SeeSawPlayer;
 
-import flashx.textLayout.formats.VerticalAlign;
-
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.events.MediaFactoryEvent;
-import org.osmf.layout.HorizontalAlign;
-import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
@@ -19,7 +15,7 @@ import uk.vodco.livrail.LiverailPluginInfo;
 
 public class LiverailComponent implements PluginLifecycle {
 
-    private var logger:ILogger = LoggerFactory.getClassLogger(ControlBarComponent);
+    private var logger:ILogger = LoggerFactory.getClassLogger(LiverailComponent);
 
     private var player:SeeSawPlayer;
 
@@ -58,21 +54,24 @@ public class LiverailComponent implements PluginLifecycle {
 
         var plugin:MediaElement = player.config.factory.createMediaElement(resource);
 
-        var layout:LayoutMetadata = plugin.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
-        if (layout == null) {
-            layout = new LayoutMetadata();
-            plugin.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
-        }
-        layout.verticalAlign = VerticalAlign.BOTTOM;
-        layout.horizontalAlign = HorizontalAlign.CENTER;
+        /*     var layout:LayoutMetadata = plugin.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
+         if (layout == null) {
+         layout = new LayoutMetadata();
+         plugin.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+         }
+         layout.verticalAlign = VerticalAlign.BOTTOM;
+         layout.horizontalAlign = HorizontalAlign.CENTER;
 
-        layout.index = 1;
-
+         layout.index = 1;
+         */
         return plugin;
     }
 
     public function applyMetadata(target:MediaElement):void {
-
+        logger.debug("applying metadata: " + target);
+        var controlBarTarget:Metadata = new Metadata();
+        controlBarTarget.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
+        target.addMetadata(LiverailPluginInfo.NS_TARGET, controlBarTarget);
 
     }
 }

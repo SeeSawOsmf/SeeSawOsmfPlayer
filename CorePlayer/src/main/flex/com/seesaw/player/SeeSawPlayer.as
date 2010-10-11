@@ -31,6 +31,8 @@ import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.media.PluginInfoResource;
 
+import uk.vodco.livrail.LiverailPluginInfo;
+
 public class SeeSawPlayer extends Sprite {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
@@ -99,6 +101,9 @@ public class SeeSawPlayer extends Sprite {
                 switch (pluginInfo.pluginInfo.getMediaFactoryItemAt(0).id) {
                     case ControlBarPlugin.ID:
                         controlBar.pluginLoaded(event);
+                        break;
+                    case LiverailPluginInfo.ID:
+                        liverail.pluginLoaded(event);
                         break;
 
 
