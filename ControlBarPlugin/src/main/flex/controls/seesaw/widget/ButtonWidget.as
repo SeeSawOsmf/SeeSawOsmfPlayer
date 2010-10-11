@@ -32,6 +32,13 @@ import org.osmf.chrome.widgets.*;
 public class ButtonWidget extends Widget {
     private var logger:ILogger = LoggerFactory.getClassLogger(ButtonWidget);
 
+    protected var currentFace:DisplayObject;
+    protected var mouseOver:Boolean;
+
+    protected var up:DisplayObject;
+    protected var down:DisplayObject;
+    protected var disabled:DisplayObject;
+
     public function ButtonWidget() {
         mouseEnabled = true;
 
@@ -55,6 +62,7 @@ public class ButtonWidget extends Widget {
     //
 
     private function onMouseOver(event:MouseEvent):void {
+        logger.debug("MOUSE OVER");
         mouseOver = true;
         setFace(enabled ? down : disabled);
     }
@@ -82,7 +90,6 @@ public class ButtonWidget extends Widget {
     }
 
     protected function onMouseClick_internal(event:MouseEvent):void {
-        logger.debug("MOUSE CLICK");
         if (enabled == false) {
             event.stopImmediatePropagation();
         }
@@ -105,13 +112,6 @@ public class ButtonWidget extends Widget {
 
     protected function onMouseClick(event:MouseEvent):void {
     }
-
-    protected var currentFace:DisplayObject;
-    protected var mouseOver:Boolean;
-
-    protected var up:DisplayObject;
-    protected var down:DisplayObject;
-    protected var disabled:DisplayObject;
 
 }
 }

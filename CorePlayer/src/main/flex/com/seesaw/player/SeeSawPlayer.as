@@ -70,6 +70,7 @@ public class SeeSawPlayer extends Sprite {
         components = new Dictionary();
 
         controlBar = new ControlBarComponent(this);
+        controlBar.applyMetadata(config.element);
         components[ControlBarPlugin.ID] = controlBar;
         config.factory.loadPlugin(controlBar.info);
 
