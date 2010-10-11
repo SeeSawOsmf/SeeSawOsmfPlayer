@@ -19,8 +19,10 @@
 
 package com.seesaw.player {
 import com.seesaw.player.components.ControlBarComponent;
+import com.seesaw.player.components.PluginLifecycle;
 
 import flash.display.Sprite;
+import flash.utils.Dictionary;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -28,6 +30,7 @@ import org.osmf.elements.ParallelElement;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
+import org.osmf.media.PluginInfoResource;
 
 public class SeeSawPlayer extends Sprite {
 
@@ -36,6 +39,8 @@ public class SeeSawPlayer extends Sprite {
     private var _controlBar:ControlBarComponent;
     private var _config:PlayerConfiguration;
     private var _rootElement:ParallelElement;
+
+    private var components:Dictionary;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
@@ -60,8 +65,10 @@ public class SeeSawPlayer extends Sprite {
 
     private function createComponents():void {
         logger.debug("creating components");
+        components = new Dictionary();
 
         controlBar = new ControlBarComponent(this);
+        components[ControlBarPlugin.ID] = controlBar;
         config.factory.loadPlugin(controlBar.info);
     }
 
@@ -82,7 +89,18 @@ public class SeeSawPlayer extends Sprite {
 
     private function onPluginLoaded(event:MediaFactoryEvent):void {
         logger.debug("plugin loaded");
-        controlBar.pluginLoaded(event);
+
+        if (event.resource is PluginInfoResource) {
+            var pluginInfo:PluginInfoResource = PluginInfoResource(event.resource);
+
+            if (pluginInfo.pluginInfo.numMediaFactoryItems > 0) {
+                var id:String = pluginInfo.pluginInfo.getMediaFactoryItemAt(0).id;
+                var component = components[id] as PluginLifecycle;
+                if (component) {
+                    component.pluginLoaded(event);
+                }
+            }
+        }
     }
 
     private function onPluginLoadError(event:MediaFactoryEvent):void {
