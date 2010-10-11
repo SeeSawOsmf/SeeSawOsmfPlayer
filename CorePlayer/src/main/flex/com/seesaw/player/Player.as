@@ -68,7 +68,10 @@ public class Player extends Sprite {
         }
 
         logger.debug("creating player");
-        videoPlayer = new SeeSawPlayer(content, PLAYER_WIDTH, PLAYER_HEIGHT);
+
+        var config:PlayerConfiguration = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, content);
+        videoPlayer = new SeeSawPlayer(config);
+
         addChild(videoPlayer);
     }
 
