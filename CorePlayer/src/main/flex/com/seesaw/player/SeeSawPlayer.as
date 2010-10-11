@@ -33,7 +33,7 @@ public class SeeSawPlayer extends Sprite {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
 
-    private var controlBar:ControlBarComponent;
+    private var _controlBar:ControlBarComponent;
     private var _config:PlayerConfiguration;
     private var _rootElement:ParallelElement;
 
@@ -104,6 +104,14 @@ public class SeeSawPlayer extends Sprite {
 
     public function set config(value:PlayerConfiguration):void {
         _config = value;
+    }
+
+    public function get controlBar():ControlBarComponent {
+        return _controlBar;
+    }
+
+    public function set controlBar(value:ControlBarComponent):void {
+        _controlBar = value;
     }
 }
 }
