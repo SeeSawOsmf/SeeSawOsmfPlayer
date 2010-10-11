@@ -69,6 +69,13 @@ public class ControlBarComponent implements PluginLifecycle {
         logger.error("plugin load error");
     }
 
+    public function applyMetadata(target:MediaElement):void {
+        logger.debug("applying metadata: " + target);
+        var controlBarTarget:Metadata = new Metadata();
+        controlBarTarget.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
+        target.addMetadata(ControlBarPlugin.NS_CONTROL_BAR_TARGET, controlBarTarget);
+    }
+
     private function constructControlBarElement():MediaElement {
         var controlBarSettings:Metadata = new Metadata();
         controlBarSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);

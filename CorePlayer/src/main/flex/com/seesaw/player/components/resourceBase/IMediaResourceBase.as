@@ -17,18 +17,11 @@
  *   Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.player.components {
-import org.osmf.events.MediaFactoryEvent;
-import org.osmf.media.MediaElement;
-import org.osmf.media.PluginInfoResource;
 
-public interface PluginLifecycle {
-    function pluginLoaded(event:MediaFactoryEvent):void;
+package com.seesaw.player.components.resourceBase {
+import org.osmf.media.MediaResourceBase;
 
-    function pluginLoadError(event:MediaFactoryEvent):void;
-
-    function applyMetadata(target:MediaElement):void;
-
-    function get info():PluginInfoResource;
+public interface IMediaResourceBase {
+    function newResourceBase(obj:Object, videoUrl:String = null):MediaResourceBase
 }
 }

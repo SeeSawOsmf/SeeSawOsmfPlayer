@@ -23,8 +23,9 @@ package {
 import controls.seesaw.widget.*;
 
 import flash.utils.Dictionary;
-import flash.utils.getDefinitionByName;
 
+import org.as3commons.logging.ILogger;
+import org.as3commons.logging.LoggerFactory;
 import org.osmf.chrome.assets.AssetsManager;
 import org.osmf.chrome.configuration.LayoutAttributesParser;
 import org.osmf.chrome.configuration.WidgetsParser;
@@ -37,6 +38,7 @@ import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.MediaTraitType;
 
 public class ControlBarElement extends MediaElement {
+    private var logger:ILogger = LoggerFactory.getClassLogger(ControlBarElement);
     // Embedded assets (see configuration.xml for their assignments):
     //
 
@@ -91,7 +93,6 @@ public class ControlBarElement extends MediaElement {
     private static const VOLUME_DISABLED:Class;
 
 
-    //COMMENT TO TEST GIT.
     public function ControlBarElement() {
 
     }
@@ -105,11 +106,11 @@ public class ControlBarElement extends MediaElement {
             this.target = target;
 
             processTarget();
+
         }
     }
 
     private function processTarget():void {
-
         if (target != null && settings != null) {
             // We use the NS_CONTROL_BAR_TARGET namespaced metadata in order
             // to find out if the instantiated element is the element that our
@@ -184,23 +185,24 @@ public class ControlBarElement extends MediaElement {
             var widgetsParser:WidgetsParser = new WidgetsParser()
 
 
-            for (var i:* in customWidgetList) {
+            /*for(var i:* in customWidgetList){
+             logger.debug("CUSTOM WIDGET " + i)
+             var widgetInstance:* = new customWidgetList[i];
+             var qualifiedDefinition:String = widgetInstance.classDefinition;
+             var newDefinition:String = qualifiedDefinition.toLocaleLowerCase();
 
-                var widgetInstance:* = new customWidgetList[i];
-                var qualifiedDefinition:String = widgetInstance.classDefinition;
-                var newDefinition:String = qualifiedDefinition.toLocaleLowerCase();
+             // Qualify the class and type
+             var type:Class = getDefinitionByName(qualifiedDefinition) as Class;
 
-                // Qualify the class and type
-                var type:Class = getDefinitionByName(qualifiedDefinition) as Class;
+             // Pass a new definition and the qualified type to the widget registry
+             widgetsParser.registerWidgetType(newDefinition, type);
 
-                // Pass a new definition and the qualified type to the widget registry
-                widgetsParser.registerWidgetType(newDefinition, type);
-
-            }
+             } */
 
 
+            logger.debug("PARSER");
             widgetsParser.parse(configuration.widgets.*, assetsManager);
-
+            logger.debug("PARSER 2");
             controlBar = widgetsParser.getWidget("controlBar");
         }
         catch (error:Error) {
@@ -214,6 +216,7 @@ public class ControlBarElement extends MediaElement {
     // So these can be registered to the chrome library
 
     private function addSeesawWidgets():void {
+        logger.debug("ADD WIDGETS");
         customWidgetList["controls.seesaw.widget.scrubbar"] = ScrubBar;
         customWidgetList["controls.seesaw.widget.playablebutton"] = PlayableButton;
         //    customWidgetList["controls.seesaw.widget.fullscreen"] = FullScreen;
