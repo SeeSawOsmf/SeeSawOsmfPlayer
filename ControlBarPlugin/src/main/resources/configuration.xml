@@ -85,6 +85,12 @@
                     top="30"
                     />
             <widget
+                    id="controls.seesaw.widget.FullScreen"
+                    type="controls.seesaw.widget.FullScreen"
+                    left="575"
+                    top="70"
+                    />
+            <widget
                     id="controls.seesaw.widget.VolumeScrubBar"
                     type="controls.seesaw.widget.VolumeScrubBar"
                     timeFieldsWidth="90"
