@@ -32,6 +32,8 @@ import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.media.PluginInfoResource;
 
+import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
+
 public class SeeSawPlayer extends Sprite {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
@@ -70,6 +72,8 @@ public class SeeSawPlayer extends Sprite {
         controlBar = new ControlBarComponent(this);
         components[ControlBarPlugin.ID] = controlBar;
         config.factory.loadPlugin(controlBar.info);
+
+        config.factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
     }
 
     private function createRootElement():MediaElement {
