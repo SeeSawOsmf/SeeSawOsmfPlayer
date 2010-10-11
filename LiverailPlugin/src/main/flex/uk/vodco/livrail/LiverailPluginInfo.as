@@ -31,7 +31,7 @@ public class LiverailPluginInfo extends PluginInfo {
             (ID
                     , canHandleResourceFunction
                     , mediaElementCreationFunction
-                    , MediaFactoryItemType.STANDARD
+                    , MediaFactoryItemType.PROXY
                     );
 
     public static const ID:String = "uk.co.vodco.liverail.LiverailPluginInfo";
