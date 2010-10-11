@@ -14,4 +14,5 @@ public class LiverailPlugin  extends Sprite {
 
     private var _pluginInfo:LiverailPluginInfo;
 }
+
 }

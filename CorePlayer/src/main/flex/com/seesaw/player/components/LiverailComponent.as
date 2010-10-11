@@ -15,6 +15,7 @@ import org.osmf.media.PluginInfoResource;
 import org.osmf.metadata.Metadata;
 
 import uk.vodco.livrail.LiverailPlugin;
+import uk.vodco.livrail.LiverailPluginInfo;
 
 public class LiverailComponent implements PluginLifecycle {
 
@@ -40,16 +41,8 @@ public class LiverailComponent implements PluginLifecycle {
     public function pluginLoaded(event:MediaFactoryEvent):void {
         logger.debug("plugin loaded");
 
-        if (!this.loaded && event.resource is PluginInfoResource) {
-            var pluginInfo:PluginInfoResource = PluginInfoResource(event.resource);
-
-            if (pluginInfo.pluginInfo.numMediaFactoryItems > 0) {
-                if (pluginInfo.pluginInfo.getMediaFactoryItemAt(0).id == ControlBarPlugin.ID) {
-                    player.rootElement.addChild(constructPlugInElement());
-                    this.loaded = true;
-                }
-            }
-        }
+        player.rootElement.addChild(constructPlugInElement());
+        this.loaded = true;
     }
 
     public function pluginLoadError(event:MediaFactoryEvent):void {
@@ -61,7 +54,7 @@ public class LiverailComponent implements PluginLifecycle {
         pluginSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
 
         var resource:MediaResourceBase = new MediaResourceBase();
-        resource.addMetadataValue(ControlBarPlugin.NS_CONTROL_BAR_SETTINGS, pluginSettings);
+        resource.addMetadataValue(LiverailPluginInfo.NS_SETTINGS, pluginSettings);
 
         var plugin:MediaElement = player.config.factory.createMediaElement(resource);
 
