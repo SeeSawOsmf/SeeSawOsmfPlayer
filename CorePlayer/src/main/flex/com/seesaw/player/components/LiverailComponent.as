@@ -45,7 +45,7 @@ public class LiverailComponent implements PluginLifecycle {
 
             if (pluginInfo.pluginInfo.numMediaFactoryItems > 0) {
                 if (pluginInfo.pluginInfo.getMediaFactoryItemAt(0).id == ControlBarPlugin.ID) {
-                    player.element.addChild(constructPlugInElement());
+                    player.rootElement.addChild(constructPlugInElement());
                     this.loaded = true;
                 }
             }
@@ -63,7 +63,7 @@ public class LiverailComponent implements PluginLifecycle {
         var resource:MediaResourceBase = new MediaResourceBase();
         resource.addMetadataValue(ControlBarPlugin.NS_CONTROL_BAR_SETTINGS, pluginSettings);
 
-        var plugin:MediaElement = player.factory.createMediaElement(resource);
+        var plugin:MediaElement = player.config.factory.createMediaElement(resource);
 
         var layout:LayoutMetadata = plugin.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
         if (layout == null) {
@@ -76,6 +76,11 @@ public class LiverailComponent implements PluginLifecycle {
         layout.index = 1;
 
         return plugin;
+    }
+
+    public function applyMetadata(target:MediaElement):void {
+
+
     }
 }
 }
