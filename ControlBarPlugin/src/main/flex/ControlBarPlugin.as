@@ -49,7 +49,6 @@ public class ControlBarPlugin extends Sprite {
      * Gives the player the PluginInfo.
      */
     public function get pluginInfo():PluginInfo {
-        logger.debug("pluginInfo");
         if (_pluginInfo == null) {
             var item:MediaFactoryItem
                     = new MediaFactoryItem
@@ -81,7 +80,6 @@ public class ControlBarPlugin extends Sprite {
     private var controlsUpdated:Boolean;
 
     private function canHandleResourceCallback(resource:MediaResourceBase):Boolean {
-        logger.debug("canHandleResourceCallback");
         var result:Boolean;
 
         if (resource != null) {
@@ -95,7 +93,6 @@ public class ControlBarPlugin extends Sprite {
     }
 
     private function mediaElementCreationCallback():MediaElement {
-        logger.debug("mediaElementCreationCallback");
         controlBarElement = new ControlBarElement();
 
         updateControls();
@@ -106,17 +103,13 @@ public class ControlBarPlugin extends Sprite {
     private function mediaElementCreationNotificationCallback(target:MediaElement):void {
         // If the control bar has been created, notify it about the just-created element.
 
-        logger.debug("mediaElementCreationNotificationCallback");
-
         this.targetElement = target;
 
         updateControls();
     }
 
     private function updateControls():void {
-        logger.debug("updateControls");
         if (controlBarElement != null && targetElement != null && controlBarElement != targetElement) {
-            logger.debug("addReference" + targetElement);
             controlBarElement.addReference(targetElement);
         }
     }

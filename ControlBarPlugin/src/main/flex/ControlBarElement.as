@@ -218,7 +218,8 @@ public class ControlBarElement extends MediaElement {
     private function addSeesawWidgets():void {
         logger.debug("ADD WIDGETS");
         customWidgetList["controls.seesaw.widget.scrubbar"] = ScrubBar;
-        customWidgetList["controls.seesaw.widget.playablebutton"] = PlayableButton;
+        customWidgetList["controls.seesaw.widget.playbutton"] = PlayButton;
+        customWidgetList["controls.seesaw.widget.pausebutton"] = PauseButton;
         //    customWidgetList["controls.seesaw.widget.fullscreen"] = FullScreen;
         customWidgetList["controls.seesaw.widget.volume"] = Volume;
         customWidgetList["controls.seesaw.widget.volumescrubbar"] = VolumeScrubBar;
