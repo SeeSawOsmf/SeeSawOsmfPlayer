@@ -104,7 +104,7 @@ public class ControlBarElement extends MediaElement {
     public function addReference(target:MediaElement):void {
         if (this.target == null) {
             this.target = target;
-
+            logger.debug("ELEMENT TO PROCESS : " + target)
             processTarget();
 
         }
@@ -116,7 +116,11 @@ public class ControlBarElement extends MediaElement {
             // to find out if the instantiated element is the element that our
             // control bar should control:
             var targetMetadata:Metadata = target.getMetadata(ControlBarPlugin.NS_CONTROL_BAR_TARGET);
+            logger.debug("GET METADATA : " + ControlBarPlugin.NS_CONTROL_BAR_TARGET)
+            logger.debug("TARGET WITH METADATA : " + target);
+            logger.debug("NEW METADATA : " + targetMetadata);
             if (targetMetadata) {
+                logger.debug("TARGET METADATA : " + targetMetadata)
                 if (targetMetadata.getValue(ID) != null
                         && targetMetadata.getValue(ID) == settings.getValue(ID)
                         ) {

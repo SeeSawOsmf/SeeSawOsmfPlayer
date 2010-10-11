@@ -32,7 +32,8 @@ public class SeeSawPlayerTest {
 
     [Test]
     public function playerCanInitialise():void {
-        var player:SeeSawPlayer = new SeeSawPlayer(new URLResource(VIDEO_URL), PLAYER_WIDTH, PLAYER_HEIGHT);
+        var config:PlayerConfiguration = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, new URLResource(VIDEO_URL));
+        var player:SeeSawPlayer = new SeeSawPlayer(config);
         assertThat(player, notNullValue());
     }
 }
