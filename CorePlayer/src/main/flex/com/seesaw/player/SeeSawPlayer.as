@@ -19,9 +19,10 @@
 
 package com.seesaw.player {
 import com.seesaw.player.components.ControlBarComponent;
-import com.seesaw.player.components.LiverailComponent;
+import com.seesaw.player.components.PluginLifecycle;
 
 import flash.display.Sprite;
+import flash.utils.Dictionary;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -31,21 +32,20 @@ import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.media.PluginInfoResource;
 
-import uk.vodco.livrail.LiverailPluginInfo;
-
 public class SeeSawPlayer extends Sprite {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
 
     private var _controlBar:ControlBarComponent;
-    private var _liverail:LiverailComponent;
     private var _config:PlayerConfiguration;
     private var _rootElement:ParallelElement;
+
+    private var components:Dictionary;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
 
-        _config = playerConfig;
+        config = playerConfig;
 
         initialisePlayer();
         createComponents();
@@ -54,61 +54,51 @@ public class SeeSawPlayer extends Sprite {
     private function initialisePlayer():void {
         logger.debug("initialising media player");
 
-        _config.factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
-        _config.factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadError);
+        config.factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
+        config.factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadError);
 
-        _config.player.media = createRootElement();
+        config.player.media = createRootElement();
 
-        _config.container.addMediaElement(_rootElement);
-        addChild(_config.container);
+        config.container.addMediaElement(rootElement);
+        addChild(config.container);
     }
 
     private function createComponents():void {
         logger.debug("creating components");
+        components = new Dictionary();
 
-        _controlBar = new ControlBarComponent(this);
-        _config.factory.loadPlugin(_controlBar.info);
-
-        _liverail = new LiverailComponent(this);
-        _config.factory.loadPlugin(_liverail.info);
+        controlBar = new ControlBarComponent(this);
+        components[ControlBarPlugin.ID] = controlBar;
+        config.factory.loadPlugin(controlBar.info);
     }
 
     private function createRootElement():MediaElement {
         logger.debug("creating root element");
 
-        _rootElement = new ParallelElement();
-        _rootElement.addChild(_config.element);
+        rootElement = new ParallelElement();
+        rootElement.addChild(config.element);
 
         var rootElementLayout:LayoutMetadata = new LayoutMetadata();
-        _rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, rootElementLayout);
+        rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, rootElementLayout);
 
-        rootElementLayout.width = _config.width;
-        rootElementLayout.height = _config.height;
+        rootElementLayout.width = config.width;
+        rootElementLayout.height = config.height;
 
-        return _rootElement;
+        return rootElement;
     }
 
     private function onPluginLoaded(event:MediaFactoryEvent):void {
         logger.debug("plugin loaded");
 
-
         if (event.resource is PluginInfoResource) {
-            // We can now construct a control
-
             var pluginInfo:PluginInfoResource = PluginInfoResource(event.resource);
 
             if (pluginInfo.pluginInfo.numMediaFactoryItems > 0) {
-                switch (pluginInfo.pluginInfo.getMediaFactoryItemAt(0).id) {
-                    case ControlBarPlugin.ID:
-                        controlBar.pluginLoaded(event);
-                        break;
-                    case LiverailPluginInfo.ID:
-                        liverail.pluginLoaded(event);
-                        break;
-
-
+                var id:String = pluginInfo.pluginInfo.getMediaFactoryItemAt(0).id;
+                var component = components[id] as PluginLifecycle;
+                if (component) {
+                    component.pluginLoaded(event);
                 }
-
             }
         }
     }
@@ -140,14 +130,6 @@ public class SeeSawPlayer extends Sprite {
 
     public function set controlBar(value:ControlBarComponent):void {
         _controlBar = value;
-    }
-
-    public function get liverail():LiverailComponent {
-        return _liverail;
-    }
-
-    public function set liverail(value:LiverailComponent):void {
-        _liverail = value;
     }
 }
 }

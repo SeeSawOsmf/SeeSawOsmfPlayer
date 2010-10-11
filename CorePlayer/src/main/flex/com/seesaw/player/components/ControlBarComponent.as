@@ -53,7 +53,7 @@ public class ControlBarComponent implements PluginLifecycle {
     public function pluginLoaded(event:MediaFactoryEvent):void {
         logger.debug("plugin loaded");
 
-        if (!this.loaded && event.resource is PluginInfoResource) {
+        if (!this.loaded) {
             player.rootElement.addChild(constructControlBarElement());
             this.loaded = true;
         }
