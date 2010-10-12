@@ -95,18 +95,16 @@ public class LiverailPlugin extends PluginInfo {
     }
 
     private function mediaElementCreationCallback():MediaElement {
-        liverailElement = new LiverailElement();
 
-        updateLiverail();
+        return null;
 
-        return liverailElement;
     }
 
     private function mediaElementCreationNotificationCallback(target:MediaElement):void {
 
         logger.debug("TARGET ELEMENT : " + target);
         this.targetElement = target;
-
+        liverailElement = new LiverailElement();
         updateLiverail();
     }
 

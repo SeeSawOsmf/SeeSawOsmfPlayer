@@ -1,4 +1,5 @@
 package uk.vodco.livrail {
+import flash.events.Event;
 import flash.system.Security;
 
 import org.as3commons.logging.ILogger;
@@ -10,12 +11,14 @@ import org.osmf.events.DisplayObjectEvent;
 import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.SeekEvent;
+import org.osmf.events.TimeEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.media.URLResource;
 import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.LoadTrait;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.SeekTrait;
+import org.osmf.traits.TimeTrait;
 
 public class LiverailElement extends ProxyElement {
 
@@ -129,13 +132,20 @@ public class LiverailElement extends ProxyElement {
                 toggleSeekListeners(added);
                 break;
 
-            case MediaTraitType.DISPLAY_OBJECT:
-                toggleDisplayListeners(added);
+            case MediaTraitType.TIME:
+                toggleTimeListeners(added);
                 break;
 
         }
     }
 
+    private function onTimerTick(event:Event = null):void {
+        var temporal:TimeTrait = proxiedElement ? proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait : null;
+        if (temporal != null) {
+
+            //	var position:Number = isNaN(seekToTime) ? temporal.currentTime : seekToTime;
+        }
+    }
 
     private function toggleDisplayListeners(added:Boolean):void {
         var display:DisplayObjectTrait = proxiedElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
@@ -181,6 +191,17 @@ public class LiverailElement extends ProxyElement {
     }
 
 
+    private function toggleTimeListeners(added:Boolean):void {
+        var time:TimeTrait = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
+
+        if (time) {
+            time.addEventListener(TimeEvent.DURATION_CHANGE, onTimeChange);
+        } else {
+            time.removeEventListener(TimeEvent.DURATION_CHANGE, onTimeChange);
+        }
+    }
+
+
     private function toggleSeekListeners(added:Boolean):void {
         var seek:SeekTrait = proxiedElement.getTrait(MediaTraitType.SEEK) as SeekTrait;
 
@@ -195,6 +216,9 @@ public class LiverailElement extends ProxyElement {
         trace("On Seek Change:{0}", event.seeking);
     }
 
+    private function onTimeChange(event:TimeEvent):void {
+        logger.debug("Time Change:  ", event.time);
+    }
 
     /* static */
 
