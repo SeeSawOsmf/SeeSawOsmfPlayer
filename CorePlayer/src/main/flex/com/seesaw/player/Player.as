@@ -18,15 +18,13 @@
  */
 
 package com.seesaw.player {
-import com.seesaw.player.components.resourceBase.SeeSawMediaResource;
-import com.seesaw.player.init.VideoPlayerInfoRequest;
 import com.seesaw.player.init.ServiceRequestBase;
+import com.seesaw.player.init.VideoPlayerInfoRequest;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 
 import flash.display.Sprite;
 import flash.events.Event;
-import flash.events.NetStatusEvent;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -75,16 +73,14 @@ public class Player extends Sprite {
     }
 
     private function createMediaResource(programmeData:Object):MediaResourceBase {
-        logger.debug("creating media: " + programmeData.lowResUrl);
-        var seeSawMediaResource:SeeSawMediaResource = new SeeSawMediaResource();
-        var mediaResource:MediaResourceBase = seeSawMediaResource.newResourceBase(this.loaderInfo.parameters, programmeData.lowResUrl);
-        return mediaResource;
+        logger.debug("creating media resource with url: " + programmeData.lowResUrl);
+        return new DynamicStream(programmeData);
     }
 
     private function requestProgrammeData():void {
-        logger.debug("requesting programme data: " + this.loaderInfo.parameters["programmeID"]);
+        logger.debug("requesting programme data for programme: " + loaderInfo.parameters["programmeID"]);
 
-        //TODO: these values should come from params
+        // TODO: these values should come from init params
         var request:ServiceRequestBase = new VideoPlayerInfoRequest("http://kgd-red-test-zxtm01.dev.vodco.co.uk", 25149);
         request.successCallback = onSuccess;
         request.failCallback = onFail;
@@ -99,6 +95,7 @@ public class Player extends Sprite {
 
     private function onFail():void {
         logger.debug("failed to retrieve programme data");
+        // TODO: set the 'programme not playing' panel as the main content
     }
 }
 }

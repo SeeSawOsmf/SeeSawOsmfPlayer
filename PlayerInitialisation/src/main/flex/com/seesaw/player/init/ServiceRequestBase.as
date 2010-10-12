@@ -21,10 +21,8 @@ package com.seesaw.player.init {
 import com.adobe.serialization.json.JSON;
 
 import flash.events.Event;
-import flash.events.HTTPStatusEvent;
 import flash.events.IEventDispatcher;
 import flash.events.IOErrorEvent;
-import flash.events.ProgressEvent;
 import flash.events.SecurityErrorEvent;
 import flash.net.URLLoader;
 import flash.net.URLRequest;
@@ -66,10 +64,7 @@ public class ServiceRequestBase {
 
     private function configureListeners(dispatcher:IEventDispatcher):void {
         dispatcher.addEventListener(Event.COMPLETE, completeHandler);
-        dispatcher.addEventListener(Event.OPEN, openHandler);
-        dispatcher.addEventListener(ProgressEvent.PROGRESS, progressHandler);
         dispatcher.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
-        dispatcher.addEventListener(HTTPStatusEvent.HTTP_STATUS, httpStatusHandler);
         dispatcher.addEventListener(IOErrorEvent.IO_ERROR, ioErrorHandler);
     }
 
@@ -94,20 +89,11 @@ public class ServiceRequestBase {
         }
     }
 
-    private function openHandler(event:Event):void {
-        logger.debug("openHandler: " + event);
-    }
-
-    private function progressHandler(event:ProgressEvent):void {
-        logger.debug("progressHandler loaded:" + event.bytesLoaded + " total: " + event.bytesTotal);
-    }
-
     private function securityErrorHandler(event:SecurityErrorEvent):void {
         logger.debug("securityErrorHandler: " + event);
-    }
-
-    private function httpStatusHandler(event:HTTPStatusEvent):void {
-        logger.debug("httpStatusHandler: " + event);
+        if (failCallback != null) {
+            failCallback.call();
+        }
     }
 
     public function get successCallback():Function {
