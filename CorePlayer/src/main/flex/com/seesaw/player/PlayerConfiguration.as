@@ -23,6 +23,7 @@ import org.osmf.media.DefaultMediaFactory;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaPlayer;
+import org.osmf.media.MediaPlayerSprite;
 import org.osmf.media.MediaResourceBase;
 
 public class PlayerConfiguration {
@@ -31,6 +32,7 @@ public class PlayerConfiguration {
     private var _player:MediaPlayer;
     private var _container:MediaContainer;
     private var _element:MediaElement;
+    private var _playerSprite:MediaPlayerSprite;
 
     private var _width:int;
     private var _height:int;
@@ -99,6 +101,10 @@ public class PlayerConfiguration {
 
     public function set container(value:MediaContainer):void {
         _container = value;
+    }
+
+    public function get playerSprite():MediaPlayerSprite {
+        return _playerSprite;
     }
 
     public function get element():MediaElement {

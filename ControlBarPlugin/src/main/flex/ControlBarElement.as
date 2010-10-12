@@ -92,12 +92,6 @@ public class ControlBarElement extends MediaElement {
     [Embed(source="/volumeOff.png")]
     private static const VOLUME_DISABLED:Class;
 
-
-    public function ControlBarElement() {
-
-    }
-
-
     // Public interface
     //
 
@@ -181,27 +175,9 @@ public class ControlBarElement extends MediaElement {
             assetsManager.addConfigurationAssets(configuration);
             assetsManager.load();
 
-            var widgetsParser:WidgetsParser = new WidgetsParser()
+            var widgetsParser:WidgetsParser = new WidgetsParser();
 
-
-            /*for(var i:* in customWidgetList){
-             logger.debug("CUSTOM WIDGET " + i)
-             var widgetInstance:* = new customWidgetList[i];
-             var qualifiedDefinition:String = widgetInstance.classDefinition;
-             var newDefinition:String = qualifiedDefinition.toLocaleLowerCase();
-
-             // Qualify the class and type
-             var type:Class = getDefinitionByName(qualifiedDefinition) as Class;
-
-             // Pass a new definition and the qualified type to the widget registry
-             widgetsParser.registerWidgetType(newDefinition, type);
-
-             } */
-
-
-            logger.debug("PARSER");
             widgetsParser.parse(configuration.widgets.*, assetsManager);
-            logger.debug("PARSER 2");
             controlBar = widgetsParser.getWidget("controlBar");
         }
         catch (error:Error) {
@@ -219,7 +195,7 @@ public class ControlBarElement extends MediaElement {
         customWidgetList["controls.seesaw.widget.scrubbar"] = ScrubBar;
         customWidgetList["controls.seesaw.widget.playbutton"] = PlayButton;
         customWidgetList["controls.seesaw.widget.pausebutton"] = PauseButton;
-        //    customWidgetList["controls.seesaw.widget.fullscreen"] = FullScreen;
+        customWidgetList["controls.seesaw.widget.fullscreen"] = FullScreen;
         customWidgetList["controls.seesaw.widget.volume"] = Volume;
         customWidgetList["controls.seesaw.widget.volumescrubbar"] = VolumeScrubBar;
         //   customWidgetList["controls.seesaw.widget.lights"] = Lights;
