@@ -87,7 +87,7 @@
             <widget
                     id="controls.seesaw.widget.FullScreen"
                     type="controls.seesaw.widget.FullScreen"
-                    left="575"
+                    right="20"
                     top="70"
                     />
             <widget
