@@ -35,30 +35,15 @@ public class PlayerInitialiser extends Sprite {
     private var logger:ILogger = LoggerFactory.getClassLogger(PlayerInitialiser);
 
     public function PlayerInitialiser() {
-        var request:ServiceRequestBase = new VideoPlayerInfoRequest("http://kgd-red-test-zxtm01.dev.vodco.co.uk", 19657);
+        var requestUrl:String = "http://localhost:8080/player.videoplayerinfo:getvideoplayerinfo?t:ac=TV:COMEDY/p/16001003001/Eighteen-Age-Rating-programme-1";
+        var request:ServiceRequest = new ServiceRequest(requestUrl);
         request.successCallback = onSuccess;
         request.failCallback = onFail;
         request.submit();
     }
 
     private function onSuccess(result:Object):void {
-        logger.debug("validTransaction " + result.validTransaction);
         logger.debug("serverTimeStamp " + result.serverTimeStamp);
-        logger.debug("stdResAssetId " + result.stdResAssetId);
-        logger.debug("lowResUrl" + result.lowResUrl);
-        logger.debug("partnerId " + result.partnerId);
-        logger.debug("lowResAssetId " + result.lowResAssetId);
-        logger.debug("logDRM " + result.logDRM);
-        logger.debug("subtitleLocation " + result.subtitleLocation);
-        logger.debug("stdResUrl " + result.stdResUrl);
-        logger.debug("highResUrl " + result.highResUrl);
-        logger.debug("offerType " + result.offerType);
-        logger.debug("geoBlocked " + result.geoBlocked);
-        logger.debug("grossUsageReached " + result.grossUsageReached);
-        logger.debug("playlist " + result.playlist);
-        logger.debug("anonymousUserId " + result.anonymousUserId);
-        logger.debug("highResAssetId " + result.highResAssetId);
-        logger.debug("transactionItemId " + result.transactionItemId);
     }
 
     private function onFail():void {

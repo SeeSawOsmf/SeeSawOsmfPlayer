@@ -31,34 +31,31 @@ import flash.net.URLRequestMethod;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 
-public class ServiceRequestBase {
+public class ServiceRequest {
 
-    private var logger:ILogger = LoggerFactory.getClassLogger(ServiceRequestBase);
+    private var logger:ILogger = LoggerFactory.getClassLogger(ServiceRequest);
 
-    private var _baseUrl:String;
+    private var _requestUrl:String;
     private var _successCallback:Function;
     private var _failCallback:Function;
 
-    public function ServiceRequestBase(baseUrl:String) {
-        _baseUrl = baseUrl;
+    public function ServiceRequest(requestUrl:String) {
+        _requestUrl = requestUrl;
     }
 
     public function submit():void {
-    }
-
-    protected function load(url:String):void {
-        logger.debug("loading url: " + url);
+        logger.debug("loading url: " + requestUrl);
 
         var loader:URLLoader = new URLLoader();
         configureListeners(loader);
 
-        var request:URLRequest = new URLRequest(url);
+        var request:URLRequest = new URLRequest(requestUrl);
         request.method = URLRequestMethod.GET;
 
         try {
             loader.load(request);
         } catch (error:Error) {
-            logger.error("unable to load requested document: " + url);
+            logger.error("unable to load requested document: " + requestUrl);
         }
     }
 
@@ -112,12 +109,12 @@ public class ServiceRequestBase {
         _failCallback = value;
     }
 
-    public function get baseUrl():String {
-        return _baseUrl;
+    public function get requestUrl():String {
+        return _requestUrl;
     }
 
-    public function set baseUrl(value:String):void {
-        _baseUrl = value;
+    public function set requestUrl(value:String):void {
+        _requestUrl = value;
     }
 }
 }

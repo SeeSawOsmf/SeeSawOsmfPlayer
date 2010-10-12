@@ -18,8 +18,7 @@
  */
 
 package com.seesaw.player {
-import com.seesaw.player.init.ServiceRequestBase;
-import com.seesaw.player.init.VideoPlayerInfoRequest;
+import com.seesaw.player.init.ServiceRequest;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 
@@ -78,10 +77,11 @@ public class Player extends Sprite {
     }
 
     private function requestProgrammeData():void {
-        logger.debug("requesting programme data for programme: " + loaderInfo.parameters["programmeID"]);
+        logger.debug("requesting programme data");
 
-        // TODO: these values should come from init params
-        var request:ServiceRequestBase = new VideoPlayerInfoRequest("http://kgd-red-test-zxtm01.dev.vodco.co.uk", 25149);
+        // TODO: this url should come from flashvars
+        var requestUrl:String = "http://localhost:8080/player.videoplayerinfo:getvideoplayerinfo?t:ac=TV:COMEDY/p/16001003001/Eighteen-Age-Rating-programme-1";
+        var request:ServiceRequest = new ServiceRequest(requestUrl);
         request.successCallback = onSuccess;
         request.failCallback = onFail;
         request.submit();

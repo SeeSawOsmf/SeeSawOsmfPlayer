@@ -31,10 +31,6 @@ public class DynamicStream extends DynamicStreamingResource {
         // TODO: read out of videoPlayerInfo when the service has been implemented to return the correct values.
         streamItems = Vector.<DynamicStreamingItem>(
                 [     new DynamicStreamingItem("mp4:e5/test/ccp/p/LOW_RES/test/test_asset.mp4", 408, 768, 428)
-                    , new DynamicStreamingItem("mp4:e5/test/ccp/p/LOW_RES/test/test_asset.mp4", 608, 768, 428)
-                    , new DynamicStreamingItem("mp4:e5/test/ccp/p/LOW_RES/test/test_asset.mp4", 908, 1024, 522)
-                    , new DynamicStreamingItem("mp4:e5/test/ccp/p/LOW_RES/test/test_asset.mp4", 1308, 1024, 522)
-                    , new DynamicStreamingItem("mp4:e5/test/ccp/p/LOW_RES/test/test_asset.mp4", 1708, 1280, 720)
                 ]);
 
         //  TODO: add metadata from video player info to the resource
