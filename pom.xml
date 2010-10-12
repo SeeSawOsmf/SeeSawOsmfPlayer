@@ -21,6 +21,7 @@
         <module>CanvasPoc</module>
         <module>PlayerControlsPlugin</module>
         <module>PlayerLogging</module>
+        <module>PlayerInitialisation</module>
     </modules>
 
     <developers>
@@ -147,6 +148,13 @@
                 <version>4.0-rc-1</version>
                 <type>swc</type>
                 <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.adobe</groupId>
+                <artifactId>as3corelib</artifactId>
+                <version>0.93</version>
+                <type>swc</type>
             </dependency>
 
         </dependencies>
