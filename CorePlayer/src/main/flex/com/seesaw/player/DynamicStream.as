@@ -18,7 +18,6 @@
  */
 
 package com.seesaw.player {
-
 import org.osmf.net.DynamicStreamingItem;
 import org.osmf.net.DynamicStreamingResource;
 
@@ -30,9 +29,9 @@ public class DynamicStream extends DynamicStreamingResource {
         super(params.scheme + "://" + params.cdnPath);
 
         streamItems = Vector.<DynamicStreamingItem>(
-        [
-            new DynamicStreamingItem(params.lowResAssetType + ":" + params.lowResAssetPath, 408, 768, 428)
-        ]);
+                [
+                    new DynamicStreamingItem(params.lowResAssetType + ":" + params.lowResAssetPath, 408, 768, 428)
+                ]);
 
         //  TODO: add metadata from video player info to the resource
         addMetadataValue(PROGRAMME_ID, params.programmeId);
