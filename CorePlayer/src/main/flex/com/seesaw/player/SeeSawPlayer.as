@@ -33,7 +33,7 @@ import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.media.PluginInfoResource;
 
-import uk.vodco.livrail.LiverailPluginInfo;
+import uk.vodco.livrail.LiverailPlugin;
 
 public class SeeSawPlayer extends Sprite {
 
@@ -81,7 +81,7 @@ public class SeeSawPlayer extends Sprite {
 
         liveRail = new LiverailComponent(this);
         liveRail.applyMetadata(config.element);
-        components[LiverailPluginInfo.ID] = liveRail;
+        components[LiverailPlugin.ID] = liveRail;
         config.factory.loadPlugin(liveRail.info);
 
 

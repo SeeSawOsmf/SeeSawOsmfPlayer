@@ -33,7 +33,6 @@ import org.osmf.media.PluginInfoResource;
 import org.osmf.metadata.Metadata;
 
 import uk.vodco.livrail.LiverailPlugin;
-import uk.vodco.livrail.LiverailPluginInfo;
 
 public class LiverailComponent implements PluginLifecycle {
 
@@ -72,7 +71,7 @@ public class LiverailComponent implements PluginLifecycle {
         logger.debug("applying metadata: " + target);
         var Target:Metadata = new Metadata();
         Target.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
-        target.addMetadata(LiverailPluginInfo.NS_TARGET, Target);
+        target.addMetadata(LiverailPlugin.NS_TARGET, Target);
     }
 
     private function constructElement():MediaElement {
@@ -80,7 +79,7 @@ public class LiverailComponent implements PluginLifecycle {
         liveRailSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
 
         var resource:MediaResourceBase = new MediaResourceBase();
-        resource.addMetadataValue(LiverailPluginInfo.NS_SETTINGS, liveRailSettings);
+        resource.addMetadataValue(LiverailPlugin.NS_SETTINGS, liveRailSettings);
 
         var liveRailModule:MediaElement = player.config.factory.createMediaElement(resource);
 
@@ -95,6 +94,8 @@ public class LiverailComponent implements PluginLifecycle {
         layout.index = 1;
 
         return liveRailModule;
+
+
     }
 
 }

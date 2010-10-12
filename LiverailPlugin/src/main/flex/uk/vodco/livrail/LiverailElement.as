@@ -6,24 +6,16 @@ import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ParallelElement;
 import org.osmf.elements.ProxyElement;
 import org.osmf.elements.SWFElement;
-import org.osmf.events.AudioEvent;
-import org.osmf.events.BufferEvent;
 import org.osmf.events.DisplayObjectEvent;
 import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
-import org.osmf.events.PlayEvent;
 import org.osmf.events.SeekEvent;
-import org.osmf.events.TimeEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.media.URLResource;
-import org.osmf.traits.AudioTrait;
-import org.osmf.traits.BufferTrait;
 import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.LoadTrait;
 import org.osmf.traits.MediaTraitType;
-import org.osmf.traits.PlayTrait;
 import org.osmf.traits.SeekTrait;
-import org.osmf.traits.TimeTrait;
 
 public class LiverailElement extends ProxyElement {
 
@@ -58,7 +50,6 @@ public class LiverailElement extends ProxyElement {
 
     public var adSlots:int = 0;
 
-
     private var availabilities:Array = [];
 
     private var _adPositions:Array = [];
@@ -85,7 +76,7 @@ public class LiverailElement extends ProxyElement {
         var liverailPath:String = "http://vox-static.liverail.com/swf/v4/skins/adplayerskin_1.swf";
         var urlResource:URLResource = new URLResource(liverailPath)
         var element:ParallelElement = new SWFElement(urlResource) as ParallelElement;
-        super();
+
     }
 
 
@@ -119,9 +110,6 @@ public class LiverailElement extends ProxyElement {
     }
 
 
-    // Internals
-    //
-
     private function onTraitAdd(event:MediaElementEvent):void {
         processTrait(event.traitType, true);
     }
@@ -132,24 +120,15 @@ public class LiverailElement extends ProxyElement {
 
     private function processTrait(traitType:String, added:Boolean):void {
         switch (traitType) {
-            case MediaTraitType.AUDIO:
-                toggleAudioListeners(added);
-                break;
+
             case MediaTraitType.LOAD:
                 toggleLoadListeners(added);
                 break;
-            case MediaTraitType.BUFFER:
-                toggleBufferListeners(added);
-                break;
-            case MediaTraitType.PLAY:
-                togglePlayListeners(added);
-                break;
+
             case MediaTraitType.SEEK:
                 toggleSeekListeners(added);
                 break;
-            case MediaTraitType.TIME:
-                toggleTimeListeners(added);
-                break;
+
             case MediaTraitType.DISPLAY_OBJECT:
                 toggleDisplayListeners(added);
                 break;
@@ -178,28 +157,6 @@ public class LiverailElement extends ProxyElement {
         trace("On Display Object Change old:{0} new:{1}", event.oldDisplayObject, event.newDisplayObject)
     }
 
-    private function toggleAudioListeners(added:Boolean):void {
-        var audible:AudioTrait = proxiedElement.getTrait(MediaTraitType.AUDIO) as AudioTrait;
-        if (audible) {
-            if (added) {
-                audible.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
-                audible.addEventListener(AudioEvent.MUTED_CHANGE, onMutedChange);
-            }
-            else {
-                audible.removeEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
-                audible.removeEventListener(AudioEvent.MUTED_CHANGE, onMutedChange);
-            }
-        }
-    }
-
-    private function onMutedChange(event:AudioEvent):void {
-        trace("Mute change: {0}", event.muted);
-    }
-
-    private function onVolumeChange(event:AudioEvent):void {
-        trace("Volume Change: {0}", event.volume);
-    }
-
     private function toggleLoadListeners(added:Boolean):void {
         var loadable:LoadTrait = proxiedElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
         if (loadable) {
@@ -223,50 +180,6 @@ public class LiverailElement extends ProxyElement {
         trace("Load state change:{0}", event.loadState);
     }
 
-    private function toggleBufferListeners(added:Boolean):void {
-        var buffer:BufferTrait = proxiedElement.getTrait(MediaTraitType.BUFFER) as BufferTrait;
-        if (buffer) {
-            if (added) {
-                buffer.addEventListener(BufferEvent.BUFFER_TIME_CHANGE, onBufferTimeChange);
-                buffer.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
-            }
-            else {
-                buffer.removeEventListener(BufferEvent.BUFFER_TIME_CHANGE, onBufferTimeChange);
-                buffer.removeEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
-            }
-        }
-    }
-
-    private function onBufferingChange(event:BufferEvent):void {
-        trace("On Buffering Change:{0}", event.buffering);
-    }
-
-    private function onBufferTimeChange(event:BufferEvent):void {
-        trace("On Buffer Time Change:{0}", event.bufferTime);
-    }
-
-    private function togglePlayListeners(added:Boolean):void {
-        var playable:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
-        if (playable) {
-            if (added) {
-                playable.addEventListener(PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
-                playable.addEventListener(PlayEvent.CAN_PAUSE_CHANGE, onCanPauseChange);
-            }
-            else {
-                playable.removeEventListener(PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
-                playable.removeEventListener(PlayEvent.CAN_PAUSE_CHANGE, onCanPauseChange);
-            }
-        }
-    }
-
-    private function onCanPauseChange(event:PlayEvent):void {
-        trace("Can Pause Change:{0}", event.canPause);
-    }
-
-    private function onPlayStateChange(event:PlayEvent):void {
-        trace("Play State Change:{0}", event.playState);
-    }
-
 
     private function toggleSeekListeners(added:Boolean):void {
         var seek:SeekTrait = proxiedElement.getTrait(MediaTraitType.SEEK) as SeekTrait;
@@ -282,31 +195,9 @@ public class LiverailElement extends ProxyElement {
         trace("On Seek Change:{0}", event.seeking);
     }
 
-    private function toggleTimeListeners(added:Boolean):void {
-        var time:TimeTrait = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
 
-        if (time) {
-            time.addEventListener(TimeEvent.COMPLETE, onComplete);
-            time.addEventListener(TimeEvent.CURRENT_TIME_CHANGE, onCurrentTimeChange);
-            time.addEventListener(TimeEvent.DURATION_CHANGE, onDurationChange);
-        } else {
-            time.removeEventListener(TimeEvent.COMPLETE, onComplete);
-            time.removeEventListener(TimeEvent.CURRENT_TIME_CHANGE, onCurrentTimeChange);
-            time.removeEventListener(TimeEvent.DURATION_CHANGE, onDurationChange);
-        }
-    }
+    /* static */
 
-    private function onDurationChange(event:TimeEvent):void {
-        trace("On Duration Change:{0}", event.target.duration);
-    }
-
-    private function onCurrentTimeChange(event:TimeEvent):void {
-        trace("On Current Time Change:{0}", event.time);
-    }
-
-    private function onComplete(event:TimeEvent):void {
-        trace("On Complete");
-    }
-
+    private static const ID:String = "LIVERAIL_ID";
 }
 }
