@@ -84,21 +84,24 @@ public class Player extends Sprite {
         // TODO: this url should come from flashvars
         var requestUrl:String = "http://localhost:8080/player.videoplayerinfo:getvideoplayerinfo?t:ac=TV:COMEDY/p/16001003001/Eighteen-Age-Rating-programme-1";
         var request:ServiceRequest = new ServiceRequest(requestUrl);
-        request.successCallback = onSuccess;
-        request.failCallback = onFail;
+        request.successCallback = onSuccessFromVideoInfo;
+        request.failCallback = onFailFromVideoInfo;
         request.submit();
     }
 
-    private function onSuccess(programmeData:Object):void {
+    private function onSuccessFromVideoInfo(programmeData:Object):void {
         logger.debug("received programme data");
         var resource:MediaResourceBase = createMediaResource(programmeData);
         loadVideo(resource);
     }
 
-    private function onFail():void {
+    private function onFailFromVideoInfo():void {
         logger.debug("failed to retrieve programme data");
-        // TODO: set the 'programme not playing' panel as the main content
+        // TODO: set the error ('programme not playing') panel as the main content
+        // Note that this is the function that will be called when VideoPlayerInfo throws an exception.
+        // VideoPlayerInfo will not return inconsistent or partial state.
 
+        // TODO: This should be removed once the new video player info service is up and running
         var resource:MediaResourceBase = createMediaResource(new MockData().videoPlayerInfo);
         loadVideo(resource);
     }
