@@ -23,18 +23,18 @@ import org.osmf.net.DynamicStreamingResource;
 
 public class DynamicStream extends DynamicStreamingResource {
 
-    private var dynResource:DynamicStreamingResource;
+    private static const PROGRAMME_ID:String = "programmeID";
 
-    public function DynamicStream(videoPlayerInfo:Object) {
-        super("rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703");
+    public function DynamicStream(params:Object) {
+        super(params.scheme + "://" + params.cdnPath);
 
-        // TODO: read out of videoPlayerInfo when the service has been implemented to return the correct values.
         streamItems = Vector.<DynamicStreamingItem>(
-                [     new DynamicStreamingItem("mp4:e5/test/ccp/p/LOW_RES/test/test_asset.mp4", 408, 768, 428)
-                ]);
+        [
+            new DynamicStreamingItem(params.lowResAssetType + ":" + params.lowResAssetPath, 408, 768, 428)
+        ]);
 
         //  TODO: add metadata from video player info to the resource
-        // dynResource.addMetadataValue(PLAYER_NAMESPACE, partnerId);
+        addMetadataValue(PROGRAMME_ID, params.programmeId);
     }
 }
 }
