@@ -19,11 +19,14 @@
 
 package com.seesaw.player {
 import com.seesaw.player.components.resourceBase.SeeSawMediaResource;
+import com.seesaw.player.init.VideoPlayerInfoRequest;
+import com.seesaw.player.init.ServiceRequestBase;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 
 import flash.display.Sprite;
 import flash.events.Event;
+import flash.events.NetStatusEvent;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -36,16 +39,12 @@ public class Player extends Sprite {
     private static const PLAYER_WIDTH:int = PLAYER::Width;
     private static const PLAYER_HEIGHT:int = PLAYER::Height;
 
-    private static const VIDEO_URL:String
-            = "rtmp://cp67126.edgefcs.net/ondemand/mp4:mediapm/osmf/content/test/sample1_700kbps.f4v";
-
     private static var loggerSetup:* = (LoggerFactory.loggerFactory = new TraceAndArthropodLoggerFactory());
     private static var osmfLoggerSetup:* = (Log.loggerFactory = new CommonsOsmfLoggerFactory());
 
     private var logger:ILogger = LoggerFactory.getClassLogger(Player);
 
     private var videoPlayer:SeeSawPlayer;
-    private var seeSawMediaResource:SeeSawMediaResource = new SeeSawMediaResource();
 
     public function Player() {
         super();
@@ -55,7 +54,7 @@ public class Player extends Sprite {
     private function onAddedToStage(event:Event):void {
         logger.debug("added to stage");
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
-        loadVideo(createMediaResource());
+        requestProgrammeData();
     }
 
     private function loadVideo(content:MediaResourceBase):void {
@@ -75,10 +74,31 @@ public class Player extends Sprite {
         addChild(videoPlayer);
     }
 
-    private function createMediaResource():MediaResourceBase {
-        logger.debug("creating media");
-        var urlResource:MediaResourceBase = seeSawMediaResource.newResourceBase(this.loaderInfo.parameters, VIDEO_URL);
-        return urlResource;
+    private function createMediaResource(programmeData:Object):MediaResourceBase {
+        logger.debug("creating media: " + programmeData.lowResUrl);
+        var seeSawMediaResource:SeeSawMediaResource = new SeeSawMediaResource();
+        var mediaResource:MediaResourceBase = seeSawMediaResource.newResourceBase(this.loaderInfo.parameters, programmeData.lowResUrl);
+        return mediaResource;
+    }
+
+    private function requestProgrammeData():void {
+        logger.debug("requesting programme data: " + this.loaderInfo.parameters["programmeID"]);
+
+        //TODO: these values should come from params
+        var request:ServiceRequestBase = new VideoPlayerInfoRequest("http://kgd-red-test-zxtm01.dev.vodco.co.uk", 25149);
+        request.successCallback = onSuccess;
+        request.failCallback = onFail;
+        request.submit();
+    }
+
+    private function onSuccess(programmeData:Object):void {
+        logger.debug("received programme data");
+        var resource:MediaResourceBase = createMediaResource(programmeData);
+        loadVideo(resource);
+    }
+
+    private function onFail():void {
+        logger.debug("failed to retrieve programme data");
     }
 }
 }

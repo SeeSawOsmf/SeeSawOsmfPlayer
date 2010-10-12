@@ -106,6 +106,13 @@
                 <type>swc</type>
             </dependency>
 
+            <dependency>
+                <artifactId>PlayerInitialisation</artifactId>
+                <groupId>uk.co.vodco</groupId>
+                <version>${pom.version}</version>
+                <type>swc</type>
+            </dependency>
+
             <!-- 3rd Party Dependencies -->
 
             <dependency>

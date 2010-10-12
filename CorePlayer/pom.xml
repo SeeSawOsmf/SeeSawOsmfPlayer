@@ -86,11 +86,16 @@
             <type>swc</type>
         </dependency>
         <dependency>
+            <groupId>uk.co.vodco</groupId>
+            <artifactId>PlayerInitialisation</artifactId>
+            <type>swc</type>
+        </dependency>
+        
+        <dependency>
             <groupId>org.as3commons</groupId>
             <artifactId>as3commons-logging</artifactId>
             <type>swc</type>
         </dependency>
-
 
         <dependency>
             <groupId>com.adobe.flexunit</groupId>

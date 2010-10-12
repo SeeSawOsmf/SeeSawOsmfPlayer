@@ -56,5 +56,11 @@
             <groupId>com.seesaw</groupId>
             <type>swc</type>
         </dependency>
+
+        <dependency>
+            <groupId>com.adobe</groupId>
+            <artifactId>as3corelib</artifactId>
+            <type>swc</type>
+        </dependency>
     </dependencies>
 </project>
