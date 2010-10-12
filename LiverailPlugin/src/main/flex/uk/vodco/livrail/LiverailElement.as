@@ -85,7 +85,7 @@ public class LiverailElement extends ProxyElement {
         var liverailPath:String = "http://vox-static.liverail.com/swf/v4/skins/adplayerskin_1.swf";
         var urlResource:URLResource = new URLResource(liverailPath)
         var element:ParallelElement = new SWFElement(urlResource) as ParallelElement;
-
+        super();
     }
 
 

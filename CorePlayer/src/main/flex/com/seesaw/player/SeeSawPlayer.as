@@ -19,6 +19,7 @@
 
 package com.seesaw.player {
 import com.seesaw.player.components.ControlBarComponent;
+import com.seesaw.player.components.LiverailComponent;
 import com.seesaw.player.components.PluginLifecycle;
 
 import flash.display.Sprite;
@@ -32,7 +33,7 @@ import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.media.PluginInfoResource;
 
-import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
+import uk.vodco.livrail.LiverailPluginInfo;
 
 public class SeeSawPlayer extends Sprite {
 
@@ -43,6 +44,7 @@ public class SeeSawPlayer extends Sprite {
     private var _rootElement:ParallelElement;
 
     private var components:Dictionary;
+    private var _liveRail:LiverailComponent;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
@@ -74,7 +76,21 @@ public class SeeSawPlayer extends Sprite {
         components[ControlBarPlugin.ID] = controlBar;
         config.factory.loadPlugin(controlBar.info);
 
-        config.factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
+
+        liveRail = new LiverailComponent(this);
+        liveRail.applyMetadata(config.element);
+        components[LiverailPluginInfo.ID] = liveRail;
+        config.factory.loadPlugin(liveRail.info);
+
+
+    }
+
+    public function set liveRail(liveRail:LiverailComponent):void {
+        _liveRail = liveRail;
+    }
+
+    public function get liveRail():LiverailComponent {
+        return _liveRail;
     }
 
     private function createRootElement():MediaElement {
@@ -100,7 +116,7 @@ public class SeeSawPlayer extends Sprite {
 
             if (pluginInfo.pluginInfo.numMediaFactoryItems > 0) {
                 var id:String = pluginInfo.pluginInfo.getMediaFactoryItemAt(0).id;
-                var component = components[id] as PluginLifecycle;
+                var component:PluginLifecycle = components[id] as PluginLifecycle;
                 if (component) {
                     component.pluginLoaded(event);
                 }
