@@ -53,6 +53,7 @@ public class SeeSawPlayer extends Sprite {
 
         initialisePlayer();
         createComponents();
+
     }
 
     private function initialisePlayer():void {
@@ -66,6 +67,7 @@ public class SeeSawPlayer extends Sprite {
         config.container.addMediaElement(rootElement);
         addChild(config.container);
     }
+
 
     private function createComponents():void {
         logger.debug("creating components");
