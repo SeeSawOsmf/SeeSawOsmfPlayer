@@ -4,16 +4,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>player</artifactId>
-        <groupId>uk.co.vodco</groupId>
+        <groupId>com.seesaw</groupId>
         <version>7.0.0-SNAPSHOT</version>
     </parent>
     <packaging>swf</packaging>
-        
+
     <modelVersion>4.0.0</modelVersion>
     <name>CanvasPoc</name>
     <artifactId>CanvasPoc</artifactId>
 
-     <build>
+    <build>
         <sourceDirectory>src/main/flex</sourceDirectory>
         <testSourceDirectory>src/test/flex</testSourceDirectory>
         <plugins>

@@ -98,7 +98,7 @@ public class SeeSawPlayer extends Sprite {
 
             if (pluginInfo.pluginInfo.numMediaFactoryItems > 0) {
                 var id:String = pluginInfo.pluginInfo.getMediaFactoryItemAt(0).id;
-                var component = components[id] as PluginLifecycle;
+                var component:PluginLifecycle = components[id] as PluginLifecycle;
                 if (component) {
                     component.pluginLoaded(event);
                 }
