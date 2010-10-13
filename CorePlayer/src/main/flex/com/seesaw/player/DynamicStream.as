@@ -18,20 +18,30 @@
  */
 
 package com.seesaw.player {
+import org.as3commons.logging.ILogger;
+import org.as3commons.logging.LoggerFactory;
 import org.osmf.net.DynamicStreamingItem;
 import org.osmf.net.DynamicStreamingResource;
 
 public class DynamicStream extends DynamicStreamingResource {
+
+    private var logger:ILogger = LoggerFactory.getClassLogger(DynamicStream);
 
     private static const PROGRAMME_ID:String = "programmeID";
 
     public function DynamicStream(params:Object) {
         super(params.scheme + "://" + params.cdnPath);
 
+        logger.debug("scheme: " + params.scheme);
+        logger.debug("cdn: " + params.cdnPath);
+        logger.debug("low res asset: " + params.lowResAssetPath);
+
         streamItems = Vector.<DynamicStreamingItem>(
                 [
                     new DynamicStreamingItem(params.lowResAssetType + ":" + params.lowResAssetPath, 408, 768, 428)
                 ]);
+
+        logger.debug("created " + streamItems.length + " stream item(s)");
 
         //  TODO: add metadata from video player info to the resource
         addMetadataValue(PROGRAMME_ID, params.programmeId);

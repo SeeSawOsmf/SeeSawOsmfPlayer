@@ -58,6 +58,9 @@ public class FullScreen extends ButtonWidget implements IWidget {
         fullScreenLabel = new TextField();
         fullScreenLabel.text = "Fullscreen";
         this.formatLabelFont();
+
+        // _container = media.container;
+        logger.debug("container: " + media);
         addChild(fullScreenLabel);
     }
 
@@ -75,7 +78,6 @@ public class FullScreen extends ButtonWidget implements IWidget {
     protected function fullScreenHandler(event:Event):void {
         logger.debug("NEW STAGE HEIGHT : " + stage.stageHeight);
         logger.debug("NEW STAGE WIDTH : " + stage.stageWidth);
-
     }
 
     protected function get playable():PlayTrait {

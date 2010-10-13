@@ -40,8 +40,9 @@ public class PlayerConfiguration {
 
     public function PlayerConfiguration(playerWidth:int, playerHeight:int, mediaResource:MediaResourceBase) {
         player = new MediaPlayer();
-        container = new MediaContainer();
-        container.name = "seesawContainer";
+        container = new SeeSawMediaContainer();
+        container.backgroundColor = 0xFF0000;
+
         width = playerWidth;
         height = playerHeight;
         resource = mediaResource;
