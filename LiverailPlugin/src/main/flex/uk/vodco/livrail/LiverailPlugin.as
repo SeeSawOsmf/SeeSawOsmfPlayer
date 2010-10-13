@@ -112,7 +112,7 @@ public class LiverailPlugin extends PluginInfo {
         if (liverailElement != null && targetElement != null && liverailElement != targetElement) {
             logger.debug("THE TARGET " + targetElement);
 
-            liverailElement.proxiedElement = targetElement;
+            liverailElement.addReference(targetElement);
         }
     }
 }
