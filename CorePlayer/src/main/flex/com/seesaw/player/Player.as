@@ -49,12 +49,16 @@ public class Player extends Sprite {
 
     public function Player() {
         super();
+        logger.debug("created new player");
+
         params = LoaderInfo(this.root.loaderInfo).parameters;
 
         // TODO: this needs to be in a flashvar from the page
         params.videoPlayerInfo = "http://localhost:8080/player.videoplayerinfo:getvideoplayerinfo?t:ac=TV:COMEDY/p/41001001001/No-Series-programmes-programme-1";
 
         stage.scaleMode = StageScaleMode.NO_SCALE;
+
+        addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
     }
 
     private function onAddedToStage(event:Event):void {
