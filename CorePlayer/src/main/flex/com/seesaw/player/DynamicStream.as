@@ -37,9 +37,9 @@ public class DynamicStream extends DynamicStreamingResource {
         logger.debug("low res asset: " + params.lowResAssetPath);
 
         streamItems = Vector.<DynamicStreamingItem>(
-        [
-            new DynamicStreamingItem(params.lowResAssetType + ":" + params.lowResAssetPath, 408, 768, 428)
-        ]);
+                [
+                    new DynamicStreamingItem(params.lowResAssetType + ":" + params.lowResAssetPath, 408, 768, 428)
+                ]);
 
         logger.debug("created " + streamItems.length + " stream item(s)");
 

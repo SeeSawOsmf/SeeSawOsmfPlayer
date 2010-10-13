@@ -68,6 +68,9 @@ public class SeeSawPlayer extends Sprite {
         logger.debug("creating components");
         components = new Dictionary();
 
+        var pluginInfoResource:PluginInfoResource = new PluginInfoResource(new MediaSizePluginInfo());
+        config.factory.loadPlugin(pluginInfoResource);
+
         controlBar = new ControlBarComponent(this);
         controlBar.applyMetadata(config.element);
         components[ControlBarPlugin.ID] = controlBar;

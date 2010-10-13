@@ -30,6 +30,7 @@ import org.osmf.chrome.assets.AssetsManager;
 import org.osmf.chrome.configuration.LayoutAttributesParser;
 import org.osmf.chrome.configuration.WidgetsParser;
 import org.osmf.chrome.widgets.Widget;
+import org.osmf.events.DisplayObjectEvent;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaResourceBase;
@@ -139,6 +140,8 @@ public class ControlBarElement extends MediaElement {
     }
 
     override protected function setupTraits():void {
+        logger.debug("setupTraits");
+
         // Setup a control bar using the ChromeLibrary:
         setupControlBar();
 
@@ -164,7 +167,8 @@ public class ControlBarElement extends MediaElement {
     //
 
     private function setupControlBar():void {
-        
+        logger.debug("setupControlBar");
+
         addSeesawWidgets();
 
         try {
