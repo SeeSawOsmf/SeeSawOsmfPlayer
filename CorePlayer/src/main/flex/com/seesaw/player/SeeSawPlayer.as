@@ -22,6 +22,7 @@ import com.seesaw.player.components.ControlBarComponent;
 import com.seesaw.player.components.PluginLifecycle;
 
 import flash.display.Sprite;
+import flash.events.Event;
 import flash.utils.Dictionary;
 
 import org.as3commons.logging.ILogger;
@@ -63,13 +64,9 @@ public class SeeSawPlayer extends Sprite {
         addChild(config.container);
     }
 
-
     private function createComponents():void {
         logger.debug("creating components");
         components = new Dictionary();
-
-        var pluginInfoResource:PluginInfoResource = new PluginInfoResource(new MediaSizePluginInfo());
-        config.factory.loadPlugin(pluginInfoResource);
 
         controlBar = new ControlBarComponent(this);
         controlBar.applyMetadata(config.element);

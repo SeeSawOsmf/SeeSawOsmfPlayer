@@ -55,14 +55,12 @@ public class Player extends Sprite {
         params.videoPlayerInfo = "http://localhost:8080/player.videoplayerinfo:getvideoplayerinfo?t:ac=TV:COMEDY/p/41001001001/No-Series-programmes-programme-1";
 
         stage.scaleMode = StageScaleMode.NO_SCALE;
-
-        addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
     }
 
     private function onAddedToStage(event:Event):void {
         logger.debug("added to stage");
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
-
+        
         requestProgrammeData();
     }
 
