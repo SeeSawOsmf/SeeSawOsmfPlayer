@@ -50,6 +50,7 @@ public class Player extends Sprite {
     public function Player() {
         super();
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+        stage.scaleMode = "noScale";
     }
 
     private function onAddedToStage(event:Event):void {
