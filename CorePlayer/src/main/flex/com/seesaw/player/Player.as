@@ -24,6 +24,7 @@ import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 
 import com.seesaw.player.mockData.MockData;
 
+import flash.display.LoaderInfo;
 import flash.display.Sprite;
 import flash.events.Event;
 
@@ -43,10 +44,16 @@ public class Player extends Sprite {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(Player);
 
-    private var videoPlayer:SeeSawPlayer;
+    private var _videoPlayer:SeeSawPlayer;
+    private var _params:Object;
 
     public function Player() {
         super();
+        params = LoaderInfo(this.root.loaderInfo).parameters;
+
+        // TODO: this needs to be in a flashvar from the page
+        params.videoPlayerInfo = "http://localhost:8080/player.videoplayerinfo:getvideoplayerinfo?t:ac=TV:COMEDY/p/41001001001/No-Series-programmes-programme-1";
+
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
     }
 
@@ -74,23 +81,21 @@ public class Player extends Sprite {
     }
 
     private function createMediaResource(programmeData:Object):MediaResourceBase {
-        logger.debug("creating media resource with url: " + programmeData.lowResUrl);
+        logger.debug("creating media resource");
         return new DynamicStream(programmeData);
     }
 
     private function requestProgrammeData():void {
-        logger.debug("requesting programme data");
+        logger.debug("requesting programme data: " + params.videoPlayerInfo);
 
-        // TODO: this url should come from flashvars
-        var requestUrl:String = "http://localhost:8080/player.videoplayerinfo:getvideoplayerinfo?t:ac=TV:COMEDY/p/16001003001/Eighteen-Age-Rating-programme-1";
-        var request:ServiceRequest = new ServiceRequest(requestUrl);
+        var request:ServiceRequest = new ServiceRequest(params.videoPlayerInfo);
         request.successCallback = onSuccessFromVideoInfo;
         request.failCallback = onFailFromVideoInfo;
         request.submit();
     }
 
     private function onSuccessFromVideoInfo(programmeData:Object):void {
-        logger.debug("received programme data");
+        logger.debug("received programme data for programme: " +  + programmeData.programme.programmeId);
         var resource:MediaResourceBase = createMediaResource(programmeData);
         loadVideo(resource);
     }
@@ -104,6 +109,22 @@ public class Player extends Sprite {
         // TODO: This should be removed once the new video player info service is up and running
         var resource:MediaResourceBase = createMediaResource(new MockData().videoPlayerInfo);
         loadVideo(resource);
+    }
+
+    public function get videoPlayer():SeeSawPlayer {
+        return _videoPlayer;
+    }
+
+    public function set videoPlayer(value:SeeSawPlayer):void {
+        _videoPlayer = value;
+    }
+
+    public function get params():Object {
+        return _params;
+    }
+
+    public function set params(value:Object):void {
+        _params = value;
     }
 }
 }

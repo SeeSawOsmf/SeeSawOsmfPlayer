@@ -1,91 +1,11 @@
 <html>
 <head>
-	<script type="text/javascript" src="swfobject/swfobject.js"></script>
-
-      <script type="text/javascript">
-
-        var swf = "_Player.swf";
-        
-        var flashvars = {
-          url: "http://preview.seesaw.co.uk/clips/MTV/the_hills_audrina_interview_5.mp4",
-         /*   url: "http://mediapm.edgesuite.net/osmf/content/test/logo_animated.flv",*/
-			showPreplay: "/i/ccp/00000035/3535.jpg",
-			autoPlay: "false"
-        };
-        var params = {
-            allowFullScreen: "true",
-            allowScriptAccess: "always",
-			autoPlay: "false"
-        };
-        var attributes = {
-
-        };
-
-        swfobject.embedSWF(swf, "myContent", "640", "480", "10.1.53", "playerProductInstall.swf", flashvars, params, attributes);
-    </script>
     <title>${title}</title>
 </head>
 <body>
-<!--
-<p>OSMF based test player</p>
-          'Contains some strong language and some scenes of a sexual nature. ', '', '18', '',
-'18',
-'true', "/i/ccp/00000035/3535.jpg",
-'false', genres, '4.1', '1332', '',
-'', '', '', '/ParentalControls',
-'11291', '5146782', false, false, '', '/unavailable'
-
-<br>
-
-
-  var flashvars = {
-            url: "rtmp://cp67126.edgefcs.net/ondemand/mediapm/strobe/content/test/SpaceAloneHD_sounas_640_500_short",
-            guidance: guidance,
-			subtitlesAvailable: subs,
-			tvAgeRating: tvAgeRating,
-			filmAgeRating: filmAgeRating,
-			rollupAgeRating: rollupAgeRating,
-			usePlaylist: usePlaylist,
-			showPreplay: showPreplay,
-			programmeType: progType,
-			genres: genres,
-			liverailVersion: liverailVersion,
-			liverailPublisherId: liverailPublisherId,
-			helpSectionLinkURL: helpSectionLinkURL,
-			lostPinLinkURL: lostPinLinkURL,
-			whatsThisLinkURL: whatsThisLinkURL,
-			termsAndConditionsLinkURL: termsAndConditionsLinkURL,
-			parentalControlsPageURL: parentalControlsPageURL,
-			programmeId: programmeId,
-			userId: userId,
-			suppressAgeRatingPopup : suppressAgeRatingPopup,
-			paidContent: paidContent,
-			ageBlockURL: ageBlockURL,
-			unavailableUrl: unavailableUrl
-
--->
-<div id="myContent">
-    <p>There should be a video here</p>
-
-
-
-
-</div>
-
-<script type="text/javascript">
-
-
-    function playVideo(){
-        $(myContent).url=$F(url);
-    }
-    
-</script>
-<!--<form id="urlForm" onsubmit="playVideo">
-
-        <label for="url">URL</label>
-        <input type="text" id="url"/>
-        <input type="submit" id="submit"/>
-    </form>
-    -->
+    <object width="${width}" height="${height}">
+        <embed src="${swf}.swf" width="${width}" height="${height}" flashvars="">
+        </embed>
+    </object>
 </body>
 </html>

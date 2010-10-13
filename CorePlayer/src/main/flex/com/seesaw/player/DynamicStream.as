@@ -35,7 +35,7 @@ public class DynamicStream extends DynamicStreamingResource {
         ]);
 
         //  TODO: add metadata from video player info to the resource
-        addMetadataValue(PROGRAMME_ID, params.programmeId);
+        addMetadataValue(PROGRAMME_ID, params.programme.programmeId);
     }
 }
 }
