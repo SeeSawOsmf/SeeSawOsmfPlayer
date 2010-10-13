@@ -21,7 +21,6 @@ package com.seesaw.player {
 import com.seesaw.player.init.ServiceRequest;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
-
 import com.seesaw.player.mockData.MockData;
 
 import flash.display.LoaderInfo;
@@ -55,11 +54,13 @@ public class Player extends Sprite {
         params.videoPlayerInfo = "http://localhost:8080/player.videoplayerinfo:getvideoplayerinfo?t:ac=TV:COMEDY/p/41001001001/No-Series-programmes-programme-1";
 
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+        stage.scaleMode = "noScale";
     }
 
     private function onAddedToStage(event:Event):void {
         logger.debug("added to stage");
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+
         requestProgrammeData();
     }
 
@@ -80,11 +81,6 @@ public class Player extends Sprite {
         addChild(videoPlayer);
     }
 
-    private function createMediaResource(programmeData:Object):MediaResourceBase {
-        logger.debug("creating media resource");
-        return new DynamicStream(programmeData);
-    }
-
     private function requestProgrammeData():void {
         logger.debug("requesting programme data: " + params.videoPlayerInfo);
 
@@ -95,9 +91,14 @@ public class Player extends Sprite {
     }
 
     private function onSuccessFromVideoInfo(programmeData:Object):void {
-        logger.debug("received programme data for programme: " +  + programmeData.programme.programmeId);
+        logger.debug("received programme data for programme: " + + programmeData.programme.programmeId);
         var resource:MediaResourceBase = createMediaResource(programmeData);
         loadVideo(resource);
+    }
+
+    private function createMediaResource(programmeData:Object):MediaResourceBase {
+        logger.debug("creating media resource");
+        return new DynamicStream(programmeData);
     }
 
     private function onFailFromVideoInfo():void {

@@ -8,12 +8,12 @@
         <version>7.0.0-SNAPSHOT</version>
     </parent>
     <packaging>swf</packaging>
-        
+
     <modelVersion>4.0.0</modelVersion>
     <name>CanvasPoc</name>
     <artifactId>CanvasPoc</artifactId>
 
-     <build>
+    <build>
         <sourceDirectory>src/main/flex</sourceDirectory>
         <testSourceDirectory>src/test/flex</testSourceDirectory>
         <plugins>
