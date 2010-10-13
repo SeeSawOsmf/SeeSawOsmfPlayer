@@ -75,6 +75,7 @@ public class FullScreen extends ButtonWidget implements IWidget {
     protected function fullScreenHandler(event:Event):void {
         logger.debug("NEW STAGE HEIGHT : " + stage.stageHeight);
         logger.debug("NEW STAGE WIDTH : " + stage.stageWidth);
+
     }
 
     protected function get playable():PlayTrait {
