@@ -91,10 +91,6 @@ public class PlayerConfiguration {
         return _player;
     }
 
-    public function get currentTime():int {
-        return player.currentTime;
-    }
-
     public function set player(value:MediaPlayer):void {
         _player = value;
     }
