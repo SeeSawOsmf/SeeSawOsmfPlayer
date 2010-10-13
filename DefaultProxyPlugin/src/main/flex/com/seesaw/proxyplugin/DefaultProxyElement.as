@@ -18,7 +18,7 @@ public class DefaultProxyElement extends ProxyElement {
     private var logger:ILogger = LoggerFactory.getClassLogger(DefaultProxyElement);
 
     public function DefaultProxyElement() {
-        logger.debug("Initialising DefaultProxyElement");
+        /// logger.debug("Initialising DefaultProxyElement");
     }
 
 
@@ -95,11 +95,11 @@ public class DefaultProxyElement extends ProxyElement {
     }
 
     private function onBytesTotalChange(event:LoadEvent):void {
-        logger.debug("Load onBytesTotal change:{0}", event.bytes);
+        /// logger.debug("Load onBytesTotal change:{0}", event.bytes);
     }
 
     private function onLoadableStateChange(event:LoadEvent):void {
-        logger.debug("Load state change:{0}", event.loadState);
+        /// logger.debug("Load state change:{0}", event.loadState);
     }
 
 
@@ -125,13 +125,13 @@ public class DefaultProxyElement extends ProxyElement {
     }
 
     private function onSeekingChange(event:SeekEvent):void {
-        logger.debug("On Seek Change:{0}", event.seeking);
+        /// logger.debug("On Seek Change:{0}", event.seeking);
         var time:TimeTrait = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
-        logger.debug(String(time.currentTime));
+        /// logger.debug(String(time.currentTime));
     }
 
     private function onTimeChange(event:TimeEvent):void {
-        logger.debug("Time Change:  ", event.time);
+        /// logger.debug("Time Change:  ", event.time);
     }
 
     /* static */

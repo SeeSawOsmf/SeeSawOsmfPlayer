@@ -76,7 +76,7 @@ public class LiverailPlugin extends PluginInfo {
     public static const NS_TARGET:String = "liverail/target";
 
     private var _pluginInfo:PluginInfo;
-    private var liverailElement:LiverailElement;
+    public var liverailElement:LiverailElement;
     private var targetElement:MediaElement;
 
     private var controlsUpdated:Boolean;

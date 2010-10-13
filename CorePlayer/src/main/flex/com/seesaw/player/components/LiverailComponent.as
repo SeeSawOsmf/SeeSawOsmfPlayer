@@ -23,12 +23,9 @@ import com.seesaw.player.SeeSawPlayer;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
+import org.osmf.elements.ParallelElement;
 import org.osmf.events.MediaFactoryEvent;
-import org.osmf.layout.HorizontalAlign;
-import org.osmf.layout.LayoutMetadata;
-import org.osmf.layout.VerticalAlign;
 import org.osmf.media.MediaElement;
-import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
 import org.osmf.metadata.Metadata;
 
@@ -43,13 +40,14 @@ public class LiverailComponent implements PluginLifecycle {
     private var loaded:Boolean;
 
     private var liveRailPluginInfo:PluginInfoResource;
+    private var liveRailPlugin:LiverailPlugin = new LiverailPlugin();
 
     public function LiverailComponent(player:SeeSawPlayer) {
         this.player = player;
     }
 
     public function get info():PluginInfoResource {
-        var liveRailPlugin:LiverailPlugin = new LiverailPlugin();
+
         liveRailPluginInfo = new PluginInfoResource(liveRailPlugin.pluginInfo);
         return liveRailPluginInfo;
     }
@@ -78,26 +76,11 @@ public class LiverailComponent implements PluginLifecycle {
         target.addMetadata(LiverailPlugin.NS_TARGET, Target);
     }
 
-    private function constructElement():MediaElement {
-        var liveRailSettings:Metadata = new Metadata();
-        liveRailSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
+    private function constructElement():ParallelElement {
 
-        var resource:MediaResourceBase = new MediaResourceBase();
-        resource.addMetadataValue(LiverailPlugin.NS_SETTINGS, liveRailSettings);
+        var element:ParallelElement = liveRailPlugin.liverailElement.element;
 
-        var liveRailModule:MediaElement = player.config.factory.createMediaElement(resource);
-
-        var layout:LayoutMetadata = liveRailModule.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
-        if (layout == null) {
-            layout = new LayoutMetadata();
-            liveRailModule.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
-        }
-        layout.verticalAlign = VerticalAlign.BOTTOM;
-        layout.horizontalAlign = HorizontalAlign.CENTER;
-
-        layout.index = 1;
-
-        return liveRailModule;
+        return element;
 
 
     }
