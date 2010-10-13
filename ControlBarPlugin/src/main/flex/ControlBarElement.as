@@ -147,7 +147,6 @@ public class ControlBarElement extends MediaElement {
         LayoutAttributesParser.parse(controlBar.configuration, layoutMetadata);
         addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layoutMetadata);
 
-
         // Signal that this media element is viewable: create a DisplayObjectTrait.
         // Assign controlBar (which is a Sprite) to be our view's displayObject.
         // Additionally, use its current width and height for the trait's mediaWidth

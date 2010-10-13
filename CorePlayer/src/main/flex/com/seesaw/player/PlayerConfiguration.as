@@ -39,8 +39,8 @@ public class PlayerConfiguration {
     private var _resource:MediaResourceBase;
 
     public function PlayerConfiguration(playerWidth:int, playerHeight:int, mediaResource:MediaResourceBase) {
-        player = new MediaPlayer();
-        container = new MediaContainer();
+        player = new SeeSawMediaPlayer();
+        container = new SeeSawMediaContainer();
 
         width = playerWidth;
         height = playerHeight;

@@ -21,7 +21,7 @@
                 <groupId>org.sonatype.flexmojos</groupId>
                 <artifactId>flexmojos-maven-plugin</artifactId>
                 <configuration>
-                    <sourceFile>uk/co/vodco/osmfPlayer/Player.as</sourceFile>
+                    <sourceFile>com/seesaw/player/Player.as</sourceFile>
                     <definesDeclaration>
                         <property>
                             <name>PLAYER::Width</name>
@@ -44,6 +44,13 @@
                             <goal>wrapper</goal>
                         </goals>
                         <phase>install</phase>
+                        <configuration>
+                            <parameters>
+                                <swf>${build.finalName}</swf>
+                                <width>672</width>
+                                <height>378</height>
+                            </parameters>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

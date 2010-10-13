@@ -57,7 +57,6 @@ public class SeeSawPlayer extends Sprite {
 
         initialisePlayer();
         createComponents();
-
     }
 
     private function initialisePlayer():void {

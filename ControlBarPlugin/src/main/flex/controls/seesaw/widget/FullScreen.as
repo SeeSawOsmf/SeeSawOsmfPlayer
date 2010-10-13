@@ -32,16 +32,19 @@ import flash.text.TextFormat;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.chrome.widgets.ButtonWidget;
+import org.osmf.containers.IMediaContainer;
 import org.osmf.media.MediaElement;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayTrait;
 
 public class FullScreen extends ButtonWidget implements IWidget {
-    private var logger:ILogger = LoggerFactory.getClassLogger(PauseButton);
+    private var logger:ILogger = LoggerFactory.getClassLogger(FullScreen);
 
     // Internals
 
     private var _playable:PlayTrait;
+
+    private var _container:IMediaContainer;
 
     private var fullScreenLabel:TextField;
 
@@ -55,6 +58,9 @@ public class FullScreen extends ButtonWidget implements IWidget {
         fullScreenLabel = new TextField();
         fullScreenLabel.text = "Fullscreen";
         this.formatLabelFont();
+
+        // _container = media.container;
+        logger.debug("container: " + media);
         addChild(fullScreenLabel);
     }
 
@@ -67,6 +73,11 @@ public class FullScreen extends ButtonWidget implements IWidget {
         textFormat.color = 0xFFFFFF;
         textFormat.align = "right";
         this.fullScreenLabel.setTextFormat(textFormat);
+    }
+
+    protected function fullScreenHandler(event:Event):void {
+        logger.debug("NEW STAGE HEIGHT : " + stage.stageHeight);
+        logger.debug("NEW STAGE WIDTH : " + stage.stageWidth);
     }
 
     protected function get playable():PlayTrait {
@@ -82,6 +93,9 @@ public class FullScreen extends ButtonWidget implements IWidget {
 
     override protected function processRequiredTraitsAvailable(element:MediaElement):void {
         _playable = element.getTrait(MediaTraitType.PLAY) as PlayTrait;
+
+        // stage.addEventListener(Event.RESIZE, fullScreenHandler);
+
         //_playable.addEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
         //_playable.addEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
 
@@ -99,7 +113,6 @@ public class FullScreen extends ButtonWidget implements IWidget {
     }
 
     override protected function onMouseClick(event:MouseEvent):void {
-        logger.debug("TARGET : " + stage.displayState);
         if (stage.displayState == StageDisplayState.NORMAL) {
             stage.displayState = StageDisplayState.FULL_SCREEN;
             fullScreenLabel.text = "Exit Fullscreen";
