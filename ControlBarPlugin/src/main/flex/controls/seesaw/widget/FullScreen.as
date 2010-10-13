@@ -59,8 +59,8 @@ public class FullScreen extends ButtonWidget implements IWidget {
         fullScreenLabel.text = "Fullscreen";
         this.formatLabelFont();
 
-       // _container = media.container;
-         logger.debug("container: " + media);
+        // _container = media.container;
+        logger.debug("container: " + media);
         addChild(fullScreenLabel);
     }
 
@@ -94,7 +94,7 @@ public class FullScreen extends ButtonWidget implements IWidget {
     override protected function processRequiredTraitsAvailable(element:MediaElement):void {
         _playable = element.getTrait(MediaTraitType.PLAY) as PlayTrait;
 
-        stage.addEventListener(Event.RESIZE, fullScreenHandler);
+        // stage.addEventListener(Event.RESIZE, fullScreenHandler);
 
         //_playable.addEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
         //_playable.addEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);

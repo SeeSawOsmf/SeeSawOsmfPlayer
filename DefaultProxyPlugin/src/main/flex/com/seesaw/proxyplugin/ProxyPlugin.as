@@ -19,7 +19,7 @@
  *  Incorporated. All Rights Reserved.
  *
  *****************************************************/
-package uk.vodco.livrail {
+package com.seesaw.proxyplugin {
 import flash.system.Security;
 
 import org.as3commons.logging.ILogger;
@@ -31,13 +31,13 @@ import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfo;
 import org.osmf.metadata.Metadata;
 
-public class LiverailPlugin extends PluginInfo {
-    private var logger:ILogger = LoggerFactory.getClassLogger(LiverailPlugin);
+public class ProxyPlugin extends PluginInfo {
+    private var logger:ILogger = LoggerFactory.getClassLogger(ProxyPlugin);
 
     /**
      * Constructor
      */
-    public function LiverailPlugin() {
+    public function ProxyPlugin() {
         // Allow any SWF that loads this SWF to access objects and
         // variables in this SWF.
         Security.allowDomain("*");
@@ -71,15 +71,14 @@ public class LiverailPlugin extends PluginInfo {
     // Internals
     //
 
-    public static const ID:String = "uk.vodco.livrail";
-    public static const NS_SETTINGS:String = "liverail/settings";
-    public static const NS_TARGET:String = "liverail/target";
+    public static const ID:String = "com.seesaw.proxy";
+    public static const NS_SETTINGS:String = "seesaw/proxy/settings";
+    public static const NS_TARGET:String = "seesaw/proxy/target";
 
     private var _pluginInfo:PluginInfo;
-    public var liverailElement:LiverailElement;
+    private var defaultElement:DefaultProxyElement;
     private var targetElement:MediaElement;
 
-    private var controlsUpdated:Boolean;
 
     private function canHandleResourceCallback(resource:MediaResourceBase):Boolean {
         var result:Boolean;
@@ -96,23 +95,22 @@ public class LiverailPlugin extends PluginInfo {
 
     private function mediaElementCreationCallback():MediaElement {
 
+        /* callback associated with every media Element */
         return null;
 
     }
 
     private function mediaElementCreationNotificationCallback(target:MediaElement):void {
 
-        logger.debug("TARGET ELEMENT : " + target);
         this.targetElement = target;
-        liverailElement = new LiverailElement();
-        updateLiverail();
+        defaultElement = new DefaultProxyElement();
+        updateProxy();
     }
 
-    private function updateLiverail():void {
-        if (liverailElement != null && targetElement != null && liverailElement != targetElement) {
-            logger.debug("THE TARGET " + targetElement);
+    private function updateProxy():void {
+        if (defaultElement != null && targetElement != null && defaultElement != targetElement) {
 
-            liverailElement.addReference(targetElement);
+            defaultElement.proxiedElement = targetElement;
         }
     }
 }

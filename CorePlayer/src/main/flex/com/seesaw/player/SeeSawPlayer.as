@@ -19,7 +19,10 @@
 
 package com.seesaw.player {
 import com.seesaw.player.components.ControlBarComponent;
+import com.seesaw.player.components.DefaultProxyComponent;
+import com.seesaw.player.components.LiverailComponent;
 import com.seesaw.player.components.PluginLifecycle;
+import com.seesaw.proxyplugin.ProxyPlugin;
 
 import flash.display.Sprite;
 import flash.events.Event;
@@ -33,6 +36,8 @@ import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.media.PluginInfoResource;
 
+import uk.vodco.livrail.LiverailPlugin;
+
 public class SeeSawPlayer extends Sprite {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
@@ -42,6 +47,9 @@ public class SeeSawPlayer extends Sprite {
     private var _rootElement:ParallelElement;
 
     private var components:Dictionary;
+    private var _liveRail:LiverailComponent;
+    private var _defaultProxy:DefaultProxyComponent;
+
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
@@ -72,6 +80,20 @@ public class SeeSawPlayer extends Sprite {
         controlBar.applyMetadata(config.element);
         components[ControlBarPlugin.ID] = controlBar;
         config.factory.loadPlugin(controlBar.info);
+
+
+        liveRail = new LiverailComponent(this);
+        liveRail.applyMetadata(config.element);
+        components[LiverailPlugin.ID] = liveRail;
+        config.factory.loadPlugin(liveRail.info);
+
+
+        defaultProxy = new DefaultProxyComponent(this);
+        defaultProxy.applyMetadata(config.element);
+        components[ProxyPlugin.ID] = defaultProxy;
+        config.factory.loadPlugin(defaultProxy.info);
+
+
     }
 
     private function createRootElement():MediaElement {
@@ -132,6 +154,22 @@ public class SeeSawPlayer extends Sprite {
 
     public function set controlBar(value:ControlBarComponent):void {
         _controlBar = value;
+    }
+
+    public function set liveRail(value:LiverailComponent):void {
+        _liveRail = value;
+    }
+
+    public function get liveRail():LiverailComponent {
+        return _liveRail;
+    }
+
+    public function set defaultProxy(value:DefaultProxyComponent):void {
+        _defaultProxy = value;
+    }
+
+    public function get defaultProxy():DefaultProxyComponent {
+        return _defaultProxy;
     }
 }
 }

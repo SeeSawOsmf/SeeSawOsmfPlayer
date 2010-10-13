@@ -22,6 +22,7 @@
         <module>PlayerControlsPlugin</module>
         <module>PlayerLogging</module>
         <module>PlayerInitialisation</module>
+        <module>DefaultProxyPlugin</module>
     </modules>
 
     <developers>
@@ -98,7 +99,12 @@
                 <version>${pom.version}</version>
                 <type>swc</type>
             </dependency>
-
+            <dependency>
+                <artifactId>DefaultProxyPlugin</artifactId>
+                <groupId>com.seesaw</groupId>
+                <version>${pom.version}</version>
+                <type>swc</type>
+            </dependency>
             <dependency>
                 <artifactId>PlayerLogging</artifactId>
                 <groupId>com.seesaw</groupId>
