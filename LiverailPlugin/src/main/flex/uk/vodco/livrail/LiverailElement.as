@@ -1,5 +1,10 @@
 package uk.vodco.livrail {
+import flash.display.Loader;
+import flash.events.Event;
+import flash.geom.Rectangle;
 import flash.system.Security;
+
+import mx.controls.SWFLoader;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -14,6 +19,8 @@ import org.osmf.metadata.Metadata;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.SeekTrait;
 
+import uk.vodco.livrail.events.LiveRailEvent;
+
 public class LiverailElement extends ParallelElement {
 
 
@@ -22,15 +29,16 @@ public class LiverailElement extends ParallelElement {
 
     private var modLoaded:Boolean = false;
 
+
     private var liveRailModuleLocation:String;
 
     private var _adManager:*;
 
     public var contentInfo:XML;
 
-    private var liveRailAdMap:String = "";
+    private var liveRailAdMap:String = "in::0;in::832.04;in::1818.36;in::100%";
 
-    private var liveRailTags:String = "";
+    private var liveRailTags:String = "sourceId_BBCWORLDWIDE,firstPresentationBrand_BBC,minimumAge_18,catchup_false,TVDRAMACONTEMPORARYBRITISH,TVDRAMA,duration_less_than_1_hour";
 
 
     private var videoId:String;
@@ -73,9 +81,9 @@ public class LiverailElement extends ParallelElement {
     }
 
 
-    public function addReference(target:MediaElement):void {
+    public function addReference(newTarget:MediaElement):void {
         if (this.target == null) {
-            this.target = target;
+            this.target = newTarget;
             processTarget();
             createLiverail();
             setupTraits();
@@ -188,18 +196,137 @@ public class LiverailElement extends ParallelElement {
 
     private function onSeekingChange(event:SeekEvent):void {
         logger.debug("On Seek Change:{0}", event.seeking);
+        adManager.shiftBox();
     }
 
     public function createLiverail():void {
 
 
-        var liverailPath:String = "http://www.swftools.org/flash/mv_zoom1.swf";
-        // var liverailPath:String = "http://vox-static.liverail.com/swf/v4/skins/adplayerskin_1.swf";
+        //  var liverailPath:String = "http://www.swftools.org/flash/mv_zoom1.swf";
+        //  var liverailPath:String = "http://vox-static.liverail.com/swf/v4/skins/adplayerskin_1.swf";
+        var liverailPath:String = "C:/Users/bmeade/Desktop/testswf.swf";
+
         var urlResource:URLResource = new URLResource(liverailPath)
+        var loader:SWFLoader = new SWFLoader();
+
+
+        var liveRailElement:SWFElement = new SWFElement(urlResource);
+        _adManager = liveRailElement;
         element = new ParallelElement();
-        element.addChild(new SWFElement(urlResource));
+
+
+        element.addChild(_adManager);
 
         addChild(element);
+        modLoaded = true;
+
+        setupAdManager();
+    }
+
+
+    private function setupAdManager():void {
+        if (modLoaded) {
+            adManager.addEventListener(LiveRailEvent.INIT_COMPLETE, onLiveRailInitComplete);
+            /*adManager.addEventListener(LiveRailEvent.INIT_ERROR, onLiveRailInitError);
+
+             adManager.addEventListener(LiveRailEvent.PREROLL_COMPLETE, onLiveRailPrerollComplete);
+             adManager.addEventListener(LiveRailEvent.POSTROLL_COMPLETE, onLiveRailPostrollComplete);
+
+             adManager.addEventListener(LiveRailEvent.AD_START, onLiveRailAdStart);
+             adManager.addEventListener(LiveRailEvent.AD_END, onLiveRailAdEnd);
+
+             adManager.addEventListener(LiveRailEvent.CLICK_THRU, onLiveRailClickThru);
+             adManager.addEventListener(LiveRailEvent.VOLUME_CHANGE, onLiveRailVolumeChange);
+
+             adManager.addEventListener(LiveRailEvent.AD_PROGRESS,onAdProgress);
+
+             adManager.addEventListener(LiveRailEvent.AD_BREAK_START, adbreakStart);
+
+             adManager.addEventListener(LiveRailEvent.AD_BREAK_COMPLETE, adbreakComplete);
+             */
+            liveRailConfig = new Object();
+
+            // set to true if you are using Junction or false if you are using AdServer
+            liveRailConfig["LR_USE_JUNCTION"] = false;
+
+            // the Junction or the AdServer Publisher ID, located on the Account page of the Publisher;
+            liveRailConfig["LR_PUBLISHER_ID"] = liverailPublisherId;
+            //once we migrate to next platform version
+            liveRailConfig["LR_VERSION"] = liverailVersion;
+
+            //Partner ID maps to CP id
+            //liveRailConfig["LR_PARTNERS"] = contentObject.mediaObject.partnerId;
+            liveRailConfig["LR_PARTNERS"] = "BBC";
+            // a unique code identifying the video played by your Flash player;
+            liveRailConfig["LR_VIDEO_ID"] = programmeId;
+
+            liveRailConfig["LR_LAYOUT_LINEAR_PAUSEONCLICKTHRU"] = false;
+            liveRailConfig["LR_LAYOUT_SKIN_ID"] = 1;
+
+            // ADMAP (optional param)
+            // admap string is: [ad-type]:[timings(start-time,end-time)];
+            // for more details on how to generate the ADMAP please see "Run-time Parameters Specification" pdf document
+            liveRailConfig["LR_ADMAP"] = liveRailAdMap;
+
+            liveRailConfig["LR_TAGS"] = liveRailTags;
+
+            //For now we will set the sting and ident (bumpers) param to default, causing LiveRail to use the defaults
+            //stored in their system. Once we are ready to specify these, then this can be changed.
+            var defaultValue:String = "default";
+
+            liveRailConfig["LR_BUMPER_PREROLL_PRE_HIGH"] = defaultValue;
+            liveRailConfig["LR_BUMPER_PREROLL_POST_HIGH"] = defaultValue;
+            liveRailConfig["LR_BUMPER_PREROLL_PRE_MED"] = defaultValue;
+            liveRailConfig["LR_BUMPER_PREROLL_POST_MED"] = defaultValue;
+            liveRailConfig["LR_BUMPER_PREROLL_PRE_LOW"] = defaultValue;
+            liveRailConfig["LR_BUMPER_PREROLL_POST_LOW"] = defaultValue;
+            liveRailConfig["LR_BUMPER_PREROLL_ADONLY"] = defaultValue;
+
+            liveRailConfig["LR_BUMPER_MIDROLL_PRE_HIGH"] = defaultValue;
+            liveRailConfig["LR_BUMPER_MIDROLL_POST_HIGH"] = defaultValue;
+            liveRailConfig["LR_BUMPER_MIDROLL_PRE_MED"] = defaultValue;
+            liveRailConfig["LR_BUMPER_MIDROLL_POST_MED"] = defaultValue;
+            liveRailConfig["LR_BUMPER_MIDROLL_PRE_LOW"] = defaultValue;
+            liveRailConfig["LR_BUMPER_MIDROLL_POST_LOW"] = defaultValue;
+            liveRailConfig["LR_BUMPER_MIDROLL_ADONLY"] = defaultValue;
+
+            liveRailConfig["LR_BUMPER_POSTROLL_PRE_HIGH"] = defaultValue;
+            liveRailConfig["LR_BUMPER_POSTROLL_POST_HIGH"] = defaultValue;
+            liveRailConfig["LR_BUMPER_POSTROLL_PRE_MED"] = defaultValue;
+            liveRailConfig["LR_BUMPER_POSTROLL_POST_MED"] = defaultValue;
+            liveRailConfig["LR_BUMPER_POSTROLL_PRE_LOW"] = defaultValue;
+            liveRailConfig["LR_BUMPER_POSTROLL_POST_LOW"] = defaultValue;
+            liveRailConfig["LR_BUMPER_POSTROLL_ADONLY"] = defaultValue;
+
+            ////	liveRailConfig["LR_ALLOWDUPLICATES"] = 1;
+
+
+            //	liveRailConfig["LR_BITRATE"] = 	media !=null && media.quality != null ? media.quality : "medium";
+            //StatusService.info("Setting LiveRail ad bitrate to "+liveRailConfig["LR_BITRATE"]);
+
+            ///////adManager.initAds(liveRailConfig);
+
+            adManager.shiftBox();
+            // comma separated list of keywords describing the content verticals
+            //	pollLoader.stop();
+
+        } else {
+            //	pollLoader.reset();
+            //	pollLoader.start();
+        }
+    }
+
+    public function get adManager():* {
+        return _adManager;
+    }
+
+    private function onLiveRailInitComplete(e:Event):void {
+        var eo:Object = e as Object;
+
+        ///	LR_AdvertsArray = e.currentTarget._adModel._adPovider.adResult.ads;  Liverail advert results array. this is however not accessable...
+
+        adManager.setSize(new Rectangle(0, 0, 300, 200));
+        ///dispatchEvent( new LiveRailEvent(LiveRailEvent.INIT_COMPLETE,eo.data));
     }
 
     // Internals
@@ -210,6 +337,7 @@ public class LiverailElement extends ParallelElement {
 
     private var target:MediaElement;
 
+    private var lrl:Loader;
 
     public var element:ParallelElement;
     /* static */

@@ -125,7 +125,7 @@ public class DefaultProxyElement extends ProxyElement {
     }
 
     private function onSeekingChange(event:SeekEvent):void {
-        /// logger.debug("On Seek Change:{0}", event.seeking);
+        logger.debug("On Seek Change:{0}", event.seeking);
         var time:TimeTrait = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
         /// logger.debug(String(time.currentTime));
     }

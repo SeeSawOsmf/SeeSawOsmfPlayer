@@ -29,11 +29,9 @@ import org.osmf.media.MediaElement;
 import org.osmf.media.PluginInfoResource;
 import org.osmf.metadata.Metadata;
 
-import uk.vodco.livrail.LiverailPlugin;
-
 public class DefaultProxyComponent implements PluginLifecycle {
 
-    private var logger:ILogger = LoggerFactory.getClassLogger(LiverailComponent);
+    private var logger:ILogger = LoggerFactory.getClassLogger(DefaultProxyComponent);
 
     private var player:SeeSawPlayer;
 
@@ -67,7 +65,7 @@ public class DefaultProxyComponent implements PluginLifecycle {
         logger.debug("applying metadata: " + target);
         var Target:Metadata = new Metadata();
         Target.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
-        target.addMetadata(LiverailPlugin.NS_TARGET, Target);
+        target.addMetadata(ProxyPlugin.NS_TARGET, Target);
     }
 
 }
