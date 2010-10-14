@@ -35,8 +35,6 @@ import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.media.PluginInfoResource;
 
-import uk.vodco.livrail.LiverailPlugin;
-
 public class SeeSawPlayer extends Sprite {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
@@ -80,12 +78,12 @@ public class SeeSawPlayer extends Sprite {
         components[ControlBarPlugin.ID] = controlBar;
         config.factory.loadPlugin(controlBar.info);
 
-
-        liveRail = new LiverailComponent(this);
-        liveRail.applyMetadata(config.element);
-        components[LiverailPlugin.ID] = liveRail;
-        config.factory.loadPlugin(liveRail.info);
-
+        /*
+         liveRail = new LiverailComponent(this);
+         liveRail.applyMetadata(config.element);
+         components[LiverailPlugin.ID] = liveRail;
+         config.factory.loadPlugin(liveRail.info);
+         */
         defaultProxy = new DefaultProxyComponent(this);
         defaultProxy.applyMetadata(config.element);
         components[ProxyPluginInfo.ID] = defaultProxy;
