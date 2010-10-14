@@ -22,7 +22,7 @@ import com.seesaw.player.components.ControlBarComponent;
 import com.seesaw.player.components.DefaultProxyComponent;
 import com.seesaw.player.components.LiverailComponent;
 import com.seesaw.player.components.PluginLifecycle;
-import com.seesaw.proxyplugin.ProxyPlugin;
+import com.seesaw.proxyplugin.ProxyPluginInfo;
 
 import flash.display.Sprite;
 import flash.events.Event;
@@ -87,13 +87,10 @@ public class SeeSawPlayer extends Sprite {
         components[LiverailPlugin.ID] = liveRail;
         config.factory.loadPlugin(liveRail.info);
 
-
         defaultProxy = new DefaultProxyComponent(this);
         defaultProxy.applyMetadata(config.element);
-        components[ProxyPlugin.ID] = defaultProxy;
+        components[ProxyPluginInfo.ID] = defaultProxy;
         config.factory.loadPlugin(defaultProxy.info);
-
-
     }
 
     private function createRootElement():MediaElement {
