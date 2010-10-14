@@ -22,6 +22,7 @@
 package {
 import controls.seesaw.widget.*;
 
+import flash.display.DisplayObject;
 import flash.utils.Dictionary;
 
 import org.as3commons.logging.ILogger;
@@ -30,6 +31,7 @@ import org.osmf.chrome.assets.AssetsManager;
 import org.osmf.chrome.configuration.LayoutAttributesParser;
 import org.osmf.chrome.configuration.WidgetsParser;
 import org.osmf.chrome.widgets.Widget;
+import org.osmf.events.DisplayObjectEvent;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaResourceBase;
@@ -110,13 +112,28 @@ public class ControlBarElement extends MediaElement {
             // control bar should control:
             var targetMetadata:Metadata = target.getMetadata(ControlBarPlugin.NS_CONTROL_BAR_TARGET);
             if (targetMetadata) {
-                if (targetMetadata.getValue(ID) != null
-                        && targetMetadata.getValue(ID) == settings.getValue(ID)
-                        ) {
+                if (targetMetadata.getValue(ID) != null && targetMetadata.getValue(ID) == settings.getValue(ID)) {
                     controlBar.media = target;
                 }
             }
         }
+    }
+
+    protected function processDisplayObjectChange(event:DisplayObjectEvent):void {
+        logger.debug("processDisplayObjectChange: " + event);
+
+        var oldDisplayObject:DisplayObject = event.oldDisplayObject;
+        var newView:DisplayObject = event.newDisplayObject;
+    }
+
+    protected function processMediaSizeChange(event:DisplayObjectEvent):void {
+        logger.debug("processMediaSizeChange: " + event);
+
+        var oldWidth:Number = event.oldWidth;
+        var oldHeight:Number = event.oldHeight;
+
+        var newWidth:Number = event.newWidth;
+        var newHeight:Number = event.newHeight;
     }
 
     // Overrides
@@ -139,6 +156,8 @@ public class ControlBarElement extends MediaElement {
     }
 
     override protected function setupTraits():void {
+        logger.debug("setupTraits");
+
         // Setup a control bar using the ChromeLibrary:
         setupControlBar();
 
@@ -164,6 +183,7 @@ public class ControlBarElement extends MediaElement {
     //
 
     private function setupControlBar():void {
+        logger.debug("setupControlBar");
 
         addSeesawWidgets();
 

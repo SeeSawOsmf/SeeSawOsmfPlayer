@@ -20,7 +20,7 @@
 package com.seesaw.player.components {
 import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.SeeSawPlayer;
-import com.seesaw.proxyplugin.ProxyPlugin;
+import com.seesaw.proxyplugin.ProxyPluginInfo;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -44,8 +44,7 @@ public class DefaultProxyComponent implements PluginLifecycle {
     }
 
     public function get info():PluginInfoResource {
-        var proxyPlugin:ProxyPlugin = new ProxyPlugin();
-        pluginInfo = new PluginInfoResource(proxyPlugin.pluginInfo);
+        pluginInfo = new PluginInfoResource(new ProxyPluginInfo());
         return pluginInfo;
     }
 
@@ -65,7 +64,7 @@ public class DefaultProxyComponent implements PluginLifecycle {
         logger.debug("applying metadata: " + target);
         var Target:Metadata = new Metadata();
         Target.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
-        target.addMetadata(ProxyPlugin.NS_TARGET, Target);
+        target.addMetadata(ProxyPluginInfo.NS_TARGET, Target);
     }
 
 }
