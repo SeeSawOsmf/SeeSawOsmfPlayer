@@ -1,20 +1,23 @@
 /*
  * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
  *
- *   The contents of this file are subject to the Mozilla Public License
- *   Version 1.1 (the "License"); you may not use this file except in
- *   compliance with the License. You may obtain a copy of the License at
- *   http://www.mozilla.org/MPL/
+ *    The contents of this file are subject to the Mozilla Public License
+ *    Version 1.1 (the "License"); you may not use this file except in
+ *    compliance with the License. You may obtain a copy of the
+ *    License athttp://www.mozilla.org/MPL/
  *
- *   Software distributed under the License is distributed on an "AS IS"
- *   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- *   License for the specific language governing rights and limitations
- *   under the License.
+ *    Software distributed under the License is distributed on an "AS IS"
+ *    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *    License for the specific language governing rights and limitations
+ *    under the License.
  *
+ *    The Initial Developer of the Original Code is ioko365 Ltd.
+ *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
+ *    Incorporated. All Rights Reserved.
  *
- *   The Initial Developer of the Original Code is ioko365 Ltd.
- *   Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *   Incorporated. All Rights Reserved.
+ *    The Initial Developer of the Original Code is ioko365 Ltd.
+ *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
+ *    Incorporated. All Rights Reserved.
  */
 
 package com.seesaw.player {
@@ -41,6 +44,7 @@ import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.MediaTraitType;
 
 import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
+import uk.vodco.liverail.LiverailPlugin;
 
 public class SeeSawPlayer extends Sprite {
 
@@ -86,7 +90,7 @@ public class SeeSawPlayer extends Sprite {
         logger.debug("loading plugins");
 
         config.factory.loadPlugin(controlBar.info);
-        // config.factory.loadPlugin(liveRail.info);
+        config.factory.loadPlugin(liveRail.info);
         config.factory.loadPlugin(debugProxy.info);
         config.factory.loadPlugin(defaultProxy.info);
     }
@@ -108,13 +112,14 @@ public class SeeSawPlayer extends Sprite {
         components[DefaultProxyPluginInfo.ID] = defaultProxy;
 
         controlBar = new ControlBarComponent(this);
+        ///  controlBar.applyMetadata(config.element);
         components[ControlBarPlugin.ID] = controlBar;
 
-        /*
-         liveRail = new LiverailComponent(this);
-         liveRail.applyMetadata(config.element);
-         components[LiverailPlugin.ID] = liveRail;
-         */
+
+        liveRail = new LiverailComponent(this);
+        ///    rootElement.addChild(liveRail.applyMetadata2());
+        components[LiverailPlugin.ID] = liveRail;
+
     }
 
     private function createRootElement():void {

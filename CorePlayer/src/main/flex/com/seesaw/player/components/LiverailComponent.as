@@ -1,20 +1,23 @@
 /*
- * * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
- *  *
- *  *   The contents of this file are subject to the Mozilla Public License
- *  *   Version 1.1 (the "License"); you may not use this file except in
- *  *   compliance with the License. You may obtain a copy of the License at
- *  *   http://www.mozilla.org/MPL/
- *  *
- *  *   Software distributed under the License is distributed on an "AS IS"
- *  *   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- *  *   License for the specific language governing rights and limitations
- *  *   under the License.
- *  *
- *  *
- *  *   The Initial Developer of the Original Code is ioko365 Ltd.
- *  *   Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *  *   Incorporated. All Rights Reserved.
+ * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
+ *
+ *    The contents of this file are subject to the Mozilla Public License
+ *    Version 1.1 (the "License"); you may not use this file except in
+ *    compliance with the License. You may obtain a copy of the
+ *    License athttp://www.mozilla.org/MPL/
+ *
+ *    Software distributed under the License is distributed on an "AS IS"
+ *    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *    License for the specific language governing rights and limitations
+ *    under the License.
+ *
+ *    The Initial Developer of the Original Code is ioko365 Ltd.
+ *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
+ *    Incorporated. All Rights Reserved.
+ *
+ *    The Initial Developer of the Original Code is ioko365 Ltd.
+ *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
+ *    Incorporated. All Rights Reserved.
  */
 
 package com.seesaw.player.components {
@@ -26,6 +29,7 @@ import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ParallelElement;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.media.MediaElement;
+import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
 import org.osmf.metadata.Metadata;
 
@@ -58,7 +62,7 @@ public class LiverailComponent implements PluginLifecycle {
         if (!this.loaded) {
             //    var LRElement:ParallelElement = new ParallelElement();
             //  LRElement.addChild(new DurationElement(20, new ImageElement(new URLResource("http://kgd-red-test-zxtm01.dev.vodco.co.uk/i/ccp/00000180/18055.jpg"))));
-            //   player.rootElement.addChild(constructElement());
+            player.rootElement.addChild(constructElement());
 
             ///     player.rootElement.addChild(LRElement);
             this.loaded = true;
@@ -74,6 +78,33 @@ public class LiverailComponent implements PluginLifecycle {
         var Target:Metadata = new Metadata();
         Target.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
         target.addMetadata(LiverailPlugin.NS_TARGET, Target);
+    }
+
+
+    public function applyMetadata2():MediaElement {
+
+        var pluginSettings:Metadata = new Metadata();
+        pluginSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
+
+        // Add the metadata to an otherwise empty media resource object:
+        var resource:MediaResourceBase = new MediaResourceBase();
+        resource.addMetadataValue(LiverailPlugin.NS_TARGET, pluginSettings);
+
+        // Request the media factory to construct a control bar element. The
+        // factory will infer a control bar element is requested by inspecting
+        // the resource's metadata (and encountering a metadata object of namespace
+        // NS_CONTROL_BAR_SETTINGS there):
+        var plugin:MediaElement = player.config.factory.createMediaElement(resource);
+
+
+        return plugin;
+
+
+        /*  logger.debug("applying metadata: " + target);
+         var Target:Metadata = new Metadata();
+         Target.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
+         target.addMetadata(LiverailPlugin.NS_TARGET, Target);
+         */
     }
 
     private function constructElement():ParallelElement {
