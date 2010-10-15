@@ -23,7 +23,6 @@ import org.osmf.media.DefaultMediaFactory;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaPlayer;
-import org.osmf.media.MediaPlayerSprite;
 import org.osmf.media.MediaResourceBase;
 
 public class PlayerConfiguration {

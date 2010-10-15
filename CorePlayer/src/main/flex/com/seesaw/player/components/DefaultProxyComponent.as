@@ -30,8 +30,6 @@ import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
 import org.osmf.metadata.Metadata;
 
-import uk.vodco.livrail.LiverailPlugin;
-
 public class DefaultProxyComponent implements PluginLifecycle {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(DefaultProxyComponent);

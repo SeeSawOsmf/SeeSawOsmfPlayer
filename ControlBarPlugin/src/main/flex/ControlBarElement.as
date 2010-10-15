@@ -126,6 +126,23 @@ public class ControlBarElement extends MediaElement {
         }
     }
 
+     protected function processDisplayObjectChange(event:DisplayObjectEvent):void {
+        logger.debug("processDisplayObjectChange: " + event);
+
+        var oldDisplayObject:DisplayObject = event.oldDisplayObject;
+        var newView:DisplayObject = event.newDisplayObject;
+    }
+
+    protected function processMediaSizeChange(event:DisplayObjectEvent):void {
+        logger.debug("processMediaSizeChange: " + event);
+
+        var oldWidth:Number = event.oldWidth;
+        var oldHeight:Number = event.oldHeight;
+
+        var newWidth:Number = event.newWidth;
+        var newHeight:Number = event.newHeight;
+    }
+
     // Overrides
     //
 
