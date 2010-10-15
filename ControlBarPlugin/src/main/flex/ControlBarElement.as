@@ -55,29 +55,37 @@ public class ControlBarElement extends MediaElement {
 
     [Embed(source="/blank.png")]
     private static const PAUSE_DISABLED:Class;
+
     [Embed(source="/pause.png")]
     private static const PAUSE_UP:Class;
+
     [Embed(source="/pauseOver.png")]
     private static const PAUSE_DOWN:Class;
 
     [Embed(source="/stop_disabled.png")]
     private static const STOP_DISABLED:Class;
+
     [Embed(source="/stop_up.png")]
     private static const STOP_UP:Class;
+
     [Embed(source="/stop_down.png")]
     private static const STOP_DOWN:Class;
 
     [Embed(source="/blank.png")]
     private static const PLAY_DISABLED:Class;
+
     [Embed(source="/play.png")]
     private static const PLAY_UP:Class;
+
     [Embed(source="/playOver.png")]
     private static const PLAY_DOWN:Class;
 
     [Embed(source="/scrubber_disabled.png")]
     private static const SCRUBBER_DISABLED:Class;
+
     [Embed(source="/scrubberButton.png")]
     private static const SCRUBBER_UP:Class;
+
     [Embed(source="/scrubberButton.png")]
     private static const SCRUBBER_DOWN:Class;
 
@@ -86,7 +94,6 @@ public class ControlBarElement extends MediaElement {
 
     [Embed(source="/scrubBarTrack.png")]
     private static const SCRUB_BAR_TRACK:Class;
-
 
     [Embed(source="/volume.png")]
     private static const VOLUME_UP:Class;
@@ -117,23 +124,6 @@ public class ControlBarElement extends MediaElement {
                 }
             }
         }
-    }
-
-     protected function processDisplayObjectChange(event:DisplayObjectEvent):void {
-        logger.debug("processDisplayObjectChange: " + event);
-
-        var oldDisplayObject:DisplayObject = event.oldDisplayObject;
-        var newView:DisplayObject = event.newDisplayObject;
-    }
-
-    protected function processMediaSizeChange(event:DisplayObjectEvent):void {
-        logger.debug("processMediaSizeChange: " + event);
-
-        var oldWidth:Number = event.oldWidth;
-        var oldHeight:Number = event.oldHeight;
-
-        var newWidth:Number = event.newWidth;
-        var newHeight:Number = event.newHeight;
     }
 
     // Overrides

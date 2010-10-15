@@ -69,5 +69,10 @@
             <type>swc</type>
         </dependency>
 
+        <dependency>
+            <artifactId>DefaultProxyPlugin</artifactId>
+            <groupId>com.seesaw</groupId>
+            <type>swc</type>
+        </dependency>
     </dependencies>
 </project>
