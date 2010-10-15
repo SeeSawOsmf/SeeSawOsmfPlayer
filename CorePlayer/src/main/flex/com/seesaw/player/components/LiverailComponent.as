@@ -29,7 +29,6 @@ import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ParallelElement;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.media.MediaElement;
-import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
 import org.osmf.metadata.Metadata;
 
@@ -80,32 +79,6 @@ public class LiverailComponent implements PluginLifecycle {
         target.addMetadata(LiverailPlugin.NS_TARGET, Target);
     }
 
-
-    public function applyMetadata2():MediaElement {
-
-        var pluginSettings:Metadata = new Metadata();
-        pluginSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
-
-        // Add the metadata to an otherwise empty media resource object:
-        var resource:MediaResourceBase = new MediaResourceBase();
-        resource.addMetadataValue(LiverailPlugin.NS_TARGET, pluginSettings);
-
-        // Request the media factory to construct a control bar element. The
-        // factory will infer a control bar element is requested by inspecting
-        // the resource's metadata (and encountering a metadata object of namespace
-        // NS_CONTROL_BAR_SETTINGS there):
-        var plugin:MediaElement = player.config.factory.createMediaElement(resource);
-
-
-        return plugin;
-
-
-        /*  logger.debug("applying metadata: " + target);
-         var Target:Metadata = new Metadata();
-         Target.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
-         target.addMetadata(LiverailPlugin.NS_TARGET, Target);
-         */
-    }
 
     private function constructElement():ParallelElement {
 
