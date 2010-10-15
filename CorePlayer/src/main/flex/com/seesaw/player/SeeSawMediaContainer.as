@@ -20,10 +20,9 @@ public class SeeSawMediaContainer extends MediaContainer {
     }
 
     private function onStageResize(event:Event = null):void {
-        logger.debug("onStageResize" + event);
+        logger.debug("onStageResize: " + event);
         width = stage.stageWidth;
         height = stage.stageHeight;
-        logger.debug("NEW CONTAINER SIZE: " + width + " " + height);
     }
 }
 }
