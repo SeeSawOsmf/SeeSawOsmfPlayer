@@ -56,7 +56,7 @@ public class LiverailPlugin extends PluginInfo {
                     (ID
                             , canHandleResourceCallback
                             , mediaElementCreationCallback
-                            , MediaFactoryItemType.STANDARD
+                            , MediaFactoryItemType.PROXY
                             );
 
             var items:Vector.<MediaFactoryItem> = new Vector.<MediaFactoryItem>();

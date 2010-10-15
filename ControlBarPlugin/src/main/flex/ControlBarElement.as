@@ -137,7 +137,8 @@ public class ControlBarElement extends MediaElement {
         // (containing only one field: "ID" that tells us the ID of the media
         // element that we should be controlling):
         if (value != null) {
-            settings = value.getMetadataValue(ControlBarPlugin.NS_CONTROL_BAR_SETTINGS) as Metadata;
+            settings
+                    = value.getMetadataValue(ControlBarPlugin.NS_CONTROL_BAR_SETTINGS) as Metadata;
 
             processTarget();
         }
@@ -190,7 +191,7 @@ public class ControlBarElement extends MediaElement {
             controlBar = widgetsParser.getWidget("controlBar");
         }
         catch (error:Error) {
-            logger.error("WARNING: failed setting up control bar:", error.message);
+            trace("WARNING: failed setting up control bar:", error.message);
         }
     }
 

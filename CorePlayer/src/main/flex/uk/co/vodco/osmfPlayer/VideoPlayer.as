@@ -18,8 +18,6 @@
  */
 
 package uk.co.vodco.osmfPlayer {
-import com.seesaw.player.controls.ControlBarPluginInfo;
-
 import flash.display.Sprite;
 
 import org.as3commons.logging.ILogger;
@@ -94,7 +92,7 @@ public class VideoPlayer extends Sprite {
 
         // Load our control bar plugin here
         // The control bar will 'bind' to whatever controls the main content based on metadata
-        var controlBarPlugin:ControlBarPluginInfo = new ControlBarPluginInfo();
+        var controlBarPlugin:ControlBarPlugin = new ControlBarPlugin();
         var controlBarPluginInfo:PluginInfoResource = new PluginInfoResource(controlBarPlugin.pluginInfo);
         mediaFactory.loadPlugin(controlBarPluginInfo);
 
@@ -130,7 +128,7 @@ public class VideoPlayer extends Sprite {
 
             if (pluginInfo.pluginInfo.numMediaFactoryItems > 0) {
                 logger.info("Plugin media factory(0).id {0}", pluginInfo.pluginInfo.getMediaFactoryItemAt(0).id)
-                if (pluginInfo.pluginInfo.getMediaFactoryItemAt(0).id == ControlBarPluginInfo.ID) {
+                if (pluginInfo.pluginInfo.getMediaFactoryItemAt(0).id == ControlBarPlugin.ID) {
                     rootElement.addChild(constructControlBarElement());
                 }
             }
@@ -167,7 +165,7 @@ public class VideoPlayer extends Sprite {
         var video:MediaElement = mediaFactory.createMediaElement(dynamicVideo.DynamicResource);
 
         // Add the metadata to the video's metadata:
-        video.addMetadata(ControlBarPluginInfo.NS_CONTROL_BAR_TARGET, controlBarTarget);
+        video.addMetadata(ControlBarPlugin.NS_CONTROL_BAR_TARGET, controlBarTarget);
         return video;
     }
 
@@ -182,7 +180,7 @@ public class VideoPlayer extends Sprite {
 
         // Add the metadata to an otherwise empty media resource object:
         var resource:MediaResourceBase = new MediaResourceBase();
-        resource.addMetadataValue(ControlBarPluginInfo.NS_CONTROL_BAR_SETTINGS, controlBarSettings);
+        resource.addMetadataValue(ControlBarPlugin.NS_CONTROL_BAR_SETTINGS, controlBarSettings);
 
         // Request the media factory to construct a control bar element. The
         // factory will infer a control bar element is requested by inspecting

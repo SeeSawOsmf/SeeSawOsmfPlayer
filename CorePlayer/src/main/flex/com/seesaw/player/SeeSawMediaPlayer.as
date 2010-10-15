@@ -14,7 +14,6 @@ public class SeeSawMediaPlayer extends MediaPlayer {
         logger.debug("created media player");
 
 
-
         addEventListener(PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
     }
 

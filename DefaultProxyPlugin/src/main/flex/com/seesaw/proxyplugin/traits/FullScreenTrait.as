@@ -5,7 +5,7 @@ import org.osmf.traits.MediaTraitBase;
 
 [Event(name="fullscreenChange", type="com.seesaw.proxyplugin.events.FullScreenEvent")]
 
-public class FullScreenTrait extends MediaTraitBase{
+public class FullScreenTrait extends MediaTraitBase {
 
     private var _fullscreen:Boolean;
 

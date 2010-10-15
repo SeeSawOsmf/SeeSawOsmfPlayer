@@ -18,50 +18,41 @@
  */
 
 package com.seesaw.player.components {
-import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.SeeSawPlayer;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
-import org.osmf.elements.ParallelElement;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.media.PluginInfoResource;
-import org.osmf.metadata.Metadata;
 
-import uk.vodco.livrail.LiverailPlugin;
+import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
 
-public class LiverailComponent implements PluginLifecycle {
+public class DebugProxyComponent implements PluginLifecycle {
 
-    private var logger:ILogger = LoggerFactory.getClassLogger(LiverailComponent);
+    private var logger:ILogger = LoggerFactory.getClassLogger(DebugProxyComponent);
 
     private var player:SeeSawPlayer;
 
     private var loaded:Boolean;
 
-    private var liveRailPluginInfo:PluginInfoResource;
-    private var liveRailPlugin:LiverailPlugin = new LiverailPlugin();
+    private var pluginInfo:PluginInfoResource;
 
-    public function LiverailComponent(player:SeeSawPlayer) {
+    public function DebugProxyComponent(player:SeeSawPlayer) {
         this.player = player;
     }
 
     public function get info():PluginInfoResource {
-
-        liveRailPluginInfo = new PluginInfoResource(liveRailPlugin.pluginInfo);
-        return liveRailPluginInfo;
+        pluginInfo = new PluginInfoResource(new DebugPluginInfo());
+        return pluginInfo;
     }
 
     public function pluginLoaded(event:MediaFactoryEvent):void {
         logger.debug("plugin loaded");
 
-        if (!this.loaded) {
-            //    var LRElement:ParallelElement = new ParallelElement();
-            //  LRElement.addChild(new DurationElement(20, new ImageElement(new URLResource("http://kgd-red-test-zxtm01.dev.vodco.co.uk/i/ccp/00000180/18055.jpg"))));
-            //   player.rootElement.addChild(constructElement());
-
-            ///     player.rootElement.addChild(LRElement);
-            this.loaded = true;
+        if (!loaded) {
+            //player.rootElement.addChild(constructControlBarElement());
+            loaded = true;
         }
     }
 
@@ -71,19 +62,6 @@ public class LiverailComponent implements PluginLifecycle {
 
     public function applyMetadata(target:MediaElement):void {
         logger.debug("applying metadata: " + target);
-        var Target:Metadata = new Metadata();
-        Target.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
-        target.addMetadata(LiverailPlugin.NS_TARGET, Target);
     }
-
-    private function constructElement():ParallelElement {
-
-        var element:ParallelElement = liveRailPlugin.liverailElement.element;
-
-        return element;
-
-
-    }
-
 }
 }

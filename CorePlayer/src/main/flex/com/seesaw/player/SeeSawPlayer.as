@@ -19,6 +19,7 @@
 
 package com.seesaw.player {
 import com.seesaw.player.components.ControlBarComponent;
+import com.seesaw.player.components.DebugProxyComponent;
 import com.seesaw.player.components.DefaultProxyComponent;
 import com.seesaw.player.components.LiverailComponent;
 import com.seesaw.player.components.PluginLifecycle;
@@ -39,6 +40,8 @@ import org.osmf.media.PluginInfoResource;
 import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.MediaTraitType;
 
+import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
+
 public class SeeSawPlayer extends Sprite {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
@@ -50,6 +53,7 @@ public class SeeSawPlayer extends Sprite {
     private var components:Dictionary;
     private var _liveRail:LiverailComponent;
     private var _defaultProxy:DefaultProxyComponent;
+    private var debugProxy:DebugProxyComponent;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
@@ -88,12 +92,21 @@ public class SeeSawPlayer extends Sprite {
 
         // config.factory.loadPlugin(controlBar.info);
         // config.factory.loadPlugin(liveRail.info);
+        config.factory.loadPlugin(debugProxy.info);
         config.factory.loadPlugin(defaultProxy.info);
     }
 
     private function createComponents():void {
         logger.debug("creating components");
+
+
         components = new Dictionary();
+
+
+        debugProxy = new DebugProxyComponent(this);
+        //defaultProxy.applyMetadata(config.element);
+        components[DebugPluginInfo.ID] = debugProxy;
+
 
         defaultProxy = new DefaultProxyComponent(this);
         // defaultProxy.applyMetadata(config.element);

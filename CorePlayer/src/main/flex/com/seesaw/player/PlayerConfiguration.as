@@ -20,7 +20,6 @@
 package com.seesaw.player {
 import org.osmf.containers.MediaContainer;
 import org.osmf.media.DefaultMediaFactory;
-import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaPlayer;
 import org.osmf.media.MediaResourceBase;

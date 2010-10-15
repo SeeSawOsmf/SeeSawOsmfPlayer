@@ -10,6 +10,7 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ParallelElement;
 import org.osmf.elements.SWFElement;
+import org.osmf.events.LoaderEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.SeekEvent;
 import org.osmf.media.MediaElement;
@@ -28,7 +29,6 @@ public class LiverailElement extends ParallelElement {
 
 
     private var modLoaded:Boolean = false;
-
 
     private var liveRailModuleLocation:String;
 
@@ -81,9 +81,10 @@ public class LiverailElement extends ParallelElement {
     }
 
 
-    public function addReference(newTarget:MediaElement):void {
+    public function addReference(target:MediaElement):void {
         if (this.target == null) {
-            this.target = newTarget;
+            resource = target.resource;
+            this.target = target;
             processTarget();
             createLiverail();
             setupTraits();
@@ -102,7 +103,9 @@ public class LiverailElement extends ParallelElement {
                         ) {
 
                 }
+
             }
+            setupTraits();
         }
     }
 
@@ -196,33 +199,50 @@ public class LiverailElement extends ParallelElement {
 
     private function onSeekingChange(event:SeekEvent):void {
         logger.debug("On Seek Change:{0}", event.seeking);
-        adManager.shiftBox();
     }
 
     public function createLiverail():void {
 
 
-        //  var liverailPath:String = "http://www.swftools.org/flash/mv_zoom1.swf";
-        //  var liverailPath:String = "http://vox-static.liverail.com/swf/v4/skins/adplayerskin_1.swf";
-        var liverailPath:String = "C:/Users/bmeade/Desktop/testswf.swf";
-
+        var liverailPath:String = "http://www.swftools.org/flash/mv_zoom1.swf";
+        //   var liverailPath:String = "http://vox-static.liverail.com/swf/v4/skins/adplayerskin_1.swf";
         var urlResource:URLResource = new URLResource(liverailPath)
         var loader:SWFLoader = new SWFLoader();
 
-
+        load(urlResource as String);
         var liveRailElement:SWFElement = new SWFElement(urlResource);
         _adManager = liveRailElement;
+        element.addEventListener(LoaderEvent.LOAD_STATE_CHANGE, onLoadComplete);
         element = new ParallelElement();
-
-
         element.addChild(_adManager);
-
         addChild(element);
+
         modLoaded = true;
 
         setupAdManager();
     }
 
+    public function load(val:String):void {
+
+        Security.allowDomain("vox-static.liverail.com");
+        //	pollLoader.start();
+
+        /*	liveRailModuleLocation = val;
+         lrl = new Loader();
+         //	lrl.width = this.width;
+         //	lrl.height = this.height;
+         lrl.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadComplete);
+         //	lrl.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onLoadError);
+         lrl.load( new URLRequest(liveRailModuleLocation) );
+         addChild(lrl as SWFElement);
+         */
+    }
+
+    private function onLoadComplete(e:Event):void {
+        modLoaded = true;
+        _adManager = lrl.content;
+        addChild(adManager);
+    }
 
     private function setupAdManager():void {
         if (modLoaded) {
@@ -255,8 +275,8 @@ public class LiverailElement extends ParallelElement {
             liveRailConfig["LR_VERSION"] = liverailVersion;
 
             //Partner ID maps to CP id
-            //liveRailConfig["LR_PARTNERS"] = contentObject.mediaObject.partnerId;
-            liveRailConfig["LR_PARTNERS"] = "BBC";
+            liveRailConfig["LR_PARTNERS"] = contentObject.mediaObject.partnerId;
+
             // a unique code identifying the video played by your Flash player;
             liveRailConfig["LR_VIDEO_ID"] = programmeId;
 
@@ -304,9 +324,7 @@ public class LiverailElement extends ParallelElement {
             //	liveRailConfig["LR_BITRATE"] = 	media !=null && media.quality != null ? media.quality : "medium";
             //StatusService.info("Setting LiveRail ad bitrate to "+liveRailConfig["LR_BITRATE"]);
 
-            ///////adManager.initAds(liveRailConfig);
-
-            adManager.shiftBox();
+            adManager.initAds(liveRailConfig);
             // comma separated list of keywords describing the content verticals
             //	pollLoader.stop();
 
@@ -342,6 +360,6 @@ public class LiverailElement extends ParallelElement {
     public var element:ParallelElement;
     /* static */
 
-    private static const ID:String = "LIVERAIL_ID";
+    private static const ID:String = "ID";
 }
 }
