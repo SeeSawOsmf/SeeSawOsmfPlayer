@@ -31,11 +31,12 @@ public class LiverailPluginInfo extends PluginInfo {
             (ID
                     , canHandleResourceFunction
                     , mediaElementCreationFunction
-                    , MediaFactoryItemType.STANDARD
+                    , MediaFactoryItemType.PROXY
                     );
 
     public static const ID:String = "uk.co.vodco.liverail.LiverailPluginInfo";
-
+    public static const NS_SETTINGS:String = "http://www.seesaw.com/liverail/settings";
+    public static const NS_TARGET:String = "http://www.seesaw.com/liverail/target";
 
 }
 }

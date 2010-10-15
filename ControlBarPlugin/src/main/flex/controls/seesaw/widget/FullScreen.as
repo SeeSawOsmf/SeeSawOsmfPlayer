@@ -76,8 +76,8 @@ public class FullScreen extends ButtonWidget implements IWidget {
     }
 
     protected function fullScreenHandler(event:Event):void {
-        logger.debug("NEW STAGE HEIGHT : " + stage.stageHeight);
-        logger.debug("NEW STAGE WIDTH : " + stage.stageWidth);
+        // logger.debug("NEW STAGE HEIGHT : " + stage.stageHeight);
+        // logger.debug("NEW STAGE WIDTH : " + stage.stageWidth);
     }
 
     protected function get playable():PlayTrait {
@@ -94,7 +94,7 @@ public class FullScreen extends ButtonWidget implements IWidget {
     override protected function processRequiredTraitsAvailable(element:MediaElement):void {
         _playable = element.getTrait(MediaTraitType.PLAY) as PlayTrait;
 
-        stage.addEventListener(Event.RESIZE, fullScreenHandler);
+        // stage.addEventListener(Event.RESIZE, fullScreenHandler);
 
         //_playable.addEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
         //_playable.addEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);

@@ -19,6 +19,9 @@
 
 package com.seesaw.player {
 import com.seesaw.player.components.ControlBarComponent;
+import com.seesaw.player.components.DebugProxyComponent;
+import com.seesaw.player.components.DefaultProxyComponent;
+import com.seesaw.player.components.LiverailComponent;
 import com.seesaw.player.components.PluginLifecycle;
 
 import flash.display.Sprite;
@@ -31,6 +34,10 @@ import org.osmf.events.MediaFactoryEvent;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.media.PluginInfoResource;
+import org.osmf.traits.DisplayObjectTrait;
+import org.osmf.traits.MediaTraitType;
+
+import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
 
 public class SeeSawPlayer extends Sprite {
 
@@ -41,6 +48,9 @@ public class SeeSawPlayer extends Sprite {
     private var _rootElement:ParallelElement;
 
     private var components:Dictionary;
+    private var _liveRail:LiverailComponent;
+    private var _defaultProxy:DefaultProxyComponent;
+    private var debugProxy:DebugProxyComponent;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
@@ -48,7 +58,6 @@ public class SeeSawPlayer extends Sprite {
         config = playerConfig;
 
         initialisePlayer();
-        createComponents();
     }
 
     private function initialisePlayer():void {
@@ -56,29 +65,59 @@ public class SeeSawPlayer extends Sprite {
 
         config.factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
         config.factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadError);
+        config.factory.addEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onMediaElementCreate);
 
-        config.player.media = createRootElement();
+        createComponents();
+        createRootElement();
+        loadPlugins();
 
+        // create video element
+        var videoElement:MediaElement = config.factory.createMediaElement(config.resource);
+        rootElement.addChild(videoElement);
         config.container.addMediaElement(rootElement);
+
         addChild(config.container);
     }
 
+    private function loadPlugins():void {
+        logger.debug("loading plugins");
+
+        config.factory.loadPlugin(controlBar.info);
+        // config.factory.loadPlugin(liveRail.info);
+        config.factory.loadPlugin(debugProxy.info);
+        config.factory.loadPlugin(defaultProxy.info);
+    }
 
     private function createComponents():void {
         logger.debug("creating components");
+
+
         components = new Dictionary();
 
+
+        debugProxy = new DebugProxyComponent(this);
+        //defaultProxy.applyMetadata(config.element);
+        components[DebugPluginInfo.ID] = debugProxy;
+
+
+        defaultProxy = new DefaultProxyComponent(this);
+        //defaultProxy.applyMetadata(config.element);
+        components[DefaultProxyPluginInfo.ID] = defaultProxy;
+
         controlBar = new ControlBarComponent(this);
-        controlBar.applyMetadata(config.element);
         components[ControlBarPlugin.ID] = controlBar;
-        config.factory.loadPlugin(controlBar.info);
+
+        /*
+         liveRail = new LiverailComponent(this);
+         liveRail.applyMetadata(config.element);
+         components[LiverailPlugin.ID] = liveRail;
+         */
     }
 
-    private function createRootElement():MediaElement {
+    private function createRootElement():void {
         logger.debug("creating root element");
 
         rootElement = new ParallelElement();
-        rootElement.addChild(config.element);
 
         var rootElementLayout:LayoutMetadata = new LayoutMetadata();
         rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, rootElementLayout);
@@ -86,7 +125,7 @@ public class SeeSawPlayer extends Sprite {
         rootElementLayout.width = config.width;
         rootElementLayout.height = config.height;
 
-        return rootElement;
+        config.player.media = rootElement;
     }
 
     private function onPluginLoaded(event:MediaFactoryEvent):void {
@@ -108,6 +147,29 @@ public class SeeSawPlayer extends Sprite {
     private function onPluginLoadError(event:MediaFactoryEvent):void {
         logger.debug("plugin error");
         controlBar.pluginLoadError(event);
+    }
+
+    private function onMediaElementCreate(event:MediaFactoryEvent):void {
+        logger.debug("created media element");
+
+        var displayable:DisplayObjectTrait = event.mediaElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
+        if (displayable) {
+            logger.debug("adding display object trait");
+        }
+
+        var fullscreen:FullScreenTrait = event.mediaElement.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
+        if (fullscreen) {
+            logger.debug("adding handler for full screen trait");
+            fullscreen.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
+        }
+    }
+
+    private function onFullscreen(event:FullScreenEvent):void {
+        logger.debug("onFullscreen");
+        if (event.value) {
+            config.container.width = stage.fullScreenWidth;
+            config.container.height = stage.fullScreenHeight;
+        }
     }
 
     public function get rootElement():ParallelElement {
@@ -132,6 +194,22 @@ public class SeeSawPlayer extends Sprite {
 
     public function set controlBar(value:ControlBarComponent):void {
         _controlBar = value;
+    }
+
+    public function set liveRail(value:LiverailComponent):void {
+        _liveRail = value;
+    }
+
+    public function get liveRail():LiverailComponent {
+        return _liveRail;
+    }
+
+    public function set defaultProxy(value:DefaultProxyComponent):void {
+        _defaultProxy = value;
+    }
+
+    public function get defaultProxy():DefaultProxyComponent {
+        return _defaultProxy;
     }
 }
 }

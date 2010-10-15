@@ -22,6 +22,7 @@
 package {
 import controls.seesaw.widget.*;
 
+import flash.display.DisplayObject;
 import flash.utils.Dictionary;
 
 import org.as3commons.logging.ILogger;
@@ -30,6 +31,7 @@ import org.osmf.chrome.assets.AssetsManager;
 import org.osmf.chrome.configuration.LayoutAttributesParser;
 import org.osmf.chrome.configuration.WidgetsParser;
 import org.osmf.chrome.widgets.Widget;
+import org.osmf.events.DisplayObjectEvent;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaResourceBase;
@@ -53,29 +55,37 @@ public class ControlBarElement extends MediaElement {
 
     [Embed(source="/blank.png")]
     private static const PAUSE_DISABLED:Class;
+
     [Embed(source="/pause.png")]
     private static const PAUSE_UP:Class;
+
     [Embed(source="/pauseOver.png")]
     private static const PAUSE_DOWN:Class;
 
     [Embed(source="/stop_disabled.png")]
     private static const STOP_DISABLED:Class;
+
     [Embed(source="/stop_up.png")]
     private static const STOP_UP:Class;
+
     [Embed(source="/stop_down.png")]
     private static const STOP_DOWN:Class;
 
     [Embed(source="/blank.png")]
     private static const PLAY_DISABLED:Class;
+
     [Embed(source="/play.png")]
     private static const PLAY_UP:Class;
+
     [Embed(source="/playOver.png")]
     private static const PLAY_DOWN:Class;
 
     [Embed(source="/scrubber_disabled.png")]
     private static const SCRUBBER_DISABLED:Class;
+
     [Embed(source="/scrubberButton.png")]
     private static const SCRUBBER_UP:Class;
+
     [Embed(source="/scrubberButton.png")]
     private static const SCRUBBER_DOWN:Class;
 
@@ -84,7 +94,6 @@ public class ControlBarElement extends MediaElement {
 
     [Embed(source="/scrubBarTrack.png")]
     private static const SCRUB_BAR_TRACK:Class;
-
 
     [Embed(source="/volume.png")]
     private static const VOLUME_UP:Class;
@@ -110,13 +119,28 @@ public class ControlBarElement extends MediaElement {
             // control bar should control:
             var targetMetadata:Metadata = target.getMetadata(ControlBarPlugin.NS_CONTROL_BAR_TARGET);
             if (targetMetadata) {
-                if (targetMetadata.getValue(ID) != null
-                        && targetMetadata.getValue(ID) == settings.getValue(ID)
-                        ) {
+                if (targetMetadata.getValue(ID) != null && targetMetadata.getValue(ID) == settings.getValue(ID)) {
                     controlBar.media = target;
                 }
             }
         }
+    }
+
+    protected function processDisplayObjectChange(event:DisplayObjectEvent):void {
+        logger.debug("processDisplayObjectChange: " + event);
+
+        var oldDisplayObject:DisplayObject = event.oldDisplayObject;
+        var newView:DisplayObject = event.newDisplayObject;
+    }
+
+    protected function processMediaSizeChange(event:DisplayObjectEvent):void {
+        logger.debug("processMediaSizeChange: " + event);
+
+        var oldWidth:Number = event.oldWidth;
+        var oldHeight:Number = event.oldHeight;
+
+        var newWidth:Number = event.newWidth;
+        var newHeight:Number = event.newHeight;
     }
 
     // Overrides
@@ -139,6 +163,8 @@ public class ControlBarElement extends MediaElement {
     }
 
     override protected function setupTraits():void {
+        logger.debug("setupTraits");
+
         // Setup a control bar using the ChromeLibrary:
         setupControlBar();
 
@@ -164,6 +190,7 @@ public class ControlBarElement extends MediaElement {
     //
 
     private function setupControlBar():void {
+        logger.debug("setupControlBar");
 
         addSeesawWidgets();
 
