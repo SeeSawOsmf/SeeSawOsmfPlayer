@@ -58,7 +58,7 @@ public class LiverailComponent implements PluginLifecycle {
         if (!this.loaded) {
             //    var LRElement:ParallelElement = new ParallelElement();
             //  LRElement.addChild(new DurationElement(20, new ImageElement(new URLResource("http://kgd-red-test-zxtm01.dev.vodco.co.uk/i/ccp/00000180/18055.jpg"))));
-            player.rootElement.addChild(constructElement());
+            //   player.rootElement.addChild(constructElement());
 
             ///     player.rootElement.addChild(LRElement);
             this.loaded = true;
