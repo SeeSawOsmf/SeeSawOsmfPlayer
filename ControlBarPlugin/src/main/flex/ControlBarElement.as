@@ -120,27 +120,11 @@ public class ControlBarElement extends MediaElement {
             var targetMetadata:Metadata = target.getMetadata(ControlBarPlugin.NS_CONTROL_BAR_TARGET);
             if (targetMetadata) {
                 if (targetMetadata.getValue(ID) != null && targetMetadata.getValue(ID) == settings.getValue(ID)) {
+                    logger.debug("setting target on control bar: " + target);
                     controlBar.media = target;
                 }
             }
         }
-    }
-
-     protected function processDisplayObjectChange(event:DisplayObjectEvent):void {
-        logger.debug("processDisplayObjectChange: " + event);
-
-        var oldDisplayObject:DisplayObject = event.oldDisplayObject;
-        var newView:DisplayObject = event.newDisplayObject;
-    }
-
-    protected function processMediaSizeChange(event:DisplayObjectEvent):void {
-        logger.debug("processMediaSizeChange: " + event);
-
-        var oldWidth:Number = event.oldWidth;
-        var oldHeight:Number = event.oldHeight;
-
-        var newWidth:Number = event.newWidth;
-        var newHeight:Number = event.newHeight;
     }
 
     // Overrides
@@ -153,8 +137,7 @@ public class ControlBarElement extends MediaElement {
         // (containing only one field: "ID" that tells us the ID of the media
         // element that we should be controlling):
         if (value != null) {
-            settings
-                    = value.getMetadataValue(ControlBarPlugin.NS_CONTROL_BAR_SETTINGS) as Metadata;
+            settings = value.getMetadataValue(ControlBarPlugin.NS_CONTROL_BAR_SETTINGS) as Metadata;
 
             processTarget();
         }
@@ -207,7 +190,7 @@ public class ControlBarElement extends MediaElement {
             controlBar = widgetsParser.getWidget("controlBar");
         }
         catch (error:Error) {
-            trace("WARNING: failed setting up control bar:", error.message);
+            logger.error("WARNING: failed setting up control bar:", error.message);
         }
     }
 

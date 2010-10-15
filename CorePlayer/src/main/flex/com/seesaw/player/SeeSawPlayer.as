@@ -72,6 +72,11 @@ public class SeeSawPlayer extends Sprite {
 
         // create video element
         var videoElement:MediaElement = config.factory.createMediaElement(config.resource);
+
+        // the control bar wants to be loaded after annotating the video
+        controlBar.applyMetadata(videoElement);
+        config.factory.loadPlugin(controlBar.info);
+
         rootElement.addChild(videoElement);
         config.container.addMediaElement(rootElement);
 
@@ -81,7 +86,7 @@ public class SeeSawPlayer extends Sprite {
     private function loadPlugins():void {
         logger.debug("loading plugins");
 
-        config.factory.loadPlugin(controlBar.info);
+        // config.factory.loadPlugin(controlBar.info);
         // config.factory.loadPlugin(liveRail.info);
         config.factory.loadPlugin(defaultProxy.info);
     }
@@ -91,10 +96,11 @@ public class SeeSawPlayer extends Sprite {
         components = new Dictionary();
 
         defaultProxy = new DefaultProxyComponent(this);
-        //defaultProxy.applyMetadata(config.element);
+        // defaultProxy.applyMetadata(config.element);
         components[DefaultProxyPluginInfo.ID] = defaultProxy;
 
         controlBar = new ControlBarComponent(this);
+        // controlBar.applyMetadata(config.element);
         components[ControlBarPlugin.ID] = controlBar;
 
         /*

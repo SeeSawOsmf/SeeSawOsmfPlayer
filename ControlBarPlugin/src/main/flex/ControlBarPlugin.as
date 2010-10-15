@@ -102,7 +102,6 @@ public class ControlBarPlugin extends Sprite {
 
     private function mediaElementCreationNotificationCallback(target:MediaElement):void {
         // If the control bar has been created, notify it about the just-created element.
-        logger.debug("TARGET ELEMENT : " + target);
         this.targetElement = target;
 
         updateControls();
@@ -110,7 +109,6 @@ public class ControlBarPlugin extends Sprite {
 
     private function updateControls():void {
         if (controlBarElement != null && targetElement != null && controlBarElement != targetElement) {
-            logger.debug("THE TARGET " + targetElement);
             controlBarElement.addReference(targetElement);
         }
     }
