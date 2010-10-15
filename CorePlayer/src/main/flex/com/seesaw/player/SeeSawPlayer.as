@@ -99,14 +99,13 @@ public class SeeSawPlayer extends Sprite {
     private function createComponents():void {
         logger.debug("creating components");
 
-
         components = new Dictionary();
 
+        // TODO: this is still being worked out
 
         debugProxy = new DebugProxyComponent(this);
         //defaultProxy.applyMetadata(config.element);
         components[DebugPluginInfo.ID] = debugProxy;
-
 
         defaultProxy = new DefaultProxyComponent(this);
         // defaultProxy.applyMetadata(config.element);
