@@ -18,16 +18,14 @@
  */
 
 package com.seesaw.player.components {
-import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.SeeSawPlayer;
-import com.seesaw.proxyplugin.ProxyPluginInfo;
+import com.seesaw.proxyplugin.DefaultProxyPluginInfo;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.media.PluginInfoResource;
-import org.osmf.metadata.Metadata;
 
 public class DefaultProxyComponent implements PluginLifecycle {
 
@@ -44,15 +42,16 @@ public class DefaultProxyComponent implements PluginLifecycle {
     }
 
     public function get info():PluginInfoResource {
-        pluginInfo = new PluginInfoResource(new ProxyPluginInfo());
+        pluginInfo = new PluginInfoResource(new DefaultProxyPluginInfo());
         return pluginInfo;
     }
 
     public function pluginLoaded(event:MediaFactoryEvent):void {
         logger.debug("plugin loaded");
 
-        if (!this.loaded) {
-            this.loaded = true;
+        if (!loaded) {
+            //player.rootElement.addChild(constructControlBarElement());
+            loaded = true;
         }
     }
 
@@ -62,10 +61,6 @@ public class DefaultProxyComponent implements PluginLifecycle {
 
     public function applyMetadata(target:MediaElement):void {
         logger.debug("applying metadata: " + target);
-        var Target:Metadata = new Metadata();
-        Target.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
-        target.addMetadata(ProxyPluginInfo.NS_TARGET, Target);
     }
-
 }
 }
