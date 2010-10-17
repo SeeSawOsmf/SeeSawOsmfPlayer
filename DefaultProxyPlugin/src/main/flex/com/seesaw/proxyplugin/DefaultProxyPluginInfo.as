@@ -33,8 +33,6 @@ public class DefaultProxyPluginInfo extends PluginInfo {
     private static var logger:ILogger = LoggerFactory.getClassLogger(DefaultProxyPluginInfo);
 
     public static const ID:String = "com.seesaw.proxyplugin.DefaultProxyPlugin";
-    public static const NS_SETTINGS:String = "seesaw/defaultproxy/settings";
-    public static const NS_TARGET:String = "seesaw/defaultproxy/target";
 
     public function DefaultProxyPluginInfo() {
         logger.debug("DefaultProxyPluginInfo()");

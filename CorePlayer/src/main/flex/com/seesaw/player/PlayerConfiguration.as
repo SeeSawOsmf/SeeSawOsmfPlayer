@@ -24,7 +24,8 @@ import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaPlayer;
 import org.osmf.media.MediaResourceBase;
 
-public class PlayerConfiguration {
+public class
+PlayerConfiguration {
 
     private var _factory:MediaFactory;
     private var _player:MediaPlayer;

@@ -34,13 +34,16 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ParallelElement;
 import org.osmf.events.MediaFactoryEvent;
+import org.osmf.layout.HorizontalAlign;
 import org.osmf.layout.LayoutMetadata;
+import org.osmf.layout.VerticalAlign;
 import org.osmf.media.MediaElement;
+import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
-import org.osmf.traits.DisplayObjectTrait;
-import org.osmf.traits.MediaTraitType;
+import org.osmf.metadata.Metadata;
 
 import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
+import uk.vodco.livrail.LiverailPlugin;
 
 public class SeeSawPlayer extends Sprite {
 
@@ -54,6 +57,7 @@ public class SeeSawPlayer extends Sprite {
     private var _liveRail:LiverailComponent;
     private var _defaultProxy:DefaultProxyComponent;
     private var debugProxy:DebugProxyComponent;
+    private var _videoElement:MediaElement;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
@@ -72,36 +76,27 @@ public class SeeSawPlayer extends Sprite {
 
         createComponents();
         createRootElement();
-        loadPlugins();
-
-        // create video element
-        var videoElement:MediaElement = config.factory.createMediaElement(config.resource);
-
-        // the control bar wants to be loaded after annotating the video
-        controlBar.applyMetadata(videoElement);
-        config.factory.loadPlugin(controlBar.info);
-
-        rootElement.addChild(videoElement);
-        config.container.addMediaElement(rootElement);
+        createVideoElement();
+        createControlBarElement();
 
         addChild(config.container);
     }
 
-    private function loadPlugins():void {
+    private function createVideoElement():void {
         logger.debug("loading plugins");
 
-        // config.factory.loadPlugin(controlBar.info);
-        // config.factory.loadPlugin(liveRail.info);
-        config.factory.loadPlugin(debugProxy.info);
         config.factory.loadPlugin(defaultProxy.info);
+        config.factory.loadPlugin(liveRail.info);
+        config.factory.loadPlugin(debugProxy.info);
+        
+        _videoElement = config.factory.createMediaElement(config.resource);
+        rootElement.addChild(_videoElement);
     }
 
     private function createComponents():void {
         logger.debug("creating components");
 
         components = new Dictionary();
-
-        // TODO: this is still being worked out
 
         debugProxy = new DebugProxyComponent(this);
         //defaultProxy.applyMetadata(config.element);
@@ -112,14 +107,36 @@ public class SeeSawPlayer extends Sprite {
         components[DefaultProxyPluginInfo.ID] = defaultProxy;
 
         controlBar = new ControlBarComponent(this);
-        // controlBar.applyMetadata(config.element);
         components[ControlBarPlugin.ID] = controlBar;
 
-        /*
-         liveRail = new LiverailComponent(this);
-         liveRail.applyMetadata(config.element);
-         components[LiverailPlugin.ID] = liveRail;
-         */
+        liveRail = new LiverailComponent(this);
+        // liveRail.applyMetadata(config.element);
+        components[LiverailPlugin.ID] = liveRail;
+    }
+
+    private function createControlBarElement() {
+        controlBar.applyMetadata(_videoElement);
+        config.factory.loadPlugin(controlBar.info);
+
+        var controlBarSettings:Metadata = new Metadata();
+        controlBarSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
+
+        var resource:MediaResourceBase = new MediaResourceBase();
+        resource.addMetadataValue(ControlBarPlugin.NS_CONTROL_BAR_SETTINGS, controlBarSettings);
+
+        var controlBarElement:MediaElement = config.factory.createMediaElement(resource);
+
+        var layout:LayoutMetadata = controlBarElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
+        if (layout == null) {
+            layout = new LayoutMetadata();
+            controlBarElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+        }
+        layout.verticalAlign = VerticalAlign.BOTTOM;
+        layout.horizontalAlign = HorizontalAlign.CENTER;
+
+        layout.index = 1;
+
+        rootElement.addChild(controlBarElement);
     }
 
     private function createRootElement():void {
@@ -134,6 +151,7 @@ public class SeeSawPlayer extends Sprite {
         rootElementLayout.height = config.height;
 
         config.player.media = rootElement;
+        config.container.addMediaElement(rootElement);
     }
 
     private function onPluginLoaded(event:MediaFactoryEvent):void {
@@ -159,11 +177,6 @@ public class SeeSawPlayer extends Sprite {
 
     private function onMediaElementCreate(event:MediaFactoryEvent):void {
         logger.debug("created media element");
-
-        var displayable:DisplayObjectTrait = event.mediaElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
-        if (displayable) {
-            logger.debug("adding display object trait");
-        }
 
         var fullscreen:FullScreenTrait = event.mediaElement.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
         if (fullscreen) {
