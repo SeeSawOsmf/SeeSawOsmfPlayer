@@ -84,12 +84,13 @@ public class SeeSawPlayer extends Sprite {
         config.container.addMediaElement(rootElement);
 
         addChild(config.container);
+        config.factory.loadPlugin(controlBar.info);
     }
 
     private function loadPlugins():void {
         logger.debug("loading plugins");
 
-        config.factory.loadPlugin(controlBar.info);
+
         config.factory.loadPlugin(liveRail.info);
         config.factory.loadPlugin(debugProxy.info);
         config.factory.loadPlugin(defaultProxy.info);

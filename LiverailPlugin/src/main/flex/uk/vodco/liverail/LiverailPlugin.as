@@ -96,6 +96,7 @@ public class LiverailPlugin extends PluginInfo {
 
     private function mediaElementCreationCallback():MediaElement {
         liverailElement = new LiverailElement();
+        //updateLiverail();
         return liverailElement;
 
     }
@@ -106,6 +107,7 @@ public class LiverailPlugin extends PluginInfo {
         this.targetElement = target;
         liverailElement = new LiverailElement();
         updateLiverail();
+
     }
 
     private function updateLiverail():void {
