@@ -53,10 +53,10 @@ public class SeeSawPlayer extends Sprite {
     private var _config:PlayerConfiguration;
     private var _rootElement:ParallelElement;
 
-    private var components:Dictionary;
+    private var _components:Dictionary;
     private var _liveRail:LiverailComponent;
     private var _defaultProxy:DefaultProxyComponent;
-    private var debugProxy:DebugProxyComponent;
+    private var _debugProxy:DebugProxyComponent;
     private var _videoElement:MediaElement;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
@@ -85,9 +85,9 @@ public class SeeSawPlayer extends Sprite {
     private function createVideoElement():void {
         logger.debug("loading plugins");
 
-        config.factory.loadPlugin(defaultProxy.info);
-        config.factory.loadPlugin(liveRail.info);
-        config.factory.loadPlugin(debugProxy.info);
+        config.factory.loadPlugin(_defaultProxy.info);
+        config.factory.loadPlugin(_liveRail.info);
+        config.factory.loadPlugin(_debugProxy.info);
         
         _videoElement = config.factory.createMediaElement(config.resource);
         rootElement.addChild(_videoElement);
@@ -96,27 +96,27 @@ public class SeeSawPlayer extends Sprite {
     private function createComponents():void {
         logger.debug("creating components");
 
-        components = new Dictionary();
+        _components = new Dictionary();
 
-        debugProxy = new DebugProxyComponent(this);
-        //defaultProxy.applyMetadata(config.element);
-        components[DebugPluginInfo.ID] = debugProxy;
-
-        defaultProxy = new DefaultProxyComponent(this);
+        _debugProxy = new DebugProxyComponent(this);
         // defaultProxy.applyMetadata(config.element);
-        components[DefaultProxyPluginInfo.ID] = defaultProxy;
+        _components[DebugPluginInfo.ID] = _debugProxy;
 
-        controlBar = new ControlBarComponent(this);
-        components[ControlBarPlugin.ID] = controlBar;
+        _defaultProxy = new DefaultProxyComponent(this);
+        // defaultProxy.applyMetadata(config.element);
+        _components[DefaultProxyPluginInfo.ID] = _defaultProxy;
 
-        liveRail = new LiverailComponent(this);
+        _controlBar = new ControlBarComponent(this);
+        _components[ControlBarPlugin.ID] = _controlBar;
+
+        _liveRail = new LiverailComponent(this);
         // liveRail.applyMetadata(config.element);
-        components[LiverailPlugin.ID] = liveRail;
+        _components[LiverailPlugin.ID] = _liveRail;
     }
 
     private function createControlBarElement() {
-        controlBar.applyMetadata(_videoElement);
-        config.factory.loadPlugin(controlBar.info);
+        _controlBar.applyMetadata(_videoElement);
+        config.factory.loadPlugin(_controlBar.info);
 
         var controlBarSettings:Metadata = new Metadata();
         controlBarSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
@@ -162,7 +162,7 @@ public class SeeSawPlayer extends Sprite {
 
             if (pluginInfo.pluginInfo.numMediaFactoryItems > 0) {
                 var id:String = pluginInfo.pluginInfo.getMediaFactoryItemAt(0).id;
-                var component:PluginLifecycle = components[id] as PluginLifecycle;
+                var component:PluginLifecycle = _components[id] as PluginLifecycle;
                 if (component) {
                     component.pluginLoaded(event);
                 }
@@ -172,7 +172,7 @@ public class SeeSawPlayer extends Sprite {
 
     private function onPluginLoadError(event:MediaFactoryEvent):void {
         logger.debug("plugin error");
-        controlBar.pluginLoadError(event);
+        _controlBar.pluginLoadError(event);
     }
 
     private function onMediaElementCreate(event:MediaFactoryEvent):void {
@@ -207,30 +207,6 @@ public class SeeSawPlayer extends Sprite {
 
     public function set config(value:PlayerConfiguration):void {
         _config = value;
-    }
-
-    public function get controlBar():ControlBarComponent {
-        return _controlBar;
-    }
-
-    public function set controlBar(value:ControlBarComponent):void {
-        _controlBar = value;
-    }
-
-    public function set liveRail(value:LiverailComponent):void {
-        _liveRail = value;
-    }
-
-    public function get liveRail():LiverailComponent {
-        return _liveRail;
-    }
-
-    public function set defaultProxy(value:DefaultProxyComponent):void {
-        _defaultProxy = value;
-    }
-
-    public function get defaultProxy():DefaultProxyComponent {
-        return _defaultProxy;
     }
 }
 }
