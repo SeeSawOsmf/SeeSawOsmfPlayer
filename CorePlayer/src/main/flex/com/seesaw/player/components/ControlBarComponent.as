@@ -24,11 +24,7 @@ import com.seesaw.player.SeeSawPlayer;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.events.MediaFactoryEvent;
-import org.osmf.layout.HorizontalAlign;
-import org.osmf.layout.LayoutMetadata;
-import org.osmf.layout.VerticalAlign;
 import org.osmf.media.MediaElement;
-import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
 import org.osmf.metadata.Metadata;
 
@@ -54,7 +50,6 @@ public class ControlBarComponent implements PluginLifecycle {
         logger.debug("plugin loaded");
 
         if (!this.loaded) {
-            player.rootElement.addChild(constructControlBarElement());
             this.loaded = true;
         }
     }
@@ -69,28 +64,5 @@ public class ControlBarComponent implements PluginLifecycle {
         controlBarTarget.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
         target.addMetadata(ControlBarPlugin.NS_CONTROL_BAR_TARGET, controlBarTarget);
     }
-
-    private function constructControlBarElement():MediaElement {
-        var controlBarSettings:Metadata = new Metadata();
-        controlBarSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
-
-        var resource:MediaResourceBase = new MediaResourceBase();
-        resource.addMetadataValue(ControlBarPlugin.NS_CONTROL_BAR_SETTINGS, controlBarSettings);
-
-        var controlBar:MediaElement = player.config.factory.createMediaElement(resource);
-
-        var layout:LayoutMetadata = controlBar.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
-        if (layout == null) {
-            layout = new LayoutMetadata();
-            controlBar.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
-        }
-        layout.verticalAlign = VerticalAlign.BOTTOM;
-        layout.horizontalAlign = HorizontalAlign.CENTER;
-
-        layout.index = 1;
-
-        return controlBar;
-    }
-
 }
 }

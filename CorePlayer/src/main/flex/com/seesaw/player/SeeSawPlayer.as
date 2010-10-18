@@ -34,13 +34,16 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ParallelElement;
 import org.osmf.events.MediaFactoryEvent;
+import org.osmf.layout.HorizontalAlign;
 import org.osmf.layout.LayoutMetadata;
+import org.osmf.layout.VerticalAlign;
 import org.osmf.media.MediaElement;
+import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
-import org.osmf.traits.DisplayObjectTrait;
-import org.osmf.traits.MediaTraitType;
+import org.osmf.metadata.Metadata;
 
 import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
+import uk.vodco.livrail.LiverailPlugin;
 
 public class SeeSawPlayer extends Sprite {
 
@@ -50,10 +53,11 @@ public class SeeSawPlayer extends Sprite {
     private var _config:PlayerConfiguration;
     private var _rootElement:ParallelElement;
 
-    private var components:Dictionary;
+    private var _components:Dictionary;
     private var _liveRail:LiverailComponent;
     private var _defaultProxy:DefaultProxyComponent;
-    private var debugProxy:DebugProxyComponent;
+    private var _debugProxy:DebugProxyComponent;
+    private var _videoElement:MediaElement;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
@@ -72,54 +76,67 @@ public class SeeSawPlayer extends Sprite {
 
         createComponents();
         createRootElement();
-        loadPlugins();
-
-        // create video element
-        var videoElement:MediaElement = config.factory.createMediaElement(config.resource);
-
-        // the control bar wants to be loaded after annotating the video
-        controlBar.applyMetadata(videoElement);
-        config.factory.loadPlugin(controlBar.info);
-
-        rootElement.addChild(videoElement);
-        config.container.addMediaElement(rootElement);
+        createVideoElement();
+        createControlBarElement();
 
         addChild(config.container);
     }
 
-    private function loadPlugins():void {
+    private function createVideoElement():void {
         logger.debug("loading plugins");
 
-        // config.factory.loadPlugin(controlBar.info);
-        // config.factory.loadPlugin(liveRail.info);
-        config.factory.loadPlugin(debugProxy.info);
-        config.factory.loadPlugin(defaultProxy.info);
+        config.factory.loadPlugin(_defaultProxy.info);
+        config.factory.loadPlugin(_liveRail.info);
+        config.factory.loadPlugin(_debugProxy.info);
+
+        _videoElement = config.factory.createMediaElement(config.resource);
+        rootElement.addChild(_videoElement);
     }
 
     private function createComponents():void {
         logger.debug("creating components");
 
-        components = new Dictionary();
+        _components = new Dictionary();
 
-        // TODO: this is still being worked out
-
-        debugProxy = new DebugProxyComponent(this);
-        //defaultProxy.applyMetadata(config.element);
-        components[DebugPluginInfo.ID] = debugProxy;
-
-        defaultProxy = new DefaultProxyComponent(this);
+        _debugProxy = new DebugProxyComponent(this);
         // defaultProxy.applyMetadata(config.element);
-        components[DefaultProxyPluginInfo.ID] = defaultProxy;
+        _components[DebugPluginInfo.ID] = _debugProxy;
 
-        controlBar = new ControlBarComponent(this);
-        // controlBar.applyMetadata(config.element);
-        components[ControlBarPlugin.ID] = controlBar;
+        _defaultProxy = new DefaultProxyComponent(this);
+        // defaultProxy.applyMetadata(config.element);
+        _components[DefaultProxyPluginInfo.ID] = _defaultProxy;
 
-        /*
-         liveRail = new LiverailComponent(this);
-         liveRail.applyMetadata(config.element);
-         components[LiverailPlugin.ID] = liveRail;
-         */
+        _controlBar = new ControlBarComponent(this);
+        _components[ControlBarPlugin.ID] = _controlBar;
+
+        _liveRail = new LiverailComponent(this);
+        // liveRail.applyMetadata(config.element);
+        _components[LiverailPlugin.ID] = _liveRail;
+    }
+
+    private function createControlBarElement() {
+        _controlBar.applyMetadata(_videoElement);
+        config.factory.loadPlugin(_controlBar.info);
+
+        var controlBarSettings:Metadata = new Metadata();
+        controlBarSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
+
+        var resource:MediaResourceBase = new MediaResourceBase();
+        resource.addMetadataValue(ControlBarPlugin.NS_CONTROL_BAR_SETTINGS, controlBarSettings);
+
+        var controlBarElement:MediaElement = config.factory.createMediaElement(resource);
+
+        var layout:LayoutMetadata = controlBarElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
+        if (layout == null) {
+            layout = new LayoutMetadata();
+            controlBarElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+        }
+        layout.verticalAlign = VerticalAlign.BOTTOM;
+        layout.horizontalAlign = HorizontalAlign.CENTER;
+
+        layout.index = 1;
+
+        rootElement.addChild(controlBarElement);
     }
 
     private function createRootElement():void {
@@ -134,6 +151,7 @@ public class SeeSawPlayer extends Sprite {
         rootElementLayout.height = config.height;
 
         config.player.media = rootElement;
+        config.container.addMediaElement(rootElement);
     }
 
     private function onPluginLoaded(event:MediaFactoryEvent):void {
@@ -144,7 +162,7 @@ public class SeeSawPlayer extends Sprite {
 
             if (pluginInfo.pluginInfo.numMediaFactoryItems > 0) {
                 var id:String = pluginInfo.pluginInfo.getMediaFactoryItemAt(0).id;
-                var component:PluginLifecycle = components[id] as PluginLifecycle;
+                var component:PluginLifecycle = _components[id] as PluginLifecycle;
                 if (component) {
                     component.pluginLoaded(event);
                 }
@@ -154,16 +172,11 @@ public class SeeSawPlayer extends Sprite {
 
     private function onPluginLoadError(event:MediaFactoryEvent):void {
         logger.debug("plugin error");
-        controlBar.pluginLoadError(event);
+        _controlBar.pluginLoadError(event);
     }
 
     private function onMediaElementCreate(event:MediaFactoryEvent):void {
         logger.debug("created media element");
-
-        var displayable:DisplayObjectTrait = event.mediaElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
-        if (displayable) {
-            logger.debug("adding display object trait");
-        }
 
         var fullscreen:FullScreenTrait = event.mediaElement.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
         if (fullscreen) {
@@ -173,10 +186,14 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onFullscreen(event:FullScreenEvent):void {
-        logger.debug("onFullscreen");
         if (event.value) {
-            config.container.width = stage.fullScreenWidth;
-            config.container.height = stage.fullScreenHeight;
+            //MAKE THE VIDEO RESIZE TO THE STAGE.FULLSCREENWIDTH and FULLSCREENHEIGHT
+            logger.debug("STAGE WIDTH : " + stage.width);
+            logger.debug("STAGE FULLSCREENWIDTH : " + stage.fullScreenWidth);
+        } else {
+            //RETURN THE VIDEO TO THE ORIGINAL SIZE
+            logger.debug("CONTAINER WIDTH : " + config.container.width);
+
         }
     }
 
@@ -194,30 +211,6 @@ public class SeeSawPlayer extends Sprite {
 
     public function set config(value:PlayerConfiguration):void {
         _config = value;
-    }
-
-    public function get controlBar():ControlBarComponent {
-        return _controlBar;
-    }
-
-    public function set controlBar(value:ControlBarComponent):void {
-        _controlBar = value;
-    }
-
-    public function set liveRail(value:LiverailComponent):void {
-        _liveRail = value;
-    }
-
-    public function get liveRail():LiverailComponent {
-        return _liveRail;
-    }
-
-    public function set defaultProxy(value:DefaultProxyComponent):void {
-        _defaultProxy = value;
-    }
-
-    public function get defaultProxy():DefaultProxyComponent {
-        return _defaultProxy;
     }
 }
 }
