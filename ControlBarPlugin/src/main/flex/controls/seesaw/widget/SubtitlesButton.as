@@ -50,10 +50,13 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
     private var _playableTrait:PlayTrait;
     private var _fullscreenTrait:FullScreenTrait;
 
+    private var subtitlesOn:Boolean;
+
     private var subtitlesLabel:TextField;
 
     /* static */
-    private static const QUALIFIED_NAME:String = "controls.seesaw.widget.PauseButton";
+    private static const QUALIFIED_NAME:String = "controls.seesaw.widget.SubtitlesButton";
+
     private static const _requiredTraits:Vector.<String> = new Vector.<String>;
     _requiredTraits[0] = MediaTraitType.PLAY;
 
@@ -77,12 +80,12 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
         this.subtitlesLabel.setTextFormat(textFormat);
     }
 
-    protected function fullScreenHandler(event:Event):void {
-        if(_fullscreenTrait) {
+    protected function subtitlesHandler(event:Event):void {
+        /*if(_fullscreenTrait) {
             logger.debug("NEW STAGE HEIGHT : " + stage.stageHeight);
             logger.debug("NEW STAGE WIDTH : " + stage.stageWidth);
             _fullscreenTrait.fullscreen = !_fullscreenTrait.fullscreen;
-        }
+        }*/
     }
 
     protected function get playable():PlayTrait {
@@ -100,7 +103,7 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
         _playableTrait = element.getTrait(MediaTraitType.PLAY) as PlayTrait;
         _fullscreenTrait = element.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
 
-        stage.addEventListener(Event.RESIZE, fullScreenHandler);
+        //stage.addEventListener(Event.RESIZE, subtitlesHandler);
 
         //_playable.addEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
         //_playable.addEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
@@ -119,11 +122,10 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
     }
 
     override protected function onMouseClick(event:MouseEvent):void {
-        if (stage.displayState == StageDisplayState.NORMAL) {
-            stage.displayState = StageDisplayState.FULL_SCREEN;
+        if (!this.subtitlesOn) {
             subtitlesLabel.text = "Subtitles are on";
+            this.subtitlesOn = true;
         } else {
-            stage.displayState = StageDisplayState.NORMAL;
             subtitlesLabel.text = "Subtitles are off";
         }
         //var playable:PlayTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
