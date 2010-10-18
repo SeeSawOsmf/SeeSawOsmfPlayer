@@ -111,7 +111,7 @@ public class SeeSawPlayer extends Sprite {
         _components[LiverailPlugin.ID] = _liveRail;
     }
 
-    private function createControlBarElement() {
+    private function createControlBarElement():void {
         logger.debug("creating control bar");
 
         _controlBar.applyMetadata(_videoElement);
