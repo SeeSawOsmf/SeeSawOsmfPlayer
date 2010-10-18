@@ -44,10 +44,8 @@ public class FullScreen extends ButtonWidget implements IWidget {
 
     // Internals
 
-    private var _playable:PlayTrait;
+    private var _playableTrait:PlayTrait;
     private var _fullscreenTrait:FullScreenTrait;
-
-    private var _container:IMediaContainer;
 
     private var fullScreenLabel:TextField;
 
@@ -62,8 +60,6 @@ public class FullScreen extends ButtonWidget implements IWidget {
         fullScreenLabel.text = "Fullscreen";
         this.formatLabelFont();
 
-        // _container = media.container;
-        logger.debug("container: " + media);
         addChild(fullScreenLabel);
     }
 
@@ -87,7 +83,7 @@ public class FullScreen extends ButtonWidget implements IWidget {
     }
 
     protected function get playable():PlayTrait {
-        return _playable;
+        return _playableTrait;
     }
 
     // Overrides
@@ -98,7 +94,7 @@ public class FullScreen extends ButtonWidget implements IWidget {
     }
 
     override protected function processRequiredTraitsAvailable(element:MediaElement):void {
-        _playable = element.getTrait(MediaTraitType.PLAY) as PlayTrait;
+        _playableTrait = element.getTrait(MediaTraitType.PLAY) as PlayTrait;
         _fullscreenTrait = element.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
 
         stage.addEventListener(Event.RESIZE, fullScreenHandler);
@@ -110,7 +106,7 @@ public class FullScreen extends ButtonWidget implements IWidget {
     }
 
     override protected function processRequiredTraitsUnavailable(element:MediaElement):void {
-        if (_playable) {
+        if (_playableTrait) {
             //_playable.removeEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
             //_playable.removeEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
             //_playable = null;
