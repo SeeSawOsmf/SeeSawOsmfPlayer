@@ -203,6 +203,7 @@ public class ControlBarElement extends MediaElement {
         customWidgetList["controls.seesaw.widget.scrubbar"] = ScrubBar;
         customWidgetList["controls.seesaw.widget.playbutton"] = PlayButton;
         customWidgetList["controls.seesaw.widget.pausebutton"] = PauseButton;
+        customWidgetList["controls.seesaw.widget.subtitlesbutton"] = SubtitlesButton;
         customWidgetList["controls.seesaw.widget.fullscreen"] = FullScreen;
         customWidgetList["controls.seesaw.widget.volume"] = Volume;
         customWidgetList["controls.seesaw.widget.volumescrubbar"] = VolumeScrubBar;

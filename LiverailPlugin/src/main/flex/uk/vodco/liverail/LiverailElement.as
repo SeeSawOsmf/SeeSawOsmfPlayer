@@ -119,8 +119,7 @@ public class LiverailElement extends ParallelElement {
             resource = target.resource;
             this.target = target;
             processTarget();
-            createLiverail();
-            setupTraits();
+
         }
     }
 
@@ -134,11 +133,11 @@ public class LiverailElement extends ParallelElement {
                 if (targetMetadata.getValue(ID) != null
                         && targetMetadata.getValue(ID) == settings.getValue(ID)
                         ) {
-
+                    createLiverail();
+                    setupTraits();
                 }
 
             }
-            setupTraits();
         }
     }
 
@@ -252,7 +251,7 @@ public class LiverailElement extends ParallelElement {
 
          modLoaded = true;
          */
-        setupAdManager();
+        /// setupAdManager();
     }
 
     public function load(val:String):void {

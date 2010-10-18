@@ -28,6 +28,7 @@ import com.seesaw.player.mockData.MockData;
 
 import flash.display.LoaderInfo;
 import flash.display.Sprite;
+import flash.display.StageAlign;
 import flash.display.StageScaleMode;
 import flash.events.Event;
 
@@ -60,6 +61,7 @@ public class Player extends Sprite {
         params.videoPlayerInfo = "http://localhost:8080/player.videoplayerinfo:getvideoplayerinfo?t:ac=TV:COMEDY/p/41001001001/No-Series-programmes-programme-1";
 
         stage.scaleMode = StageScaleMode.NO_SCALE;
+        stage.align = StageAlign.TOP_LEFT;
 
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
     }

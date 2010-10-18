@@ -21,6 +21,7 @@
  */
 
 package com.seesaw.player.components {
+import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.SeeSawPlayer;
 
 import org.as3commons.logging.ILogger;
@@ -28,6 +29,7 @@ import org.as3commons.logging.LoggerFactory;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.media.PluginInfoResource;
+import org.osmf.metadata.Metadata;
 
 import uk.vodco.liverail.LiverailPlugin;
 
@@ -80,5 +82,13 @@ public class LiverailComponent implements PluginLifecycle {
 
     }
 
+
+    public function applyMetadata(target:MediaElement):void {
+        logger.debug("applying metadata: " + target);
+
+        var controlBarTarget:Metadata = new Metadata();
+        controlBarTarget.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
+        target.addMetadata(LiverailPlugin.NS_TARGET, controlBarTarget);
+    }
 }
 }

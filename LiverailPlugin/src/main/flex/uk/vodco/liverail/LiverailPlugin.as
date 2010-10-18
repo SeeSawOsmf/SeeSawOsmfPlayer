@@ -45,7 +45,7 @@ public class LiverailPlugin extends PluginInfo {
         var items:Vector.<MediaFactoryItem> = new Vector.<MediaFactoryItem>();
         items.push(mediaFactoryItem);
 
-        super(items);
+        super(items, mediaElementCreationNotificationCallback);
 
     }
 
@@ -92,7 +92,7 @@ public class LiverailPlugin extends PluginInfo {
 
     private function mediaElementCreationCallback():MediaElement {
         liverailElement = new LiverailElement();
-        updateLiverail();
+
         return liverailElement;
 
     }
@@ -100,10 +100,16 @@ public class LiverailPlugin extends PluginInfo {
     private function mediaElementCreationNotificationCallback(target:MediaElement):void {
 
         logger.debug("TARGET ELEMENT : " + target);
-        this.targetElement = target;
-        ///   liverailElement = new LiverailElement();
-        updateLiverail();
 
+        var settings:Metadata
+                = target.getMetadata(NS_SETTINGS) as Metadata;
+
+        if (settings != null) {
+
+            this.targetElement = target;
+            ///   liverailElement = new LiverailElement();
+            updateLiverail();
+        }
     }
 
     private function updateLiverail():void {
