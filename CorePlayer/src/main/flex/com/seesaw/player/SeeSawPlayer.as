@@ -182,7 +182,7 @@ public class SeeSawPlayer extends Sprite {
     private function onFullscreen(event:FullScreenEvent):void {
         logger.debug("onFullscreen");
 
-        if(!event.value) {
+        if(event.value) {
             layout(stage.fullScreenWidth, stage.fullScreenHeight);
         }
         else {
