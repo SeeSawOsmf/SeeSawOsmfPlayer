@@ -122,11 +122,12 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
     }
 
     override protected function onMouseClick(event:MouseEvent):void {
-        if (!this.subtitlesOn) {
+        if (this.subtitlesOn == false) {
             subtitlesLabel.text = "Subtitles are on";
             this.subtitlesOn = true;
         } else {
             subtitlesLabel.text = "Subtitles are off";
+            this.subtitlesOn = false;
         }
         //var playable:PlayTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
         //playable.play();
