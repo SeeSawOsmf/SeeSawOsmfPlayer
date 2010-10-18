@@ -26,12 +26,11 @@ import flash.events.Event;
 import flash.geom.Rectangle;
 import flash.system.Security;
 
-import mx.controls.SWFLoader;
-
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ParallelElement;
 import org.osmf.elements.SWFElement;
+import org.osmf.elements.SWFLoader;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.SeekEvent;
 import org.osmf.media.MediaElement;
@@ -95,18 +94,25 @@ public class LiverailElement extends ParallelElement {
     private var _seekOffset:Number = 0.5;
     private var LR_AdvertsArray:Array;
     private var logger:ILogger = LoggerFactory.getClassLogger(LiverailElement);
+    public var loader:SWFLoader = new SWFLoader();
 
     public function LiverailElement() {
         logger.debug("Initialising LiverailElement");
-        Security.allowDomain("vox-static.liverail.com");
-        var liverailPath:String = "http://www.swftools.org/flash/mv_zoom1.swf";
+        Security.allowDomain("*");
+        var liverailPath:String = "C:/Users/bmeade/Desktop/testswf.swf";
+        // var liverailPath:String = "http://mediapm.edgesuite.net/osmf/content/test/ten.swf";
+        //  var liverailPath:String = "h/p://www.swftools.org/flash/mv_zoom1.swf";
         //   var liverailPath:String = "http://vox-static.liverail.com/swf/v4/skins/adplayerskin_1.swf";
-        var urlResource:URLResource = new URLResource(liverailPath)
-        var loader:SWFLoader = new SWFLoader();
+        var urlResource:URLResource = new URLResource(liverailPath);
 
 
-        var liveRailElement:SWFElement = new SWFElement(urlResource);
-        _adManager = liveRailElement;
+        var liveRailElement:SWFElement = new SWFElement(urlResource, loader);
+        liveRailElement.addEventListener(Event.COMPLETE, swfLoaded);
+
+    }
+
+    private function swfLoaded(event:Event):void {
+        _adManager = event.target;
 
         element = new ParallelElement();
         element.addChild(_adManager);
@@ -256,7 +262,7 @@ public class LiverailElement extends ParallelElement {
 
     public function load(val:String):void {
 
-        Security.allowDomain("vox-static.liverail.com");
+        ///  Security.allowDomain("vox-static.liverail.com");
         //	pollLoader.start();
 
         /*	liveRailModuleLocation = val;

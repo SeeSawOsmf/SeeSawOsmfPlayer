@@ -101,15 +101,15 @@ public class LiverailPlugin extends PluginInfo {
 
         logger.debug("TARGET ELEMENT : " + target);
 
-        var settings:Metadata
-                = target.getMetadata(NS_SETTINGS) as Metadata;
+        /*    var settings:Metadata
+         = target.getMetadata(NS_SETTINGS) as Metadata;
 
-        if (settings != null) {
-
-            this.targetElement = target;
-            ///   liverailElement = new LiverailElement();
-            updateLiverail();
-        }
+         if (settings != null) {
+         */
+        this.targetElement = target;
+        ///   liverailElement = new LiverailElement();
+        updateLiverail();
+        // }
     }
 
     private function updateLiverail():void {
