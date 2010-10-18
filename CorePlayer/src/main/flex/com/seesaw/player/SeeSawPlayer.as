@@ -80,18 +80,23 @@ public class SeeSawPlayer extends Sprite {
 
         // create video element
         var videoElement:MediaElement = config.factory.createMediaElement(config.resource);
+
+        // the control bar wants to be loaded after annotating the video
+        controlBar.applyMetadata(videoElement);
+        liveRail.applyMetadata(videoElement);
+        config.factory.loadPlugin(controlBar.info);
+        config.factory.loadPlugin(liveRail.info);
         rootElement.addChild(videoElement);
         config.container.addMediaElement(rootElement);
 
         addChild(config.container);
-        config.factory.loadPlugin(controlBar.info);
     }
 
     private function loadPlugins():void {
         logger.debug("loading plugins");
 
+        // config.factory.loadPlugin(controlBar.info);
 
-        config.factory.loadPlugin(liveRail.info);
         config.factory.loadPlugin(debugProxy.info);
         config.factory.loadPlugin(defaultProxy.info);
     }
@@ -99,27 +104,28 @@ public class SeeSawPlayer extends Sprite {
     private function createComponents():void {
         logger.debug("creating components");
 
-
         components = new Dictionary();
+
+        // TODO: this is still being worked out
+
+
+        liveRail = new LiverailComponent(this);
+        ///    rootElement.addChild(liveRail.applyMetadata2());
+        components[LiverailPlugin.ID] = liveRail;
 
 
         debugProxy = new DebugProxyComponent(this);
         //defaultProxy.applyMetadata(config.element);
         components[DebugPluginInfo.ID] = debugProxy;
 
-
         defaultProxy = new DefaultProxyComponent(this);
-        //defaultProxy.applyMetadata(config.element);
+        // defaultProxy.applyMetadata(config.element);
         components[DefaultProxyPluginInfo.ID] = defaultProxy;
 
         controlBar = new ControlBarComponent(this);
-        ///  controlBar.applyMetadata(config.element);
+        // controlBar.applyMetadata(config.element);
         components[ControlBarPlugin.ID] = controlBar;
 
-
-        liveRail = new LiverailComponent(this);
-        ///    rootElement.addChild(liveRail.applyMetadata2());
-        components[LiverailPlugin.ID] = liveRail;
 
     }
 

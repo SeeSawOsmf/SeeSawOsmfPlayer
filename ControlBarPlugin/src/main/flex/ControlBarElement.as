@@ -1,28 +1,27 @@
-/*****************************************************
+/*
+ * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
  *
- *  Copyright 2010 Adobe Systems Incorporated.  All Rights Reserved.
+ *    The contents of this file are subject to the Mozilla Public License
+ *    Version 1.1 (the "License"); you may not use this file except in
+ *    compliance with the License. You may obtain a copy of the
+ *    License athttp://www.mozilla.org/MPL/
  *
- *****************************************************
- *  The contents of this file are subject to the Mozilla Public License
- *  Version 1.1 (the "License"); you may not use this file except in
- *  compliance with the License. You may obtain a copy of the License at
- *  http://www.mozilla.org/MPL/
+ *    Software distributed under the License is distributed on an "AS IS"
+ *    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *    License for the specific language governing rights and limitations
+ *    under the License.
  *
- *  Software distributed under the License is distributed on an "AS IS"
- *  basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- *  License for the specific language governing rights and limitations
- *  under the License.
+ *    The Initial Developer of the Original Code is ioko365 Ltd.
+ *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
+ *    Incorporated. All Rights Reserved.
  *
- *
- *  The Initial Developer of the Original Code is Adobe Systems Incorporated.
- *  Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe Systems
- *  Incorporated. All Rights Reserved.
- *
- *****************************************************/
+ *    The Initial Developer of the Original Code is ioko365 Ltd.
+ *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
+ *    Incorporated. All Rights Reserved.
+ */
 package {
 import controls.seesaw.widget.*;
 
-import flash.display.DisplayObject;
 import flash.utils.Dictionary;
 
 import org.as3commons.logging.ILogger;
@@ -31,7 +30,6 @@ import org.osmf.chrome.assets.AssetsManager;
 import org.osmf.chrome.configuration.LayoutAttributesParser;
 import org.osmf.chrome.configuration.WidgetsParser;
 import org.osmf.chrome.widgets.Widget;
-import org.osmf.events.DisplayObjectEvent;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaResourceBase;
@@ -120,27 +118,11 @@ public class ControlBarElement extends MediaElement {
             var targetMetadata:Metadata = target.getMetadata(ControlBarPlugin.NS_CONTROL_BAR_TARGET);
             if (targetMetadata) {
                 if (targetMetadata.getValue(ID) != null && targetMetadata.getValue(ID) == settings.getValue(ID)) {
+                    logger.debug("setting target on control bar: " + target);
                     controlBar.media = target;
                 }
             }
         }
-    }
-
-    protected function processDisplayObjectChange(event:DisplayObjectEvent):void {
-        logger.debug("processDisplayObjectChange: " + event);
-
-        var oldDisplayObject:DisplayObject = event.oldDisplayObject;
-        var newView:DisplayObject = event.newDisplayObject;
-    }
-
-    protected function processMediaSizeChange(event:DisplayObjectEvent):void {
-        logger.debug("processMediaSizeChange: " + event);
-
-        var oldWidth:Number = event.oldWidth;
-        var oldHeight:Number = event.oldHeight;
-
-        var newWidth:Number = event.newWidth;
-        var newHeight:Number = event.newHeight;
     }
 
     // Overrides

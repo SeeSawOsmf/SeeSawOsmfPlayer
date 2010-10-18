@@ -235,7 +235,7 @@ public class LiverailElement extends ParallelElement {
         var liveRailElement:SWFElement = new SWFElement(urlResource);
         _adManager = liveRailElement;
         element.addEventListener(LoaderEvent.LOAD_STATE_CHANGE, onLoadComplete);
-
+        element = new ParallelElement();
         element.addChild(_adManager);
         addChild(element);
 
@@ -379,7 +379,7 @@ public class LiverailElement extends ParallelElement {
 
     private var lrl:Loader;
 
-    public var element:ParallelElement = new ParallelElement();
+    public var element:ParallelElement;
     /* static */
 
     private static const ID:String = "ID";
