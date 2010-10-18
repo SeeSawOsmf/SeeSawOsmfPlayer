@@ -70,8 +70,8 @@ public class ControlBarPlugin extends Sprite {
     //
 
     public static const ID:String = "org.osmf.samples.controlbar";
-    public static const NS_CONTROL_BAR_SETTINGS:String = "http://www.osmf.org/samples/controlbar/settings";
-    public static const NS_CONTROL_BAR_TARGET:String = "http://www.osmf.org/samples/controlbar/target";
+    public static const NS_SETTINGS:String = "http://www.osmf.org/samples/controlbar/settings";
+    public static const NS_TARGET:String = "http://www.osmf.org/samples/controlbar/target";
 
     private var _pluginInfo:PluginInfo;
     private var controlBarElement:ControlBarElement;
@@ -84,7 +84,7 @@ public class ControlBarPlugin extends Sprite {
 
         if (resource != null) {
             var settings:Metadata
-                    = resource.getMetadataValue(NS_CONTROL_BAR_SETTINGS) as Metadata;
+                    = resource.getMetadataValue(NS_SETTINGS) as Metadata;
 
             result = settings != null;
         }

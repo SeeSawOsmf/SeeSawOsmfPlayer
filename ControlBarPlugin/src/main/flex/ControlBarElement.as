@@ -115,7 +115,7 @@ public class ControlBarElement extends MediaElement {
             // We use the NS_CONTROL_BAR_TARGET namespaced metadata in order
             // to find out if the instantiated element is the element that our
             // control bar should control:
-            var targetMetadata:Metadata = target.getMetadata(ControlBarPlugin.NS_CONTROL_BAR_TARGET);
+            var targetMetadata:Metadata = target.getMetadata(ControlBarPlugin.NS_TARGET);
             if (targetMetadata) {
                 if (targetMetadata.getValue(ID) != null && targetMetadata.getValue(ID) == settings.getValue(ID)) {
                     logger.debug("setting target on control bar: " + target);
@@ -136,7 +136,7 @@ public class ControlBarElement extends MediaElement {
         // element that we should be controlling):
         if (value != null) {
             settings
-                    = value.getMetadataValue(ControlBarPlugin.NS_CONTROL_BAR_SETTINGS) as Metadata;
+                    = value.getMetadataValue(ControlBarPlugin.NS_SETTINGS) as Metadata;
 
             processTarget();
         }

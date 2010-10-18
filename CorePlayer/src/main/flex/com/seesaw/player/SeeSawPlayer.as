@@ -39,7 +39,9 @@ import org.osmf.elements.ParallelElement;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
+import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
+import org.osmf.metadata.Metadata;
 import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.MediaTraitType;
 
@@ -76,16 +78,30 @@ public class SeeSawPlayer extends Sprite {
 
         createComponents();
         createRootElement();
+
         loadPlugins();
 
         // create video element
         var videoElement:MediaElement = config.factory.createMediaElement(config.resource);
 
         // the control bar wants to be loaded after annotating the video
-        controlBar.applyMetadata(videoElement);
-        liveRail.applyMetadata(videoElement);
-        config.factory.loadPlugin(controlBar.info);
+        var targetMetadata:Metadata = new Metadata();
+        targetMetadata.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
+        videoElement.addMetadata(ControlBarPlugin.NS_TARGET, targetMetadata);
+
         config.factory.loadPlugin(liveRail.info);
+
+        var liverailMetadata:Metadata = new Metadata();
+        liverailMetadata.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
+
+        var resource:MediaResourceBase = new MediaResourceBase();
+        resource.addMetadataValue(LiverailPlugin.NS_SETTINGS, liverailMetadata);
+
+        var liverailElement:ParallelElement = config.factory.createMediaElement(resource) as ParallelElement;
+        //  rootElement.addChild(liverailElement);
+
+        config.factory.loadPlugin(controlBar.info);
+
         rootElement.addChild(videoElement);
         config.container.addMediaElement(rootElement);
 
@@ -109,11 +125,6 @@ public class SeeSawPlayer extends Sprite {
         // TODO: this is still being worked out
 
 
-        liveRail = new LiverailComponent(this);
-        ///    rootElement.addChild(liveRail.applyMetadata2());
-        components[LiverailPlugin.ID] = liveRail;
-
-
         debugProxy = new DebugProxyComponent(this);
         //defaultProxy.applyMetadata(config.element);
         components[DebugPluginInfo.ID] = debugProxy;
@@ -126,6 +137,9 @@ public class SeeSawPlayer extends Sprite {
         // controlBar.applyMetadata(config.element);
         components[ControlBarPlugin.ID] = controlBar;
 
+        liveRail = new LiverailComponent(this);
+
+        components[LiverailPlugin.ID] = liveRail;
 
     }
 

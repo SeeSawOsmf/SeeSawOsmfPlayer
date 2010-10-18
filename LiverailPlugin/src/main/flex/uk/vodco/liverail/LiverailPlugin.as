@@ -26,7 +26,6 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactoryItem;
-import org.osmf.media.MediaFactoryItemType;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfo;
 import org.osmf.metadata.Metadata;
@@ -42,6 +41,7 @@ public class LiverailPlugin extends PluginInfo {
         // variables in this SWF.
         Security.allowDomain("*");
 
+
         super();
 
     }
@@ -49,6 +49,7 @@ public class LiverailPlugin extends PluginInfo {
     /**
      * Gives the player the PluginInfo.
      */
+
     public function get pluginInfo():PluginInfo {
         if (_pluginInfo == null) {
             var item:MediaFactoryItem
@@ -56,7 +57,6 @@ public class LiverailPlugin extends PluginInfo {
                     (ID
                             , canHandleResourceCallback
                             , mediaElementCreationCallback
-                            , MediaFactoryItemType.PROXY
                             );
 
             var items:Vector.<MediaFactoryItem> = new Vector.<MediaFactoryItem>();
@@ -68,18 +68,15 @@ public class LiverailPlugin extends PluginInfo {
         return _pluginInfo;
     }
 
-    // Internals
-    //
 
     public static const ID:String = "uk.vodco.liverail.LiverailPluginInfo";
     public static const NS_SETTINGS:String = "http://www.seesaw.com/liverail/settings";
     public static const NS_TARGET:String = "http://www.seesaw.com/liverail/target";
 
     private var _pluginInfo:PluginInfo;
-    public var liverailElement:LiverailElement;
+    private var _liverailElement:LiverailElement;
     private var targetElement:MediaElement;
 
-    private var controlsUpdated:Boolean;
 
     private function canHandleResourceCallback(resource:MediaResourceBase):Boolean {
         var result:Boolean;
@@ -96,7 +93,7 @@ public class LiverailPlugin extends PluginInfo {
 
     private function mediaElementCreationCallback():MediaElement {
         liverailElement = new LiverailElement();
-        //updateLiverail();
+        updateLiverail();
         return liverailElement;
 
     }
@@ -116,6 +113,14 @@ public class LiverailPlugin extends PluginInfo {
 
             liverailElement.addReference(targetElement);
         }
+    }
+
+    public function get liverailElement():LiverailElement {
+        return _liverailElement;
+    }
+
+    public function set liverailElement(value:LiverailElement):void {
+        _liverailElement = value;
     }
 }
 }

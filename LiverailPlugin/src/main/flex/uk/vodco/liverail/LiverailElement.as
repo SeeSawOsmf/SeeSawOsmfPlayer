@@ -32,7 +32,6 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ParallelElement;
 import org.osmf.elements.SWFElement;
-import org.osmf.events.LoaderEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.SeekEvent;
 import org.osmf.media.MediaElement;
@@ -100,6 +99,18 @@ public class LiverailElement extends ParallelElement {
     public function LiverailElement() {
         logger.debug("Initialising LiverailElement");
         Security.allowDomain("vox-static.liverail.com");
+        var liverailPath:String = "http://www.swftools.org/flash/mv_zoom1.swf";
+        //   var liverailPath:String = "http://vox-static.liverail.com/swf/v4/skins/adplayerskin_1.swf";
+        var urlResource:URLResource = new URLResource(liverailPath)
+        var loader:SWFLoader = new SWFLoader();
+
+
+        var liveRailElement:SWFElement = new SWFElement(urlResource);
+        _adManager = liveRailElement;
+
+        element = new ParallelElement();
+        element.addChild(_adManager);
+        addChild(element);
     }
 
 
@@ -226,21 +237,21 @@ public class LiverailElement extends ParallelElement {
     public function createLiverail():void {
 
 
-        var liverailPath:String = "http://www.swftools.org/flash/mv_zoom1.swf";
-        //   var liverailPath:String = "http://vox-static.liverail.com/swf/v4/skins/adplayerskin_1.swf";
-        var urlResource:URLResource = new URLResource(liverailPath)
-        var loader:SWFLoader = new SWFLoader();
+        /*    var liverailPath:String = "http://www.swftools.org/flash/mv_zoom1.swf";
+         //   var liverailPath:String = "http://vox-static.liverail.com/swf/v4/skins/adplayerskin_1.swf";
+         var urlResource:URLResource = new URLResource(liverailPath)
+         var loader:SWFLoader = new SWFLoader();
 
-        load(urlResource as String);
-        var liveRailElement:SWFElement = new SWFElement(urlResource);
-        _adManager = liveRailElement;
-        element.addEventListener(LoaderEvent.LOAD_STATE_CHANGE, onLoadComplete);
-        element = new ParallelElement();
-        element.addChild(_adManager);
-        addChild(element);
+         load(urlResource as String);
+         var liveRailElement:SWFElement = new SWFElement(urlResource);
+         _adManager = liveRailElement;
 
-        modLoaded = true;
+         element = new ParallelElement();
+         element.addChild(_adManager);
+         addChild(element);
 
+         modLoaded = true;
+         */
         setupAdManager();
     }
 
@@ -260,11 +271,6 @@ public class LiverailElement extends ParallelElement {
          */
     }
 
-    private function onLoadComplete(e:Event):void {
-        modLoaded = true;
-        _adManager = lrl.content;
-        addChild(adManager);
-    }
 
     private function setupAdManager():void {
         if (modLoaded) {
