@@ -26,6 +26,7 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactoryItem;
+import org.osmf.media.MediaFactoryItemType;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfo;
 import org.osmf.metadata.Metadata;
@@ -41,8 +42,10 @@ public class LiverailPlugin extends PluginInfo {
         // variables in this SWF.
         Security.allowDomain("*");
 
+        var items:Vector.<MediaFactoryItem> = new Vector.<MediaFactoryItem>();
+        items.push(mediaFactoryItem);
 
-        super();
+        super(items);
 
     }
 
@@ -50,24 +53,20 @@ public class LiverailPlugin extends PluginInfo {
      * Gives the player the PluginInfo.
      */
 
-    public function get pluginInfo():PluginInfo {
-        if (_pluginInfo == null) {
-            var item:MediaFactoryItem
-                    = new MediaFactoryItem
-                    (ID
-                            , canHandleResourceCallback
-                            , mediaElementCreationCallback
-                            );
+    private var _mediaFactoryItem:MediaFactoryItem
+            = new MediaFactoryItem
+            (ID
+                    , canHandleResourceCallback
+                    , mediaElementCreationCallback
+                    , MediaFactoryItemType.STANDARD
+                    );
 
-            var items:Vector.<MediaFactoryItem> = new Vector.<MediaFactoryItem>();
-            items.push(item);
-
-            _pluginInfo = new PluginInfo(items, mediaElementCreationNotificationCallback);
-        }
-
-        return _pluginInfo;
+    public function get mediaFactoryItem():MediaFactoryItem {
+        return _mediaFactoryItem;
     }
 
+    // Internals
+    //
 
     public static const ID:String = "uk.vodco.liverail.LiverailPluginInfo";
     public static const NS_SETTINGS:String = "http://www.seesaw.com/liverail/settings";
@@ -102,7 +101,7 @@ public class LiverailPlugin extends PluginInfo {
 
         logger.debug("TARGET ELEMENT : " + target);
         this.targetElement = target;
-        liverailElement = new LiverailElement();
+        ///   liverailElement = new LiverailElement();
         updateLiverail();
 
     }

@@ -48,7 +48,7 @@ public class LiverailComponent implements PluginLifecycle {
 
     public function get info():PluginInfoResource {
         liveRailPlugin = new LiverailPlugin();
-        liveRailPluginInfo = new PluginInfoResource(liveRailPlugin.pluginInfo);
+        liveRailPluginInfo = new PluginInfoResource(liveRailPlugin);
         return liveRailPluginInfo;
     }
 
