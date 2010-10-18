@@ -21,6 +21,9 @@
  *****************************************************/
 
 package controls.seesaw.widget {
+import controls.seesaw.widget.interfaces.*;
+import controls.seesaw.widget.*;
+
 import com.seesaw.proxyplugin.traits.FullScreenTrait;
 
 import controls.seesaw.widget.interfaces.IWidget;
@@ -34,33 +37,36 @@ import flash.text.TextFormat;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.chrome.widgets.ButtonWidget;
-import org.osmf.containers.IMediaContainer;
+
 import org.osmf.media.MediaElement;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayTrait;
 
-public class FullScreen extends ButtonWidget implements IWidget {
-    private var logger:ILogger = LoggerFactory.getClassLogger(FullScreen);
+public class SubtitlesButton extends ButtonWidget implements IWidget {
+    private var logger:ILogger = LoggerFactory.getClassLogger(SubtitlesButton);
 
     // Internals
 
     private var _playableTrait:PlayTrait;
     private var _fullscreenTrait:FullScreenTrait;
 
-    private var fullScreenLabel:TextField;
+    private var subtitlesOn:Boolean;
+
+    private var subtitlesLabel:TextField;
 
     /* static */
-    private static const QUALIFIED_NAME:String = "controls.seesaw.widget.PauseButton";
+    private static const QUALIFIED_NAME:String = "controls.seesaw.widget.SubtitlesButton";
+
     private static const _requiredTraits:Vector.<String> = new Vector.<String>;
     _requiredTraits[0] = MediaTraitType.PLAY;
 
-    public function FullScreen() {
-        logger.debug("Full Screen Constructor");
-        fullScreenLabel = new TextField();
-        fullScreenLabel.text = "Fullscreen";
+    public function SubtitlesButton() {
+        logger.debug("Subtitles Constructor");
+        subtitlesLabel = new TextField();
+        subtitlesLabel.text = "Subtitles are off";
         this.formatLabelFont();
 
-        addChild(fullScreenLabel);
+        addChild(subtitlesLabel);
     }
 
     // Protected
@@ -71,15 +77,15 @@ public class FullScreen extends ButtonWidget implements IWidget {
         textFormat.size = 12;
         textFormat.color = 0x00A78D;
         textFormat.align = "right";
-        this.fullScreenLabel.setTextFormat(textFormat);
+        this.subtitlesLabel.setTextFormat(textFormat);
     }
 
-    protected function fullScreenHandler(event:Event):void {
-        if(_fullscreenTrait) {
+    protected function subtitlesHandler(event:Event):void {
+        /*if(_fullscreenTrait) {
             logger.debug("NEW STAGE HEIGHT : " + stage.stageHeight);
             logger.debug("NEW STAGE WIDTH : " + stage.stageWidth);
             _fullscreenTrait.fullscreen = !_fullscreenTrait.fullscreen;
-        }
+        }*/
     }
 
     protected function get playable():PlayTrait {
@@ -97,7 +103,7 @@ public class FullScreen extends ButtonWidget implements IWidget {
         _playableTrait = element.getTrait(MediaTraitType.PLAY) as PlayTrait;
         _fullscreenTrait = element.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
 
-        stage.addEventListener(Event.RESIZE, fullScreenHandler);
+        //stage.addEventListener(Event.RESIZE, subtitlesHandler);
 
         //_playable.addEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
         //_playable.addEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
@@ -116,12 +122,12 @@ public class FullScreen extends ButtonWidget implements IWidget {
     }
 
     override protected function onMouseClick(event:MouseEvent):void {
-        if (stage.displayState == StageDisplayState.NORMAL) {
-            stage.displayState = StageDisplayState.FULL_SCREEN;
-            fullScreenLabel.text = "Exit Fullscreen";
+        if (this.subtitlesOn == false) {
+            subtitlesLabel.text = "Subtitles are on";
+            this.subtitlesOn = true;
         } else {
-            stage.displayState = StageDisplayState.NORMAL;
-            fullScreenLabel.text = "Fullscreen";
+            subtitlesLabel.text = "Subtitles are off";
+            this.subtitlesOn = false;
         }
         //var playable:PlayTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
         //playable.play();

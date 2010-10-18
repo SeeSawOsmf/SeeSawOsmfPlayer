@@ -85,6 +85,12 @@
                     top="30"
                     />
             <widget
+                    id="controls.seesaw.widget.SubtitlesButton"
+                    type="controls.seesaw.widget.SubtitlesButton"
+                    right="100"
+                    top="70"
+                    />
+            <widget
                     id="controls.seesaw.widget.FullScreen"
                     type="controls.seesaw.widget.FullScreen"
                     right="20"
