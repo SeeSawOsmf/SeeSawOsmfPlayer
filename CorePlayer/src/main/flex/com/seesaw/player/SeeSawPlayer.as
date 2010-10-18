@@ -88,7 +88,7 @@ public class SeeSawPlayer extends Sprite {
         config.factory.loadPlugin(_defaultProxy.info);
         config.factory.loadPlugin(_liveRail.info);
         config.factory.loadPlugin(_debugProxy.info);
-        
+
         _videoElement = config.factory.createMediaElement(config.resource);
         rootElement.addChild(_videoElement);
     }
@@ -99,22 +99,21 @@ public class SeeSawPlayer extends Sprite {
         _components = new Dictionary();
 
         _debugProxy = new DebugProxyComponent(this);
-        // defaultProxy.applyMetadata(config.element);
         _components[DebugPluginInfo.ID] = _debugProxy;
 
         _defaultProxy = new DefaultProxyComponent(this);
-        // defaultProxy.applyMetadata(config.element);
         _components[DefaultProxyPluginInfo.ID] = _defaultProxy;
 
         _controlBar = new ControlBarComponent(this);
         _components[ControlBarPlugin.ID] = _controlBar;
 
         _liveRail = new LiverailComponent(this);
-        // liveRail.applyMetadata(config.element);
         _components[LiverailPlugin.ID] = _liveRail;
     }
 
     private function createControlBarElement() {
+        logger.debug("creating control bar");
+
         _controlBar.applyMetadata(_videoElement);
         config.factory.loadPlugin(_controlBar.info);
 
@@ -143,12 +142,7 @@ public class SeeSawPlayer extends Sprite {
         logger.debug("creating root element");
 
         rootElement = new ParallelElement();
-
-        var rootElementLayout:LayoutMetadata = new LayoutMetadata();
-        rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, rootElementLayout);
-
-        rootElementLayout.width = config.width;
-        rootElementLayout.height = config.height;
+        layout(config.width, config.height);
 
         config.player.media = rootElement;
         config.container.addMediaElement(rootElement);
@@ -187,10 +181,23 @@ public class SeeSawPlayer extends Sprite {
 
     private function onFullscreen(event:FullScreenEvent):void {
         logger.debug("onFullscreen");
-        if (event.value) {
-            config.container.width = stage.fullScreenWidth;
-            config.container.height = stage.fullScreenHeight;
+
+        if(!event.value) {
+            layout(stage.fullScreenWidth, stage.fullScreenHeight);
         }
+        else {
+            layout(config.width, config.height);
+        }
+    }
+
+    private function layout(width:int, height:int):void {
+        var rootElementLayout:LayoutMetadata = new LayoutMetadata();
+        rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, rootElementLayout);
+
+        rootElementLayout.width = width;
+        rootElementLayout.height = height;
+
+        config.container.layout(width, height, true);
     }
 
     public function get rootElement():ParallelElement {
