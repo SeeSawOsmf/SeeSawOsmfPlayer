@@ -19,6 +19,7 @@
 
 package com.seesaw.player.components {
 import com.seesaw.player.SeeSawPlayer;
+import com.seesaw.proxyplugin.DefaultProxyPluginInfo;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -49,7 +50,6 @@ public class DefaultProxyComponent implements PluginLifecycle {
         logger.debug("plugin loaded");
 
         if (!loaded) {
-            //player.rootElement.addChild(constructControlBarElement());
             loaded = true;
         }
     }

@@ -20,10 +20,8 @@
 package com.seesaw.player {
 import org.osmf.containers.MediaContainer;
 import org.osmf.media.DefaultMediaFactory;
-import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaPlayer;
-import org.osmf.media.MediaPlayerSprite;
 import org.osmf.media.MediaResourceBase;
 
 public class PlayerConfiguration {
@@ -31,16 +29,14 @@ public class PlayerConfiguration {
     private var _factory:MediaFactory;
     private var _player:MediaPlayer;
     private var _container:MediaContainer;
-    private var _element:MediaElement;
-    private var _playerSprite:MediaPlayerSprite;
 
     private var _width:int;
     private var _height:int;
     private var _resource:MediaResourceBase;
 
     public function PlayerConfiguration(playerWidth:int, playerHeight:int, mediaResource:MediaResourceBase) {
-        player = new MediaPlayer();
-        container = new MediaContainer();
+        player = new SeeSawMediaPlayer();
+        container = new SeeSawMediaContainer();
 
         width = playerWidth;
         height = playerHeight;
@@ -49,7 +45,6 @@ public class PlayerConfiguration {
 
     public function set resource(value:MediaResourceBase):void {
         _resource = value;
-        element = factory.createMediaElement(resource);
     }
 
     public function get resource():MediaResourceBase {
@@ -101,18 +96,6 @@ public class PlayerConfiguration {
 
     public function set container(value:MediaContainer):void {
         _container = value;
-    }
-
-    public function get playerSprite():MediaPlayerSprite {
-        return _playerSprite;
-    }
-
-    public function get element():MediaElement {
-        return _element;
-    }
-
-    public function set element(value:MediaElement):void {
-        _element = value;
     }
 }
 }

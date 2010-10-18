@@ -45,15 +45,15 @@
                         input="Low res"
                         />
                 <widget
-                        id="com.seesaw.player.controls.widget.PauseButton"
-                        type="com.seesaw.player.controls.widget.PauseButton"
+                        id="controls.seesaw.widget.PauseButton"
+                        type="controls.seesaw.widget.PauseButton"
                         upFace="pauseUp"
                         downFace="pauseDown"
                         disabledFace="pauseDisabled"
                         />
                 <widget
-                        id="com.seesaw.player.controls.widget.PlayButton"
-                        type="com.seesaw.player.controls.widget.PlayButton"
+                        id="controls.seesaw.widget.PlayButton"
+                        type="controls.seesaw.widget.PlayButton"
                         upFace="playUp"
                         downFace="playDown"
                         disabledFace="playDisabled"
@@ -61,8 +61,8 @@
             </widget>
 
             <widget
-                    id="com.seesaw.player.controls.widget.ScrubBar"
-                    type="com.seesaw.player.controls.widget.ScrubBar"
+                    id="controls.seesaw.widget.ScrubBar"
+                    type="controls.seesaw.widget.ScrubBar"
                     timeFieldsWidth="90"
                     timeFieldsHeight="15"
                     timeFieldSpacing="1"
@@ -76,8 +76,8 @@
                     trackTrail="trackTrail"
                     />
             <widget
-                    id="com.seesaw.player.controls.widget.Volume"
-                    type="com.seesaw.player.controls.widget.Volume"
+                    id="controls.seesaw.widget.Volume"
+                    type="controls.seesaw.widget.Volume"
                     upFace="volumeUp"
                     downFace="volumeUp"
                     disabledFace="volumeDisabled"
@@ -85,14 +85,14 @@
                     top="30"
                     />
             <widget
-                    id="com.seesaw.player.controls.widget.FullScreen"
-                    type="com.seesaw.player.controls.widget.FullScreen"
+                    id="controls.seesaw.widget.FullScreen"
+                    type="controls.seesaw.widget.FullScreen"
                     right="20"
                     top="70"
                     />
             <widget
-                    id="com.seesaw.player.controls.widget.VolumeScrubBar"
-                    type="com.seesaw.player.controls.widget.VolumeScrubBar"
+                    id="controls.seesaw.widget.VolumeScrubBar"
+                    type="controls.seesaw.widget.VolumeScrubBar"
                     timeFieldsWidth="90"
                     timeFieldsHeight="15"
                     timeFieldSpacing="1"

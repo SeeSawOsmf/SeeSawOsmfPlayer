@@ -21,6 +21,8 @@
  *****************************************************/
 
 package controls.seesaw.widget {
+import com.seesaw.proxyplugin.traits.FullScreenTrait;
+
 import controls.seesaw.widget.interfaces.IWidget;
 
 import flash.display.StageDisplayState;
@@ -43,6 +45,7 @@ public class FullScreen extends ButtonWidget implements IWidget {
     // Internals
 
     private var _playable:PlayTrait;
+    private var _fullscreen:FullScreenTrait;
 
     private var _container:IMediaContainer;
 
@@ -76,8 +79,11 @@ public class FullScreen extends ButtonWidget implements IWidget {
     }
 
     protected function fullScreenHandler(event:Event):void {
-        // logger.debug("NEW STAGE HEIGHT : " + stage.stageHeight);
-        // logger.debug("NEW STAGE WIDTH : " + stage.stageWidth);
+        if (_fullscreen) {
+            logger.debug("NEW STAGE HEIGHT : " + stage.stageHeight);
+            logger.debug("NEW STAGE WIDTH : " + stage.stageWidth);
+            _fullscreen.fullscreen = !_fullscreen.fullscreen;
+        }
     }
 
     protected function get playable():PlayTrait {
@@ -93,8 +99,9 @@ public class FullScreen extends ButtonWidget implements IWidget {
 
     override protected function processRequiredTraitsAvailable(element:MediaElement):void {
         _playable = element.getTrait(MediaTraitType.PLAY) as PlayTrait;
+        _fullscreen = element.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
 
-        // stage.addEventListener(Event.RESIZE, fullScreenHandler);
+        stage.addEventListener(Event.RESIZE, fullScreenHandler);
 
         //_playable.addEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
         //_playable.addEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
