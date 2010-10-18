@@ -22,7 +22,6 @@
 package {
 import controls.seesaw.widget.*;
 
-import flash.display.DisplayObject;
 import flash.utils.Dictionary;
 
 import org.as3commons.logging.ILogger;
@@ -31,7 +30,6 @@ import org.osmf.chrome.assets.AssetsManager;
 import org.osmf.chrome.configuration.LayoutAttributesParser;
 import org.osmf.chrome.configuration.WidgetsParser;
 import org.osmf.chrome.widgets.Widget;
-import org.osmf.events.DisplayObjectEvent;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaResourceBase;
