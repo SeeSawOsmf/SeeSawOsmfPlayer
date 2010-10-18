@@ -97,7 +97,7 @@ public class FullScreen extends ButtonWidget implements IWidget {
         _playableTrait = element.getTrait(MediaTraitType.PLAY) as PlayTrait;
         _fullscreenTrait = element.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
 
-        stage.addEventListener(Event.RESIZE, fullScreenHandler);
+        // stage.addEventListener(Event.RESIZE, fullScreenHandler);
 
         //_playable.addEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
         //_playable.addEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
