@@ -79,7 +79,7 @@ public class SeeSawPlayer extends Sprite {
 
     private function addMediaElement(component:MediaComponent) {
         var mediaElement:MediaElement = component.createMediaElement(config.factory, _videoElement);
-        rootElement.addChild(mediaElement);
+        _rootElement.addChild(mediaElement);
     }
 
     private function createVideoElement():void {
@@ -95,19 +95,19 @@ public class SeeSawPlayer extends Sprite {
         }
 
         logger.debug("adding video element to container");
-        rootElement.addChild(_videoElement);
+        _rootElement.addChild(_videoElement);
     }
 
     private function createRootElement():void {
         logger.debug("creating root element");
 
-        rootElement = new ParallelElement();
+        _rootElement = new ParallelElement();
         layout(config.width, config.height);
 
-        config.player.media = rootElement;
+        config.player.media = _rootElement;
 
         logger.debug("adding root element to container");
-        config.container.addMediaElement(rootElement);
+        config.container.addMediaElement(_rootElement);
     }
 
     private function onMediaElementCreate(event:MediaFactoryEvent):void {
@@ -115,14 +115,13 @@ public class SeeSawPlayer extends Sprite {
 
         var fullscreen:FullScreenTrait = event.mediaElement.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
         if (fullscreen) {
-            logger.debug("adding handler for full screen trait");
+            logger.debug("adding handler for full screen trait: " + event.mediaElement);
             fullscreen.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
         }
     }
 
     private function onFullscreen(event:FullScreenEvent):void {
-        logger.debug("onFullscreen");
-
+        logger.debug("onFullscreen: " + event.value);
         if (event.value) {
             layout(stage.fullScreenWidth, stage.fullScreenHeight);
         }
@@ -132,21 +131,15 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function layout(width:int, height:int):void {
+        logger.debug("setting new layout for root media element: " + width + "x" + height);
+
         var rootElementLayout:LayoutMetadata = new LayoutMetadata();
-        rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, rootElementLayout);
+        _rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, rootElementLayout);
 
         rootElementLayout.width = width;
         rootElementLayout.height = height;
 
         config.container.layout(width, height, true);
-    }
-
-    public function get rootElement():ParallelElement {
-        return _rootElement;
-    }
-
-    public function set rootElement(value:ParallelElement):void {
-        _rootElement = value;
     }
 
     public function get config():PlayerConfiguration {
