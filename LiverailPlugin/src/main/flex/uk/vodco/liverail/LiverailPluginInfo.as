@@ -19,44 +19,46 @@
  *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
  *    Incorporated. All Rights Reserved.
  */
-package com.seesaw.player.fullscreen {
-import org.as3commons.logging.ILogger;
-import org.as3commons.logging.LoggerFactory;
+
+package uk.vodco.liverail {
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactoryItem;
 import org.osmf.media.MediaFactoryItemType;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfo;
 
-public class FullScreenProxyPluginInfo extends PluginInfo {
-
-    private static var logger:ILogger = LoggerFactory.getClassLogger(FullScreenProxyPluginInfo);
-
-    public static const ID:String = "com.seesaw.player.DefaultProxyPlugin";
-
-    public function FullScreenProxyPluginInfo() {
-        logger.debug("com.seesaw.player.fullscreen.FullScreenProxyPluginInfo()");
-
-        var item:MediaFactoryItem = new MediaFactoryItem(
-                ID,
-                canHandleResourceFunction,
-                mediaElementCreationFunction,
-                MediaFactoryItemType.PROXY);
-
+public class LiverailPluginInfo extends PluginInfo {
+    public function LiverailPluginInfo() {
         var items:Vector.<MediaFactoryItem> = new Vector.<MediaFactoryItem>();
-        items.push(item);
+        items.push(mediaFactoryItem);
 
-        super(items);
+        super(items, mediaElementCreationNotificationFunction);
+    }
+
+    public static function get mediaFactoryItem():MediaFactoryItem {
+        return _mediaFactoryItem;
     }
 
     private static function canHandleResourceFunction(resource:MediaResourceBase):Boolean {
-        logger.debug("can handle this resource: " + resource);
         return true;
     }
 
     private static function mediaElementCreationFunction():MediaElement {
-        logger.debug("constructing proxy element");
-        return new FullScreenProxyElement();
+
+        return new LiverailElement();
     }
+
+    private static var _mediaFactoryItem:MediaFactoryItem
+            = new MediaFactoryItem
+            (ID
+                    , canHandleResourceFunction
+                    , mediaElementCreationFunction
+                    , MediaFactoryItemType.PROXY
+                    );
+
+    public static const ID:String = "uk.vodco.liverail.LiverailPluginInfo";
+    public static const NS_SETTINGS:String = "http://www.seesaw.com/liverail/settings";
+    public static const NS_TARGET:String = "http://www.seesaw.com/liverail/target";
+
 }
 }

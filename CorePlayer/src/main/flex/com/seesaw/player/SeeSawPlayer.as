@@ -1,20 +1,23 @@
 /*
  * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
  *
- *   The contents of this file are subject to the Mozilla Public License
- *   Version 1.1 (the "License"); you may not use this file except in
- *   compliance with the License. You may obtain a copy of the License at
- *   http://www.mozilla.org/MPL/
+ *    The contents of this file are subject to the Mozilla Public License
+ *    Version 1.1 (the "License"); you may not use this file except in
+ *    compliance with the License. You may obtain a copy of the
+ *    License athttp://www.mozilla.org/MPL/
  *
- *   Software distributed under the License is distributed on an "AS IS"
- *   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- *   License for the specific language governing rights and limitations
- *   under the License.
+ *    Software distributed under the License is distributed on an "AS IS"
+ *    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *    License for the specific language governing rights and limitations
+ *    under the License.
  *
+ *    The Initial Developer of the Original Code is ioko365 Ltd.
+ *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
+ *    Incorporated. All Rights Reserved.
  *
- *   The Initial Developer of the Original Code is ioko365 Ltd.
- *   Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *   Incorporated. All Rights Reserved.
+ *    The Initial Developer of the Original Code is ioko365 Ltd.
+ *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
+ *    Incorporated. All Rights Reserved.
  */
 
 package com.seesaw.player {
@@ -44,7 +47,7 @@ import org.osmf.media.PluginInfoResource;
 import org.osmf.metadata.Metadata;
 
 import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
-import uk.vodco.livrail.LiverailPlugin;
+import uk.vodco.liverail.LiverailPlugin;
 
 public class SeeSawPlayer extends Sprite {
 
@@ -56,7 +59,7 @@ public class SeeSawPlayer extends Sprite {
 
     private var _components:Dictionary;
     private var _liveRail:LiverailComponent;
-    private var _defaultProxy:DefaultProxyComponent;
+    private var _fullScreenProxy:DefaultProxyComponent;
     private var _debugProxy:DebugProxyComponent;
     private var _videoElement:MediaElement;
 
@@ -86,16 +89,36 @@ public class SeeSawPlayer extends Sprite {
         createComponents();
         createRootElement();
         createVideoElement();
-        createControlBarElement();
-
+        createMediaElementPlugins();
         addChild(config.container);
+    }
+
+    private function createMediaElementPlugins():void {
+        createControlBarElement();
+        createLiverailElement();
+    }
+
+    private function createLiverailElement():void {
+        logger.debug("creating control bar");
+
+        _liveRail.applyMetadata(_videoElement);
+        config.factory.loadPlugin(_liveRail.info);
+
+        var pluginSettings:Metadata = new Metadata();
+        pluginSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
+
+        var resource:MediaResourceBase = new MediaResourceBase();
+        resource.addMetadataValue(LiverailPlugin.NS_SETTINGS, pluginSettings);
+
+        var pluginElement:MediaElement = config.factory.createMediaElement(resource);
+
+        rootElement.addChild(pluginElement);
     }
 
     private function createVideoElement():void {
         logger.debug("loading plugins");
 
-        config.factory.loadPlugin(_defaultProxy.info);
-        config.factory.loadPlugin(_liveRail.info);
+        config.factory.loadPlugin(_fullScreenProxy.info);
         config.factory.loadPlugin(_debugProxy.info);
 
         _videoElement = config.factory.createMediaElement(config.resource);
@@ -111,8 +134,8 @@ public class SeeSawPlayer extends Sprite {
         _debugProxy = new DebugProxyComponent(this);
         _components[DebugPluginInfo.ID] = _debugProxy;
 
-        _defaultProxy = new DefaultProxyComponent(this);
-        _components[FullScreenProxyPluginInfo.ID] = _defaultProxy;
+        _fullScreenProxy = new DefaultProxyComponent(this);
+        _components[FullScreenProxyPluginInfo.ID] = _fullScreenProxy;
 
         _controlBar = new ControlBarComponent(this);
         _components[ControlBarPlugin.ID] = _controlBar;
@@ -131,7 +154,7 @@ public class SeeSawPlayer extends Sprite {
         controlBarSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
 
         var resource:MediaResourceBase = new MediaResourceBase();
-        resource.addMetadataValue(ControlBarPlugin.NS_CONTROL_BAR_SETTINGS, controlBarSettings);
+        resource.addMetadataValue(ControlBarPlugin.NS_SETTINGS, controlBarSettings);
 
         var controlBarElement:MediaElement = config.factory.createMediaElement(resource);
 
