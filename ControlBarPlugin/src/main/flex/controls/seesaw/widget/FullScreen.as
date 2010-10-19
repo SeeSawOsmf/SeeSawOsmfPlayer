@@ -34,7 +34,6 @@ import flash.text.TextFormat;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.chrome.widgets.ButtonWidget;
-import org.osmf.containers.IMediaContainer;
 import org.osmf.media.MediaElement;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayTrait;
@@ -75,7 +74,7 @@ public class FullScreen extends ButtonWidget implements IWidget {
     }
 
     protected function fullScreenHandler(event:Event):void {
-        if(_fullscreenTrait) {
+        if (_fullscreenTrait) {
             logger.debug("NEW STAGE HEIGHT : " + stage.stageHeight);
             logger.debug("NEW STAGE WIDTH : " + stage.stageWidth);
             _fullscreenTrait.fullscreen = !_fullscreenTrait.fullscreen;
@@ -125,6 +124,10 @@ public class FullScreen extends ButtonWidget implements IWidget {
         }
         //var playable:PlayTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
         //playable.play();
+
+        if (_fullscreenTrait) {
+            _fullscreenTrait.fullscreen = !_fullscreenTrait.fullscreen;
+        }
     }
 
     // Stubs

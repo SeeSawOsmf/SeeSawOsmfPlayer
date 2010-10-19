@@ -31,6 +31,10 @@
             <name>Ben Gidley</name>
             <url>http://www.gidley.co.uk/</url>
         </developer>
+        <developer>
+            <id>ibhana</id>
+            <name>Ismail Bhana</name>
+        </developer>
     </developers>
 
     <issueManagement>
