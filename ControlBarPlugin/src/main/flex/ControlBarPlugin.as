@@ -83,16 +83,19 @@ public class ControlBarPlugin extends Sprite {
         var result:Boolean;
 
         if (resource != null) {
-            var settings:Metadata
-                    = resource.getMetadataValue(NS_SETTINGS) as Metadata;
+            var settings:Metadata = resource.getMetadataValue(NS_SETTINGS) as Metadata;
 
             result = settings != null;
         }
+
+        logger.debug("canHandleResourceCallback: " + result);
 
         return result;
     }
 
     private function mediaElementCreationCallback():MediaElement {
+        logger.debug("mediaElementCreationCallback");
+
         controlBarElement = new ControlBarElement();
 
         updateControls();
@@ -101,14 +104,18 @@ public class ControlBarPlugin extends Sprite {
     }
 
     private function mediaElementCreationNotificationCallback(target:MediaElement):void {
-        this.targetElement = target;
+        logger.debug("mediaElementCreationNotificationCallback: " + target);
 
-        updateControls();
+        var targetMetadata:Metadata = target.getMetadata(ControlBarPlugin.NS_TARGET);
+        if (targetMetadata) {
+            this.targetElement = target;
+            updateControls();
+        }
     }
 
     private function updateControls():void {
         if (controlBarElement != null && targetElement != null && controlBarElement != targetElement) {
-            // controlBarElement.addReference(targetElement);
+            controlBarElement.addReference(targetElement);
         }
     }
 }

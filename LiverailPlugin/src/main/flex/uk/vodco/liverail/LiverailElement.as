@@ -101,6 +101,7 @@ public class LiverailElement extends ParallelElement {
     private var logger:ILogger = LoggerFactory.getClassLogger(LiverailElement);
     //  public var loader:SWFLoader = new SWFLoader(true);
     private var loaderLoadTrait:LoaderLoadTrait;
+    private var generatedAdMap:Object;
 
     public function LiverailElement() {
         logger.debug("Initialising LiverailElement");
@@ -125,7 +126,12 @@ public class LiverailElement extends ParallelElement {
 
             event.currentTarget.removeEventListener(LoaderEvent.LOAD_STATE_CHANGE, onLoadStateChange);
 
+            // todo add this back in for the liverail AdManager   _adManager = event.currentTarget.loader.content;
+
             _adManager = event.currentTarget.loader.content;
+            modLoaded = true;
+
+            generatedAdMap = AdMapCreator
             setupAdManager();
         }
     }
@@ -254,8 +260,8 @@ public class LiverailElement extends ParallelElement {
 
         // var liverailPath:String = "http://simple-player.enxus.co.uk/testswf.swf";
         //  var liverailPath:String = "http://mediapm.edgesuite.net/osmf/content/test/ten.swf";
-        var liverailPath:String = "http://www.swftools.org/flash/mv_zoom1.swf";
-        //   var liverailPath:String = "http://vox-static.liverail.com/swf/v4/skins/adplayerskin_1.swf";
+        //  var liverailPath:String = "http://www.swftools.org/flash/mv_zoom1.swf";
+        var liverailPath:String = "http://vox-static.liverail.com/swf/v4/admanager.swf";
         var urlResource:URLResource = new URLResource(liverailPath);
 
         liveRailElement = new SWFElement(urlResource);
@@ -299,7 +305,7 @@ public class LiverailElement extends ParallelElement {
             liveRailConfig["LR_VERSION"] = liverailVersion;
 
             //Partner ID maps to CP id
-            liveRailConfig["LR_PARTNERS"] = contentObject.mediaObject.partnerId;
+            liveRailConfig["LR_PARTNERS"] = "contentObject.mediaObject.partnerId";
 
             // a unique code identifying the video played by your Flash player;
             liveRailConfig["LR_VIDEO_ID"] = programmeId;

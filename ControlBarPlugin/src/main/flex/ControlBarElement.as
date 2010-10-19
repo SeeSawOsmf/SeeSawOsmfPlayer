@@ -32,6 +32,8 @@ import org.osmf.chrome.configuration.WidgetsParser;
 import org.osmf.chrome.widgets.Widget;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
+import org.osmf.media.MediaResourceBase;
+import org.osmf.metadata.Metadata;
 import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.MediaTraitType;
 
@@ -97,11 +99,51 @@ public class ControlBarElement extends MediaElement {
     [Embed(source="/volumeOff.png")]
     private static const VOLUME_DISABLED:Class;
 
-    private var _target:MediaElement;
-    private var controlBar:Widget;
-    private var viewable:DisplayObjectTrait;
+    // Public interface
+    //
 
-    private var customWidgetList:Dictionary = new Dictionary();
+    public function addReference(target:MediaElement):void {
+        logger.debug("adding target reference: " + target);
+        if (this.target == null) {
+            this.target = target;
+            processTarget();
+        }
+    }
+
+    private function processTarget():void {
+        if (target != null && settings != null) {
+            // We use the NS_CONTROL_BAR_TARGET namespaced metadata in order
+            // to find out if the instantiated element is the element that our
+            // control bar should control:
+            var targetMetadata:Metadata = target.getMetadata(ControlBarPlugin.NS_TARGET);
+            if (targetMetadata) {
+                if (targetMetadata.getValue(ID) != null && targetMetadata.getValue(ID) == settings.getValue(ID)) {
+                    logger.debug("setting target on control bar: " + target);
+                    controlBar.media = target;
+                }
+            }
+        }
+    }
+
+    // Overrides
+    //
+
+    override public function set resource(value:MediaResourceBase):void {
+        logger.debug("setting resource: " + value);
+
+        // Right after the media factory has instantiated us, it will set the
+        // resource that it used to do so. We look the NS_CONTROL_BAR_SETTINGS
+        // namespaced metadata, and retain it as our settings record
+        // (containing only one field: "ID" that tells us the ID of the media
+        // element that we should be controlling):
+        if (value != null) {
+            settings = value.getMetadataValue(ControlBarPlugin.NS_SETTINGS) as Metadata;
+
+            processTarget();
+        }
+
+        super.resource = value;
+    }
 
     override protected function setupTraits():void {
         logger.debug("setupTraits");
@@ -173,13 +215,16 @@ public class ControlBarElement extends MediaElement {
         //   customWidgetList["controls.seesaw.widget.streamsense"] = StreamSense;
     }
 
-    public function get target():MediaElement {
-        return _target;
-    }
+    private var settings:Metadata;
 
-    public function set target(value:MediaElement):void {
-        _target = value;
-        controlBar.media = target;
-    }
+    private var target:MediaElement;
+    private var controlBar:Widget;
+    private var viewable:DisplayObjectTrait;
+
+    private var customWidgetList:Dictionary = new Dictionary();
+
+    /* static */
+
+    private static const ID:String = "ID";
 }
 }

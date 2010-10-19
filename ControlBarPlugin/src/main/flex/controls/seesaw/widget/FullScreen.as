@@ -124,6 +124,10 @@ public class FullScreen extends ButtonWidget implements IWidget {
         }
         //var playable:PlayTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
         //playable.play();
+
+        if (_fullscreenTrait) {
+            _fullscreenTrait.fullscreen = !_fullscreenTrait.fullscreen;
+        }
     }
 
     // Stubs

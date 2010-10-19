@@ -113,6 +113,7 @@ public class SeeSawPlayer extends Sprite {
         config.factory.loadPlugin(_debugProxy.info);
 
         _videoElement = config.factory.createMediaElement(config.resource);
+        logger.debug("VIDEO ELEMENT: " + _videoElement);
         rootElement.addChild(_videoElement);
     }
 
@@ -137,8 +138,16 @@ public class SeeSawPlayer extends Sprite {
     private function createControlBarElement():void {
         logger.debug("creating control bar");
 
-        var controlBarElement:ControlBarElement = new ControlBarElement();
-        controlBarElement.target = _videoElement;
+        _controlBar.applyMetadata(_videoElement);
+        config.factory.loadPlugin(_controlBar.info);
+
+        var controlBarSettings:Metadata = new Metadata();
+        controlBarSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
+
+        var resource:MediaResourceBase = new MediaResourceBase();
+        resource.addMetadataValue(ControlBarPlugin.NS_SETTINGS, controlBarSettings);
+
+        var controlBarElement:MediaElement = config.factory.createMediaElement(resource);
 
         var layout:LayoutMetadata = controlBarElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
         if (layout == null) {
@@ -185,7 +194,7 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onMediaElementCreate(event:MediaFactoryEvent):void {
-        logger.debug("created media element");
+        logger.debug("CREATED MEDIA ELEMENT: " + event.mediaElement);
 
         var fullscreen:FullScreenTrait = event.mediaElement.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
         if (fullscreen) {
