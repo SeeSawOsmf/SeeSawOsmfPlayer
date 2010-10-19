@@ -20,7 +20,7 @@
  *    Incorporated. All Rights Reserved.
  */
 
-package uk.vodco.liverail {
+package uk.vodco.liverail.config {
 public class AdMapCreator {
 
     private var _adPositions:Array = [];

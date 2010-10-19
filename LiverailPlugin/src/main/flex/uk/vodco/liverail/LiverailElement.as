@@ -44,6 +44,7 @@ import org.osmf.traits.LoadTrait;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.SeekTrait;
 
+import uk.vodco.liverail.config.AdMapCreator;
 import uk.vodco.liverail.events.LiveRailEvent;
 
 public class LiverailElement extends ParallelElement {
