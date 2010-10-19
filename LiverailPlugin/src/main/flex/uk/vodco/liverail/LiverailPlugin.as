@@ -89,6 +89,7 @@ public class LiverailPlugin extends PluginInfo {
     }
 
     private function mediaElementCreationCallback():MediaElement {
+        logger.debug("mediaElementCreationCallback");
         liverailElement = new LiverailElement();
 
         return liverailElement;
@@ -97,17 +98,17 @@ public class LiverailPlugin extends PluginInfo {
 
     private function mediaElementCreationNotificationCallback(target:MediaElement):void {
 
-        logger.debug("TARGET ELEMENT : " + target);
 
-        /*    var settings:Metadata
-         = target.getMetadata(NS_SETTINGS) as Metadata;
+        logger.debug("mediaElementCreationNotificationCallback: " + target);
 
-         if (settings != null) {
-         */
-        this.targetElement = target;
-        ///   liverailElement = new LiverailElement();
-        updateLiverail();
-        // }
+        var targetMetadata:Metadata = target.getMetadata(LiverailPlugin.NS_TARGET);
+        if (targetMetadata) {
+            logger.debug("TARGET ELEMENT : " + target);
+
+            this.targetElement = target;
+
+            updateLiverail();
+        }
     }
 
     private function updateLiverail():void {

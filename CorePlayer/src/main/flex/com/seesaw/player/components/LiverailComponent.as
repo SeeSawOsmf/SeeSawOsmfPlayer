@@ -86,9 +86,9 @@ public class LiverailComponent implements PluginLifecycle {
     public function applyMetadata(target:MediaElement):void {
         logger.debug("applying metadata: " + target);
 
-        var controlBarTarget:Metadata = new Metadata();
-        controlBarTarget.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
-        target.addMetadata(LiverailPlugin.NS_TARGET, controlBarTarget);
+        var elementTarget:Metadata = new Metadata();
+        elementTarget.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
+        target.addMetadata(LiverailPlugin.NS_TARGET, elementTarget);
     }
 }
 }
