@@ -21,7 +21,7 @@
  *****************************************************/
 
 package controls.seesaw.widget {
-import com.seesaw.proxyplugin.traits.FullScreenTrait;
+import com.seesaw.player.traits.FullScreenTrait;
 
 import controls.seesaw.widget.interfaces.IWidget;
 

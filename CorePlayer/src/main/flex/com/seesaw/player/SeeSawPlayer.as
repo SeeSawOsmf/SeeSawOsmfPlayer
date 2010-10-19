@@ -23,11 +23,12 @@ import com.seesaw.player.components.DebugProxyComponent;
 import com.seesaw.player.components.DefaultProxyComponent;
 import com.seesaw.player.components.LiverailComponent;
 import com.seesaw.player.components.PluginLifecycle;
-import com.seesaw.proxyplugin.DefaultProxyPluginInfo;
-import com.seesaw.proxyplugin.events.FullScreenEvent;
-import com.seesaw.proxyplugin.traits.FullScreenTrait;
+import com.seesaw.player.events.FullScreenEvent;
+import com.seesaw.player.fullscreen.FullScreenProxyPluginInfo;
+import com.seesaw.player.traits.FullScreenTrait;
 
 import flash.display.Sprite;
+import flash.events.Event;
 import flash.utils.Dictionary;
 
 import org.as3commons.logging.ILogger;
@@ -65,6 +66,14 @@ public class SeeSawPlayer extends Sprite {
         config = playerConfig;
 
         initialisePlayer();
+
+        addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+    }
+
+    private function onAddedToStage(event:Event):void {
+        logger.debug("added to stage");
+        removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+
     }
 
     private function initialisePlayer():void {
@@ -90,7 +99,7 @@ public class SeeSawPlayer extends Sprite {
         config.factory.loadPlugin(_debugProxy.info);
 
         _videoElement = config.factory.createMediaElement(config.resource);
-        logger.debug("VIDEO ELEMENT: " + _videoElement);
+        logger.debug("created video element: " + _videoElement);
         rootElement.addChild(_videoElement);
     }
 
@@ -103,7 +112,7 @@ public class SeeSawPlayer extends Sprite {
         _components[DebugPluginInfo.ID] = _debugProxy;
 
         _defaultProxy = new DefaultProxyComponent(this);
-        _components[DefaultProxyPluginInfo.ID] = _defaultProxy;
+        _components[FullScreenProxyPluginInfo.ID] = _defaultProxy;
 
         _controlBar = new ControlBarComponent(this);
         _components[ControlBarPlugin.ID] = _controlBar;
@@ -171,7 +180,7 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onMediaElementCreate(event:MediaFactoryEvent):void {
-        logger.debug("CREATED MEDIA ELEMENT: " + event.mediaElement);
+        logger.debug("created media element: " + event.mediaElement);
 
         var fullscreen:FullScreenTrait = event.mediaElement.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
         if (fullscreen) {

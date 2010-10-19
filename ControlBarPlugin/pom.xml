@@ -70,7 +70,7 @@
         </dependency>
 
         <dependency>
-            <artifactId>DefaultProxyPlugin</artifactId>
+            <artifactId>FullScreenProxyPlugin</artifactId>
             <groupId>com.seesaw</groupId>
             <type>swc</type>
         </dependency>

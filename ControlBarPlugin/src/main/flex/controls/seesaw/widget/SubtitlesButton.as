@@ -21,14 +21,10 @@
  *****************************************************/
 
 package controls.seesaw.widget {
-import controls.seesaw.widget.interfaces.*;
-import controls.seesaw.widget.*;
-
-import com.seesaw.proxyplugin.traits.FullScreenTrait;
+import com.seesaw.player.traits.FullScreenTrait;
 
 import controls.seesaw.widget.interfaces.IWidget;
 
-import flash.display.StageDisplayState;
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.text.TextField;
@@ -37,7 +33,6 @@ import flash.text.TextFormat;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.chrome.widgets.ButtonWidget;
-
 import org.osmf.media.MediaElement;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayTrait;
@@ -82,10 +77,10 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
 
     protected function subtitlesHandler(event:Event):void {
         /*if(_fullscreenTrait) {
-            logger.debug("NEW STAGE HEIGHT : " + stage.stageHeight);
-            logger.debug("NEW STAGE WIDTH : " + stage.stageWidth);
-            _fullscreenTrait.fullscreen = !_fullscreenTrait.fullscreen;
-        }*/
+         logger.debug("NEW STAGE HEIGHT : " + stage.stageHeight);
+         logger.debug("NEW STAGE WIDTH : " + stage.stageWidth);
+         _fullscreenTrait.fullscreen = !_fullscreenTrait.fullscreen;
+         }*/
     }
 
     protected function get playable():PlayTrait {

@@ -1,14 +1,18 @@
 package com.seesaw.player.mockData {
 public class MockData {
 
-    private var videoPlayerInfoData:Object;
+    public function get playerInit():Object {
 
-    public function MockData() {
+        var playerInitData:Object = {
+            "programmeId":10001,
+            "videoPlayerInfoUrl":"http://localhost:8080/player.videoplayerinfo:getvideoplayerinfo?t:ac=TV:COMEDY/p/41001001001/No-Series-programmes-programme-1"
+        }
+        return playerInitData;
     }
 
     public function get videoPlayerInfo():Object {
 
-        videoPlayerInfoData = {
+        var videoPlayerInfoData:Object = {
             "programmeId":10001,
             "scheme":"rtmpe",
             "cdnPath":"cdn-flash-red-dev.vodco.co.uk/a2703",

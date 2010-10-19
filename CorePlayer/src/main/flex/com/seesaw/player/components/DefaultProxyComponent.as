@@ -19,7 +19,7 @@
 
 package com.seesaw.player.components {
 import com.seesaw.player.SeeSawPlayer;
-import com.seesaw.proxyplugin.DefaultProxyPluginInfo;
+import com.seesaw.player.fullscreen.FullScreenProxyPluginInfo;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -42,7 +42,7 @@ public class DefaultProxyComponent implements PluginLifecycle {
     }
 
     public function get info():PluginInfoResource {
-        pluginInfo = new PluginInfoResource(new DefaultProxyPluginInfo());
+        pluginInfo = new PluginInfoResource(new FullScreenProxyPluginInfo());
         return pluginInfo;
     }
 
