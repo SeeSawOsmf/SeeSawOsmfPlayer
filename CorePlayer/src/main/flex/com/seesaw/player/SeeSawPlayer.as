@@ -29,7 +29,6 @@ import com.seesaw.player.fullscreen.FullScreenProxyPluginInfo;
 import com.seesaw.player.traits.FullScreenTrait;
 
 import flash.display.Sprite;
-import flash.events.Event;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
