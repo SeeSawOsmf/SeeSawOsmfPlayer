@@ -8,7 +8,6 @@ public class MockPlayerConfiguration extends PlayerConfiguration {
         super(playerWidth, playerHeight, mediaResource);
     }
 
-
     override protected function constructFactory():MediaFactory {
         return new MockMediaFactory();
     }

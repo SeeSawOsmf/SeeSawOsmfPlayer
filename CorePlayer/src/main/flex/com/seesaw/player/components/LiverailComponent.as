@@ -22,73 +22,43 @@
 
 package com.seesaw.player.components {
 import com.seesaw.player.PlayerConstants;
-import com.seesaw.player.SeeSawPlayer;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
-import org.osmf.events.MediaFactoryEvent;
 import org.osmf.media.MediaElement;
+import org.osmf.media.MediaFactory;
+import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
 import org.osmf.metadata.Metadata;
 
 import uk.vodco.liverail.LiverailPlugin;
 
-public class LiverailComponent implements PluginLifecycle {
+public class LiverailComponent implements MediaComponent {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(LiverailComponent);
 
-    private var player:SeeSawPlayer;
-
-    private var loaded:Boolean;
-
-    private var liveRailPluginInfo:PluginInfoResource;
-    private var liveRailPlugin:LiverailPlugin;
-
-    public function LiverailComponent(player:SeeSawPlayer) {
-        this.player = player;
-    }
-
     public function get info():PluginInfoResource {
-        liveRailPlugin = new LiverailPlugin();
-        liveRailPluginInfo = new PluginInfoResource(liveRailPlugin);
-        return liveRailPluginInfo;
+        return new PluginInfoResource(new LiverailPlugin());
     }
 
-    public function pluginLoaded(event:MediaFactoryEvent):void {
-        logger.debug("plugin loaded");
-
-        if (!this.loaded) {
-            //    var LRElement:ParallelElement = new ParallelElement();
-            //  LRElement.addChild(new DurationElement(20, new ImageElement(new URLResource("http://kgd-red-test-zxtm01.dev.vodco.co.uk/i/ccp/00000180/18055.jpg"))));
-            /// player.rootElement.addChild(constructElement());
-
-            this.loaded = true;
-        }
-    }
-
-    public function pluginLoadError(event:MediaFactoryEvent):void {
-        logger.error("plugin load error");
-    }
-
-
-    private function constructElement():MediaElement {
-
-
-        var element:MediaElement = liveRailPlugin.liverailElement;
-
-
-        return element;
-
-
-    }
-
-
-    public function applyMetadata(target:MediaElement):void {
-        logger.debug("applying metadata: " + target);
+    public function createMediaElement(factory:MediaFactory, target:MediaElement):MediaElement {
+        logger.debug("creating control bar");
 
         var controlBarTarget:Metadata = new Metadata();
         controlBarTarget.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
         target.addMetadata(LiverailPlugin.NS_TARGET, controlBarTarget);
+
+        factory.loadPlugin(this.info);
+
+        var pluginSettings:Metadata = new Metadata();
+        pluginSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
+
+        var resource:MediaResourceBase = new MediaResourceBase();
+        resource.addMetadataValue(LiverailPlugin.NS_SETTINGS, pluginSettings);
+
+        var pluginElement:MediaElement = factory.createMediaElement(resource);
+
+        return pluginElement;
     }
 }
 }
