@@ -69,7 +69,7 @@ public class ControlBarPlugin extends Sprite {
     // Internals
     //
 
-    public static const ID:String = "org.osmf.samples.controlbar";
+    public static const ID:String = "com.seesaw.player.controlbar.ControlBarPlugin";
     public static const NS_CONTROL_BAR_SETTINGS:String = "http://www.osmf.org/samples/controlbar/settings";
     public static const NS_CONTROL_BAR_TARGET:String = "http://www.osmf.org/samples/controlbar/target";
 
@@ -83,16 +83,19 @@ public class ControlBarPlugin extends Sprite {
         var result:Boolean;
 
         if (resource != null) {
-            var settings:Metadata
-                    = resource.getMetadataValue(NS_CONTROL_BAR_SETTINGS) as Metadata;
+            var settings:Metadata = resource.getMetadataValue(NS_CONTROL_BAR_SETTINGS) as Metadata;
 
             result = settings != null;
         }
+
+        logger.debug("canHandleResourceCallback: " + result);
 
         return result;
     }
 
     private function mediaElementCreationCallback():MediaElement {
+        logger.debug("mediaElementCreationCallback");
+
         controlBarElement = new ControlBarElement();
 
         updateControls();
@@ -101,14 +104,18 @@ public class ControlBarPlugin extends Sprite {
     }
 
     private function mediaElementCreationNotificationCallback(target:MediaElement):void {
-        this.targetElement = target;
+        logger.debug("mediaElementCreationNotificationCallback: " + target);
 
-        updateControls();
+        var targetMetadata:Metadata = target.getMetadata(ControlBarPlugin.NS_CONTROL_BAR_TARGET);
+        if (targetMetadata) {
+            this.targetElement = target;
+            updateControls();
+        }
     }
 
     private function updateControls():void {
         if (controlBarElement != null && targetElement != null && controlBarElement != targetElement) {
-            // controlBarElement.addReference(targetElement);
+            controlBarElement.addReference(targetElement);
         }
     }
 }
