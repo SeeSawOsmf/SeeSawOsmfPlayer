@@ -30,13 +30,17 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ParallelElement;
 import org.osmf.elements.SWFElement;
-import org.osmf.elements.SWFLoader;
+import org.osmf.elements.loaderClasses.LoaderLoadTrait;
+import org.osmf.events.LoadEvent;
+import org.osmf.events.LoaderEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.SeekEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.URLResource;
 import org.osmf.metadata.Metadata;
+import org.osmf.traits.LoadState;
+import org.osmf.traits.LoadTrait;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.SeekTrait;
 
@@ -89,34 +93,41 @@ public class LiverailElement extends ParallelElement {
     public var liverailVersion:String;
     public var liverailPublisherId:String;
     public var programmeId:Number;
+    private var liveRailElement:SWFElement;
 
     //use a small offset to go back so that we show an ad when resuming at it, instead of skipping it by mistake
     private var _seekOffset:Number = 0.5;
     private var LR_AdvertsArray:Array;
     private var logger:ILogger = LoggerFactory.getClassLogger(LiverailElement);
-    public var loader:SWFLoader = new SWFLoader();
+    //  public var loader:SWFLoader = new SWFLoader(true);
+    private var loaderLoadTrait:LoaderLoadTrait;
 
     public function LiverailElement() {
         logger.debug("Initialising LiverailElement");
         Security.allowDomain("*");
-        var liverailPath:String = "C:/Users/bmeade/Desktop/testswf.swf";
-        // var liverailPath:String = "http://mediapm.edgesuite.net/osmf/content/test/ten.swf";
-        //  var liverailPath:String = "h/p://www.swftools.org/flash/mv_zoom1.swf";
-        //   var liverailPath:String = "http://vox-static.liverail.com/swf/v4/skins/adplayerskin_1.swf";
-        var urlResource:URLResource = new URLResource(liverailPath);
-
-
-        var liveRailElement:SWFElement = new SWFElement(urlResource, loader);
-        liveRailElement.addEventListener(Event.COMPLETE, swfLoaded);
+        createLiverail();
 
     }
 
-    private function swfLoaded(event:Event):void {
-        _adManager = event.target;
 
-        element = new ParallelElement();
-        element.addChild(_adManager);
-        addChild(element);
+    private function preload(mediaElement:MediaElement):void {
+        var loadTrait:LoadTrait = mediaElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
+
+
+        loadTrait.addEventListener(LoaderEvent.LOAD_STATE_CHANGE, onLoadStateChange);
+        loadTrait.load();
+
+    }
+
+    private function onLoadStateChange(event:LoadEvent):void {
+        if (event.loadState == LoadState.READY) {
+            element.addChild(liveRailElement);
+
+            event.currentTarget.removeEventListener(LoaderEvent.LOAD_STATE_CHANGE, onLoadStateChange);
+
+            _adManager = event.currentTarget.loader.content;
+            setupAdManager();
+        }
     }
 
 
@@ -139,7 +150,7 @@ public class LiverailElement extends ParallelElement {
                 if (targetMetadata.getValue(ID) != null
                         && targetMetadata.getValue(ID) == settings.getValue(ID)
                         ) {
-                    createLiverail();
+
                     setupTraits();
                 }
 
@@ -241,39 +252,19 @@ public class LiverailElement extends ParallelElement {
 
     public function createLiverail():void {
 
+        // var liverailPath:String = "http://simple-player.enxus.co.uk/testswf.swf";
+        //  var liverailPath:String = "http://mediapm.edgesuite.net/osmf/content/test/ten.swf";
+        var liverailPath:String = "http://www.swftools.org/flash/mv_zoom1.swf";
+        //   var liverailPath:String = "http://vox-static.liverail.com/swf/v4/skins/adplayerskin_1.swf";
+        var urlResource:URLResource = new URLResource(liverailPath);
 
-        /*    var liverailPath:String = "http://www.swftools.org/flash/mv_zoom1.swf";
-         //   var liverailPath:String = "http://vox-static.liverail.com/swf/v4/skins/adplayerskin_1.swf";
-         var urlResource:URLResource = new URLResource(liverailPath)
-         var loader:SWFLoader = new SWFLoader();
+        liveRailElement = new SWFElement(urlResource);
 
-         load(urlResource as String);
-         var liveRailElement:SWFElement = new SWFElement(urlResource);
-         _adManager = liveRailElement;
 
-         element = new ParallelElement();
-         element.addChild(_adManager);
-         addChild(element);
+        preload(liveRailElement);
 
-         modLoaded = true;
-         */
-        /// setupAdManager();
-    }
 
-    public function load(val:String):void {
-
-        ///  Security.allowDomain("vox-static.liverail.com");
-        //	pollLoader.start();
-
-        /*	liveRailModuleLocation = val;
-         lrl = new Loader();
-         //	lrl.width = this.width;
-         //	lrl.height = this.height;
-         lrl.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadComplete);
-         //	lrl.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onLoadError);
-         lrl.load( new URLRequest(liveRailModuleLocation) );
-         addChild(lrl as SWFElement);
-         */
+        addChild(element);
     }
 
 
@@ -390,8 +381,9 @@ public class LiverailElement extends ParallelElement {
 
     private var lrl:Loader;
 
-    public var element:ParallelElement;
+    public var element:ParallelElement = new ParallelElement();
     /* static */
+    private static const PLUGININFO_PROPERTY_NAME:String = "pluginInfo";
 
     private static const ID:String = "ID";
 }

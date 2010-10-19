@@ -53,6 +53,7 @@ public class Player extends Sprite {
 
     public function Player() {
         super();
+
         logger.debug("created new player");
 
         params = LoaderInfo(this.root.loaderInfo).parameters;

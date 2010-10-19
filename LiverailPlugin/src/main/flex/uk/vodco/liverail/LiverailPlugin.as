@@ -20,8 +20,6 @@
  *    Incorporated. All Rights Reserved.
  */
 package uk.vodco.liverail {
-import flash.system.Security;
-
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.media.MediaElement;
@@ -40,7 +38,7 @@ public class LiverailPlugin extends PluginInfo {
     public function LiverailPlugin() {
         // Allow any SWF that loads this SWF to access objects and
         // variables in this SWF.
-        Security.allowDomain("*");
+
 
         var items:Vector.<MediaFactoryItem> = new Vector.<MediaFactoryItem>();
         items.push(mediaFactoryItem);
