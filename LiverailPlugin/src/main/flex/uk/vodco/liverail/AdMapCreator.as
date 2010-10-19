@@ -76,6 +76,7 @@ public class AdMapCreator {
         //remove the last semi-colon in the string, apparently there is a reason for this as LR asked us to do it
         liveRailAdMap = liveRailAdMap.substring(0, liveRailAdMap.lastIndexOf(";"));
 
+        return liveRailAdMap;
     }
 
 
