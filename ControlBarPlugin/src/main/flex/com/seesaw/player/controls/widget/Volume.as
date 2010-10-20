@@ -20,7 +20,7 @@
  *
  *****************************************************/
 
-package controls.seesaw.widget {
+package com.seesaw.player.controls.widget {
 import controls.seesaw.widget.interfaces.IWidget;
 
 import flash.events.MouseEvent;
@@ -106,7 +106,7 @@ public class Volume extends ButtonWidget implements IWidget {
     }
 
     /* static */
-    private static const QUALIFIED_NAME:String = "controls.seesaw.widget.Volume";
+    private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.Volume";
     private static const _requiredTraits:Vector.<String> = new Vector.<String>;
     _requiredTraits[0] = MediaTraitType.AUDIO;
 }

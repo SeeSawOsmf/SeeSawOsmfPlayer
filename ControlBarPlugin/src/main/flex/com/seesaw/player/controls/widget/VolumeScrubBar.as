@@ -19,7 +19,7 @@
 *  Incorporated. All Rights Reserved. 
 *  
 *****************************************************/
-package controls.seesaw.widget
+package com.seesaw.player.controls.widget
 {
 import controls.seesaw.widget.interfaces.IWidget;
 
@@ -229,7 +229,7 @@ public class VolumeScrubBar extends Widget implements IWidget
         protected var audible:AudioTrait;
 
         
-        private static const QUALIFIED_NAME : String = "controls.seesaw.widget.VolumeScrubBar";
+        private static const QUALIFIED_NAME : String = "com.seesaw.player.controls.widget.VolumeScrubBar";
 		private static const CURRENT_POSITION_UPDATE_INTERVAL:int = 100;
 		private static const _requiredTraits:Vector.<String> = new Vector.<String>;
 		_requiredTraits[0] = MediaTraitType.AUDIO;

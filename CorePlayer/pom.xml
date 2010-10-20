@@ -125,6 +125,12 @@
             <artifactId>PlayerInitialisation</artifactId>
             <type>swc</type>
         </dependency>
+        <dependency>
+            <artifactId>AdProxyPlugin</artifactId>
+            <groupId>com.seesaw</groupId>
+            <version>${pom.version}</version>
+            <type>swc</type>
+        </dependency>
 
         <dependency>
             <groupId>org.as3commons</groupId>

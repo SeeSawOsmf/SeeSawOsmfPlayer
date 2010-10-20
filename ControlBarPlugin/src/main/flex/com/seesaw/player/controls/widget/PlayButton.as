@@ -20,7 +20,7 @@
  *
  *****************************************************/
 
-package controls.seesaw.widget {
+package com.seesaw.player.controls.widget {
 import controls.seesaw.widget.interfaces.IWidget;
 
 import flash.events.Event;
@@ -35,7 +35,7 @@ import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.PlayTrait;
 
-public class PauseButton extends ButtonWidget implements IWidget {
+public class PlayButton extends ButtonWidget implements IWidget {
     private var logger:ILogger = LoggerFactory.getClassLogger(PauseButton);
 
     // Internals
@@ -43,12 +43,12 @@ public class PauseButton extends ButtonWidget implements IWidget {
     private var _playable:PlayTrait;
 
     /* static */
-    private static const QUALIFIED_NAME:String = "controls.seesaw.widget.PauseButton";
+    private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.PauseButton";
     private static const _requiredTraits:Vector.<String> = new Vector.<String>;
     _requiredTraits[0] = MediaTraitType.PLAY;
 
-    public function PauseButton() {
-        logger.debug("Pause Button Constructor");
+    public function PlayButton() {
+        logger.debug("Play Button Constructor");
     }
 
     // Protected
@@ -85,15 +85,14 @@ public class PauseButton extends ButtonWidget implements IWidget {
 
     override protected function onMouseClick(event:MouseEvent):void {
         var playable:PlayTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
-        playable.pause();
+        playable.play();
     }
 
     // Stubs
     //
 
     protected function visibilityDeterminingEventHandler(event:Event = null):void {
-        logger.debug("VISIBLE = " + (playable && playable.playState != PlayState.PAUSED && playable.canPause));
-        visible = playable && playable.playState != PlayState.PAUSED && playable.canPause;
+        visible = playable && playable.playState == PlayState.PAUSED && playable.canPause;
     }
 
     public function get classDefinition():String {

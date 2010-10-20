@@ -20,7 +20,7 @@
  *    Incorporated. All Rights Reserved.
  */
 
-package controls.seesaw.widget {
+package com.seesaw.player.controls.widget {
 import com.seesaw.player.traits.FullScreenTrait;
 
 import controls.seesaw.widget.interfaces.IWidget;
@@ -50,7 +50,7 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
     private var subtitlesLabel:TextField;
 
     /* static */
-    private static const QUALIFIED_NAME:String = "controls.seesaw.widget.SubtitlesButton";
+    private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.SubtitlesButton";
 
     private static const _requiredTraits:Vector.<String> = new Vector.<String>;
     _requiredTraits[0] = MediaTraitType.PLAY;

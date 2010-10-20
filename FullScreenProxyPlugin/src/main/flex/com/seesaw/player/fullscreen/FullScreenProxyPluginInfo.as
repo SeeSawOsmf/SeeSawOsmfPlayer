@@ -32,10 +32,10 @@ public class FullScreenProxyPluginInfo extends PluginInfo {
 
     private static var logger:ILogger = LoggerFactory.getClassLogger(FullScreenProxyPluginInfo);
 
-    public static const ID:String = "com.seesaw.player.DefaultProxyPlugin";
+    public static const ID:String = "com.seesaw.player.FullScreenProxyPlugin";
 
     public function FullScreenProxyPluginInfo() {
-        logger.debug("com.seesaw.player.fullscreen.FullScreenProxyPluginInfo()");
+        logger.debug("FullScreenProxyPluginInfo()");
 
         var item:MediaFactoryItem = new MediaFactoryItem(
                 ID,

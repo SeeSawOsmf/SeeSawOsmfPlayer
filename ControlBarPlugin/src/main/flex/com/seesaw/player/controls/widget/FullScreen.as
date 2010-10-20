@@ -20,7 +20,9 @@
  *    Incorporated. All Rights Reserved.
  */
 
-package controls.seesaw.widget {
+package com.seesaw.player.controls.widget {
+import controls.seesaw.widget.*;
+
 import com.seesaw.player.traits.FullScreenTrait;
 
 import controls.seesaw.widget.interfaces.IWidget;
@@ -49,7 +51,7 @@ public class FullScreen extends ButtonWidget implements IWidget {
     private var fullScreenLabel:TextField;
 
     /* static */
-    private static const QUALIFIED_NAME:String = "controls.seesaw.widget.PauseButton";
+    private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.PauseButton";
     private static const _requiredTraits:Vector.<String> = new Vector.<String>;
     _requiredTraits[0] = MediaTraitType.PLAY;
 
