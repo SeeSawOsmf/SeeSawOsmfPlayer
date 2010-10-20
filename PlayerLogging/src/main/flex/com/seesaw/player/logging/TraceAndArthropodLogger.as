@@ -30,9 +30,22 @@ import org.as3commons.logging.util.MessageUtil;
 public class TraceAndArthropodLogger extends AbstractLogger {
 
     private var _level:int;
+    private var _colour:uint = 0xFFFFFF;
 
     public function TraceAndArthropodLogger(name:String) {
         super(name);
+
+        var colours:Vector.<ColourMap> = new Vector.<ColourMap>;
+
+        colours.push(new ColourMap("uk.vodco.liverail", Debug.RED));
+
+
+        for each (var map:ColourMap in colours) {
+            if (name.search(map.category) == 0) {
+                _colour = map.colour;
+            }
+        }
+
     }
 
     public function set level(value:int):void {
@@ -55,17 +68,36 @@ public class TraceAndArthropodLogger extends AbstractLogger {
             trace(msg);
 
             // And to Arthorpod
-            switch (level) {
+            var logColour:uint
+            if (!_colour) {
+                switch (level) {
                 case LogLevel.ERROR:
-                    Debug.error(msg);
+                    logColour = 0xCC0000;
                     break;
 
                 case LogLevel.WARN:
-                    Debug.warning(msg);
+                    logColour = 0xCCCC00;
                     break;
 
                 default:
-                    Debug.log(msg);
+                    logColour = 0xFEFEFE;
+                }
+            } else {
+                logColour = _colour;
+            }
+
+
+            switch (level) {
+            case LogLevel.ERROR:
+                Debug.log(msg, logColour);
+                break;
+
+            case LogLevel.WARN:
+                Debug.log(msg, logColour);
+                break;
+
+            default:
+                Debug.log(msg, logColour);
             }
         }
     }

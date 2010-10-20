@@ -33,6 +33,7 @@ public class CommonsOsmfLogger extends Logger {
     public function CommonsOsmfLogger(name:String) {
         super(name);
         logger = LoggerFactory.getLogger(name);
+
     }
 
     override public function debug(message:String, ...rest):void {
@@ -54,6 +55,7 @@ public class CommonsOsmfLogger extends Logger {
     override public function fatal(message:String, ...rest):void {
         logger.fatal(message, rest);
     }
-}
 
+
+}
 }

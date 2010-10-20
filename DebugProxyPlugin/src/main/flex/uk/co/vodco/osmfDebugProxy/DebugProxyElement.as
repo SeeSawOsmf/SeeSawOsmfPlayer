@@ -50,33 +50,28 @@ public class DebugProxyElement extends ProxyElement {
         logger.debug("Initialising Proxy Element");
     }
 
-    override public function set proxiedElement(value:MediaElement):void
-    {
+    override public function set proxiedElement(value:MediaElement):void {
         super.proxiedElement = value;
 
         var traitType:String
 
-        if (value != null)
-        {
+        if (value != null) {
             // Clear our old listeners.
             value.removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
             value.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
 
-            for each (traitType in value.traitTypes)
-            {
+            for each (traitType in value.traitTypes) {
                 processTrait(traitType, false);
             }
         }
 
 
-        if (value != null)
-        {
+        if (value != null) {
             // Listen for traits being added and removed.
             value.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
             value.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
 
-            for each (traitType in value.traitTypes)
-            {
+            for each (traitType in value.traitTypes) {
                 processTrait(traitType, true);
             }
         }
@@ -88,47 +83,43 @@ public class DebugProxyElement extends ProxyElement {
     // Internals
     //
 
-    private function onTraitAdd(event:MediaElementEvent):void
-    {
+    private function onTraitAdd(event:MediaElementEvent):void {
         processTrait(event.traitType, true);
     }
 
-    private function onTraitRemove(event:MediaElementEvent):void
-    {
+    private function onTraitRemove(event:MediaElementEvent):void {
         processTrait(event.traitType, false);
     }
 
-    private function processTrait(traitType:String, added:Boolean):void
-    {
-        switch (traitType)
-        {
-            case MediaTraitType.AUDIO:
-                toggleAudioListeners(added);
-                break;
-            case MediaTraitType.LOAD:
-                toggleLoadListeners(added);
-                break;
-            case MediaTraitType.BUFFER:
-                toggleBufferListeners(added);
-                break;
-            case MediaTraitType.PLAY:
-                togglePlayListeners(added);
-                break;
-            case MediaTraitType.SEEK:
-                toggleSeekListeners(added);
-                break;
-            case MediaTraitType.TIME:
-                toggleTimeListeners(added);
-                break;
-            case MediaTraitType.DISPLAY_OBJECT:
-                toggleDisplayListeners(added);
-                break;
-            case MediaTraitType.DRM:
-                toggleDrmListeners(added);
-                break;
-            case MediaTraitType.DYNAMIC_STREAM:
-                toggleDynamicStreamListeners(added);
-                break;
+    private function processTrait(traitType:String, added:Boolean):void {
+        switch (traitType) {
+        case MediaTraitType.AUDIO:
+            toggleAudioListeners(added);
+            break;
+        case MediaTraitType.LOAD:
+            toggleLoadListeners(added);
+            break;
+        case MediaTraitType.BUFFER:
+            toggleBufferListeners(added);
+            break;
+        case MediaTraitType.PLAY:
+            togglePlayListeners(added);
+            break;
+        case MediaTraitType.SEEK:
+            toggleSeekListeners(added);
+            break;
+        case MediaTraitType.TIME:
+            toggleTimeListeners(added);
+            break;
+        case MediaTraitType.DISPLAY_OBJECT:
+            toggleDisplayListeners(added);
+            break;
+        case MediaTraitType.DRM:
+            toggleDrmListeners(added);
+            break;
+        case MediaTraitType.DYNAMIC_STREAM:
+            toggleDynamicStreamListeners(added);
+            break;
         }
     }
 
@@ -180,25 +171,22 @@ public class DebugProxyElement extends ProxyElement {
     }
 
     private function onMediaSizeChange(event:DisplayObjectEvent):void {
-        logger.debug("On Media Size Change old:{0}x{1} new:{2}x{3}", event.oldHeight, event.oldWidth, event.newHeight, event.newWidth);
+        logger.debug("On Media Size Change old:{0}x{1} new:{2}x{3}", event.oldHeight, event.oldWidth, event.newHeight,
+                event.newWidth);
     }
 
     private function onDisplayObjectChange(event:DisplayObjectEvent):void {
         logger.debug("On Display Object Change old:{0} new:{1}", event.oldDisplayObject, event.newDisplayObject)
     }
 
-    private function toggleAudioListeners(added:Boolean):void
-    {
+    private function toggleAudioListeners(added:Boolean):void {
         var audible:AudioTrait = proxiedElement.getTrait(MediaTraitType.AUDIO) as AudioTrait;
-        if (audible)
-        {
-            if (added)
-            {
+        if (audible) {
+            if (added) {
                 audible.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
                 audible.addEventListener(AudioEvent.MUTED_CHANGE, onMutedChange);
             }
-            else
-            {
+            else {
                 audible.removeEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
                 audible.removeEventListener(AudioEvent.MUTED_CHANGE, onMutedChange);
             }
@@ -213,19 +201,15 @@ public class DebugProxyElement extends ProxyElement {
         logger.debug("Volume Change: {0}", event.volume);
     }
 
-    private function toggleLoadListeners(added:Boolean):void
-    {
+    private function toggleLoadListeners(added:Boolean):void {
         var loadable:LoadTrait = proxiedElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
-        if (loadable)
-        {
-            if (added)
-            {
+        if (loadable) {
+            if (added) {
                 loadable.addEventListener(LoadEvent.LOAD_STATE_CHANGE, onLoadableStateChange);
                 loadable.addEventListener(LoadEvent.BYTES_TOTAL_CHANGE, onBytesTotalChange);
 
             }
-            else
-            {
+            else {
                 loadable.removeEventListener(LoadEvent.LOAD_STATE_CHANGE, onLoadableStateChange);
                 loadable.removeEventListener(LoadEvent.BYTES_TOTAL_CHANGE, onBytesTotalChange);
             }
@@ -236,23 +220,18 @@ public class DebugProxyElement extends ProxyElement {
         logger.debug("Load onBytesTotal change:{0}", event.bytes);
     }
 
-    private function onLoadableStateChange(event:LoadEvent):void
-    {
+    private function onLoadableStateChange(event:LoadEvent):void {
         logger.debug("Load state change:{0}", event.loadState);
     }
 
-    private function toggleBufferListeners(added:Boolean):void
-    {
+    private function toggleBufferListeners(added:Boolean):void {
         var buffer:BufferTrait = proxiedElement.getTrait(MediaTraitType.BUFFER) as BufferTrait;
-        if (buffer)
-        {
-            if (added)
-            {
+        if (buffer) {
+            if (added) {
                 buffer.addEventListener(BufferEvent.BUFFER_TIME_CHANGE, onBufferTimeChange);
                 buffer.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
             }
-            else
-            {
+            else {
                 buffer.removeEventListener(BufferEvent.BUFFER_TIME_CHANGE, onBufferTimeChange);
                 buffer.removeEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
             }
@@ -267,18 +246,14 @@ public class DebugProxyElement extends ProxyElement {
         logger.debug("On Buffer Time Change:{0}", event.bufferTime);
     }
 
-    private function togglePlayListeners(added:Boolean):void
-    {
+    private function togglePlayListeners(added:Boolean):void {
         var playable:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
-        if (playable)
-        {
-            if (added)
-            {
+        if (playable) {
+            if (added) {
                 playable.addEventListener(PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
                 playable.addEventListener(PlayEvent.CAN_PAUSE_CHANGE, onCanPauseChange);
             }
-            else
-            {
+            else {
                 playable.removeEventListener(PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
                 playable.removeEventListener(PlayEvent.CAN_PAUSE_CHANGE, onCanPauseChange);
             }
@@ -294,8 +269,7 @@ public class DebugProxyElement extends ProxyElement {
     }
 
 
-    private function toggleSeekListeners(added:Boolean):void
-    {
+    private function toggleSeekListeners(added:Boolean):void {
         var seek:SeekTrait = proxiedElement.getTrait(MediaTraitType.SEEK) as SeekTrait;
 
         if (seek) {
@@ -309,8 +283,7 @@ public class DebugProxyElement extends ProxyElement {
         logger.debug("On Seek Change:{0}", event.seeking);
     }
 
-    private function toggleTimeListeners(added:Boolean):void
-    {
+    private function toggleTimeListeners(added:Boolean):void {
         var time:TimeTrait = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
 
         if (time) {
@@ -335,8 +308,6 @@ public class DebugProxyElement extends ProxyElement {
     private function onComplete(event:TimeEvent):void {
         logger.debug("On Complete");
     }
-
-
 
 }
 }
