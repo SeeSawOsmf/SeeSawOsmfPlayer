@@ -106,7 +106,8 @@ public class MockData {
             "grossUsageReached":["false"],
             "playlist":[null],
             "anonymousUserId":[5151618],
-            "transactionItemId":["5151821"]
+            "transactionItemId":["5151821"],
+            "contentInfo": [contentInfo]   ////todo this may need to be in the initialiser call not the videoPlayerInfo
         }
         return videoPlayerInfoData;
     }

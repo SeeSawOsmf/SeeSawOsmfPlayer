@@ -41,7 +41,6 @@
         <module>DebugProxyPlugin</module>
         <module>LiverailPlugin</module>
         <module>CanvasPoc</module>
-        <module>PlayerControlsPlugin</module>
         <module>PlayerLogging</module>
         <module>PlayerInitialisation</module>
         <module>FullScreenProxyPlugin</module>

@@ -42,11 +42,11 @@ public class LiverailComponent implements MediaComponent {
     }
 
     public function createMediaElement(factory:MediaFactory, target:MediaElement):MediaElement {
-        logger.debug("creating control bar");
+        logger.debug("creating Liverail");
 
-        var controlBarTarget:Metadata = new Metadata();
-        controlBarTarget.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
-        target.addMetadata(LiverailPlugin.NS_TARGET, controlBarTarget);
+        var pluginTarget:Metadata = new Metadata();
+        pluginTarget.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
+        target.addMetadata(LiverailPlugin.NS_TARGET, pluginTarget);
 
         factory.loadPlugin(this.info);
 
