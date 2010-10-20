@@ -22,6 +22,7 @@
 
 package com.seesaw.player.components {
 import com.seesaw.player.PlayerConstants;
+import com.seesaw.player.config.AdvertisingMetaData;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -56,8 +57,11 @@ public class LiverailComponent implements MediaComponent {
         var resource:MediaResourceBase = new MediaResourceBase();
         resource.addMetadataValue(LiverailPlugin.NS_SETTINGS, pluginSettings);
 
+        var advertisingMeta:AdvertisingMetaData = new AdvertisingMetaData();
         var pluginElement:MediaElement = factory.createMediaElement(resource);
-
+        pluginElement.addMetadata("adMap"
+        advertisingMeta.
+    )
         return pluginElement;
     }
 }

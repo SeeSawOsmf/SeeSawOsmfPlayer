@@ -111,7 +111,7 @@ public class LiverailElement extends ParallelElement {
 
     }
 
-
+    //   override protected function removeTrait():
     private function preload(mediaElement:MediaElement):void {
         var loadTrait:LoadTrait = mediaElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
 
@@ -131,7 +131,7 @@ public class LiverailElement extends ParallelElement {
 
             _adManager = event.currentTarget.loader.content;
             modLoaded = true;
-
+            this.getMetadata("adMap");
             generatedAdMap = AdMapCreator
             setupAdManager();
         }
