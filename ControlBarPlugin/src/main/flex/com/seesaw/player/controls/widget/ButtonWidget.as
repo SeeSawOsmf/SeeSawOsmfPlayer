@@ -20,7 +20,7 @@
  *
  *****************************************************/
 
-package controls.seesaw.widget {
+package com.seesaw.player.controls.widget {
 import flash.display.DisplayObject;
 import flash.events.MouseEvent;
 

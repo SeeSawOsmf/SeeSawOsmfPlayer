@@ -40,7 +40,6 @@
         <module>DebugProxyPlugin</module>
         <module>LiverailPlugin</module>
         <module>CanvasPoc</module>
-        <module>PlayerControlsPlugin</module>
         <module>PlayerLogging</module>
         <module>PlayerInitialisation</module>
         <module>FullScreenProxyPlugin</module>
@@ -107,13 +106,6 @@
 
             <dependency>
                 <artifactId>ControlBarPlugin</artifactId>
-                <groupId>com.seesaw</groupId>
-                <version>${pom.version}</version>
-                <type>swc</type>
-            </dependency>
-
-            <dependency>
-                <artifactId>PlayerControlsPlugin</artifactId>
                 <groupId>com.seesaw</groupId>
                 <version>${pom.version}</version>
                 <type>swc</type>

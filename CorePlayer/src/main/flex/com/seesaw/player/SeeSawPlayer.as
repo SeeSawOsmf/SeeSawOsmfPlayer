@@ -86,7 +86,7 @@ public class SeeSawPlayer extends Sprite {
         logger.debug("loading the proxy plugins that wrap the video element");
         config.factory.loadPlugin(new PluginInfoResource(new FullScreenProxyPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
-        //config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
+        config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
 
         logger.debug("creating video element");
         _videoElement = config.factory.createMediaElement(config.resource);
