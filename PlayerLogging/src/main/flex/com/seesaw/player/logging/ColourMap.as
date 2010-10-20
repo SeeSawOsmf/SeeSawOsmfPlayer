@@ -20,45 +20,32 @@
  *    Incorporated. All Rights Reserved.
  */
 
-
 package com.seesaw.player.logging {
-import org.as3commons.logging.ILogger;
-import org.as3commons.logging.LoggerFactory;
-import org.osmf.logging.Logger;
+public class ColourMap {
+    public function ColourMap(category:String, colour:uint) {
+        _category = category;
+        _colour = colour;
 
-/**
- * An OSMF logger that feeds to commons logging
- */
-public class CommonsOsmfLogger extends Logger {
-
-    private var logger:ILogger;
-
-    public function CommonsOsmfLogger(name:String) {
-        super(name);
-        logger = LoggerFactory.getLogger(name);
 
     }
 
-    override public function debug(message:String, ...rest):void {
-        logger.debug(message, rest);
+    private var _category:String;
+    private var _colour:uint;
+
+    public function get category():String {
+        return _category;
     }
 
-    override public function info(message:String, ...rest):void {
-        logger.info(message, rest);
+    public function set category(value:String):void {
+        _category = value;
     }
 
-    override public function warn(message:String, ...rest):void {
-        logger.warn(message, rest);
+    public function get colour():uint {
+        return _colour;
     }
 
-    override public function error(message:String, ...rest):void {
-        logger.error(message, rest);
+    public function set colour(value:uint):void {
+        _colour = value;
     }
-
-    override public function fatal(message:String, ...rest):void {
-        logger.fatal(message, rest);
-    }
-
-
 }
 }
