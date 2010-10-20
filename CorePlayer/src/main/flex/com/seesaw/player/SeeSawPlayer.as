@@ -22,194 +22,105 @@
 
 package com.seesaw.player {
 import com.seesaw.player.components.ControlBarComponent;
-import com.seesaw.player.components.DebugProxyComponent;
-import com.seesaw.player.components.DefaultProxyComponent;
 import com.seesaw.player.components.LiverailComponent;
-import com.seesaw.player.components.PluginLifecycle;
-import com.seesaw.proxyplugin.DefaultProxyPluginInfo;
-import com.seesaw.proxyplugin.events.FullScreenEvent;
-import com.seesaw.proxyplugin.traits.FullScreenTrait;
+import com.seesaw.player.components.MediaComponent;
+import com.seesaw.player.events.FullScreenEvent;
+import com.seesaw.player.fullscreen.FullScreenProxyPluginInfo;
+import com.seesaw.player.traits.FullScreenTrait;
 
 import flash.display.Sprite;
-import flash.utils.Dictionary;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ParallelElement;
 import org.osmf.events.MediaFactoryEvent;
-import org.osmf.layout.HorizontalAlign;
 import org.osmf.layout.LayoutMetadata;
-import org.osmf.layout.VerticalAlign;
 import org.osmf.media.MediaElement;
-import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
-import org.osmf.metadata.Metadata;
 
 import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
-import uk.vodco.liverail.LiverailPlugin;
 
 public class SeeSawPlayer extends Sprite {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
 
-    private var _controlBar:ControlBarComponent;
     private var _config:PlayerConfiguration;
     private var _rootElement:ParallelElement;
-
-    private var _components:Dictionary;
-    private var _liveRail:LiverailComponent;
-    private var _defaultProxy:DefaultProxyComponent;
-    private var _debugProxy:DebugProxyComponent;
     private var _videoElement:MediaElement;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
 
         config = playerConfig;
-
         initialisePlayer();
     }
 
     private function initialisePlayer():void {
         logger.debug("initialising media player");
 
-        config.factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
-        config.factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadError);
         config.factory.addEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onMediaElementCreate);
 
-        createComponents();
         createRootElement();
         createVideoElement();
+        createMediaElementPlugins();
 
+        logger.debug("adding container to stage");
         addChild(config.container);
     }
 
     private function createMediaElementPlugins():void {
-        createControlBarElement();
-        createLiverailElement();
+        logger.debug("adding control bar media element to container");
+        addMediaElement(new ControlBarComponent());
+
+        logger.debug("adding liverail media element to container");
+        addMediaElement(new LiverailComponent());
     }
 
-    private function createLiverailElement():void {
-        logger.debug("creating control bar");
-
-        _liveRail.applyMetadata(_videoElement);
-        config.factory.loadPlugin(_liveRail.info);
-
-        var pluginSettings:Metadata = new Metadata();
-        pluginSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
-
-        var resource:MediaResourceBase = new MediaResourceBase();
-        resource.addMetadataValue(LiverailPlugin.NS_SETTINGS, pluginSettings);
-
-        var pluginElement:MediaElement = config.factory.createMediaElement(resource);
-
-        rootElement.addChild(pluginElement);
+    private function addMediaElement(component:MediaComponent) {
+        var mediaElement:MediaElement = component.createMediaElement(config.factory, _videoElement);
+        _rootElement.addChild(mediaElement);
     }
 
     private function createVideoElement():void {
-        logger.debug("loading plugins");
+        logger.debug("loading the proxy plugins that wrap the video element");
+        config.factory.loadPlugin(new PluginInfoResource(new FullScreenProxyPluginInfo()));
+        config.factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
 
-        config.factory.loadPlugin(_defaultProxy.info);
-        config.factory.loadPlugin(_debugProxy.info);
-
+        logger.debug("creating video element");
         _videoElement = config.factory.createMediaElement(config.resource);
-        logger.debug("VIDEO ELEMENT: " + _videoElement);
-        rootElement.addChild(_videoElement);
-        createMediaElementPlugins();
-    }
 
-    private function createComponents():void {
-        logger.debug("creating components");
-
-        _components = new Dictionary();
-
-        _debugProxy = new DebugProxyComponent(this);
-        _components[DebugPluginInfo.ID] = _debugProxy;
-
-        _defaultProxy = new DefaultProxyComponent(this);
-        _components[DefaultProxyPluginInfo.ID] = _defaultProxy;
-
-        _controlBar = new ControlBarComponent(this);
-        _components[ControlBarPlugin.ID] = _controlBar;
-
-        _liveRail = new LiverailComponent(this);
-        _components[LiverailPlugin.ID] = _liveRail;
-    }
-
-    private function createControlBarElement():void {
-        logger.debug("creating control bar");
-
-        _controlBar.applyMetadata(_videoElement);
-        config.factory.loadPlugin(_controlBar.info);
-
-        var controlBarSettings:Metadata = new Metadata();
-        controlBarSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
-
-        var resource:MediaResourceBase = new MediaResourceBase();
-        resource.addMetadataValue(ControlBarPlugin.NS_SETTINGS, controlBarSettings);
-
-        var controlBarElement:MediaElement = config.factory.createMediaElement(resource);
-
-        var layout:LayoutMetadata = controlBarElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
-        if (layout == null) {
-            layout = new LayoutMetadata();
-            controlBarElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+        if (_videoElement == null) {
+            throw ArgumentError("failed to create main media element for player");
         }
-        layout.verticalAlign = VerticalAlign.BOTTOM;
-        layout.horizontalAlign = HorizontalAlign.CENTER;
 
-        layout.index = 1;
-
-        rootElement.addChild(controlBarElement);
+        logger.debug("adding video element to container");
+        _rootElement.addChild(_videoElement);
     }
 
     private function createRootElement():void {
         logger.debug("creating root element");
 
-        rootElement = new ParallelElement();
+        _rootElement = new ParallelElement();
         layout(config.width, config.height);
 
-        config.player.media = rootElement;
-        config.container.addMediaElement(rootElement);
-    }
+        config.player.media = _rootElement;
 
-    private function onPluginLoaded(event:MediaFactoryEvent):void {
-        logger.debug("plugin loaded");
-
-        if (event.resource is PluginInfoResource) {
-            var pluginInfo:PluginInfoResource = PluginInfoResource(event.resource);
-
-            if (pluginInfo.pluginInfo.numMediaFactoryItems > 0) {
-                var id:String = pluginInfo.pluginInfo.getMediaFactoryItemAt(0).id;
-                var component:PluginLifecycle = _components[id] as PluginLifecycle;
-                if (component) {
-                    component.pluginLoaded(event);
-                }
-            }
-        }
-    }
-
-    private function onPluginLoadError(event:MediaFactoryEvent):void {
-        logger.debug("plugin error");
-        _controlBar.pluginLoadError(event);
+        logger.debug("adding root element to container");
+        config.container.addMediaElement(_rootElement);
     }
 
     private function onMediaElementCreate(event:MediaFactoryEvent):void {
-        logger.debug("CREATED MEDIA ELEMENT: " + event.mediaElement);
-
-        //  var loadTrait:LoadTrait = event.mediaElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
-
+        logger.debug("created media element: " + event.mediaElement);
 
         var fullscreen:FullScreenTrait = event.mediaElement.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
         if (fullscreen) {
-            logger.debug("adding handler for full screen trait");
+            logger.debug("adding handler for full screen trait: " + event.mediaElement);
             fullscreen.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
         }
     }
 
     private function onFullscreen(event:FullScreenEvent):void {
-        logger.debug("onFullscreen");
-
+        logger.debug("onFullscreen: " + event.value);
         if (event.value) {
             layout(stage.fullScreenWidth, stage.fullScreenHeight);
         }
@@ -219,21 +130,15 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function layout(width:int, height:int):void {
+        logger.debug("setting new layout for root media element: " + width + "x" + height);
+
         var rootElementLayout:LayoutMetadata = new LayoutMetadata();
-        rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, rootElementLayout);
+        _rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, rootElementLayout);
 
         rootElementLayout.width = width;
         rootElementLayout.height = height;
 
         config.container.layout(width, height, true);
-    }
-
-    public function get rootElement():ParallelElement {
-        return _rootElement;
-    }
-
-    public function set rootElement(value:ParallelElement):void {
-        _rootElement = value;
     }
 
     public function get config():PlayerConfiguration {

@@ -117,7 +117,7 @@
         </dependency>
         <dependency>
             <groupId>com.seesaw</groupId>
-            <artifactId>DefaultProxyPlugin</artifactId>
+            <artifactId>FullScreenProxyPlugin</artifactId>
             <type>swc</type>
         </dependency>
         <dependency>

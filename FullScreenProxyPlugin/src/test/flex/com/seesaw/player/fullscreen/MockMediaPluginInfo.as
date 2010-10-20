@@ -20,27 +20,36 @@
  *    Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.proxyplugin {
-import com.seesaw.proxyplugin.traits.FullScreenTrait;
-
-import org.as3commons.logging.ILogger;
-import org.as3commons.logging.LoggerFactory;
-import org.osmf.elements.ProxyElement;
+package com.seesaw.player.fullscreen {
 import org.osmf.media.MediaElement;
+import org.osmf.media.MediaFactoryItem;
+import org.osmf.media.MediaFactoryItemType;
+import org.osmf.media.MediaResourceBase;
+import org.osmf.media.PluginInfo;
 
-public class DefaultProxyElement extends ProxyElement {
+public class MockMediaPluginInfo extends PluginInfo {
 
-    private var logger:ILogger = LoggerFactory.getClassLogger(DefaultProxyElement);
+    public static const ID:String = "com.seesaw.test.Mock";
 
-    public function DefaultProxyElement(proxiedElement:MediaElement = null) {
-        logger.debug("DefaultProxyElement()");
-        super(proxiedElement);
+    public function MockMediaPluginInfo() {
+        var item:MediaFactoryItem = new MediaFactoryItem(
+                ID,
+                canHandleResourceFunction,
+                mediaElementCreationFunction,
+                MediaFactoryItemType.STANDARD);
+
+        var items:Vector.<MediaFactoryItem> = new Vector.<MediaFactoryItem>();
+        items.push(item);
+
+        super(items);
     }
 
-    override protected function setupTraits():void {
-        logger.debug("setupTraits");
-        addTrait(FullScreenTrait.FULL_SCREEN, new FullScreenTrait());
-        super.setupTraits();
+    private static function canHandleResourceFunction(resource:MediaResourceBase):Boolean {
+        return true;
+    }
+
+    private static function mediaElementCreationFunction():MediaElement {
+        return new MockMediaElement();
     }
 }
 }

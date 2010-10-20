@@ -20,15 +20,32 @@
  *    Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.player.components {
-import org.osmf.events.MediaFactoryEvent;
+package com.seesaw.player.fullscreen {
+import com.seesaw.player.traits.FullScreenTrait;
+
+import flash.display.Sprite;
+
+import org.flexunit.asserts.assertNotNull;
+import org.flexunit.asserts.assertTrue;
+import org.osmf.media.DefaultMediaFactory;
+import org.osmf.media.MediaElement;
+import org.osmf.media.MediaFactory;
+import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
 
-public interface PluginLifecycle {
-    function pluginLoaded(event:MediaFactoryEvent):void;
+public class FullScreenProxyElementTest extends Sprite {
 
-    function pluginLoadError(event:MediaFactoryEvent):void;
+    [Test]
+    public function testFullScreenTraitAvailable():void {
+        var factory:MediaFactory = new DefaultMediaFactory();
+        factory.loadPlugin(new PluginInfoResource(new MockMediaPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new FullScreenProxyPluginInfo()));
 
-    function get info():PluginInfoResource;
+        var resource:MediaResourceBase = new MediaResourceBase();
+        var element:MediaElement = factory.createMediaElement(resource);
+        assertNotNull(element);
+
+        assertTrue(element.hasTrait(FullScreenTrait.FULL_SCREEN));
+    }
 }
 }

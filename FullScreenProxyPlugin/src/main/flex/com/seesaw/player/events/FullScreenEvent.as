@@ -19,30 +19,22 @@
  *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
  *    Incorporated. All Rights Reserved.
  */
+package com.seesaw.player.events {
+import flash.events.Event;
 
-package com.seesaw.player {
-import org.as3commons.logging.ILogger;
-import org.as3commons.logging.LoggerFactory;
-import org.osmf.events.PlayEvent;
-import org.osmf.media.MediaPlayer;
-import org.osmf.traits.MediaTraitType;
-import org.osmf.traits.PlayTrait;
+public class FullScreenEvent extends Event {
 
-public class SeeSawMediaPlayer extends MediaPlayer {
+    public static const FULL_SCREEN:String = "fullscreenChange";
 
-    private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawMediaContainer);
+    private var _value:Boolean;
 
-    public function SeeSawMediaPlayer() {
-        logger.debug("created media player");
-
-
-        addEventListener(PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
+    public function FullScreenEvent(value:Boolean) {
+        super(FULL_SCREEN, false, false);
+        _value = value;
     }
 
-    private function onPlayStateChange(event:PlayEvent):void {
-        logger.debug("onPlayStateChange");
-        var playable:PlayTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
-        logger.debug("play trait: " + playable);
+    public function get value():Boolean {
+        return _value;
     }
 }
 }

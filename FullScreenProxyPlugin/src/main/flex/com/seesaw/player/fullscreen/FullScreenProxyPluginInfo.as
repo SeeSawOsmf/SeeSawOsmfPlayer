@@ -19,7 +19,7 @@
  *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
  *    Incorporated. All Rights Reserved.
  */
-package com.seesaw.proxyplugin {
+package com.seesaw.player.fullscreen {
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.media.MediaElement;
@@ -28,16 +28,14 @@ import org.osmf.media.MediaFactoryItemType;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfo;
 
-public class DefaultProxyPluginInfo extends PluginInfo {
+public class FullScreenProxyPluginInfo extends PluginInfo {
 
-    private static var logger:ILogger = LoggerFactory.getClassLogger(DefaultProxyPluginInfo);
+    private static var logger:ILogger = LoggerFactory.getClassLogger(FullScreenProxyPluginInfo);
 
-    public static const ID:String = "com.seesaw.proxyplugin.DefaultProxyPlugin";
-    public static const NS_SETTINGS:String = "seesaw/defaultproxy/settings";
-    public static const NS_TARGET:String = "seesaw/defaultproxy/target";
+    public static const ID:String = "com.seesaw.player.DefaultProxyPlugin";
 
-    public function DefaultProxyPluginInfo() {
-        logger.debug("DefaultProxyPluginInfo()");
+    public function FullScreenProxyPluginInfo() {
+        logger.debug("com.seesaw.player.fullscreen.FullScreenProxyPluginInfo()");
 
         var item:MediaFactoryItem = new MediaFactoryItem(
                 ID,
@@ -58,7 +56,7 @@ public class DefaultProxyPluginInfo extends PluginInfo {
 
     private static function mediaElementCreationFunction():MediaElement {
         logger.debug("constructing proxy element");
-        return new DefaultProxyElement();
+        return new FullScreenProxyElement();
     }
 }
 }

@@ -19,31 +19,27 @@
  *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
  *    Incorporated. All Rights Reserved.
  */
+package com.seesaw.player.fullscreen {
+import com.seesaw.player.traits.FullScreenTrait;
 
-package com.seesaw.proxyplugin.traits {
-import com.seesaw.proxyplugin.events.FullScreenEvent;
+import org.as3commons.logging.ILogger;
+import org.as3commons.logging.LoggerFactory;
+import org.osmf.elements.ProxyElement;
+import org.osmf.media.MediaElement;
 
-import org.osmf.traits.MediaTraitBase;
+public class FullScreenProxyElement extends ProxyElement {
 
-[Event(name="fullscreenChange", type="com.seesaw.proxyplugin.events.FullScreenEvent")]
+    private var logger:ILogger = LoggerFactory.getClassLogger(FullScreenProxyElement);
 
-public class FullScreenTrait extends MediaTraitBase {
-
-    private var _fullscreen:Boolean;
-
-    public static const FULL_SCREEN:String = "fullscreen";
-
-    public function FullScreenTrait() {
-        super(FULL_SCREEN);
+    public function FullScreenProxyElement(proxiedElement:MediaElement = null) {
+        logger.debug("com.seesaw.player.fullscreen.FullScreenProxyElement()");
+        super(proxiedElement);
     }
 
-    public function get fullscreen():Boolean {
-        return _fullscreen;
-    }
-
-    public function set fullscreen(value:Boolean):void {
-        _fullscreen = value;
-        dispatchEvent(new FullScreenEvent(value));
+    override protected function setupTraits():void {
+        logger.debug("setupTraits");
+        addTrait(FullScreenTrait.FULL_SCREEN, new FullScreenTrait());
+        super.setupTraits();
     }
 }
 }

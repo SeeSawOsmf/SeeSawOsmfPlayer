@@ -30,9 +30,9 @@
         <groupId>com.seesaw</groupId>
         <version>7.0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>DefaultProxyPlugin</artifactId>
+    <artifactId>FullScreenProxyPlugin</artifactId>
     <packaging>swc</packaging>
-    <name>DefaultProxyPlugin</name>
+    <name>FullScreenProxyPlugin</name>
     <build>
         <sourceDirectory>src/main/flex</sourceDirectory>
         <testSourceDirectory>src/test/flex</testSourceDirectory>

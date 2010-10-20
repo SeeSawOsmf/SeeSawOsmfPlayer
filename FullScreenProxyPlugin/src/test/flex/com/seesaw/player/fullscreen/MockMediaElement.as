@@ -20,17 +20,12 @@
  *    Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.player {
-import org.as3commons.logging.ILogger;
-import org.as3commons.logging.LoggerFactory;
-import org.osmf.containers.MediaContainer;
+package com.seesaw.player.fullscreen {
+import org.osmf.media.MediaElement;
 
-public class SeeSawMediaContainer extends MediaContainer {
-
-    private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawMediaContainer);
-
-    public function SeeSawMediaContainer() {
-        logger.debug("created media container");
+public class MockMediaElement extends MediaElement {
+    public function MockMediaElement() {
+        super();
     }
 }
 }
