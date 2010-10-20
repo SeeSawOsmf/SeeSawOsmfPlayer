@@ -23,8 +23,29 @@
 package com.seesaw.player.mockData {
 public class MockData {
 
-    public function get playerInit():Object {
-
+    public function get contentInfo():XML {
+        var contentInfoBBC:XML = new XML('<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>' +
+                '<ns2:contentInfo xmlns:ns2=\"http:\/\/www.vodco.co.uk\/sherbet\/advertising\/v1.6\">' +
+                '<primaryGenre>TV:COMEDY:SATIRE<\/primaryGenre>' +
+                '<sourceId>BBC_WORLDWIDE<\/sourceId>' +
+                '<firstPresentationBrand>BBC<\/firstPresentationBrand>' +
+                '<brandId>fc40414b-6cef-4690-9042-a8a9b9880cc6<\/brandId>' +
+                '<brandTitle>The Thick of It<\/brandTitle>' +
+                '<seriesId>25142<\/seriesId>' +
+                '<seriesTitle>The Thick of It<\/seriesTitle>' +
+                '<programmeId>ABDB188B-01<\/programmeId>' +
+                '<programmeTitle>Episode 1<\/programmeTitle>' +
+                '<tvAgeRating>16<\/tvAgeRating>' +
+                '<duration>1754<\/duration>' +
+                '<adRule>ALWAYS<\/adRule>' +
+                '<catchup>false<\/catchup>' +
+                '<loggingSheet><break>' +
+                '<breakOffset>00:12:48.52<\/breakOffset>' +
+                '<resumeOffset>00:12:49.08<\/resumeOffset>' +
+                '<data>RSTRCT=NONE<\/data>' +
+                '<\/break>' +
+                '<\/loggingSheet>' +
+                '<\/ns2:contentInfo>');
 
         var contentInfoFive:XML = new XML('<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>' +
                 '<ns2:contentInfo xmlns:ns2=\"http:\/\/www.vodco.co.uk\/sherbet\/advertising\/v1.6\">' +
@@ -49,29 +70,11 @@ public class MockData {
                 '<\/loggingSheet>' +
                 '<\/ns2:contentInfo>');
 
-        var contentInfoBBC:XML = new XML('<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>' +
-                '<ns2:contentInfo xmlns:ns2=\"http:\/\/www.vodco.co.uk\/sherbet\/advertising\/v1.6\">' +
-                '<primaryGenre>TV:COMEDY:SATIRE<\/primaryGenre>' +
-                '<sourceId>BBC_WORLDWIDE<\/sourceId>' +
-                '<firstPresentationBrand>BBC<\/firstPresentationBrand>' +
-                '<brandId>fc40414b-6cef-4690-9042-a8a9b9880cc6<\/brandId>' +
-                '<brandTitle>The Thick of It<\/brandTitle>' +
-                '<seriesId>25142<\/seriesId>' +
-                '<seriesTitle>The Thick of It<\/seriesTitle>' +
-                '<programmeId>ABDB188B-01<\/programmeId>' +
-                '<programmeTitle>Episode 1<\/programmeTitle>' +
-                '<tvAgeRating>16<\/tvAgeRating>' +
-                '<duration>1754<\/duration>' +
-                '<adRule>ALWAYS<\/adRule>' +
-                '<catchup>false<\/catchup>' +
-                '<loggingSheet><break>' +
-                '<breakOffset>00:12:48.52<\/breakOffset>' +
-                '<resumeOffset>00:12:49.08<\/resumeOffset>' +
-                '<data>RSTRCT=NONE<\/data>' +
-                '<\/break>' +
-                '<\/loggingSheet>' +
-                '<\/ns2:contentInfo>');
+        return contentInfoBBC;
 
+    }
+
+    public function get playerInit():Object {
 
         var playerInitData:Object = {
             "programmeId":10001,
