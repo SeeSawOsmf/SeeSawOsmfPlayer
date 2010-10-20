@@ -56,6 +56,10 @@
             <id>ibhana</id>
             <name>Ismail Bhana</name>
         </developer>
+        <developer>
+            <id>bmeade</id>
+            <name>Brendan Meade</name>
+        </developer>
     </developers>
 
     <issueManagement>
