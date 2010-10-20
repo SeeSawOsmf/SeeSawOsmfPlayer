@@ -44,8 +44,6 @@ import org.osmf.media.MediaElement;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
 import org.osmf.metadata.Metadata;
-import org.osmf.traits.LoadTrait;
-import org.osmf.traits.MediaTraitType;
 
 import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
 import uk.vodco.liverail.LiverailPlugin;
@@ -63,7 +61,6 @@ public class SeeSawPlayer extends Sprite {
     private var _defaultProxy:DefaultProxyComponent;
     private var _debugProxy:DebugProxyComponent;
     private var _videoElement:MediaElement;
-    private var loadSequenceNumber:int = 0;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
@@ -200,9 +197,7 @@ public class SeeSawPlayer extends Sprite {
     private function onMediaElementCreate(event:MediaFactoryEvent):void {
         logger.debug("CREATED MEDIA ELEMENT: " + event.mediaElement);
 
-        var loadTrait:LoadTrait = event.mediaElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
-
-        var component:PluginLifecycle = _components[loadSequenceNumber] as PluginLifecycle;
+        //  var loadTrait:LoadTrait = event.mediaElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
 
 
         var fullscreen:FullScreenTrait = event.mediaElement.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;

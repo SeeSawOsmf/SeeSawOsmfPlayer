@@ -157,7 +157,6 @@ public class LiverailElement extends ParallelElement {
                 if (targetMetadata.getValue(ID) != null
                         && targetMetadata.getValue(ID) == settings.getValue(ID)
                         ) {
-
                     setupTraits();
                 }
 

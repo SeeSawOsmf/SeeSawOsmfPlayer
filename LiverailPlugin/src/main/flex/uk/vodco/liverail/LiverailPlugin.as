@@ -90,8 +90,9 @@ public class LiverailPlugin extends PluginInfo {
 
     private function mediaElementCreationCallback():MediaElement {
         logger.debug("mediaElementCreationCallback");
-        liverailElement = new LiverailElement();
-
+        if (liverailElement == null) {
+            liverailElement = new LiverailElement();
+        }
         return liverailElement;
 
     }
@@ -106,7 +107,9 @@ public class LiverailPlugin extends PluginInfo {
             logger.debug("TARGET ELEMENT : " + target);
 
             this.targetElement = target;
-
+            if (liverailElement == null) {
+                liverailElement = new LiverailElement();
+            }
             updateLiverail();
         }
     }
