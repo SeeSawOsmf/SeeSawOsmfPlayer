@@ -44,7 +44,6 @@ import org.osmf.traits.LoadTrait;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.SeekTrait;
 
-import uk.vodco.liverail.config.AdMapCreator;
 import uk.vodco.liverail.events.LiveRailEvent;
 
 public class LiverailElement extends ParallelElement {
@@ -131,9 +130,9 @@ public class LiverailElement extends ParallelElement {
 
             _adManager = event.currentTarget.loader.content;
             modLoaded = true;
-            this.getMetadata("adMap");
-            generatedAdMap = AdMapCreator
-            setupAdManager();
+            //   this.getMetadata("adMap");
+            //generatedAdMap = AdMapCreator
+            //   setupAdManager();
         }
     }
 
@@ -258,10 +257,10 @@ public class LiverailElement extends ParallelElement {
 
     public function createLiverail():void {
 
-        // var liverailPath:String = "http://simple-player.enxus.co.uk/testswf.swf";
+        var liverailPath:String = "http://simple-player.enxus.co.uk/testswf.swf";
         //  var liverailPath:String = "http://mediapm.edgesuite.net/osmf/content/test/ten.swf";
         //  var liverailPath:String = "http://www.swftools.org/flash/mv_zoom1.swf";
-        var liverailPath:String = "http://vox-static.liverail.com/swf/v4/admanager.swf";
+        //   var liverailPath:String = "http://vox-static.liverail.com/swf/v4/admanager.swf";
         var urlResource:URLResource = new URLResource(liverailPath);
 
         liveRailElement = new SWFElement(urlResource);

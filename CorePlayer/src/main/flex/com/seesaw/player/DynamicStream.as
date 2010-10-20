@@ -23,6 +23,7 @@
 package com.seesaw.player {
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
+import org.osmf.metadata.Metadata;
 import org.osmf.net.DynamicStreamingItem;
 import org.osmf.net.DynamicStreamingResource;
 
@@ -31,6 +32,9 @@ public class DynamicStream extends DynamicStreamingResource {
     private var logger:ILogger = LoggerFactory.getClassLogger(DynamicStream);
 
     private static const PROGRAMME_ID:String = "programmeID";
+    private static const CONTENT_INFO:String = "contentInfo";
+    private static const CONTENT_ID:String = "contentId";
+
 
     public function DynamicStream(params:Object) {
         super(params.scheme + "://" + params.cdnPath);
@@ -47,7 +51,14 @@ public class DynamicStream extends DynamicStreamingResource {
         logger.debug("created " + streamItems.length + " stream item(s)");
 
         //  TODO: add metadata from video player info to the resource
+
+        var metaSettings:Metadata = new Metadata();
+        metaSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);  // Use this to check the resource is the mainContent for the plugins
+
+        addMetadataValue(CONTENT_ID, metaSettings);
+
         addMetadataValue(PROGRAMME_ID, params.programmeId);
+        addMetadataValue(CONTENT_INFO, params.contentInfo)
     }
 }
 }

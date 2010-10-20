@@ -25,11 +25,11 @@ import com.seesaw.player.ads.AdProxyPluginInfo;
 import com.seesaw.player.components.ControlBarComponent;
 import com.seesaw.player.components.LiverailComponent;
 import com.seesaw.player.components.MediaComponent;
+import com.seesaw.player.events.*;
 import com.seesaw.player.fullscreen.FullScreenProxyPluginInfo;
 import com.seesaw.player.traits.FullScreenTrait;
 
 import flash.display.Sprite;
-import com.seesaw.player.events.*;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -89,7 +89,10 @@ public class SeeSawPlayer extends Sprite {
         config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
 
         logger.debug("creating video element");
+
+
         _videoElement = config.factory.createMediaElement(config.resource);
+
 
         if (_videoElement == null) {
             throw ArgumentError("failed to create main media element for player");

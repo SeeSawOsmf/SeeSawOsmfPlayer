@@ -59,9 +59,9 @@ public class LiverailComponent implements MediaComponent {
 
         var advertisingMeta:AdvertisingMetaData = new AdvertisingMetaData();
         var pluginElement:MediaElement = factory.createMediaElement(resource);
-        pluginElement.addMetadata("adMap"
-        advertisingMeta.
-    )
+        // pluginElement.addMetadata("adMap"
+        // advertisingMeta. )
+
         return pluginElement;
     }
 }

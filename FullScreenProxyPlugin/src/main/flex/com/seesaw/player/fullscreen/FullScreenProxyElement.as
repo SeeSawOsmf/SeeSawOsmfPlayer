@@ -42,6 +42,5 @@ public class FullScreenProxyElement extends ProxyElement {
         super.setupTraits();
     }
 
-    blockedTraits
 }
 }
