@@ -22,11 +22,9 @@
 
 package com.seesaw.player.components {
 import com.seesaw.player.PlayerConstants;
-import com.seesaw.player.SeeSawPlayer;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
-import org.osmf.events.MediaFactoryEvent;
 import org.osmf.layout.HorizontalAlign;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.layout.VerticalAlign;
