@@ -131,6 +131,11 @@
             <version>${pom.version}</version>
             <type>swc</type>
         </dependency>
+        <dependency>
+            <artifactId>PlayerCommon</artifactId>
+            <groupId>com.seesaw</groupId>
+            <type>swc</type>
+        </dependency>
 
         <dependency>
             <groupId>org.as3commons</groupId>

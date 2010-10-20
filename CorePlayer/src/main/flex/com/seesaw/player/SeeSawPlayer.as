@@ -25,6 +25,7 @@ import com.seesaw.player.ads.AdProxyPluginInfo;
 import com.seesaw.player.components.ControlBarComponent;
 import com.seesaw.player.components.LiverailComponent;
 import com.seesaw.player.components.MediaComponent;
+import com.seesaw.player.events.FullScreenEvent;
 import com.seesaw.player.fullscreen.FullScreenProxyPluginInfo;
 import com.seesaw.player.traits.FullScreenTrait;
 
@@ -38,6 +39,8 @@ import org.osmf.events.MediaFactoryEvent;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.media.PluginInfoResource;
+
+import org.osmf.media.URLResource;
 
 import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
 

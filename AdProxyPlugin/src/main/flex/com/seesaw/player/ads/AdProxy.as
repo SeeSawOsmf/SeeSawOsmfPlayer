@@ -12,6 +12,8 @@ import org.osmf.events.MediaElementEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.MediaTraitType;
+import org.osmf.traits.PlayState;
+import org.osmf.traits.PlayTrait;
 import org.osmf.traits.TimeTrait;
 
 public class AdProxy extends ProxyElement {
@@ -37,7 +39,7 @@ public class AdProxy extends ProxyElement {
 
         blockedTraits = traitsToBlock;
 
-        var timer:Timer = new Timer(300);
+        var timer:Timer = new Timer(5000);
         timer.addEventListener(TimerEvent.TIMER, onTimerTick);
         timer.start();
     }
@@ -119,9 +121,18 @@ public class AdProxy extends ProxyElement {
     private function onTimerTick(event:TimerEvent):void {
         var labelText:String = "";
         if (proxiedElement != null) {
-            var timeTrait:TimeTrait = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait
-            if (timeTrait && timeTrait.duration && (timeTrait.duration - timeTrait.currentTime) > 0.9) {
-                labelText = "[ Advertisement - Remaining Time: " + Math.round(timeTrait.duration - timeTrait.currentTime) + " seconds... ]";
+            var timeTrait:TimeTrait = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
+            var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
+
+             if(playTrait) {
+                if(playTrait.playState == PlayState.PLAYING) {
+                    playTrait.pause();
+                    labelText = "[ Advertisement ]";
+                }
+                else if(playTrait.playState == PlayState.PAUSED)  {
+                    playTrait.play();
+                    labelText = "";
+                }
             }
         }
         label.text = labelText;

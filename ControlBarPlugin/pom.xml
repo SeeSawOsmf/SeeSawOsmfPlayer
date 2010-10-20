@@ -92,7 +92,7 @@
         </dependency>
 
         <dependency>
-            <artifactId>FullScreenProxyPlugin</artifactId>
+            <artifactId>PlayerCommon</artifactId>
             <groupId>com.seesaw</groupId>
             <type>swc</type>
         </dependency>
