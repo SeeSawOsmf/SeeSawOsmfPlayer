@@ -21,11 +21,15 @@
  */
 
 package com.seesaw.player {
+import com.seesaw.player.impl.services.ResumeServiceImpl;
 import com.seesaw.player.init.ServiceRequest;
+import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 import com.seesaw.player.mockData.MockData;
 import com.seesaw.player.panels.GuidancePanel;
+
+import com.seesaw.player.services.ResumeService;
 
 import flash.display.LoaderInfo;
 import flash.display.Sprite;
@@ -59,6 +63,8 @@ public class Player extends Sprite {
         super();
 
         logger.debug("created new player");
+
+        registerServices();
 
         params = LoaderInfo(this.root.loaderInfo).parameters;
 
@@ -146,6 +152,15 @@ public class Player extends Sprite {
         // TODO: This should be removed once the new video player info service is up and running
         var resource:StreamingURLResource = createMediaResource(new MockData().videoPlayerInfo);
         loadVideo(resource);
+    }
+
+    /**
+     * Is this the best place for this?
+     */
+    private function registerServices() {
+        logger.debug("registering services");
+        var provider:ObjectProvider = ObjectProvider.getInstance();
+        provider.register(ResumeService, new ResumeServiceImpl());
     }
 
     public function get videoPlayer():SeeSawPlayer {
