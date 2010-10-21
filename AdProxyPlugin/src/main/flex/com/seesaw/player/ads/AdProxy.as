@@ -120,9 +120,7 @@ public class AdProxy extends ProxyElement {
 
         blockedTraits = traitsToBlock;
 
-        var timer:Timer = new Timer(1000);
-        timer.addEventListener(TimerEvent.TIMER, onTimerTick);
-        timer.start();
+
     }
 
     public override function set proxiedElement(proxiedElement:MediaElement):void {
@@ -279,6 +277,12 @@ public class AdProxy extends ProxyElement {
 
             if (playTrait) {
                 if (playTrait.playState == PlayState.PLAYING) {
+
+                    var traitsToBlock:Vector.<String> = new Vector.<String>();
+                    traitsToBlock[0] = MediaTraitType.SEEK;
+                    traitsToBlock[1] = MediaTraitType.TIME;
+
+                    blockedTraits = traitsToBlock;
                     playTrait.pause();
 
                 }
@@ -295,8 +299,11 @@ public class AdProxy extends ProxyElement {
 
             if (playTrait) {
                 if (playTrait.playState == PlayState.PAUSED) {
+                    blockedTraits = new Vector.<String>();
                     playTrait.play();
-
+                    var timer:Timer = new Timer(1000);
+                    timer.addEventListener(TimerEvent.TIMER, onTimerTick);
+                    timer.start();
                 }
             }
 
@@ -386,7 +393,7 @@ public class AdProxy extends ProxyElement {
             if (playTrait) {
                 if (playTrait.playState == PlayState.PLAYING) {
                     /// playTrait.pause();
-                    //    onContentUpdate(0, timeTrait.duration);
+                    onContentUpdate(timeTrait.currentTime, timeTrait.duration);
                     labelText = "[ Advertisement ]" + timeTrait.currentTime;
                 }
                 else if (playTrait.playState == PlayState.PAUSED) {
