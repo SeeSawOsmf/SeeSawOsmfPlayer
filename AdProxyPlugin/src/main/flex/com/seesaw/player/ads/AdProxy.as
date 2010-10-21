@@ -39,7 +39,6 @@ import flash.utils.Timer;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ProxyElement;
-import org.osmf.elements.SWFElement;
 import org.osmf.events.DisplayObjectEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.media.MediaElement;
@@ -54,15 +53,9 @@ public class AdProxy extends ProxyElement {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(AdProxy);
 
-    private var liveRailElement:SWFElement;
     private var _adManager:*;
     private var liverailLoader:Loader;
     public static var TYPE:String = "LIVERAIL_INTERFACE";
-
-
-    private var modLoaded:Boolean = false;
-
-    private var liveRailModuleLocation:String;
 
 
     public var contentInfo:XML;
@@ -75,7 +68,7 @@ public class AdProxy extends ProxyElement {
     private var videoId:String;
 
 
-    private var liveRailConfig:Object;
+    private var config:Object;
 
 
     public var contentObject:Object;
@@ -100,6 +93,7 @@ public class AdProxy extends ProxyElement {
     public var liverailVersion:String;
     public var liverailPublisherId:String;
     public var programmeId:Number;
+    private var liverailConfig:LiverailConfig;
 
     public function AdProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -124,7 +118,7 @@ public class AdProxy extends ProxyElement {
 
         blockedTraits = traitsToBlock;
 
-        var timer:Timer = new Timer(5000);
+        var timer:Timer = new Timer(1000);
         timer.addEventListener(TimerEvent.TIMER, onTimerTick);
         timer.start();
     }
@@ -138,7 +132,7 @@ public class AdProxy extends ProxyElement {
                 proxiedElement.addEventListener(MediaElementEvent.TRAIT_ADD, onProxiedTraitsChange);
                 proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onProxiedTraitsChange);
                 //   var value:* = proxiedElement.resource.getMetadataValue("contentInfo");
-                //  blockedTraits = new Vector.<String>();
+                //  blockedTraits = new Vector.<String>();    todo use this to clear the blockedtraits list...
                 createLiverail();
 
             }
@@ -150,9 +144,6 @@ public class AdProxy extends ProxyElement {
 
     private function createLiverail():void {
 
-        // var liverailPath:String = "http://simple-player.enxus.co.uk/testswf.swf";
-        // var liverailPath:String = "http://mediapm.edgesuite.net/osmf/content/test/ten.swf";
-        //  var liverailPath:String = "http://www.swftools.org/flash/mv_zoom1.swf";
         var liverailPath:String = "http://vox-static.liverail.com/swf/v4/admanager.swf";
         var urlResource:URLRequest = new URLRequest(liverailPath);
 
@@ -165,10 +156,6 @@ public class AdProxy extends ProxyElement {
         displayObject.addChild(liverailLoader);
     }
 
-    private function preload(resource:URLRequest):void {
-
-
-    }
 
     private function onLoadComplete(event:Event):void {
 
@@ -185,6 +172,8 @@ public class AdProxy extends ProxyElement {
     private function setupAdManager():void {
 
         adManager.addEventListener(LiveRailEvent.INIT_COMPLETE, onLiveRailInitComplete);
+        adManager.addEventListener(LiveRailEvent.AD_BREAK_START, adbreakStart);
+        adManager.addEventListener(LiveRailEvent.AD_BREAK_COMPLETE, adbreakComplete);
         /*adManager.addEventListener(LiveRailEvent.INIT_ERROR, onLiveRailInitError);
 
          adManager.addEventListener(LiveRailEvent.PREROLL_COMPLETE, onLiveRailPrerollComplete);
@@ -198,108 +187,13 @@ public class AdProxy extends ProxyElement {
 
          adManager.addEventListener(LiveRailEvent.AD_PROGRESS,onAdProgress);
 
-         adManager.addEventListener(LiveRailEvent.AD_BREAK_START, adbreakStart);
 
-         adManager.addEventListener(LiveRailEvent.AD_BREAK_COMPLETE, adbreakComplete);
+
+
          */
-        liveRailConfig = new Object();
 
-        // set to true if you are using Junction or false if you are using AdServer
-        liveRailConfig["LR_USE_JUNCTION"] = false;
-
-        // the Junction or the AdServer Publisher ID, located on the Account page of the Publisher;
-        liveRailConfig["LR_PUBLISHER_ID"] = liverailPublisherId;
-        //once we migrate to next platform version
-        liveRailConfig["LR_VERSION"] = liverailVersion;
-
-        //Partner ID maps to CP id
-        liveRailConfig["LR_PARTNERS"] = "SHERBET";
-
-        // a unique code identifying the video played by your Flash player;
-        liveRailConfig["LR_VIDEO_ID"] = programmeId;
-
-        liveRailConfig["LR_LAYOUT_LINEAR_PAUSEONCLICKTHRU"] = false;
-        liveRailConfig["LR_LAYOUT_SKIN_ID"] = 1;
-
-        // ADMAP (optional param)
-        // admap string is: [ad-type]:[timings(start-time,end-time)];
-        // for more details on how to generate the ADMAP please see "Run-time Parameters Specification" pdf document
-        liveRailConfig["LR_ADMAP"] = liveRailAdMap;
-
-        liveRailConfig["LR_TAGS"] = liveRailTags;
-
-        //For now we will set the sting and ident (bumpers) param to default, causing LiveRail to use the defaults
-        //stored in their system. Once we are ready to specify these, then this can be changed.
-        var defaultValue:String = "default";
-
-        liveRailConfig["LR_BUMPER_PREROLL_PRE_HIGH"] = defaultValue;
-        liveRailConfig["LR_BUMPER_PREROLL_POST_HIGH"] = defaultValue;
-        liveRailConfig["LR_BUMPER_PREROLL_PRE_MED"] = defaultValue;
-        liveRailConfig["LR_BUMPER_PREROLL_POST_MED"] = defaultValue;
-        liveRailConfig["LR_BUMPER_PREROLL_PRE_LOW"] = defaultValue;
-        liveRailConfig["LR_BUMPER_PREROLL_POST_LOW"] = defaultValue;
-        liveRailConfig["LR_BUMPER_PREROLL_ADONLY"] = defaultValue;
-
-        liveRailConfig["LR_BUMPER_MIDROLL_PRE_HIGH"] = defaultValue;
-        liveRailConfig["LR_BUMPER_MIDROLL_POST_HIGH"] = defaultValue;
-        liveRailConfig["LR_BUMPER_MIDROLL_PRE_MED"] = defaultValue;
-        liveRailConfig["LR_BUMPER_MIDROLL_POST_MED"] = defaultValue;
-        liveRailConfig["LR_BUMPER_MIDROLL_PRE_LOW"] = defaultValue;
-        liveRailConfig["LR_BUMPER_MIDROLL_POST_LOW"] = defaultValue;
-        liveRailConfig["LR_BUMPER_MIDROLL_ADONLY"] = defaultValue;
-
-        liveRailConfig["LR_BUMPER_POSTROLL_PRE_HIGH"] = defaultValue;
-        liveRailConfig["LR_BUMPER_POSTROLL_POST_HIGH"] = defaultValue;
-        liveRailConfig["LR_BUMPER_POSTROLL_PRE_MED"] = defaultValue;
-        liveRailConfig["LR_BUMPER_POSTROLL_POST_MED"] = defaultValue;
-        liveRailConfig["LR_BUMPER_POSTROLL_PRE_LOW"] = defaultValue;
-        liveRailConfig["LR_BUMPER_POSTROLL_POST_LOW"] = defaultValue;
-        liveRailConfig["LR_BUMPER_POSTROLL_ADONLY"] = defaultValue;
-
-        ////	liveRailConfig["LR_ALLOWDUPLICATES"] = 1;
-
-
-        liveRailConfig["LR_BITRATE"] = "medium";
-        //StatusService.info("Setting LiveRail ad bitrate to "+liveRailConfig["LR_BITRATE"]);
-
-
-        var livRailCOnfigDefault:Object = {
-            "LR_ADMAP": "in::0;in::832.04;in::1818.36;in::100%",
-            "LR_BITRATE" :    "low",
-            "LR_BUMPER_MIDROLL_ADONLY"    :"default",
-            "LR_BUMPER_MIDROLL_POST_HIGH"    :"default",
-            "LR_BUMPER_MIDROLL_POST_LOW" :    "default",
-            "LR_BUMPER_MIDROLL_POST_MED"    : "default",
-            "LR_BUMPER_MIDROLL_PRE_HIGH" :    "default",
-            "LR_BUMPER_MIDROLL_PRE_LOW" :    "default",
-            "LR_BUMPER_MIDROLL_PRE_MED" :    "default",
-            "LR_BUMPER_POSTROLL_ADONLY" :    "default",
-            "LR_BUMPER_POSTROLL_POST_HIGH" :    "default"  ,
-            "LR_BUMPER_POSTROLL_POST_LOW" :    "default"  ,
-            "LR_BUMPER_POSTROLL_POST_MED" :    "default" ,
-            "LR_BUMPER_POSTROLL_PRE_HIGH" :    "default" ,
-            "LR_BUMPER_POSTROLL_PRE_LOW" :    "default"  ,
-            "LR_BUMPER_POSTROLL_PRE_MED" :    "default"  ,
-            "LR_BUMPER_PREROLL_ADONLY" :    "default" ,
-            "LR_BUMPER_PREROLL_POST_HIGH" :    "default"  ,
-            "LR_BUMPER_PREROLL_POST_LOW" :    "default"   ,
-            "LR_BUMPER_PREROLL_POST_MED" :    "default"   ,
-            "LR_BUMPER_PREROLL_PRE_HIGH" :    "default"   ,
-            "LR_BUMPER_PREROLL_PRE_LOW" :    "default"    ,
-            "LR_BUMPER_PREROLL_PRE_MED" :    "default"   ,
-            "LR_LAYOUT_LINEAR_PAUSEONCLICKTHRU" :    false  ,
-            "LR_LAYOUT_SKIN_ID" :    1 ,
-            "LR_PARTNERS" :    "SHERBET" ,
-            "LR_PUBLISHER_ID" :    "1332" ,
-            "LR_TAGS" :    "sourceId_BBCWORLDWIDE,firstPresentationBrand_BBC,minimumAge_18,catchup_false,TVDRAMACONTEMPORARYBRITISH,TVDRAMA,duration_less_than_1_hour",
-            "LR_USE_JUNCTION" :    false,
-            "LR_VERSION" :    "4.1",
-            "LR_VIDEO_ID"    : 11291
-        }
-        adManager.initAds(livRailCOnfigDefault);
-        // comma separated list of keywords describing the content verticals
-        //	pollLoader.stop();
-
+        liverailConfig = new LiverailConfig();
+        adManager.initAds(liverailConfig.config);
 
     }
 
@@ -309,7 +203,44 @@ public class AdProxy extends ProxyElement {
 
 
     private function onLiveRailInitComplete(e:Event):void {
-        adManager.setSize(new Rectangle(0, 0, 300, 200));
+        adManager.setSize(new Rectangle(0, 0, outerViewable.mediaWidth, outerViewable.mediaHeight));
+        adManager.onContentStart();
+    }
+
+
+    private function adbreakStart(e:Event):void {
+
+        if (proxiedElement != null) {
+            var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
+
+            if (playTrait) {
+                if (playTrait.playState == PlayState.PLAYING) {
+                    playTrait.pause();
+
+                }
+
+            }
+
+        }
+    }
+
+    private function adbreakComplete(e:Event):void {
+        if (proxiedElement != null) {
+
+            var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
+
+            if (playTrait) {
+                if (playTrait.playState == PlayState.PAUSED) {
+                    playTrait.play();
+
+                }
+            }
+
+        }
+    }
+
+    public function onContentUpdate(time:Number, duration:Number):void {
+        adManager.onContentUpdate(time, duration);
     }
 
     private function onProxiedTraitsChange(event:MediaElementEvent):void {
@@ -386,11 +317,12 @@ public class AdProxy extends ProxyElement {
 
             if (playTrait) {
                 if (playTrait.playState == PlayState.PLAYING) {
-                    playTrait.pause();
+                    /// playTrait.pause();
+                    onContentUpdate(0, timeTrait.duration);
                     labelText = "[ Advertisement ]" + timeTrait.currentTime;
                 }
                 else if (playTrait.playState == PlayState.PAUSED) {
-                    playTrait.play();
+                    //  playTrait.play();
                     labelText = "";
                 }
             }
