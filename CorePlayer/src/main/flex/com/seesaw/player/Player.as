@@ -22,12 +22,15 @@
 
 package com.seesaw.player {
 import com.seesaw.player.buttons.PlayResumePreviewButton;
+import com.seesaw.player.impl.services.ResumeServiceImpl;
 import com.seesaw.player.init.ServiceRequest;
+import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 import com.seesaw.player.mockData.MockData;
-
 import com.seesaw.player.panels.GuidancePanel;
+
+import com.seesaw.player.services.ResumeService;
 
 import flash.display.LoaderInfo;
 import flash.display.Sprite;
@@ -38,9 +41,9 @@ import flash.events.Event;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.logging.Log;
-import org.osmf.media.MediaResourceBase;
+import org.osmf.net.StreamingURLResource;
 
-[SWF(width=PLAYER::Width, height=PLAYER::Height)]
+[SWF(width=PLAYER::Width, height=PLAYER::Height, backgroundColor="#222222")]
 public class Player extends Sprite {
 
     private static const PLAYER_WIDTH:int = PLAYER::Width;
@@ -60,10 +63,15 @@ public class Player extends Sprite {
     private var _videoPlayer:SeeSawPlayer;
     private var _params:Object;
 
+    // TODO: this is mocked for now
+    private var _playerInitParams = new MockData().playerInit;
+
     public function Player() {
         super();
 
         logger.debug("created new player");
+
+        registerServices();
 
         params = LoaderInfo(this.root.loaderInfo).parameters;
 
@@ -97,11 +105,13 @@ public class Player extends Sprite {
         //guidancePanel.addEventListener("GUIDANCE_DECLINED", this.videoNo);
 
         addChild(guidancePanel);*/
-
-
     }
 
-    private function loadVideo(content:MediaResourceBase):void {
+    private function initialisePlayback() {
+        requestProgrammeData();
+    }
+
+    private function loadVideo(content:StreamingURLResource):void {
         logger.debug("loading video");
 
         if (videoPlayer) {
@@ -129,11 +139,11 @@ public class Player extends Sprite {
 
     private function onSuccessFromVideoInfo(programmeData:Object):void {
         logger.debug("received programme data for programme: " + + programmeData.programme.programmeId);
-        var resource:MediaResourceBase = createMediaResource(programmeData);
+        var resource:StreamingURLResource = createMediaResource(programmeData);
         loadVideo(resource);
     }
 
-    private function createMediaResource(programmeData:Object):MediaResourceBase {
+    private function createMediaResource(programmeData:Object):StreamingURLResource {
         logger.debug("creating media resource");
         return new DynamicStream(programmeData);
     }
@@ -145,8 +155,17 @@ public class Player extends Sprite {
         // VideoPlayerInfo will not return inconsistent or partial state.
 
         // TODO: This should be removed once the new video player info service is up and running
-        var resource:MediaResourceBase = createMediaResource(new MockData().videoPlayerInfo);
+        var resource:StreamingURLResource = createMediaResource(new MockData().videoPlayerInfo);
         loadVideo(resource);
+    }
+
+    /**
+     * Is this the best place for this?
+     */
+    private function registerServices() {
+        logger.debug("registering services");
+        var provider:ObjectProvider = ObjectProvider.getInstance();
+        provider.register(ResumeService, new ResumeServiceImpl());
     }
 
     public function get videoPlayer():SeeSawPlayer {

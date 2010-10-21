@@ -12,6 +12,8 @@ import flash.text.TextFormat;
 
 public class GuidancePanel extends Sprite {
 
+    public static const GUIDANCE_ACCEPTED = "GUIDANCE_ACCEPTED";
+
     //Guidance warning string passed into the constructor
     private var guidanceWarning:String;
     private var guidanceExplanation:String;
@@ -228,7 +230,7 @@ public class GuidancePanel extends Sprite {
 
     private function onAcceptClick(event:MouseEvent):void {
         this.visible = false;
-        this.dispatchEvent(new Event("GUIDANCE_ACCEPTED"));
+        this.dispatchEvent(new Event(GUIDANCE_ACCEPTED));
     }
 
     private function buildDeclineButton(label:String):Sprite {

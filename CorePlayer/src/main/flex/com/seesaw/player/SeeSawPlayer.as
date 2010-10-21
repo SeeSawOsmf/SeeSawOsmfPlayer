@@ -33,6 +33,7 @@ import flash.display.Sprite;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ParallelElement;
+import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
@@ -111,10 +112,25 @@ public class SeeSawPlayer extends Sprite {
     private function onMediaElementCreate(event:MediaFactoryEvent):void {
         logger.debug("created media element: " + event.mediaElement);
 
-        var fullscreen:FullScreenTrait = event.mediaElement.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
-        if (fullscreen) {
-            logger.debug("adding handler for full screen trait: " + event.mediaElement);
-            fullscreen.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
+        event.mediaElement.addEventListener(MediaElementEvent.TRAIT_ADD, onMediaTraitsChange);
+        event.mediaElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onMediaTraitsChange);
+    }
+
+    private function onMediaTraitsChange(event:MediaElementEvent):void {
+        var target = event.target as MediaElement;
+
+        var fullscreen:FullScreenTrait = target.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
+        if (event.type == MediaElementEvent.TRAIT_ADD) {
+            if (fullscreen) {
+                logger.debug("adding handler for full screen trait: " + target);
+                fullscreen.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
+            }
+        }
+        else {
+            if (fullscreen) {
+                logger.debug("adding handler for full screen trait: " + target);
+                fullscreen.removeEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
+            }
         }
     }
 

@@ -26,6 +26,7 @@ import org.osmf.media.DefaultMediaFactory;
 import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaPlayer;
 import org.osmf.media.MediaResourceBase;
+import org.osmf.net.StreamingURLResource;
 
 public class PlayerConfiguration {
 
@@ -35,9 +36,9 @@ public class PlayerConfiguration {
 
     private var _width:int;
     private var _height:int;
-    private var _resource:MediaResourceBase;
+    private var _resource:StreamingURLResource;
 
-    public function PlayerConfiguration(playerWidth:int, playerHeight:int, mediaResource:MediaResourceBase) {
+    public function PlayerConfiguration(playerWidth:int, playerHeight:int, mediaResource:StreamingURLResource) {
         player = new MediaPlayer();
         container = new MediaContainer();
 
@@ -46,11 +47,11 @@ public class PlayerConfiguration {
         resource = mediaResource;
     }
 
-    public function set resource(value:MediaResourceBase):void {
+    public function set resource(value:StreamingURLResource):void {
         _resource = value;
     }
 
-    public function get resource():MediaResourceBase {
+    public function get resource():StreamingURLResource {
         return _resource;
     }
 
