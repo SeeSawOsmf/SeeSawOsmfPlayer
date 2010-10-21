@@ -103,13 +103,6 @@
             <!-- Multi-project Dependencies -->
 
             <dependency>
-                <artifactId>LiverailPlugin</artifactId>
-                <groupId>com.seesaw</groupId>
-                <version>${pom.version}</version>
-                <type>swc</type>
-            </dependency>
-
-            <dependency>
                 <artifactId>ControlBarPlugin</artifactId>
                 <groupId>com.seesaw</groupId>
                 <version>${pom.version}</version>

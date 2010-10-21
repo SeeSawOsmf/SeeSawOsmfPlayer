@@ -107,11 +107,6 @@
         </dependency>
         <dependency>
             <groupId>com.seesaw</groupId>
-            <artifactId>LiverailPlugin</artifactId>
-            <type>swc</type>
-        </dependency>
-        <dependency>
-            <groupId>com.seesaw</groupId>
             <artifactId>DebugProxyPlugin</artifactId>
             <type>swc</type>
         </dependency>
