@@ -21,7 +21,7 @@
  */
 
 package com.seesaw.player {
-import com.seesaw.player.buttons.PlayResumePreviewButton;
+import com.seesaw.player.buttons.PlayStartButton;
 import com.seesaw.player.impl.services.ResumeServiceImpl;
 import com.seesaw.player.init.ServiceRequest;
 import com.seesaw.player.ioc.ObjectProvider;
@@ -29,7 +29,6 @@ import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 import com.seesaw.player.mockData.MockData;
 import com.seesaw.player.panels.GuidancePanel;
-
 import com.seesaw.player.services.ResumeService;
 
 import flash.display.LoaderInfo;
@@ -48,12 +47,6 @@ public class Player extends Sprite {
 
     private static const PLAYER_WIDTH:int = PLAYER::Width;
     private static const PLAYER_HEIGHT:int = PLAYER::Height;
-
-    //constants for the button types
-    private const PLAY:String = "play";
-    private const PLAY_SUBSCRIBED:String = "playSubscribed";
-    private const PREVIEW:String = "preview";
-    private const RESUME:String = "resume";
 
     private static var loggerSetup:* = (LoggerFactory.loggerFactory = new TraceAndArthropodLoggerFactory());
     private static var osmfLoggerSetup:* = (Log.loggerFactory = new CommonsOsmfLoggerFactory());
@@ -89,25 +82,38 @@ public class Player extends Sprite {
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 
         //Play / resume / preview button
-        var playButton = new PlayResumePreviewButton(PLAY);
-        playButton.addEventListener("PROCEED", function(event:Event) {
-            requestProgrammeData();
+        var playButton:PlayStartButton = new PlayStartButton(PlayStartButton.PLAY);
+        playButton.addEventListener(PlayStartButton.PROCEED, function(event:Event) {
+            initialisePlayback();
         });
 
         addChild(playButton);
-
-        //GUIDANCE PANEL
-        /*
-        var guidancePanel = new GuidancePanel("Strong language and adult humour", "This programme isn't suitable for younger viewers", "Please confirm you are aged 18 or older and accept our <a href=\"http://www.seesaw.com/TermsAndConditions\">Terms and Conditions</a>", "http://www.seesaw.com/ParentalControls/TV/Comedy/p-32181-The-Camping-Trip", "http://www.seesaw.com/watchingtv/aboutparentalcontrols");
-        guidancePanel.addEventListener("GUIDANCE_ACCEPTED", function(event:Event) {
-            requestProgrammeData();
-        });
-        //guidancePanel.addEventListener("GUIDANCE_DECLINED", this.videoNo);
-
-        addChild(guidancePanel);*/
     }
 
     private function initialisePlayback() {
+        if (_playerInitParams.guidance) {
+            var guidancePanel = new GuidancePanel(
+                    _playerInitParams.guidanceWarning,
+                    _playerInitParams.guidanceExplanation,
+                    _playerInitParams.guidanceConfirmationMessage,
+                    _playerInitParams.guidanceParentalControlsUrl,
+                    _playerInitParams.guidanceFindOutMoreLink
+                    );
+
+            guidancePanel.addEventListener(GuidancePanel.GUIDANCE_ACCEPTED, function(event:Event) {
+                startPlayback();
+            });
+
+            //guidancePanel.addEventListener("GUIDANCE_DECLINED", this.videoNo);
+
+            addChild(guidancePanel);
+        }
+        else {
+            startPlayback();
+        }
+    }
+
+    private function startPlayback() {
         requestProgrammeData();
     }
 

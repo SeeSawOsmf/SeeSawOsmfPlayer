@@ -3,37 +3,44 @@ import flash.display.Bitmap;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
-import flash.net.URLRequest;
-import flash.net.navigateToURL;
 import flash.system.Security;
-import flash.text.StyleSheet;
-import flash.text.TextField;
-import flash.text.TextFormat;
 
-public class PlayResumePreviewButton extends Sprite {
+public class PlayStartButton extends Sprite {
 
-    //Requested button type - play, resume or preview
+    // the event to listen for
+    public static const PROCEED = "PROCEED";
+
+    // constants for the button types
+    public static const PLAY:String = "play";
+    public static const PLAY_SUBSCRIBED:String = "playSubscribed";
+    public static const PREVIEW:String = "preview";
+    public static const RESUME:String = "resume";
+
+    // Requested button type - play, resume or preview
     private var buttonType:String;
 
     //Embed images
     [Embed(source="resources/playButton.jpg")]
     private var playButtonImageEmbed:Class;
     private var playButtonImage:Bitmap = new playButtonImageEmbed();
+
     [Embed(source="resources/playSubscribedButton.jpg")]
     private var playSubscribedButtonImageEmbed:Class;
     private var playSubscribedButtonImage:Bitmap = new playSubscribedButtonImageEmbed();
+
     [Embed(source="resources/resumeButton.jpg")]
     private var resumeButtonImageEmbed:Class;
     private var resumeButtonImage:Bitmap = new resumeButtonImageEmbed();
+
     [Embed(source="resources/previewButton.jpg")]
     private var previewButtonImageEmbed:Class;
     private var previewButtonImage:Bitmap = new previewButtonImageEmbed();
 
     /*Constructor
-    * Takes: warning:String - the guidance warning that appears at the top of the panel
-    *
-    */
-    public function PlayResumePreviewButton(type:String) {
+     * Takes: warning:String - the guidance warning that appears at the top of the panel
+     *
+     */
+    public function PlayStartButton(type:String) {
 
         this.buttonType = type;
 
@@ -48,7 +55,7 @@ public class PlayResumePreviewButton extends Sprite {
     }
 
     private function positionButton(event:Event):void {
-        this.x = (stage.stageWidth/2) - (this.width / 2);
+        this.x = (stage.stageWidth / 2) - (this.width / 2);
         this.y = (stage.stageHeight / 2) - (this.height / 2);
     }
 
@@ -76,7 +83,8 @@ public class PlayResumePreviewButton extends Sprite {
                 proceedButton.addChild(this.resumeButtonImage);
                 break;
             default:
-
+                // setting an invalid button type is a coding error so throw an exception
+                throw new ArgumentError("button type not recognised: " + buttonType);
         }
 
         proceedButton.addEventListener(MouseEvent.CLICK, this.onProceedClick);
@@ -89,9 +97,9 @@ public class PlayResumePreviewButton extends Sprite {
 
     private function onProceedClick(event:MouseEvent):void {
         this.visible = false;
-        this.dispatchEvent(new Event("PROCEED"));
+        this.dispatchEvent(new Event(PROCEED));
     }
-    
+
 }
 
 }
