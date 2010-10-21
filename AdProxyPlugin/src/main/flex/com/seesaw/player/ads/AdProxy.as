@@ -39,7 +39,6 @@ import flash.utils.Timer;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ProxyElement;
-import org.osmf.elements.SWFElement;
 import org.osmf.events.DisplayObjectEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.media.MediaElement;
@@ -54,15 +53,9 @@ public class AdProxy extends ProxyElement {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(AdProxy);
 
-    private var liveRailElement:SWFElement;
     private var _adManager:*;
     private var liverailLoader:Loader;
     public static var TYPE:String = "LIVERAIL_INTERFACE";
-
-
-    private var modLoaded:Boolean = false;
-
-    private var liveRailModuleLocation:String;
 
 
     public var contentInfo:XML;
@@ -125,7 +118,7 @@ public class AdProxy extends ProxyElement {
 
         blockedTraits = traitsToBlock;
 
-        var timer:Timer = new Timer(5000);
+        var timer:Timer = new Timer(1000);
         timer.addEventListener(TimerEvent.TIMER, onTimerTick);
         timer.start();
     }
@@ -179,6 +172,8 @@ public class AdProxy extends ProxyElement {
     private function setupAdManager():void {
 
         adManager.addEventListener(LiveRailEvent.INIT_COMPLETE, onLiveRailInitComplete);
+        adManager.addEventListener(LiveRailEvent.AD_BREAK_START, adbreakStart);
+        adManager.addEventListener(LiveRailEvent.AD_BREAK_COMPLETE, adbreakComplete);
         /*adManager.addEventListener(LiveRailEvent.INIT_ERROR, onLiveRailInitError);
 
          adManager.addEventListener(LiveRailEvent.PREROLL_COMPLETE, onLiveRailPrerollComplete);
@@ -192,9 +187,9 @@ public class AdProxy extends ProxyElement {
 
          adManager.addEventListener(LiveRailEvent.AD_PROGRESS,onAdProgress);
 
-         adManager.addEventListener(LiveRailEvent.AD_BREAK_START, adbreakStart);
 
-         adManager.addEventListener(LiveRailEvent.AD_BREAK_COMPLETE, adbreakComplete);
+
+
          */
 
         liverailConfig = new LiverailConfig();
@@ -208,7 +203,44 @@ public class AdProxy extends ProxyElement {
 
 
     private function onLiveRailInitComplete(e:Event):void {
-        adManager.setSize(new Rectangle(0, 0, 300, 200));
+        adManager.setSize(new Rectangle(0, 0, outerViewable.mediaWidth, outerViewable.mediaHeight));
+        adManager.onContentStart();
+    }
+
+
+    private function adbreakStart(e:Event):void {
+
+        if (proxiedElement != null) {
+            var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
+
+            if (playTrait) {
+                if (playTrait.playState == PlayState.PLAYING) {
+                    playTrait.pause();
+
+                }
+
+            }
+
+        }
+    }
+
+    private function adbreakComplete(e:Event):void {
+        if (proxiedElement != null) {
+
+            var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
+
+            if (playTrait) {
+                if (playTrait.playState == PlayState.PAUSED) {
+                    playTrait.play();
+
+                }
+            }
+
+        }
+    }
+
+    public function onContentUpdate(time:Number, duration:Number):void {
+        adManager.onContentUpdate(time, duration);
     }
 
     private function onProxiedTraitsChange(event:MediaElementEvent):void {
@@ -285,11 +317,12 @@ public class AdProxy extends ProxyElement {
 
             if (playTrait) {
                 if (playTrait.playState == PlayState.PLAYING) {
-                    playTrait.pause();
+                    /// playTrait.pause();
+                    onContentUpdate(0, timeTrait.duration);
                     labelText = "[ Advertisement ]" + timeTrait.currentTime;
                 }
                 else if (playTrait.playState == PlayState.PAUSED) {
-                    playTrait.play();
+                    //  playTrait.play();
                     labelText = "";
                 }
             }
