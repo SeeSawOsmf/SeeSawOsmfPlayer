@@ -26,6 +26,8 @@ import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 import com.seesaw.player.mockData.MockData;
 
+import com.seesaw.player.panels.GuidancePanel;
+
 import flash.display.LoaderInfo;
 import flash.display.Sprite;
 import flash.display.StageAlign;
@@ -71,7 +73,15 @@ public class Player extends Sprite {
         logger.debug("added to stage");
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 
-        requestProgrammeData();
+        var guidancePanel = new GuidancePanel("Strong language and adult humour", "This programme isn't suitable for younger viewers", "Please confirm you are aged 18 or older and accept our <a href=\"http://www.seesaw.com/TermsAndConditions\">Terms and Conditions</a>", "http://www.seesaw.com/ParentalControls/TV/Comedy/p-32181-The-Camping-Trip", "http://www.seesaw.com/watchingtv/aboutparentalcontrols");
+        guidancePanel.addEventListener("GUIDANCE_ACCEPTED", function(event:Event) {
+            requestProgrammeData();
+        });
+        //guidancePanel.addEventListener("GUIDANCE_DECLINED", this.videoNo);
+
+        addChild(guidancePanel);
+
+
     }
 
     private function loadVideo(content:MediaResourceBase):void {
