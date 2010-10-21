@@ -36,6 +36,7 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.logging.Log;
 import org.osmf.media.MediaResourceBase;
+import org.osmf.net.StreamingURLResource;
 
 [SWF(width=PLAYER::Width, height=PLAYER::Height)]
 public class Player extends Sprite {
@@ -74,7 +75,7 @@ public class Player extends Sprite {
         requestProgrammeData();
     }
 
-    private function loadVideo(content:MediaResourceBase):void {
+    private function loadVideo(content:StreamingURLResource):void {
         logger.debug("loading video");
 
         if (videoPlayer) {
@@ -102,11 +103,11 @@ public class Player extends Sprite {
 
     private function onSuccessFromVideoInfo(programmeData:Object):void {
         logger.debug("received programme data for programme: " + + programmeData.programme.programmeId);
-        var resource:MediaResourceBase = createMediaResource(programmeData);
+        var resource:StreamingURLResource = createMediaResource(programmeData);
         loadVideo(resource);
     }
 
-    private function createMediaResource(programmeData:Object):MediaResourceBase {
+    private function createMediaResource(programmeData:Object):StreamingURLResource {
         logger.debug("creating media resource");
         return new DynamicStream(programmeData);
     }
@@ -118,7 +119,7 @@ public class Player extends Sprite {
         // VideoPlayerInfo will not return inconsistent or partial state.
 
         // TODO: This should be removed once the new video player info service is up and running
-        var resource:MediaResourceBase = createMediaResource(new MockData().videoPlayerInfo);
+        var resource:StreamingURLResource = createMediaResource(new MockData().videoPlayerInfo);
         loadVideo(resource);
     }
 
