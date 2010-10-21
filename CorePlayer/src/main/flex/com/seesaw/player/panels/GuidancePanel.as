@@ -1,8 +1,5 @@
 package com.seesaw.player.panels {
 import flash.display.Bitmap;
-import flash.display.GradientType;
-import flash.display.MovieClip;
-import flash.display.Sprite;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
