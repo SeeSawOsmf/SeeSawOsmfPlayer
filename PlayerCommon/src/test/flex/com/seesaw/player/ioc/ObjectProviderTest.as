@@ -3,7 +3,6 @@ import com.seesaw.player.impl.services.ResumeServiceImpl;
 import com.seesaw.player.services.ResumeService;
 
 import org.flexunit.assertThat;
-import org.flexunit.asserts.assertTrue;
 import org.hamcrest.object.notNullValue;
 
 public class ObjectProviderTest {
