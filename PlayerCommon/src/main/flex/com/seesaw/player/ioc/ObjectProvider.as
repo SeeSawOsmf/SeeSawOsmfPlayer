@@ -39,7 +39,7 @@ public class ObjectProvider {
         _objects = new Dictionary();
     }
 
-    public function getInstance(kind:Class):* {
+    public function getObject(kind:Class):* {
         return _objects[getQualifiedClassName(kind)];
     }
 
