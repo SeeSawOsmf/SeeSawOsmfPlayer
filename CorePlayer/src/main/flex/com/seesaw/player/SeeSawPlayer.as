@@ -23,7 +23,6 @@
 package com.seesaw.player {
 import com.seesaw.player.ads.AdProxyPluginInfo;
 import com.seesaw.player.components.ControlBarComponent;
-import com.seesaw.player.components.LiverailComponent;
 import com.seesaw.player.components.MediaComponent;
 import com.seesaw.player.events.FullScreenEvent;
 import com.seesaw.player.fullscreen.FullScreenProxyPluginInfo;
@@ -73,8 +72,6 @@ public class SeeSawPlayer extends Sprite {
         logger.debug("adding control bar media element to container");
         addMediaElement(new ControlBarComponent());
 
-        logger.debug("adding liverail media element to container");
-        addMediaElement(new LiverailComponent());
     }
 
     private function addMediaElement(component:MediaComponent) {
