@@ -25,7 +25,6 @@ import com.seesaw.player.init.ServiceRequest;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 import com.seesaw.player.mockData.MockData;
-
 import com.seesaw.player.panels.GuidancePanel;
 
 import flash.display.LoaderInfo;
@@ -37,10 +36,9 @@ import flash.events.Event;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.logging.Log;
-import org.osmf.media.MediaResourceBase;
 import org.osmf.net.StreamingURLResource;
 
-[SWF(width=PLAYER::Width, height=PLAYER::Height)]
+[SWF(width=PLAYER::Width, height=PLAYER::Height, backgroundColor="#222222")]
 public class Player extends Sprite {
 
     private static const PLAYER_WIDTH:int = PLAYER::Width;
@@ -53,6 +51,9 @@ public class Player extends Sprite {
 
     private var _videoPlayer:SeeSawPlayer;
     private var _params:Object;
+
+    // TODO: this is mocked for now
+    private var _playerInitParams = new MockData().playerInit;
 
     public function Player() {
         super();
@@ -74,15 +75,29 @@ public class Player extends Sprite {
         logger.debug("added to stage");
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 
-        var guidancePanel = new GuidancePanel("Strong language and adult humour", "This programme isn't suitable for younger viewers", "Please confirm you are aged 18 or older and accept our <a href=\"http://www.seesaw.com/TermsAndConditions\">Terms and Conditions</a>", "http://www.seesaw.com/ParentalControls/TV/Comedy/p-32181-The-Camping-Trip", "http://www.seesaw.com/watchingtv/aboutparentalcontrols");
-        guidancePanel.addEventListener("GUIDANCE_ACCEPTED", function(event:Event) {
-            requestProgrammeData();
-        });
-        //guidancePanel.addEventListener("GUIDANCE_DECLINED", this.videoNo);
+        if (_playerInitParams.guidance) {
+            var guidancePanel = new GuidancePanel(
+                    _playerInitParams.guidanceWarning,
+                    _playerInitParams.guidanceExplanation,
+                    _playerInitParams.guidanceConfirmationMessage,
+                    _playerInitParams.guidanceParentalControlsUrl,
+                    _playerInitParams.guidanceFindOutMoreLink
+            );
+
+            guidancePanel.addEventListener(GuidancePanel.GUIDANCE_ACCEPTED, function(event:Event) {
+                initialisePlayback();
+            });
+            //guidancePanel.addEventListener("GUIDANCE_DECLINED", this.videoNo);
+        }
+        else {
+            initialisePlayback();
+        }
 
         addChild(guidancePanel);
+    }
 
-
+    private function initialisePlayback() {
+        requestProgrammeData();
     }
 
     private function loadVideo(content:StreamingURLResource):void {

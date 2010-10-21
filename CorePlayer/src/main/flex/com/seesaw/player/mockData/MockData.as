@@ -78,7 +78,12 @@ public class MockData {
 
         var playerInitData:Object = {
             "programmeId":10001,
-            "videoPlayerInfoUrl":"http://localhost:8080/player.videoplayerinfo:getvideoplayerinfo?t:ac=TV:COMEDY/p/41001001001/No-Series-programmes-programme-1"
+            "guidance":true,
+            "guidanceWarning":"Strong language and adult humour",
+            "guidanceExplanation":"This programme isn't suitable for younger viewers",
+            "guidanceConfirmationMessage":"Please confirm you are aged 18 or older and accept our <a href=\"http://www.seesaw.com/TermsAndConditions\">Terms and Conditions</a>",
+            "guidanceParentalControlsUrl":"http://www.seesaw.com/ParentalControls/TV/Comedy/p-32181-The-Camping-Trip",
+            "guidanceFindOutMoreLink":"http://www.seesaw.com/watchingtv/aboutparentalcontrols"
         }
         return playerInitData;
     }
