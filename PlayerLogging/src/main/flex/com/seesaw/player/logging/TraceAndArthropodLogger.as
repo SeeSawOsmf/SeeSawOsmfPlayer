@@ -40,8 +40,9 @@ public class TraceAndArthropodLogger extends AbstractLogger {
 
         var colours:Vector.<ColourMap> = new Vector.<ColourMap>;
 
-        colours.push(new ColourMap("uk.vodco.liverail", Debug.RED));
-
+        colours.push(new ColourMap("com.seesaw.player.ads", 0x07ff13));
+        colours.push(new ColourMap("uk.co.vodco.osmfDebugProxy", 0xff00f0));
+        colours.push(new ColourMap("com.seesaw.player.control", 0xfffc00));
 
         for each (var map:ColourMap in colours) {
             if (name.search(map.category) == 0) {

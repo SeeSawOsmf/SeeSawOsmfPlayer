@@ -36,6 +36,8 @@ import flash.text.TextFormat;
 import flash.text.TextFormatAlign;
 import flash.utils.Timer;
 
+import org.as3commons.logging.ILogger;
+import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ProxyElement;
 import org.osmf.elements.SWFElement;
 import org.osmf.events.DisplayObjectEvent;
@@ -48,6 +50,9 @@ import org.osmf.traits.PlayTrait;
 import org.osmf.traits.TimeTrait;
 
 public class AdProxy extends ProxyElement {
+
+
+    private var logger:ILogger = LoggerFactory.getClassLogger(AdProxy);
 
     private var liveRailElement:SWFElement;
     private var _adManager:*;
@@ -115,7 +120,7 @@ public class AdProxy extends ProxyElement {
 
         var traitsToBlock:Vector.<String> = new Vector.<String>();
         traitsToBlock[0] = MediaTraitType.SEEK;
-        traitsToBlock[1] = MediaTraitType.TIME;
+        //   traitsToBlock[1] = MediaTraitType.TIME;
 
         blockedTraits = traitsToBlock;
 
@@ -304,12 +309,7 @@ public class AdProxy extends ProxyElement {
 
 
     private function onLiveRailInitComplete(e:Event):void {
-        var eo:Object = e as Object;
-
-        ///	LR_AdvertsArray = e.currentTarget._adModel._adPovider.adResult.ads;  Liverail advert results array. this is however not accessable...
-
         adManager.setSize(new Rectangle(0, 0, 300, 200));
-        ///dispatchEvent( new LiveRailEvent(LiveRailEvent.INIT_COMPLETE,eo.data));
     }
 
     private function onProxiedTraitsChange(event:MediaElementEvent):void {
@@ -387,7 +387,7 @@ public class AdProxy extends ProxyElement {
             if (playTrait) {
                 if (playTrait.playState == PlayState.PLAYING) {
                     playTrait.pause();
-                    labelText = "[ Advertisement ]";
+                    labelText = "[ Advertisement ]" + timeTrait.currentTime;
                 }
                 else if (playTrait.playState == PlayState.PAUSED) {
                     playTrait.play();
