@@ -55,6 +55,13 @@ public class GuidancePanel extends Sprite {
         //Build the panel and add it to the GuidancePanel MovieClip
         addChild(this.buildPanel());
 
+        this.addEventListener(Event.ADDED_TO_STAGE, this.positionPanel);
+
+    }
+
+    private function positionPanel(event:Event):void {
+        this.x = (stage.stageWidth/2) - (this.width / 2);
+        this.y = (stage.stageHeight / 2) - (this.height / 2);
     }
 
     private function buildCSS():void {
@@ -84,7 +91,6 @@ public class GuidancePanel extends Sprite {
 
         return panel;
 
-        //addChild(panel);
     }
 
     private function buildPanelBG():Sprite {
