@@ -22,6 +22,8 @@
 
 package com.seesaw.player.ads {
 import com.seesaw.player.ads.events.LiveRailEvent;
+import com.seesaw.player.traits.ads.AdTrait;
+import com.seesaw.player.traits.ads.AdTraitType;
 
 import flash.display.Loader;
 import flash.display.Sprite;
@@ -96,6 +98,7 @@ public class AdProxy extends ProxyElement {
     public var liverailPublisherId:String;
     public var programmeId:Number;
     private var liverailConfig:LiverailConfig;
+    private var adTrait:AdTrait = new AdTrait();
 
     public function AdProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -148,6 +151,7 @@ public class AdProxy extends ProxyElement {
 
                 }
 
+                addTrait(AdTraitType.PLAY, adTrait);
                 createLiverail();
                 //   var value:* = proxiedElement.resource.getMetadataValue("contentInfo");
                 //  blockedTraits = new Vector.<String>();    todo use this to clear the blockedtraits list...
@@ -289,6 +293,15 @@ public class AdProxy extends ProxyElement {
 
             }
 
+            var adTrait:AdTrait = proxiedElement.getTrait(AdTraitType.PLAY) as AdTrait;
+
+            if (adTrait) {
+                /*  if (adTrait.playState == AdState.PAUSED) {
+                 blockedTraits = new Vector.<String>();
+                 adTrait.play();
+                 */
+            }
+
         }
     }
 
@@ -315,7 +328,10 @@ public class AdProxy extends ProxyElement {
     }
 
     private function onProxiedTraitsChange(event:MediaElementEvent):void {
+
         if (event.type == MediaElementEvent.TRAIT_ADD) {
+
+
             if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
                 innerViewable = DisplayObjectTrait(proxiedElement.getTrait(event.traitType));
                 if (_innerViewable) {
@@ -333,6 +349,8 @@ public class AdProxy extends ProxyElement {
                 removeTrait(MediaTraitType.DISPLAY_OBJECT);
             }
         }
+        ///    _fullscreenTrait = element.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
+
     }
 
     private function set innerViewable(value:DisplayObjectTrait):void {
