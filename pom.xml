@@ -1,4 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2010 ioko365 Ltd.  All Rights Reserved.
+  ~
+  ~    The contents of this file are subject to the Mozilla Public License
+  ~    Version 1.1 (the "License"); you may not use this file except in
+  ~    compliance with the License. You may obtain a copy of the
+  ~    License athttp://www.mozilla.org/MPL/
+  ~
+  ~    Software distributed under the License is distributed on an "AS IS"
+  ~    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+  ~    License for the specific language governing rights and limitations
+  ~    under the License.
+  ~
+  ~    The Initial Developer of the Original Code is ioko365 Ltd.
+  ~    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
+  ~    Incorporated. All Rights Reserved.
+  ~
+  ~    The Initial Developer of the Original Code is ioko365 Ltd.
+  ~    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
+  ~    Incorporated. All Rights Reserved.
+  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -19,10 +40,11 @@
         <module>DebugProxyPlugin</module>
         <module>LiverailPlugin</module>
         <module>CanvasPoc</module>
-        <module>PlayerControlsPlugin</module>
         <module>PlayerLogging</module>
         <module>PlayerInitialisation</module>
-        <module>DefaultProxyPlugin</module>
+        <module>FullScreenProxyPlugin</module>
+        <module>AdProxyPlugin</module>
+        <module>PlayerCommon</module>
     </modules>
 
     <developers>
@@ -30,6 +52,14 @@
             <id>bgidley</id>
             <name>Ben Gidley</name>
             <url>http://www.gidley.co.uk/</url>
+        </developer>
+        <developer>
+            <id>ibhana</id>
+            <name>Ismail Bhana</name>
+        </developer>
+        <developer>
+            <id>bmeade</id>
+            <name>Brendan Meade</name>
         </developer>
     </developers>
 
@@ -87,20 +117,13 @@
             </dependency>
 
             <dependency>
-                <artifactId>PlayerControlsPlugin</artifactId>
-                <groupId>com.seesaw</groupId>
-                <version>${pom.version}</version>
-                <type>swc</type>
-            </dependency>
-
-            <dependency>
                 <artifactId>DebugProxyPlugin</artifactId>
                 <groupId>com.seesaw</groupId>
                 <version>${pom.version}</version>
                 <type>swc</type>
             </dependency>
             <dependency>
-                <artifactId>DefaultProxyPlugin</artifactId>
+                <artifactId>FullScreenProxyPlugin</artifactId>
                 <groupId>com.seesaw</groupId>
                 <version>${pom.version}</version>
                 <type>swc</type>
@@ -111,9 +134,20 @@
                 <version>${pom.version}</version>
                 <type>swc</type>
             </dependency>
-
             <dependency>
                 <artifactId>PlayerInitialisation</artifactId>
+                <groupId>com.seesaw</groupId>
+                <version>${pom.version}</version>
+                <type>swc</type>
+            </dependency>
+            <dependency>
+                <artifactId>AdProxyPlugin</artifactId>
+                <groupId>com.seesaw</groupId>
+                <version>${pom.version}</version>
+                <type>swc</type>
+            </dependency>
+            <dependency>
+                <artifactId>PlayerCommon</artifactId>
                 <groupId>com.seesaw</groupId>
                 <version>${pom.version}</version>
                 <type>swc</type>
@@ -230,7 +264,7 @@
     </reporting>
 
     <properties>
-        <flex.sdk.version>4.0.0.14159</flex.sdk.version>
+        <flex.sdk.version>4.5.0.17855</flex.sdk.version>
         <osmf.version>1.0</osmf.version>
     </properties>
 
