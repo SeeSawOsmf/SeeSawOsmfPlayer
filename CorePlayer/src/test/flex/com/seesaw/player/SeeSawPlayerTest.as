@@ -20,7 +20,7 @@
 package com.seesaw.player {
 import org.flexunit.assertThat;
 import org.hamcrest.object.notNullValue;
-import org.osmf.media.URLResource;
+import org.osmf.net.StreamingURLResource;
 
 public class SeeSawPlayerTest {
 
@@ -32,7 +32,7 @@ public class SeeSawPlayerTest {
 
     [Test]
     public function playerCanInitialise():void {
-        var config:PlayerConfiguration = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, new URLResource(VIDEO_URL));
+        var config:PlayerConfiguration = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, new StreamingURLResource(VIDEO_URL));
         var player:SeeSawPlayer = new SeeSawPlayer(config);
         assertThat(player, notNullValue());
     }

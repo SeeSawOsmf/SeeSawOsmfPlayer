@@ -1,8 +1,5 @@
 package com.seesaw.player.panels {
 import flash.display.Bitmap;
-import flash.display.GradientType;
-import flash.display.MovieClip;
-import flash.display.Sprite;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
@@ -14,6 +11,8 @@ import flash.text.TextField;
 import flash.text.TextFormat;
 
 public class GuidancePanel extends Sprite {
+
+    public static const GUIDANCE_ACCEPTED = "GUIDANCE_ACCEPTED";
 
     //Guidance warning string passed into the constructor
     private var guidanceWarning:String;
@@ -231,7 +230,7 @@ public class GuidancePanel extends Sprite {
 
     private function onAcceptClick(event:MouseEvent):void {
         this.visible = false;
-        this.dispatchEvent(new Event("GUIDANCE_ACCEPTED"));
+        this.dispatchEvent(new Event(GUIDANCE_ACCEPTED));
     }
 
     private function buildDeclineButton(label:String):Sprite {
