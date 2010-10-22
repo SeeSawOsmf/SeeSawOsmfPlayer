@@ -165,7 +165,14 @@ public class AdProxy extends ProxyElement {
 
     override protected function setupTraits():void {
         logger.debug("setupTraits");
+
+
+        //    innerViewable = new DisplayObjectTrait(controlBar, controlBar.measuredWidth, controlBar.measuredHeight);;
+
+        //    addTrait(MediaTraitType.DISPLAY_OBJECT, outerViewable);
+
         addTrait(AdTraitType.PLAY, adTrait);
+        super.setupTraits();
     }
 
 
