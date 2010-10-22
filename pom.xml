@@ -45,7 +45,6 @@
         <module>FullScreenProxyPlugin</module>
         <module>AdProxyPlugin</module>
         <module>PlayerCommon</module>
-        <module>AdTraitsProxyPlugin</module>
     </modules>
 
     <developers>
