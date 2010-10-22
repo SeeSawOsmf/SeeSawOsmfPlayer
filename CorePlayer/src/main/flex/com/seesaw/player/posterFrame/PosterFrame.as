@@ -6,6 +6,7 @@ import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.net.URLRequest;
 import flash.net.navigateToURL;
+import flash.system.LoaderContext;
 import flash.system.Security;
 import flash.text.StyleSheet;
 import flash.text.TextField;
@@ -44,10 +45,14 @@ public class PosterFrame extends Sprite {
         //get the image url
         var url:String = this.posterFrameURL;
 
+        //loaderContext to prevent the cross domain issues...
+        var loaderContext = new LoaderContext(true);
+
         var pictLdr:Loader = new Loader();
 		var pictURL:String = this.posterFrameURL;
+
 		var pictURLReq:URLRequest = new URLRequest(pictURL);
-		pictLdr.load(pictURLReq);
+		pictLdr.load(pictURLReq, loaderContext);
 
         return pictLdr;
 
@@ -63,7 +68,9 @@ public class PosterFrame extends Sprite {
 
     private function sizePosterFrame(event:Event):void {
 
-        //event.currentTarget.width = stage.stageWidth;
+        var image:Bitmap = Bitmap(event.currentTarget.content);
+        image.width = stage.stageWidth;
+        image.height = stage.stageHeight;
         this.dispatchEvent(new Event(LOADED));
         
     }
