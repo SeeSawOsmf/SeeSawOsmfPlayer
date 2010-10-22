@@ -30,6 +30,7 @@ import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 import com.seesaw.player.mockData.MockData;
 import com.seesaw.player.panels.GuidancePanel;
 
+import com.seesaw.player.posterFrame.PosterFrame;
 import com.seesaw.player.services.ResumeService;
 
 import flash.display.LoaderInfo;
@@ -87,6 +88,9 @@ public class Player extends Sprite {
     private function onAddedToStage(event:Event):void {
         logger.debug("added to stage");
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+
+        var posterFrame = new PosterFrame("http://www.seesaw.com/i/ccp/00000210/21035.jpg");
+        addChild(posterFrame);
 
         //Play / resume / preview button
         var playButton = new PlayResumePreviewButton(PLAY);
