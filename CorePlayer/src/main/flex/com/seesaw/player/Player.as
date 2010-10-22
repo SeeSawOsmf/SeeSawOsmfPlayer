@@ -91,9 +91,10 @@ public class Player extends Sprite {
     private function resetPreInitStages() {
         // sets the order of stuff to evaluate during initialisation
         _preInitStages = new Vector.<Function>();
-        _preInitStages[0] = showPlayPanel;
-        _preInitStages[1] = showGuidancePanel;
-        _preInitStages[2] = attemptPlaybackStart;
+        _preInitStages[0] = showPosterFrame;
+        _preInitStages[1] = showPlayPanel;
+        _preInitStages[2] = showGuidancePanel;
+        _preInitStages[3] = attemptPlaybackStart;
     }
 
     private function evaluatePreInitStages():void {
@@ -102,6 +103,15 @@ public class Player extends Sprite {
         if (initialisationStage) {
             initialisationStage.call(this);
         }
+    }
+
+    private function showPosterFrame():void {
+        //Play / resume / preview button
+        var posterFrame = new PosterFrame("http://www.seesaw.com/i/ccp/00000210/21035.jpg");
+        posterFrame.addEventListener(PosterFrame.LOADED, function(event:Event) {
+            evaluatePreInitStages();
+        });
+        addChild(posterFrame);
     }
 
     private function showPlayPanel():void {

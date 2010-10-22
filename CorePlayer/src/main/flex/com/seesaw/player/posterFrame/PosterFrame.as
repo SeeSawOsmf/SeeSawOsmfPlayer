@@ -13,6 +13,9 @@ import flash.text.TextFormat;
 
 public class PosterFrame extends Sprite {
 
+    // the event to listen for
+    public static const LOADED = "LOADED";
+
     private var posterFrameURL:String;
 
     private var loadedImage:Loader;
@@ -60,7 +63,8 @@ public class PosterFrame extends Sprite {
 
     private function sizePosterFrame(event:Event):void {
 
-        event.currentTarget.width = stage.stageWidth;
+        //event.currentTarget.width = stage.stageWidth;
+        this.dispatchEvent(new Event(LOADED));
         
     }
 
