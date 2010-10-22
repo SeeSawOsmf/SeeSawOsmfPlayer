@@ -224,7 +224,7 @@ public class DebugProxyElement extends ProxyElement {
     }
 
     private function onLoadableStateChange(event:LoadEvent):void {
-        /// logger.debug("Load state change:{0}", event.loadState);
+        logger.debug("Load state change:{0}", event.loadState);
     }
 
     private function toggleBufferListeners(added:Boolean):void {

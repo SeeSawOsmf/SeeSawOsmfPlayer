@@ -25,7 +25,6 @@ import com.seesaw.player.ads.AdProxyPluginInfo;
 import com.seesaw.player.components.ControlBarComponent;
 import com.seesaw.player.components.MediaComponent;
 import com.seesaw.player.events.FullScreenEvent;
-import com.seesaw.player.fullscreen.FullScreenProxyPluginInfo;
 import com.seesaw.player.traits.FullScreenTrait;
 
 import flash.display.Sprite;
@@ -82,7 +81,7 @@ public class SeeSawPlayer extends Sprite {
 
     private function createVideoElement():void {
         logger.debug("loading the proxy plugins that wrap the video element");
-        config.factory.loadPlugin(new PluginInfoResource(new FullScreenProxyPluginInfo()));
+        // config.factory.loadPlugin(new PluginInfoResource(new FullScreenProxyPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
 
