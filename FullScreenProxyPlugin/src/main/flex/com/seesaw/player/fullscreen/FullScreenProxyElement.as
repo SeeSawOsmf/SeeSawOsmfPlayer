@@ -21,6 +21,8 @@
  */
 package com.seesaw.player.fullscreen {
 import com.seesaw.player.traits.FullScreenTrait;
+import com.seesaw.player.traits.ads.AdTrait;
+import com.seesaw.player.traits.ads.AdTraitType;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -38,6 +40,7 @@ public class FullScreenProxyElement extends ProxyElement {
 
     override protected function setupTraits():void {
         logger.debug("setupTraits");
+        addTrait(AdTraitType.AD_PLAY, new AdTrait());
         addTrait(FullScreenTrait.FULL_SCREEN, new FullScreenTrait());
         super.setupTraits();
     }

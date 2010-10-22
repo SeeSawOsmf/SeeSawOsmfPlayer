@@ -39,7 +39,7 @@ public final class AdTraitType {
 
     public static const LOAD:String = "load";
 
-    public static const PLAY:String = "play";
+    public static const AD_PLAY:String = "adPlay";
 
     public static const SEEK:String = "seek";
 
@@ -55,7 +55,7 @@ public final class AdTraitType {
                 , DRM
                 , DYNAMIC_STREAM
                 , LOAD
-                , PLAY
+                , AD_PLAY
                 , SEEK
                 , TIME
                 , DISPLAY_OBJECT

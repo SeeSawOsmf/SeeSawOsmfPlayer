@@ -98,7 +98,8 @@ public class AdProxy extends ProxyElement {
     public var liverailPublisherId:String;
     public var programmeId:Number;
     private var liverailConfig:LiverailConfig;
-    private var adTrait:AdTrait = new AdTrait();
+    private var adTrait:AdTrait;
+    private var target:MediaElement;
 
     public function AdProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -149,6 +150,9 @@ public class AdProxy extends ProxyElement {
                     proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onProxiedTraitsChange);
 
 
+                    for each (traitType in proxiedElement.traitTypes) {
+                        processTrait(traitType, true);
+                    }
                 }
 
 
@@ -163,21 +167,26 @@ public class AdProxy extends ProxyElement {
         }
     }
 
+
     override protected function setupTraits():void {
         logger.debug("setupTraits");
 
 
-        //    innerViewable = new DisplayObjectTrait(controlBar, controlBar.measuredWidth, controlBar.measuredHeight);;
+    }
 
-        //    addTrait(MediaTraitType.DISPLAY_OBJECT, outerViewable);
 
-        addTrait(AdTraitType.PLAY, adTrait);
-        super.setupTraits();
+    function processRequiredTraits(element:MediaElement):void {
+
+
+        var adTrait:AdTrait = element.getTrait(AdTraitType.AD_PLAY) as AdTrait;
+        trace("hello");
     }
 
 
     private function processTrait(traitType:String, added:Boolean):void {
+        logger.debug(" --------- traitType -----------" + traitType);
         switch (traitType) {
+
             case MediaTraitType.AUDIO:
 
                 break;
@@ -306,7 +315,6 @@ public class AdProxy extends ProxyElement {
 
             }
 
-            var adTrait:AdTrait = proxiedElement.getTrait(AdTraitType.PLAY) as AdTrait;
 
             if (adTrait) {
                 /*  if (adTrait.playState == AdState.PAUSED) {
@@ -353,6 +361,7 @@ public class AdProxy extends ProxyElement {
                 }
             }
 
+
             /*  if(event.traitType == MediaTraitType.LOAD){
              processTrait(event.traitType, true);    todo look a why the outerViewable State is not being set if the mainContent is paused using the onLoadableStateChange listener
              } */
@@ -363,7 +372,7 @@ public class AdProxy extends ProxyElement {
             }
         }
         ///    _fullscreenTrait = element.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
-
+        // processTrait(event.traitType, true);
     }
 
     private function set innerViewable(value:DisplayObjectTrait):void {
