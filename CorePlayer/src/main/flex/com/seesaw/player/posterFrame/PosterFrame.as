@@ -71,6 +71,7 @@ public class PosterFrame extends Sprite {
         var image:Bitmap = Bitmap(event.currentTarget.content);
         image.width = stage.stageWidth;
         image.height = stage.stageHeight;
+        image.smoothing = true;
         this.dispatchEvent(new Event(LOADED));
         
     }
