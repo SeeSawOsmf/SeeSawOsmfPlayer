@@ -29,6 +29,8 @@ import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 import com.seesaw.player.mockData.MockData;
 import com.seesaw.player.panels.GuidancePanel;
+
+import com.seesaw.player.posterFrame.PosterFrame;
 import com.seesaw.player.services.ResumeService;
 
 import flash.display.LoaderInfo;
@@ -59,6 +61,8 @@ public class Player extends Sprite {
     // TODO: this is mocked for now
     private var _playerInitParams = new MockData().playerInit;
 
+    private var _preInitStages:Vector.<Function>;
+
     public function Player() {
         super();
 
@@ -80,17 +84,46 @@ public class Player extends Sprite {
     private function onAddedToStage(event:Event):void {
         logger.debug("added to stage");
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+        resetPreInitStages();
+        evaluatePreInitStages();
+    }
 
+    private function resetPreInitStages() {
+        // sets the order of stuff to evaluate during initialisation
+        _preInitStages = new Vector.<Function>();
+        _preInitStages[0] = showPosterFrame;
+        _preInitStages[1] = showPlayPanel;
+        _preInitStages[2] = showGuidancePanel;
+        _preInitStages[3] = attemptPlaybackStart;
+    }
+
+    private function evaluatePreInitStages():void {
+        // remove the next initialisation step and evaluate it
+        var initialisationStage:Function = _preInitStages.shift();
+        if (initialisationStage) {
+            initialisationStage.call(this);
+        }
+    }
+
+    private function showPosterFrame():void {
+        //Play / resume / preview button
+        var posterFrame = new PosterFrame("http://www.seesaw.com/i/ccp/00000210/21035.jpg");
+        posterFrame.addEventListener(PosterFrame.LOADED, function(event:Event) {
+            evaluatePreInitStages();
+        });
+        addChild(posterFrame);
+    }
+
+    private function showPlayPanel():void {
         //Play / resume / preview button
         var playButton:PlayStartButton = new PlayStartButton(PlayStartButton.PLAY);
         playButton.addEventListener(PlayStartButton.PROCEED, function(event:Event) {
-            initialisePlayback();
+            evaluatePreInitStages();
         });
-
         addChild(playButton);
     }
 
-    private function initialisePlayback() {
+    private function showGuidancePanel():void {
         if (_playerInitParams.guidance) {
             var guidancePanel = new GuidancePanel(
                     _playerInitParams.guidanceWarning,
@@ -101,20 +134,38 @@ public class Player extends Sprite {
                     );
 
             guidancePanel.addEventListener(GuidancePanel.GUIDANCE_ACCEPTED, function(event:Event) {
-                startPlayback();
+                evaluatePreInitStages();
             });
 
-            //guidancePanel.addEventListener("GUIDANCE_DECLINED", this.videoNo);
+            guidancePanel.addEventListener(GuidancePanel.GUIDANCE_DECLINED, function(event:Event) {
+                resetPreInitStages(); // sends the user back to stage 1
+                evaluatePreInitStages();
+            });
 
             addChild(guidancePanel);
         }
         else {
-            startPlayback();
+            evaluatePreInitStages();
         }
     }
 
-    private function startPlayback() {
+    private function attemptPlaybackStart():void {
         requestProgrammeData();
+    }
+
+    private function requestProgrammeData():void {
+        logger.debug("requesting programme data: " + params.videoPlayerInfo);
+
+        var request:ServiceRequest = new ServiceRequest(params.videoPlayerInfo);
+        request.successCallback = onSuccessFromVideoInfo;
+        request.failCallback = onFailFromVideoInfo;
+        request.submit();
+    }
+
+    private function onSuccessFromVideoInfo(programmeData:Object):void {
+        logger.debug("received programme data for programme: " + + programmeData.programme.programmeId);
+        var resource:StreamingURLResource = createMediaResource(programmeData);
+        loadVideo(resource);
     }
 
     private function loadVideo(content:StreamingURLResource):void {
@@ -132,21 +183,6 @@ public class Player extends Sprite {
         videoPlayer = new SeeSawPlayer(config);
 
         addChild(videoPlayer);
-    }
-
-    private function requestProgrammeData():void {
-        logger.debug("requesting programme data: " + params.videoPlayerInfo);
-
-        var request:ServiceRequest = new ServiceRequest(params.videoPlayerInfo);
-        request.successCallback = onSuccessFromVideoInfo;
-        request.failCallback = onFailFromVideoInfo;
-        request.submit();
-    }
-
-    private function onSuccessFromVideoInfo(programmeData:Object):void {
-        logger.debug("received programme data for programme: " + + programmeData.programme.programmeId);
-        var resource:StreamingURLResource = createMediaResource(programmeData);
-        loadVideo(resource);
     }
 
     private function createMediaResource(programmeData:Object):StreamingURLResource {

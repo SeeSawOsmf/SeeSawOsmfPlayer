@@ -20,19 +20,16 @@ public class PlayStartButton extends Sprite {
     private var buttonType:String;
 
     //Embed images
-    [Embed(source="resources/playButton.jpg")]
+    [Embed(source="resources/preplayButton.png")]
     private var playButtonImageEmbed:Class;
     private var playButtonImage:Bitmap = new playButtonImageEmbed();
-
-    [Embed(source="resources/playSubscribedButton.jpg")]
+    [Embed(source="resources/Player_Subscribed.png")]
     private var playSubscribedButtonImageEmbed:Class;
     private var playSubscribedButtonImage:Bitmap = new playSubscribedButtonImageEmbed();
-
-    [Embed(source="resources/resumeButton.jpg")]
+    [Embed(source="resources/resumePreplayButton.png")]
     private var resumeButtonImageEmbed:Class;
     private var resumeButtonImage:Bitmap = new resumeButtonImageEmbed();
-
-    [Embed(source="resources/previewButton.jpg")]
+    [Embed(source="resources/Player_Preview.png")]
     private var previewButtonImageEmbed:Class;
     private var previewButtonImage:Bitmap = new previewButtonImageEmbed();
 

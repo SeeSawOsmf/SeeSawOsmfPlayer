@@ -13,6 +13,7 @@ import flash.text.TextFormat;
 public class GuidancePanel extends Sprite {
 
     public static const GUIDANCE_ACCEPTED = "GUIDANCE_ACCEPTED";
+    public static const GUIDANCE_DECLINED = "GUIDANCE_DECLINED";
 
     //Guidance warning string passed into the constructor
     private var guidanceWarning:String;
@@ -279,7 +280,7 @@ public class GuidancePanel extends Sprite {
 
     private function onDeclineClick(event:MouseEvent):void {
         this.visible = false;
-        this.dispatchEvent(new Event("GUIDANCE_DECLINED"));
+        this.dispatchEvent(new Event(GUIDANCE_DECLINED));
     }
 
     private function buildParentalControlsLink():Sprite {
