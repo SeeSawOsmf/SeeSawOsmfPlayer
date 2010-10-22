@@ -90,7 +90,7 @@ public class LiverailConfig {
 
          */
         _config = {
-            "LR_ADMAP": "in::0;in::832.04;in::1818.36;in::100%",
+            "LR_ADMAP": "in::0;in::60.04;in::1818.36;in::100%",
             "LR_BITRATE" :    "low",
             "LR_BUMPER_MIDROLL_ADONLY"    :"default",
             "LR_BUMPER_MIDROLL_POST_HIGH"    :"default",

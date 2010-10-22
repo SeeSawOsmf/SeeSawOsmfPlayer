@@ -22,6 +22,8 @@
 
 package com.seesaw.player.ads {
 import com.seesaw.player.ads.events.LiveRailEvent;
+import com.seesaw.player.traits.ads.AdTrait;
+import com.seesaw.player.traits.ads.AdTraitType;
 
 import flash.display.Loader;
 import flash.display.Sprite;
@@ -96,6 +98,7 @@ public class AdProxy extends ProxyElement {
     public var liverailPublisherId:String;
     public var programmeId:Number;
     private var liverailConfig:LiverailConfig;
+    private var adTrait:AdTrait = new AdTrait();
 
     public function AdProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -120,9 +123,7 @@ public class AdProxy extends ProxyElement {
 
         blockedTraits = traitsToBlock;
 
-        var timer:Timer = new Timer(1000);
-        timer.addEventListener(TimerEvent.TIMER, onTimerTick);
-        timer.start();
+
     }
 
     public override function set proxiedElement(proxiedElement:MediaElement):void {
@@ -150,6 +151,7 @@ public class AdProxy extends ProxyElement {
 
                 }
 
+
                 createLiverail();
                 //   var value:* = proxiedElement.resource.getMetadataValue("contentInfo");
                 //  blockedTraits = new Vector.<String>();    todo use this to clear the blockedtraits list...
@@ -159,6 +161,18 @@ public class AdProxy extends ProxyElement {
         } catch(e:Error) {
 
         }
+    }
+
+    override protected function setupTraits():void {
+        logger.debug("setupTraits");
+
+
+        //    innerViewable = new DisplayObjectTrait(controlBar, controlBar.measuredWidth, controlBar.measuredHeight);;
+
+        //    addTrait(MediaTraitType.DISPLAY_OBJECT, outerViewable);
+
+        addTrait(AdTraitType.PLAY, adTrait);
+        super.setupTraits();
     }
 
 
@@ -222,7 +236,7 @@ public class AdProxy extends ProxyElement {
 
 
     private function onLoadComplete(event:Event):void {
-
+        logger.debug("Liverail Loaded ---- onLoadComplete")
         _adManager = liverailLoader.content;
         displayObject.addChild(_adManager);
 
@@ -267,6 +281,7 @@ public class AdProxy extends ProxyElement {
 
 
     private function onLiveRailInitComplete(e:Event):void {
+        logger.debug("Liverail ---- onLiveRailInitComplete")
         adManager.setSize(new Rectangle(0, 0, outerViewable.mediaWidth, outerViewable.mediaHeight));
         adManager.onContentStart();
     }
@@ -279,10 +294,25 @@ public class AdProxy extends ProxyElement {
 
             if (playTrait) {
                 if (playTrait.playState == PlayState.PLAYING) {
+
+                    var traitsToBlock:Vector.<String> = new Vector.<String>();
+                    traitsToBlock[0] = MediaTraitType.SEEK;
+                    traitsToBlock[1] = MediaTraitType.TIME;
+
+                    blockedTraits = traitsToBlock;
                     playTrait.pause();
 
                 }
 
+            }
+
+            var adTrait:AdTrait = proxiedElement.getTrait(AdTraitType.PLAY) as AdTrait;
+
+            if (adTrait) {
+                /*  if (adTrait.playState == AdState.PAUSED) {
+                 blockedTraits = new Vector.<String>();
+                 adTrait.play();
+                 */
             }
 
         }
@@ -295,8 +325,11 @@ public class AdProxy extends ProxyElement {
 
             if (playTrait) {
                 if (playTrait.playState == PlayState.PAUSED) {
+                    blockedTraits = new Vector.<String>();
                     playTrait.play();
-
+                    var timer:Timer = new Timer(1000);
+                    timer.addEventListener(TimerEvent.TIMER, onTimerTick);
+                    timer.start();
                 }
             }
 
@@ -308,7 +341,10 @@ public class AdProxy extends ProxyElement {
     }
 
     private function onProxiedTraitsChange(event:MediaElementEvent):void {
+
         if (event.type == MediaElementEvent.TRAIT_ADD) {
+
+
             if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
                 innerViewable = DisplayObjectTrait(proxiedElement.getTrait(event.traitType));
                 if (_innerViewable) {
@@ -326,6 +362,8 @@ public class AdProxy extends ProxyElement {
                 removeTrait(MediaTraitType.DISPLAY_OBJECT);
             }
         }
+        ///    _fullscreenTrait = element.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
+
     }
 
     private function set innerViewable(value:DisplayObjectTrait):void {
@@ -386,7 +424,7 @@ public class AdProxy extends ProxyElement {
             if (playTrait) {
                 if (playTrait.playState == PlayState.PLAYING) {
                     /// playTrait.pause();
-                    //    onContentUpdate(0, timeTrait.duration);
+                    onContentUpdate(timeTrait.currentTime, timeTrait.duration);
                     labelText = "[ Advertisement ]" + timeTrait.currentTime;
                 }
                 else if (playTrait.playState == PlayState.PAUSED) {
