@@ -32,9 +32,10 @@ import org.osmf.media.MediaElement;
 public class FullScreenProxyElement extends ProxyElement {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(FullScreenProxyElement);
+    public static const ID:String = "com.seesaw.player.traitAdded";
 
     public function FullScreenProxyElement(proxiedElement:MediaElement = null) {
-        logger.debug("com.seesaw.player.fullscreen.FullScreenProxyElement()");
+
         super(proxiedElement);
     }
 

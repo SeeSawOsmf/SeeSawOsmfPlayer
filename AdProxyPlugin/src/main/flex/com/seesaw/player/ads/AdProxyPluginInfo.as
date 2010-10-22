@@ -21,6 +21,9 @@
  */
 
 package com.seesaw.player.ads {
+import com.seesaw.player.traits.ads.AdTrait;
+import com.seesaw.player.traits.ads.AdTraitType;
+
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.media.MediaElement;
@@ -36,6 +39,7 @@ public class AdProxyPluginInfo extends PluginInfo {
 
     public static const ID:String = "com.seesaw.player.ads.AdProxy";
     private static var adProxy:AdProxy;
+    private var adTrait:AdTrait;
 
     public function AdProxyPluginInfo() {
         logger.debug("AdProxyPluginInfo()");
@@ -49,7 +53,7 @@ public class AdProxyPluginInfo extends PluginInfo {
         var items:Vector.<MediaFactoryItem> = new Vector.<MediaFactoryItem>();
         items.push(item);
 
-        super(items);
+        super(items, mediaElementCreationNotificationCallback);
     }
 
     private static function canHandleResourceFunction(resource:MediaResourceBase):Boolean {
@@ -72,6 +76,16 @@ public class AdProxyPluginInfo extends PluginInfo {
         adProxy = new AdProxy();
 
         return adProxy;
+    }
+
+    private function mediaElementCreationNotificationCallback(target:MediaElement):void {
+        logger.debug("mediaElementCreationNotificationCallback: " + target);
+        if (!adTrait) {
+            adTrait = target.getTrait(AdTraitType.AD_PLAY) as AdTrait;
+            if (adTrait) {
+                adProxy.adTrait = adTrait;
+            }
+        }
     }
 }
 }
