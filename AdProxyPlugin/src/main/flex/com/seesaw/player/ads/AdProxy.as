@@ -151,7 +151,7 @@ public class AdProxy extends ProxyElement {
 
                 }
 
-                addTrait(AdTraitType.PLAY, adTrait);
+
                 createLiverail();
                 //   var value:* = proxiedElement.resource.getMetadataValue("contentInfo");
                 //  blockedTraits = new Vector.<String>();    todo use this to clear the blockedtraits list...
@@ -161,6 +161,11 @@ public class AdProxy extends ProxyElement {
         } catch(e:Error) {
 
         }
+    }
+
+    override protected function setupTraits():void {
+        logger.debug("setupTraits");
+        addTrait(AdTraitType.PLAY, adTrait);
     }
 
 
@@ -224,7 +229,7 @@ public class AdProxy extends ProxyElement {
 
 
     private function onLoadComplete(event:Event):void {
-
+        logger.debug("Liverail Loaded ---- onLoadComplete")
         _adManager = liverailLoader.content;
         displayObject.addChild(_adManager);
 
@@ -269,6 +274,7 @@ public class AdProxy extends ProxyElement {
 
 
     private function onLiveRailInitComplete(e:Event):void {
+        logger.debug("Liverail ---- onLiveRailInitComplete")
         adManager.setSize(new Rectangle(0, 0, outerViewable.mediaWidth, outerViewable.mediaHeight));
         adManager.onContentStart();
     }

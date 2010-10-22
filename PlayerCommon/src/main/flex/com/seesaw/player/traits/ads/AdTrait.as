@@ -25,7 +25,6 @@ import com.seesaw.player.events.AdEvents;
 
 import flash.errors.IllegalOperationError;
 
-import org.osmf.events.PlayEvent;
 import org.osmf.traits.MediaTraitBase;
 import org.osmf.utils.OSMFStrings;
 
@@ -77,7 +76,7 @@ public class AdTrait extends MediaTraitBase {
         if (value != _canPause) {
             _canPause = value;
 
-            dispatchEvent(new PlayEvent(PlayEvent.CAN_PAUSE_CHANGE));
+            dispatchEvent(new AdEvents(AdEvents.CAN_PAUSE_CHANGE));
         }
     }
 
@@ -86,7 +85,7 @@ public class AdTrait extends MediaTraitBase {
 
 
     protected function adStateChangeEnd():void {
-        dispatchEvent(new PlayEvent(AdEvents.AD_STATE_CHANGE, false, false, playState));
+        dispatchEvent(new AdEvents(AdEvents.AD_STATE_CHANGE, false, false, playState));
     }
 
     private function attemptAdStateChange(newPlayState:String):void {
