@@ -19,19 +19,14 @@
  *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
  *    Incorporated. All Rights Reserved.
  */
-package com.seesaw.player.controls{
+package com.seesaw.player.controls {
 import com.seesaw.player.controls.widget.FullScreen;
 import com.seesaw.player.controls.widget.PauseButton;
 import com.seesaw.player.controls.widget.PlayButton;
 import com.seesaw.player.controls.widget.ScrubBar;
-
 import com.seesaw.player.controls.widget.SubtitlesButton;
-
 import com.seesaw.player.controls.widget.Volume;
-
 import com.seesaw.player.controls.widget.VolumeScrubBar;
-
-import controls.seesaw.widget.*;
 
 import flash.utils.Dictionary;
 
@@ -176,6 +171,8 @@ public class ControlBarElement extends MediaElement {
         addTrait(MediaTraitType.DISPLAY_OBJECT, viewable);
 
         controlBar.measure();
+
+        // _playableTrait = target.getTrait(MediaTraitType.PLAY) as PlayTrait;
 
         super.setupTraits();
     }
