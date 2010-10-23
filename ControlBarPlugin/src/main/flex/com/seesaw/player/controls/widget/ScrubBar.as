@@ -22,6 +22,11 @@
 
 package
 com.seesaw.player.controls.widget {
+import com.seesaw.player.events.AdEvents;
+import com.seesaw.player.traits.ads.AdState;
+import com.seesaw.player.traits.ads.AdTrait;
+import com.seesaw.player.traits.ads.AdTraitType;
+
 import controls.seesaw.widget.interfaces.IWidget;
 
 import flash.display.DisplayObject;
@@ -49,6 +54,8 @@ import org.osmf.traits.SeekTrait;
 import org.osmf.traits.TimeTrait;
 
 public class ScrubBar extends Widget implements IWidget {
+    private var _adState:AdTrait;
+
     public function ScrubBar() {
         currentTime = new TextField();
         addChild(currentTime);
@@ -177,7 +184,20 @@ public class ScrubBar extends Widget implements IWidget {
     private function updateState():void {
         visible = media != null;
         scrubber.enabled = media ? media.hasTrait(MediaTraitType.SEEK) : false;
+        adTrait = media ? media.getTrait(AdTraitType.AD_PLAY) as AdTrait : null;
+        if (adTrait)
+            adTrait.addEventListener(AdEvents.AD_STATE_CHANGE, disableScrubber);
+
         updateTimerState();
+    }
+
+    private function disableScrubber(event:AdEvents):void {
+        if (adTrait.playState == AdState.PLAYING) {
+            currentTime.visible = scrubber.visible = scrubBarTrail.visible = scrubBarTrack.visible = false;
+        } else if (adTrait.playState == AdState.STOPPED) {
+            currentTime.visible = scrubber.visible = scrubBarTrail.visible = scrubBarTrack.visible = true;
+        }
+
     }
 
     private function updateTimerState():void {
@@ -327,5 +347,15 @@ public class ScrubBar extends Widget implements IWidget {
     private static const CURRENT_POSITION_UPDATE_INTERVAL:int = 100;
     private static const _requiredTraits:Vector.<String> = new Vector.<String>;
     _requiredTraits[0] = MediaTraitType.TIME;
+    _requiredTraits[1] = AdTraitType.AD_PLAY;
+
+
+    public function get adTrait():AdTrait {
+        return _adState;
+    }
+
+    public function set adTrait(value:AdTrait):void {
+        _adState = value;
+    }
 }
 }
