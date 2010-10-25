@@ -59,6 +59,8 @@ public class Player extends Sprite {
     private var _videoPlayer:SeeSawPlayer;
     private var _params:Object;
 
+    private var guidanceBar:Sprite;
+
     // TODO: this is mocked for now
     private var _playerInitParams = new MockData().playerInit;
 
@@ -115,14 +117,14 @@ public class Player extends Sprite {
         });
         addChild(posterFrame);
 
-        if (_playerInitParams.guidance) {
-            var guidanceBar = new GuidanceBar(_playerInitParams.guidanceWarning);
-            addChild(guidanceBar);
-        }
     }
 
     private function showPlayPanel():void {
         //Play / resume / preview button
+        if (_playerInitParams.guidance) {
+            this.guidanceBar = new GuidanceBar(_playerInitParams.guidanceWarning);
+            addChild(this.guidanceBar);
+        }
         var playButton:PlayStartButton = new PlayStartButton(PlayStartButton.PLAY);
         playButton.addEventListener(PlayStartButton.PROCEED, function(event:Event) {
             evaluatePreInitStages();
@@ -132,6 +134,9 @@ public class Player extends Sprite {
 
     private function showGuidancePanel():void {
         if (_playerInitParams.guidance) {
+            if (this.guidanceBar) {
+                this.guidanceBar.visible = false;
+            }
             var guidancePanel = new GuidancePanel(
                     _playerInitParams.guidanceWarning,
                     _playerInitParams.guidanceExplanation,
