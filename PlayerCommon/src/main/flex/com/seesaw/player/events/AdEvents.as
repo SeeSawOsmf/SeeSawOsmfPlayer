@@ -28,7 +28,7 @@ import flash.events.Event;
  */
 public class AdEvents extends Event {
 
-    public static const CAN_PAUSE_CHANGE:String = "canPauseChange";
+    public static const PLAY_PAUSE_CHANGE:String = "playPauseChange";
 
     public static const AD_STATE_CHANGE:String = "adStateChange";
 
@@ -36,28 +36,40 @@ public class AdEvents extends Event {
             (type:String,
              bubbles:Boolean = false,
              cancelable:Boolean = false,
-             playState:String = null,
-             canPause:Boolean = false
+             adState:String = null,
+             playPauseState:String = null
                     ) {
         super(type, bubbles, cancelable);
 
-        _playState = playState;
+        _adState = adState;
         _canPause = canPause;
+        _playPauseState = playPauseState;
     }
 
     override public function clone():Event {
-        return new AdEvents(type, bubbles, cancelable, playState, canPause);
+        return new AdEvents(type, bubbles, cancelable, adState, playPauseState);
     }
 
-    public function get playState():String {
-        return _playState;
+    public function get adState():String {
+        return _adState;
     }
 
     public function get canPause():Boolean {
         return _canPause;
     }
 
-    private var _playState:String;
+    public function get playPauseState():String {
+        return _playPauseState;
+    }
+
+    public function set playPauseState(value:String):void {
+        _playPauseState = value;
+    }
+
+    private var _adState:String;
+    private var _playPauseState:String;
     private var _canPause:Boolean;
+
+
 }
 }

@@ -68,7 +68,7 @@ public class FullScreen extends ButtonWidget implements IWidget {
 
     }
 
-    private function KeyPressed(event:KeyboardEvent) {
+    private function KeyPressed(event:KeyboardEvent):void {
         switch (event.keyCode) {
             case Keyboard.ESCAPE :
                 if (stage.displayState == StageDisplayState.NORMAL) {

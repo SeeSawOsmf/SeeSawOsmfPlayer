@@ -28,14 +28,6 @@ package com.seesaw.player.traits.ads {
  */
 public final class AdTraitType {
 
-    public static const AUDIO:String = "audio";
-
-    public static const BUFFER:String = "buffer";
-
-    public static const DRM:String = "drm";
-
-    public static const DYNAMIC_STREAM:String = "dynamicStream";
-
 
     public static const LOAD:String = "load";
 
@@ -45,21 +37,15 @@ public final class AdTraitType {
 
     public static const TIME:String = "time";
 
-    public static const DISPLAY_OBJECT:String = "displayObject";
+    public static const PLAY_PAUSE:String = "playPause";
 
-    public static const DVR:String = "dvr";
 
     public static const ALL_TYPES:Vector.<String> = Vector.<String>
-            ([ AUDIO
-                , BUFFER
-                , DRM
-                , DYNAMIC_STREAM
+            ([ PLAY_PAUSE
                 , LOAD
                 , AD_PLAY
                 , SEEK
                 , TIME
-                , DISPLAY_OBJECT
-                , DVR
             ]
                     );
 }

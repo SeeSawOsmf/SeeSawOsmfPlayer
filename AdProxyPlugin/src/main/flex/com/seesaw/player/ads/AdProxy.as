@@ -22,6 +22,7 @@
 
 package com.seesaw.player.ads {
 import com.seesaw.player.ads.events.LiveRailEvent;
+import com.seesaw.player.events.AdEvents;
 import com.seesaw.player.traits.ads.AdState;
 import com.seesaw.player.traits.ads.AdTrait;
 
@@ -44,6 +45,7 @@ import org.osmf.elements.ProxyElement;
 import org.osmf.events.DisplayObjectEvent;
 import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
+import org.osmf.events.PlayEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.LoadTrait;
@@ -156,12 +158,23 @@ public class AdProxy extends ProxyElement {
                 }
 
                 if (adTrait) {
+
                     createLiverail();
                 }
             }
         } catch(e:Error) {
 
         }
+    }
+
+    private function playPauseEventHandler(event:AdEvents):void {
+        if (adTrait && adTrait.playPauseState == AdState.PLAYING) {
+            pause();
+        } else if (adTrait && adTrait.playPauseState == AdState.PAUSED) {
+            play();
+        }
+
+
     }
 
 
@@ -182,10 +195,29 @@ public class AdProxy extends ProxyElement {
             case MediaTraitType.LOAD:
                 toggleLoadListeners(added);
                 break;
+            case MediaTraitType.PLAY:
+                togglePlayListeners(added);
+                break;
 
         }
 
     }
+
+
+    private function togglePlayListeners(added:Boolean):void {
+        var playable:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
+        if (playable) {
+            if (added) {
+                playable.addEventListener(PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
+                playable.addEventListener(PlayEvent.CAN_PAUSE_CHANGE, onCanPauseChange);
+            }
+            else {
+                playable.removeEventListener(PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
+                playable.removeEventListener(PlayEvent.CAN_PAUSE_CHANGE, onCanPauseChange);
+            }
+        }
+    }
+
 
     private function toggleLoadListeners(added:Boolean):void {
         var loadable:LoadTrait = proxiedElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
@@ -218,7 +250,17 @@ public class AdProxy extends ProxyElement {
         /// logger.debug("Load onBytesTotal change:{0}", event.bytes);
     }
 
+    private function onCanPauseChange(event:PlayEvent):void {
+        logger.debug("Can Pause Change:{0}", event.canPause);
+    }
+
+    private function onPlayStateChange(event:PlayEvent):void {
+        logger.debug("Play State Change:{0}", event.playState);
+    }
+
     private function createLiverail():void {
+
+        adTrait.addEventListener(AdEvents.PLAY_PAUSE_CHANGE, playPauseEventHandler);
 
         var liverailPath:String = "http://vox-static.liverail.com/swf/v4/admanager.swf";
         var urlResource:URLRequest = new URLRequest(liverailPath);
@@ -287,6 +329,11 @@ public class AdProxy extends ProxyElement {
         if (proxiedElement != null) {
             var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
 
+            if (adTrait) {
+                if (adTrait.adState == AdState.AD_STOPPED) {
+                    adTrait.adStarted();
+                }
+            }
             if (playTrait) {    /// todo 
                 if (playTrait.playState == PlayState.PLAYING) {
 
@@ -302,12 +349,6 @@ public class AdProxy extends ProxyElement {
             }
 
 
-            if (adTrait) {
-                if (adTrait.playState == AdState.STOPPED) {
-                    adTrait.play();
-                }
-            }
-
         }
     }
 
@@ -315,6 +356,10 @@ public class AdProxy extends ProxyElement {
         if (proxiedElement != null) {
 
             var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
+
+            if (adTrait.adState == AdState.AD_STARTED) {
+                adTrait.adStopped();
+            }
 
             if (playTrait) {
                 if (playTrait.playState == PlayState.PAUSED) {
@@ -326,12 +371,21 @@ public class AdProxy extends ProxyElement {
                 }
 
 
-                if (adTrait.playState == AdState.PLAYING) {
-                    adTrait.stop();
-                }
             }
 
         }
+    }
+
+    public function volume(vol:Number):void {
+        adManager.setVolume(vol / 10, false);
+    }
+
+    public function pause():void {
+        adManager.pauseAd();
+    }
+
+    public function play():void {
+        adManager.resumeAd();
     }
 
     public function onContentUpdate(time:Number, duration:Number):void {
