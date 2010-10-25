@@ -120,11 +120,12 @@ public class Player extends Sprite {
     }
 
     private function showPlayPanel():void {
-        //Play / resume / preview button
+        //if there is guidance, show the guidance bar
         if (_playerInitParams.guidance) {
             this.guidanceBar = new GuidanceBar(_playerInitParams.guidanceWarning);
             addChild(this.guidanceBar);
         }
+        //Play / resume / preview button
         var playButton:PlayStartButton = new PlayStartButton(PlayStartButton.PLAY);
         playButton.addEventListener(PlayStartButton.PROCEED, function(event:Event) {
             evaluatePreInitStages();
@@ -134,6 +135,7 @@ public class Player extends Sprite {
 
     private function showGuidancePanel():void {
         if (_playerInitParams.guidance) {
+            //if there is a guidance bar, hide it
             if (this.guidanceBar) {
                 this.guidanceBar.visible = false;
             }
