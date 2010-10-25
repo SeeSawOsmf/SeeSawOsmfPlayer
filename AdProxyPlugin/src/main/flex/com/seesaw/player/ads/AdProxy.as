@@ -123,7 +123,6 @@ public class AdProxy extends ProxyElement {
         var traitsToBlock:Vector.<String> = new Vector.<String>();
         traitsToBlock[0] = MediaTraitType.SEEK;
         traitsToBlock[1] = MediaTraitType.TIME;
-
         blockedTraits = traitsToBlock;
 
 
@@ -334,7 +333,7 @@ public class AdProxy extends ProxyElement {
                     adTrait.adStarted();
                 }
             }
-            if (playTrait) {    /// todo 
+            if (playTrait) {
                 if (playTrait.playState == PlayState.PLAYING) {
 
                     var traitsToBlock:Vector.<String> = new Vector.<String>();
