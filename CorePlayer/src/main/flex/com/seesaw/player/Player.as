@@ -28,6 +28,7 @@ import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 import com.seesaw.player.mockData.MockData;
+import com.seesaw.player.panels.GuidanceBar;
 import com.seesaw.player.panels.GuidancePanel;
 
 import com.seesaw.player.posterFrame.PosterFrame;
@@ -57,6 +58,10 @@ public class Player extends Sprite {
 
     private var _videoPlayer:SeeSawPlayer;
     private var _params:Object;
+
+    private var guidanceBar:Sprite;
+    private var posterFrame:PosterFrame;
+
 
     // TODO: this is mocked for now
     private var _playerInitParams = new MockData().playerInit;
@@ -107,14 +112,21 @@ public class Player extends Sprite {
 
     private function showPosterFrame():void {
         //Play / resume / preview button
-        var posterFrame = new PosterFrame("http://www.seesaw.com/i/ccp/00000210/21035.jpg");
-        posterFrame.addEventListener(PosterFrame.LOADED, function(event:Event) {
+        this.posterFrame = new PosterFrame("http://www.seesaw.com/i/ccp/00000210/21035.jpg");
+
+        this.posterFrame.addEventListener(PosterFrame.LOADED, function(event:Event) {
             evaluatePreInitStages();
         });
-        addChild(posterFrame);
+        addChild(this.posterFrame);
+
     }
 
     private function showPlayPanel():void {
+        //if there is guidance, show the guidance bar
+        if (_playerInitParams.guidance) {
+            this.guidanceBar = new GuidanceBar(_playerInitParams.guidanceWarning);
+            addChild(this.guidanceBar);
+        }
         //Play / resume / preview button
         var playButton:PlayStartButton = new PlayStartButton(PlayStartButton.PLAY);
         playButton.addEventListener(PlayStartButton.PROCEED, function(event:Event) {
@@ -125,6 +137,10 @@ public class Player extends Sprite {
 
     private function showGuidancePanel():void {
         if (_playerInitParams.guidance) {
+            //if there is a guidance bar, hide it
+            if (this.guidanceBar) {
+                this.guidanceBar.visible = false;
+            }
             var guidancePanel = new GuidancePanel(
                     _playerInitParams.guidanceWarning,
                     _playerInitParams.guidanceExplanation,
@@ -182,6 +198,11 @@ public class Player extends Sprite {
         var config:PlayerConfiguration = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, content);
         videoPlayer = new SeeSawPlayer(config);
 
+        //if there is a poster frame, hide it for playback
+        if (this.posterFrame) {
+            this.posterFrame.visible = false;
+        }
+        
         addChild(videoPlayer);
     }
 
