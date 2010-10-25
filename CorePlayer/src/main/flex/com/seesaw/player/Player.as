@@ -232,6 +232,8 @@ public class Player extends Sprite {
         logger.debug("failed to retrieve init data");
         // TODO: set the error ('programme not playing') panel as the main content
         _playerInit = MockData.playerInit;
+        resetInitialisationStages();
+        nextInitialisationStage();
     }
 
     private function onFailFromVideoInfo():void {

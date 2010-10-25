@@ -72,7 +72,7 @@ public class AdProxy extends ProxyElement {
     }
 
     public override function set proxiedElement(proxiedElement:MediaElement):void {
-        if (proxiedElement && (proxiedElement.resource.getMetadataValue("contentId") != null)) {
+        if (proxiedElement) {
 
             super.proxiedElement = proxiedElement;
 
