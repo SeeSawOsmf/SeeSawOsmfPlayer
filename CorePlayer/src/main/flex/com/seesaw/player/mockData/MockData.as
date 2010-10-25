@@ -74,49 +74,60 @@ public class MockData {
 
     }
 
-    public function get playerInit():Object {
-
-        var guidance:Object = {
-            "warning":"Strong language and adult humour",
-            "explanation":"This programme isn't suitable for younger viewers",
-            "confirmation":"Please confirm you are aged 18 or older and accept our <a href=\"http://www.seesaw.com/TermsAndConditions\">Terms and Conditions</a>",
-            "parentalControlsUrl":"http://www.seesaw.com/ParentalControls/TV/Comedy/p-32181-The-Camping-Trip",
-            "findOutMoreLink":"http://www.seesaw.com/watchingtv/aboutparentalcontrols"
-        }
-
+    public static function get playerInit():Object {
         var playerInitData:Object = {
-            "programmeId":10001,
-            "guidance":guidance
-        }
+            "timestamp":1288026360828,
+            "guidance":{
+                "guidance":"guidance",
+                "explanation":"This programme isn't suitable for younger viewers",
+                "warning":"Strong language and adult humour"},
+            "programme":{
+                "svod":false,
+                "genres":"\"TV:ENTERTAINMENT:OTHER_ENTERTAINMENT\", \"TV:COMEDY:SKETCH_SHOWS\", \"TV:ENTERTAINMENT:FAMILY_ENTERTAINMENT\"",
+                "rollupAgeRating":"16",
+                "displayMode":"series",
+                "smallImageUrl":"http://kgd-red-dev-zxtm01.dev.vodco.co.uk/i/ccp/programs/Small.jpg",
+                "filmAgeRating":"U",
+                "formattedTitle":"South Park programme 2: South Park programme 2",
+                "titleExt":"South Park programme 2",
+                "tvAgeRating":"16",
+                "episodeNumber":2,
+                "petiteImageUrl":"http://kgd-red-dev-zxtm01.dev.vodco.co.uk/i/ccp/programs/Petite.jpg",
+                "id":12001018002,
+                "title":"South Park programme 2",
+                "duration":1800,
+                "avod":true,
+                "programmeType":"TV",
+                "tvod":false,
+                "largeImageUrl":"http://kgd-red-dev-zxtm01.dev.vodco.co.uk/i/ccp/programs/Large.jpg",
+                "synopsis":"South Park programme 2"},
+            "parentalControls":{
+                "parentalControlsPageURL":"/Parental_Controls",
+                "termsAndConditionsLinkURL":"",
+                "helpSectionLinkURL":"",
+                "lostPinLinkURL":"",
+                "whatsThisLinkURL":""},
+            "videoPlayerInfoUrl":"http://localhost:8080/player.playerinitialisation:videoinfo?t:ac=TV:ENTERTAINMENT/p/12001018002/South-Park-programme-2",
+            "unavailablePageUrl":"/unavailable"};
+
         return playerInitData;
     }
 
-    public function get videoPlayerInfo():Object {
-
+    public static function get videoInfo():Object {
         var videoPlayerInfoData:Object = {
-            "programmeId":10001,
-            "scheme":"rtmpe",
-            "cdnPath":"cdn-flash-red-dev.vodco.co.uk/a2703",
-            "lowResAssetType":["mp4"],
-            "lowResAssetPath":["e5/test/ccp/p/LOW_RES/test/test_asset.mp4?s=1286540710&e=1286584210&h=0a882c290f40c11b48435e35861f9c49"],
-            "stdResAssetPath":["e5/test/ccp/p/LOW_RES/test/test_asset.mp4?s=1286540710&e=1286584210&h=0a882c290f40c11b48435e35861f9c49"],
-            "highResAssetPath":["e5/test/ccp/p/LOW_RES/test/test_asset.mp4?s=1286540710&e=1286584210&h=0a882c290f40c11b48435e35861f9c49"],
-            "validTransaction":["true"],
-            "serverTimeStamp":[1286541010215],
-            "lowResAssetId":[6714],
-            "stdResAssetId":[6715],
-            "highResAssetId":[6716],
-            "partnerId":["SHERBET"],
-            "logDRM":["true"],
-            "subtitleLocation":[""],
-            "offerType":["AVOD"],
-            "geoBlocked":["false"],
-            "grossUsageReached":["false"],
-            "playlist":[null],
-            "anonymousUserId":[5151618],
-            "transactionItemId":["5151821"],
-            "contentInfo": [contentInfo]   ////todo this may need to be in the initialiser call not the videoPlayerInfo
-        }
+            "timestamp":1288026611892,
+            "assets":{
+                "low":{
+                    "height":288,
+                    "cdn":"rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703",
+                    "width":512,
+                    "quality":1,
+                    "path":"e5/dev/ccp/p/LOW_RES/testing/big_buck_bunny_1080p_h264.mp4?s=1288026581&e=1288027331&h=06c0ddb776936627c999682029c49a12",
+                    "bitrate":500,
+                    "type":"mp4"}},
+            "geoblocked":"false",
+            "programmeId":12001018002};
+        
         return videoPlayerInfoData;
     }
 }

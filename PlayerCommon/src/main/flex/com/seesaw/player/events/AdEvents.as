@@ -24,21 +24,52 @@ package com.seesaw.player.events {
 import flash.events.Event;
 
 /**
- * AdEvents is dispatched when the properties of a AdTrait change.
+ * A AdEvents is dispatched when the properties of a AdTrait change.
  */
-public class AdEvent extends Event {
+public class AdEvents extends Event {
+
+    public static const PLAY_PAUSE_CHANGE:String = "playPauseChange";
 
     public static const AD_STATE_CHANGE:String = "adStateChange";
 
-    private var _adState:String;
+    public function AdEvents
+            (type:String,
+             bubbles:Boolean = false,
+             cancelable:Boolean = false,
+             adState:String = null,
+             playPauseState:String = null
+                    ) {
+        super(type, bubbles, cancelable);
 
-    public function AdEvent(adState:String) {
-        super(AD_STATE_CHANGE, false, false);
         _adState = adState;
+        _canPause = canPause;
+        _playPauseState = playPauseState;
+    }
+
+    override public function clone():Event {
+        return new AdEvents(type, bubbles, cancelable, adState, playPauseState);
     }
 
     public function get adState():String {
         return _adState;
     }
+
+    public function get canPause():Boolean {
+        return _canPause;
+    }
+
+    public function get playPauseState():String {
+        return _playPauseState;
+    }
+
+    public function set playPauseState(value:String):void {
+        _playPauseState = value;
+    }
+
+    private var _adState:String;
+    private var _playPauseState:String;
+    private var _canPause:Boolean;
+
+
 }
 }

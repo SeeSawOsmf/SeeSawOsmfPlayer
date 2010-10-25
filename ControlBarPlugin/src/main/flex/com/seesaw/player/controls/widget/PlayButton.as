@@ -1,27 +1,27 @@
-/*****************************************************
+/*
+ * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
  *
- *  Copyright 2009 Adobe Systems Incorporated.  All Rights Reserved.
+ *    The contents of this file are subject to the Mozilla Public License
+ *    Version 1.1 (the "License"); you may not use this file except in
+ *    compliance with the License. You may obtain a copy of the
+ *    License athttp://www.mozilla.org/MPL/
  *
- *****************************************************
- *  The contents of this file are subject to the Mozilla Public License
- *  Version 1.1 (the "License"); you may not use this file except in
- *  compliance with the License. You may obtain a copy of the License at
- *  http://www.mozilla.org/MPL/
+ *    Software distributed under the License is distributed on an "AS IS"
+ *    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *    License for the specific language governing rights and limitations
+ *    under the License.
  *
- *  Software distributed under the License is distributed on an "AS IS"
- *  basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- *  License for the specific language governing rights and limitations
- *  under the License.
+ *    The Initial Developer of the Original Code is ioko365 Ltd.
+ *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
+ *    Incorporated. All Rights Reserved.
  *
- *
- *  The Initial Developer of the Original Code is Adobe Systems Incorporated.
- *  Portions created by Adobe Systems Incorporated are Copyright (C) 2009 Adobe Systems
- *  Incorporated. All Rights Reserved.
- *
- *****************************************************/
+ *    The Initial Developer of the Original Code is ioko365 Ltd.
+ *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
+ *    Incorporated. All Rights Reserved.
+ */
 
 package com.seesaw.player.controls.widget {
-import com.seesaw.player.events.AdEvent;
+import com.seesaw.player.events.AdEvents;
 import com.seesaw.player.traits.ads.AdState;
 import com.seesaw.player.traits.ads.AdTrait;
 import com.seesaw.player.traits.ads.AdTraitType;
@@ -41,7 +41,7 @@ import org.osmf.traits.PlayState;
 import org.osmf.traits.PlayTrait;
 
 public class PlayButton extends ButtonWidget implements IWidget {
-    private var logger:ILogger = LoggerFactory.getClassLogger(PauseButton);
+    private var _logger:ILogger = LoggerFactory.getClassLogger(PauseButton);
 
     // Internals
 
@@ -49,12 +49,12 @@ public class PlayButton extends ButtonWidget implements IWidget {
 
     /* static */
     private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.PauseButton";
-
-    private var _requiredTraits:Vector.<String> = new Vector.<String>;
+    private static const _requiredTraits:Vector.<String> = new Vector.<String>;
+    private var _adTrait:AdTrait;
+    _requiredTraits[0] = MediaTraitType.PLAY;
 
     public function PlayButton() {
         logger.debug("Play Button Constructor");
-        _requiredTraits[0] = MediaTraitType.PLAY;
     }
 
     // Protected
@@ -76,7 +76,15 @@ public class PlayButton extends ButtonWidget implements IWidget {
         _playable.addEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
         _playable.addEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
 
+        adTrait = media ? media.getTrait(AdTraitType.AD_PLAY) as AdTrait : null;
+        if (adTrait) {
+            adTrait.addEventListener(AdEvents.PLAY_PAUSE_CHANGE, visibilityDeterminingAdEventHandler);
+        }
         visibilityDeterminingEventHandler();
+    }
+
+    private function visibilityDeterminingAdEventHandler(event:AdEvents):void {
+        visible = adTrait && adTrait.playPauseState == AdState.PAUSED;
     }
 
     override protected function processRequiredTraitsUnavailable(element:MediaElement):void {
@@ -91,25 +99,45 @@ public class PlayButton extends ButtonWidget implements IWidget {
 
     override protected function onMouseClick(event:MouseEvent):void {
         var playable:PlayTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
-        var adTrait:AdTrait = media ? media.getTrait(AdTraitType.AD_PLAY) as AdTrait : null;
+        adTrait = media ? media.getTrait(AdTraitType.AD_PLAY) as AdTrait : null;
+        if (adTrait)
+            if (adTrait.adState == AdState.AD_STARTED) {
 
-        if(adTrait && adTrait.playState == AdState.PLAYING) {
-            adTrait.stop();
-        }
-        else {
-            playable.play();
-        }
+                adTrait.play();
+
+            } else if (!adTrait) {
+                playable.play();
+            }
     }
 
     // Stubs
     //
 
     protected function visibilityDeterminingEventHandler(event:Event = null):void {
-        visible = playable && playable.playState == PlayState.PAUSED && playable.canPause;
+        if (adTrait)
+            if (adTrait.adState == AdState.AD_STOPPED) {
+                visible = playable && playable.playState == PlayState.PAUSED && playable.canPause;
+            }
     }
 
     public function get classDefinition():String {
         return QUALIFIED_NAME;
+    }
+
+    public function get logger():ILogger {
+        return _logger;
+    }
+
+    public function set logger(value:ILogger):void {
+        _logger = value;
+    }
+
+    public function get adTrait():AdTrait {
+        return _adTrait;
+    }
+
+    public function set adTrait(value:AdTrait):void {
+        _adTrait = value;
     }
 }
 }

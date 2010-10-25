@@ -28,6 +28,7 @@ import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 import com.seesaw.player.mockData.MockData;
+import com.seesaw.player.panels.GuidanceBar;
 import com.seesaw.player.panels.GuidancePanel;
 import com.seesaw.player.posterFrame.PosterFrame;
 import com.seesaw.player.services.ResumeService;
@@ -58,6 +59,7 @@ public class Player extends Sprite {
     private var _loaderParams:Object;
     private var _preInitStages:Vector.<Function>;
     private var _posterFrame:PosterFrame;
+    private var _guidanceBar:Sprite;
 
     // returned by the player initialiser AJAX call
     private var _playerInit:Object;
@@ -108,6 +110,12 @@ public class Player extends Sprite {
         _posterFrame.addEventListener(PosterFrame.LOADED, function(event:Event) {
             nextInitialisationStage();
         });
+
+        //if there is guidance, show the guidance bar
+        if (_playerInit.guidance) {
+            _guidanceBar = new GuidanceBar(_playerInit.guidance.warning);
+            _posterFrame.addChild(_guidanceBar);
+        }
         addChild(_posterFrame);
     }
 
@@ -118,7 +126,6 @@ public class Player extends Sprite {
     }
 
     private function showPlayPanel():void {
-        //Play / resume / preview button
         var playButton:PlayStartButton = new PlayStartButton(PlayStartButton.PLAY);
         playButton.addEventListener(PlayStartButton.PROCEED, function(event:Event) {
             nextInitialisationStage();
@@ -223,6 +230,8 @@ public class Player extends Sprite {
 
     private function onFailFromPlayerInit():void {
         logger.debug("failed to retrieve init data");
+        // TODO: set the error ('programme not playing') panel as the main content
+        _playerInit = MockData.playerInit;
     }
 
     private function onFailFromVideoInfo():void {
@@ -232,7 +241,7 @@ public class Player extends Sprite {
         // VideoPlayerInfo will not return inconsistent or partial state.
 
         // TODO: This should be removed once the new video player info service is up and running
-        var resource:StreamingURLResource = createMediaResource(new MockData().videoPlayerInfo);
+        var resource:StreamingURLResource = createMediaResource(MockData.videoInfo);
         loadVideo(resource);
     }
 

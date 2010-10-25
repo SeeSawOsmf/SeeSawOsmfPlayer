@@ -23,8 +23,13 @@
 package  com.seesaw.player.traits.ads {
 
 public final class AdState {
+
     public static const PLAYING:String = "playing";
+
     public static const PAUSED:String = "paused";
-    public static const STOPPED:String = "stopped";
+
+    public static const AD_STOPPED:String = "adStoped";
+
+    public static const AD_STARTED:String = "adStarted";
 }
 }

@@ -21,48 +21,81 @@
  */
 
 package com.seesaw.player.traits.ads {
-import com.seesaw.player.events.AdEvent;
+import com.seesaw.player.events.AdEvents;
 
 import org.osmf.traits.MediaTraitBase;
+
+[Event(name="canPauseChange",type="com.seesaw.player.events")]
 
 [Event(name="adStateChange",type="com.seesaw.player.events")]
 
 public class AdTrait extends MediaTraitBase {
 
-    private var _playState:String;
+    private var _adState:String;
+    private var _playPauseState:String;
 
     public function AdTrait() {
         super(AdTraitType.AD_PLAY);
-        _playState = AdState.STOPPED;
+        _adState = AdState.AD_STOPPED;
     }
 
-    public function get playState():String {
-        return _playState;
+    public final function play():void {
+        attemptAdPlayPauseChange(AdState.PLAYING);
     }
 
-    public function set playState(value:String):void {
-        if (value == null)
-            throw new ArgumentError("ad state cannot be null");
-        _playState = value;
-        dispatchEvent(new AdEvent(value));
+    public final function adStarted():void {
+        attemptAdStateChange(AdState.AD_STARTED);
     }
 
-    public function play():void {
-        if (playState != AdState.PLAYING) {
-            playState = AdState.PLAYING;
+    public final function adStopped():void {
+        attemptAdStateChange(AdState.AD_STOPPED);
+    }
+
+    public final function pause():void {
+        attemptAdPlayPauseChange(AdState.PAUSED);
+    }
+
+    public final function stop():void {
+        attemptAdStateChange(AdState.AD_STOPPED);
+    }
+
+    public function get adState():String {
+        return _adState;
+    }
+
+    protected function adStateChangeStart(newPlayState:String):void {
+    }
+
+    protected function adStateChangeEnd():void {
+        dispatchEvent(new AdEvents(AdEvents.AD_STATE_CHANGE, false, false, adState));
+    }
+
+    protected function adPlayPauseChangeEnd():void {
+        dispatchEvent(new AdEvents(AdEvents.PLAY_PAUSE_CHANGE, false, false, adState, _playPauseState));
+    }
+
+    private function attemptAdStateChange(newPlayState:String):void {
+        if (_adState != newPlayState) {
+            adStateChangeStart(newPlayState);
+
+            _adState = newPlayState;
+
+            adStateChangeEnd();
         }
     }
 
-    public function stop():void {
-        if (playState != AdState.STOPPED) {
-            playState = AdState.STOPPED;
+    private function attemptAdPlayPauseChange(newPlayState:String):void {
+        if (_playPauseState != newPlayState) {
+            adStateChangeStart(newPlayState);
+
+            _playPauseState = newPlayState;
+
+            adPlayPauseChangeEnd();
         }
     }
 
-    public function pause():void {
-        if (playState != AdState.PAUSED) {
-            playState = AdState.PAUSED;
-        }
+    public function get playPauseState():String {
+        return _playPauseState;
     }
 }
 }

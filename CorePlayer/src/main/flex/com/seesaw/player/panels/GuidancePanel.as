@@ -99,7 +99,7 @@ public class GuidancePanel extends Sprite {
         with (panelBG.graphics) {
             lineStyle(1, 0x000000);
             beginFill(0x000000, 0.8);
-            drawRoundRect(0, 0, 600, 300, 10);
+            drawRoundRect(0, 0, 525, 253, 10);
             endFill();
         }
 
@@ -109,8 +109,8 @@ public class GuidancePanel extends Sprite {
     private function buildContentContainer():Sprite {
         var contentContainer:Sprite = new Sprite();
         //the x and y of this container are the equivalent to padding in CSS
-        contentContainer.x = 30;
-        contentContainer.y = 30;
+        contentContainer.x = 39;
+        contentContainer.y = 32;
         return contentContainer;
     }
 
@@ -129,7 +129,7 @@ public class GuidancePanel extends Sprite {
         var explanationLabel = new TextField();
         explanationLabel.width = 540;
         explanationLabel.htmlText = this.guidanceExplanation;
-        explanationLabel.y = 40;
+        explanationLabel.y = 32;
         var formattedWarningLabel:TextField = this.applyInfoFormat(explanationLabel);
 
         return explanationLabel;
@@ -140,7 +140,7 @@ public class GuidancePanel extends Sprite {
         var confirmationLabel = new TextField();
         confirmationLabel.width = 540;
         confirmationLabel.htmlText = this.confirmationMessage;
-        confirmationLabel.y = 80;
+        confirmationLabel.y = 66;
         var formattedWarningLabel:TextField = this.applyInfoFormat(confirmationLabel);
 
         confirmationLabel.styleSheet = this.css;
@@ -179,6 +179,13 @@ public class GuidancePanel extends Sprite {
         textToFormat.setTextFormat(textFormat);
     }
 
+    private function applySmallFormat(textToFormat:TextField) {
+        var textFormat:TextFormat = new TextFormat();
+        textFormat.size = 11;
+
+        textToFormat.setTextFormat(textFormat);
+    }
+
     private function applyHoverFormat(textToFormat:TextField) {
         var textFormat:TextFormat = new TextFormat();
         textFormat.color = 0xFFFFFF;
@@ -211,7 +218,7 @@ public class GuidancePanel extends Sprite {
         acceptButton.addEventListener(MouseEvent.CLICK, this.onAcceptClick);
 
         //position the button
-        acceptButton.y = 130;
+        acceptButton.y = 106;
         acceptButton.height = 40;
         acceptButton.width = 100;
 
@@ -260,8 +267,8 @@ public class GuidancePanel extends Sprite {
         declineButton.addEventListener(MouseEvent.CLICK, this.onDeclineClick);
 
         //position the button
-        declineButton.y = 125;
-        declineButton.x = 120;
+        declineButton.y = 102;
+        declineButton.x = 109;
 
         return declineButton;
     }
@@ -301,6 +308,7 @@ public class GuidancePanel extends Sprite {
         parentalControlsLabel.width = 140;
         var formattedButtonLabel:TextField = this.applyInfoFormat(parentalControlsLabel);
         this.applyDefaultFormat(formattedButtonLabel);
+        this.applySmallFormat(formattedButtonLabel);
 
         //add the label to the button
         parentalControlsButton.addChild(formattedButtonLabel);
@@ -310,7 +318,7 @@ public class GuidancePanel extends Sprite {
         parentalControlsButton.addEventListener(MouseEvent.CLICK, this.onParentalControlClick);
 
         //position the button
-        parentalControlsButton.y = 200;
+        parentalControlsButton.y = 175;
         parentalControlsButton.x = 0;
 
         return parentalControlsButton;
@@ -344,6 +352,7 @@ public class GuidancePanel extends Sprite {
         findOutMoreLabel.width = 85;
         var formattedButtonLabel:TextField = this.applyInfoFormat(findOutMoreLabel);
         this.applyDefaultFormat(formattedButtonLabel);
+        this.applySmallFormat(formattedButtonLabel);
 
         //add the label to the button
         findOutMoreButton.addChild(formattedButtonLabel);
@@ -353,8 +362,8 @@ public class GuidancePanel extends Sprite {
         findOutMoreButton.addEventListener(MouseEvent.CLICK, this.onFindOutMoreClick);
 
         //position the button
-        findOutMoreButton.y = 200;
-        findOutMoreButton.x = 170;
+        findOutMoreButton.y = 175;
+        findOutMoreButton.x = 147;
 
         return findOutMoreButton;
     }

@@ -28,7 +28,22 @@ package com.seesaw.player.traits.ads {
  */
 public final class AdTraitType {
 
+    public static const LOAD:String = "load";
+
     public static const AD_PLAY:String = "adPlay";
 
+    public static const SEEK:String = "seek";
+
+    public static const TIME:String = "time";
+
+    public static const PLAY_PAUSE:String = "playPause";
+
+    public static const ALL_TYPES:Vector.<String> = Vector.<String>
+            ([ PLAY_PAUSE
+                , LOAD
+                , AD_PLAY
+                , SEEK
+                , TIME
+            ] );
 }
 }

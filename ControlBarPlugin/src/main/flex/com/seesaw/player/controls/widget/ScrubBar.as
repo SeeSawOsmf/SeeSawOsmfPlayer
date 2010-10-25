@@ -22,7 +22,7 @@
 
 package
 com.seesaw.player.controls.widget {
-import com.seesaw.player.events.AdEvent;
+import com.seesaw.player.events.AdEvents;
 import com.seesaw.player.traits.ads.AdState;
 import com.seesaw.player.traits.ads.AdTrait;
 import com.seesaw.player.traits.ads.AdTraitType;
@@ -184,18 +184,17 @@ public class ScrubBar extends Widget implements IWidget {
     private function updateState():void {
         visible = media != null;
         scrubber.enabled = media ? media.hasTrait(MediaTraitType.SEEK) : false;
-
         adTrait = media ? media.getTrait(AdTraitType.AD_PLAY) as AdTrait : null;
         if (adTrait)
-            adTrait.addEventListener(AdEvent.AD_STATE_CHANGE, disableScrubber);
+            adTrait.addEventListener(AdEvents.AD_STATE_CHANGE, disableScrubber);
 
         updateTimerState();
     }
 
-    private function disableScrubber(event:AdEvent):void {
-        if (adTrait.playState == AdState.PLAYING) {
+    private function disableScrubber(event:AdEvents):void {
+        if (adTrait.adState == AdState.AD_STARTED) {
             currentTime.visible = scrubber.visible = scrubBarTrail.visible = scrubBarTrack.visible = false;
-        } else if (adTrait.playState == AdState.STOPPED) {
+        } else if (adTrait.adState == AdState.AD_STOPPED) {
             currentTime.visible = scrubber.visible = scrubBarTrail.visible = scrubBarTrack.visible = true;
         }
 

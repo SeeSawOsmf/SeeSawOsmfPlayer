@@ -80,14 +80,6 @@ public class AdProxyPluginInfo extends PluginInfo {
 
     private function mediaElementCreationNotificationCallback(target:MediaElement):void {
         logger.debug("mediaElementCreationNotificationCallback: " + target);
-        /*
-        if (!adTrait) {
-            adTrait = target.getTrait(AdTraitType.AD_PLAY) as AdTrait;
-            if (adTrait) {
-                adProxy.adTrait = adTrait;
-            }
-        }
-        */
     }
 }
 }
