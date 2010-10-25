@@ -21,6 +21,8 @@
  */
 package com.seesaw.player.fullscreen {
 import com.seesaw.player.traits.FullScreenTrait;
+import com.seesaw.player.traits.ads.AdTrait;
+import com.seesaw.player.traits.ads.AdTraitType;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -30,14 +32,16 @@ import org.osmf.media.MediaElement;
 public class FullScreenProxyElement extends ProxyElement {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(FullScreenProxyElement);
+    public static const ID:String = "com.seesaw.player.traitAdded";
 
     public function FullScreenProxyElement(proxiedElement:MediaElement = null) {
-        logger.debug("com.seesaw.player.fullscreen.FullScreenProxyElement()");
+
         super(proxiedElement);
     }
 
     override protected function setupTraits():void {
         logger.debug("setupTraits");
+        addTrait(AdTraitType.AD_PLAY, new AdTrait());
         addTrait(FullScreenTrait.FULL_SCREEN, new FullScreenTrait());
         super.setupTraits();
     }

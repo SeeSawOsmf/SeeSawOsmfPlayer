@@ -36,7 +36,7 @@ import org.osmf.utils.OSMFStrings;
 public class AdTrait extends MediaTraitBase {
 
     public function AdTrait() {
-        super(AdTraitType.PLAY);
+        super(AdTraitType.AD_PLAY);
 
         _canPause = true;
         _playState = AdState.STOPPED;

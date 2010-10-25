@@ -22,8 +22,8 @@
 
 package com.seesaw.player.ads {
 import com.seesaw.player.ads.events.LiveRailEvent;
+import com.seesaw.player.traits.ads.AdState;
 import com.seesaw.player.traits.ads.AdTrait;
-import com.seesaw.player.traits.ads.AdTraitType;
 
 import flash.display.Loader;
 import flash.display.Sprite;
@@ -98,7 +98,8 @@ public class AdProxy extends ProxyElement {
     public var liverailPublisherId:String;
     public var programmeId:Number;
     private var liverailConfig:LiverailConfig;
-    private var adTrait:AdTrait = new AdTrait();
+    private var _adTrait:AdTrait;
+
 
     public function AdProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -148,36 +149,33 @@ public class AdProxy extends ProxyElement {
                     proxiedElement.addEventListener(MediaElementEvent.TRAIT_ADD, onProxiedTraitsChange);
                     proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onProxiedTraitsChange);
 
-
+                    var traitType:String
+                    for each (traitType in proxiedElement.traitTypes) {
+                        processTrait(traitType, true);
+                    }
                 }
 
-
-                createLiverail();
-                //   var value:* = proxiedElement.resource.getMetadataValue("contentInfo");
-                //  blockedTraits = new Vector.<String>();    todo use this to clear the blockedtraits list...
-
-
+                if (adTrait) {
+                    createLiverail();
+                }
             }
         } catch(e:Error) {
 
         }
     }
 
+
     override protected function setupTraits():void {
         logger.debug("setupTraits");
 
 
-        //    innerViewable = new DisplayObjectTrait(controlBar, controlBar.measuredWidth, controlBar.measuredHeight);;
-
-        //    addTrait(MediaTraitType.DISPLAY_OBJECT, outerViewable);
-
-        addTrait(AdTraitType.PLAY, adTrait);
-        super.setupTraits();
     }
 
 
     private function processTrait(traitType:String, added:Boolean):void {
+        logger.debug(" --------- traitType -----------" + traitType);
         switch (traitType) {
+
             case MediaTraitType.AUDIO:
 
                 break;
@@ -226,12 +224,9 @@ public class AdProxy extends ProxyElement {
         var urlResource:URLRequest = new URLRequest(liverailPath);
 
         liverailLoader = new Loader();
-        //	liverailLoader.width = this.width;
-        //	liverailLoader.height = this.height;
         liverailLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadComplete);
         liverailLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onLoadError);
         liverailLoader.load(urlResource);
-        //displayObject.addChild(liverailLoader);
     }
 
 
@@ -292,7 +287,7 @@ public class AdProxy extends ProxyElement {
         if (proxiedElement != null) {
             var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
 
-            if (playTrait) {
+            if (playTrait) {    /// todo 
                 if (playTrait.playState == PlayState.PLAYING) {
 
                     var traitsToBlock:Vector.<String> = new Vector.<String>();
@@ -306,13 +301,11 @@ public class AdProxy extends ProxyElement {
 
             }
 
-            var adTrait:AdTrait = proxiedElement.getTrait(AdTraitType.PLAY) as AdTrait;
 
             if (adTrait) {
-                /*  if (adTrait.playState == AdState.PAUSED) {
-                 blockedTraits = new Vector.<String>();
-                 adTrait.play();
-                 */
+                if (adTrait.playState == AdState.STOPPED) {
+                    adTrait.play();
+                }
             }
 
         }
@@ -330,6 +323,11 @@ public class AdProxy extends ProxyElement {
                     var timer:Timer = new Timer(1000);
                     timer.addEventListener(TimerEvent.TIMER, onTimerTick);
                     timer.start();
+                }
+
+
+                if (adTrait.playState == AdState.PLAYING) {
+                    adTrait.stop();
                 }
             }
 
@@ -353,17 +351,12 @@ public class AdProxy extends ProxyElement {
                 }
             }
 
-            /*  if(event.traitType == MediaTraitType.LOAD){
-             processTrait(event.traitType, true);    todo look a why the outerViewable State is not being set if the mainContent is paused using the onLoadableStateChange listener
-             } */
         } else {
             if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
                 innerViewable = null;
                 removeTrait(MediaTraitType.DISPLAY_OBJECT);
             }
         }
-        ///    _fullscreenTrait = element.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
-
     }
 
     private function set innerViewable(value:DisplayObjectTrait):void {
@@ -423,12 +416,10 @@ public class AdProxy extends ProxyElement {
 
             if (playTrait) {
                 if (playTrait.playState == PlayState.PLAYING) {
-                    /// playTrait.pause();
                     onContentUpdate(timeTrait.currentTime, timeTrait.duration);
                     labelText = "[ Advertisement ]" + timeTrait.currentTime;
                 }
                 else if (playTrait.playState == PlayState.PAUSED) {
-                    //  playTrait.play();
                     labelText = "";
                 }
             }
@@ -440,5 +431,18 @@ public class AdProxy extends ProxyElement {
     private var outerViewable:AdProxyDisplayObjectTrait;
     private var displayObject:Sprite;
     private var label:TextField;
+
+    public function get adTrait():AdTrait {
+        return _adTrait;
+    }
+
+    public function set adTrait(value:AdTrait):void {
+
+        _adTrait = value;
+        if (proxiedElement) {
+            createLiverail();
+        }
+
+    }
 }
 }
