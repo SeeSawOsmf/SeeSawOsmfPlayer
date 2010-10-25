@@ -55,6 +55,7 @@ public class Player extends Sprite {
 
     private var _videoPlayer:SeeSawPlayer;
     private var _params:Object;
+    private var _playerInit:Object;
 
     // TODO: this is mocked for now
     private var _playerInitParams = new MockData().playerInit;
@@ -71,7 +72,8 @@ public class Player extends Sprite {
         params = LoaderInfo(this.root.loaderInfo).parameters;
 
         // TODO: this needs to be in a flashvar from the page
-        params.videoPlayerInfo = "http://localhost:8080/player.videoplayerinfo:getvideoplayerinfo?t:ac=TV:COMEDY/p/41001001001/No-Series-programmes-programme-1";
+        params.playerInitUrl = "http://localhost:8080/player.playerinitialisation:playerInit" +
+                "?t:ac=TV:COMEDY/p/41001001001/No-Series-programmes-programme-1";
 
         stage.scaleMode = StageScaleMode.NO_SCALE;
         stage.align = StageAlign.TOP_LEFT;
@@ -82,11 +84,12 @@ public class Player extends Sprite {
     private function onAddedToStage(event:Event):void {
         logger.debug("added to stage");
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
-        resetPreInitStages();
-        evaluatePreInitStages();
+
+        requestPlayerInitData();
     }
 
     private function resetPreInitStages() {
+        logger.debug("reseting pre-initialisation stages");
         // sets the order of stuff to evaluate during initialisation
         _preInitStages = new Vector.<Function>()
         _preInitStages[0] = showPlayPanel;
@@ -98,6 +101,7 @@ public class Player extends Sprite {
         // remove the next initialisation step and evaluate it
         var initialisationStage:Function = _preInitStages.shift();
         if (initialisationStage) {
+            logger.debug("evaluating pre-initialisation stage");
             initialisationStage.call(this);
         }
     }
@@ -114,11 +118,11 @@ public class Player extends Sprite {
     private function showGuidancePanel():void {
         if (_playerInitParams.guidance) {
             var guidancePanel = new GuidancePanel(
-                    _playerInitParams.guidanceWarning,
-                    _playerInitParams.guidanceExplanation,
-                    _playerInitParams.guidanceConfirmationMessage,
-                    _playerInitParams.guidanceParentalControlsUrl,
-                    _playerInitParams.guidanceFindOutMoreLink
+                    _playerInitParams.guidance.warning,
+                    _playerInitParams.guidance.explanation,
+                    _playerInitParams.guidance.confirmation,
+                    _playerInitParams.guidance.parentalControlsUrl,
+                    _playerInitParams.guidance.findOutMoreLink
                     );
 
             guidancePanel.addEventListener(GuidancePanel.GUIDANCE_ACCEPTED, function(event:Event) {
@@ -126,7 +130,7 @@ public class Player extends Sprite {
             });
 
             guidancePanel.addEventListener(GuidancePanel.GUIDANCE_DECLINED, function(event:Event) {
-                resetPreInitStages(); // sends the user back to stage 1
+                resetPreInitStages(); // sends the user back to stage 0
                 evaluatePreInitStages();
             });
 
@@ -141,19 +145,46 @@ public class Player extends Sprite {
         requestProgrammeData();
     }
 
+    private function requestPlayerInitData():void {
+        logger.debug("requesting programme data: " + params.videoPlayerInfo);
+
+        var request:ServiceRequest = new ServiceRequest(params.playerInitUrl);
+        request.successCallback = onSuccessFromPlayerInit;
+        request.failCallback = onFailFromPlayerInit;
+        request.submit();
+    }
+
+    private function onSuccessFromPlayerInit(playerInit:Object):void {
+        logger.debug("received player init data for programme: " + playerInit.programme.id);
+        _playerInit = playerInit;
+        resetPreInitStages();
+        evaluatePreInitStages();
+    }
+
     private function requestProgrammeData():void {
         logger.debug("requesting programme data: " + params.videoPlayerInfo);
 
-        var request:ServiceRequest = new ServiceRequest(params.videoPlayerInfo);
+        var request:ServiceRequest = new ServiceRequest(_playerInit.videoPlayerInfoUrl);
         request.successCallback = onSuccessFromVideoInfo;
         request.failCallback = onFailFromVideoInfo;
         request.submit();
     }
 
     private function onSuccessFromVideoInfo(programmeData:Object):void {
-        logger.debug("received programme data for programme: " + + programmeData.programme.programmeId);
-        var resource:StreamingURLResource = createMediaResource(programmeData);
-        loadVideo(resource);
+        logger.debug("received programme data for programme: " + + programmeData.programmeId);
+
+        if(programmeData.geoblocked == "true") {
+            // TODO: show the geoblock panel
+            return;
+        }
+
+        if(programmeData.assets != null) {
+            var resource:StreamingURLResource = createMediaResource(programmeData);
+            loadVideo(resource);
+        }
+        else {
+            // TODO: show the error panel
+        }
     }
 
     private function loadVideo(content:StreamingURLResource):void {
@@ -176,6 +207,10 @@ public class Player extends Sprite {
     private function createMediaResource(programmeData:Object):StreamingURLResource {
         logger.debug("creating media resource");
         return new DynamicStream(programmeData);
+    }
+
+    private function onFailFromPlayerInit():void {
+        logger.debug("failed to retrieve init data");
     }
 
     private function onFailFromVideoInfo():void {

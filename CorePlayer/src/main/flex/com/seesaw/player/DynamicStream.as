@@ -37,15 +37,16 @@ public class DynamicStream extends DynamicStreamingResource {
 
 
     public function DynamicStream(params:Object) {
-        super(params.scheme + "://" + params.cdnPath);
+        var asset:Object = params.assets.low;
 
-        logger.debug("scheme: " + params.scheme);
-        logger.debug("cdn: " + params.cdnPath);
-        logger.debug("low res asset: " + params.lowResAssetPath);
+        super(asset.cdn);
+
+        logger.debug("cdn: " + asset.cdn);
+        logger.debug("asset: " + asset.path);
 
         streamItems = Vector.<DynamicStreamingItem>(
                 [
-                    new DynamicStreamingItem(params.lowResAssetType + ":" + params.lowResAssetPath, 408, 768, 428)
+                    new DynamicStreamingItem(asset.type + ":" + asset.path, asset.bitrate, asset.width, asset.height)
                 ]);
 
         logger.debug("created " + streamItems.length + " stream item(s)");
@@ -58,7 +59,7 @@ public class DynamicStream extends DynamicStreamingResource {
         addMetadataValue(CONTENT_ID, metaSettings);
 
         addMetadataValue(PROGRAMME_ID, params.programmeId);
-        addMetadataValue(CONTENT_INFO, params.contentInfo)
+        // addMetadataValue(CONTENT_INFO, params.contentInfo)
     }
 }
 }

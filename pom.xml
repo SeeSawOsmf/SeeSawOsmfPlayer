@@ -258,7 +258,7 @@
 
     <properties>
         <flex.sdk.version>4.5.0.17855</flex.sdk.version>
-        <osmf.version>1.0</osmf.version>
+        <osmf.version>1.5</osmf.version>
     </properties>
 
 </project>

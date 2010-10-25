@@ -76,14 +76,17 @@ public class MockData {
 
     public function get playerInit():Object {
 
+        var guidance:Object = {
+            "warning":"Strong language and adult humour",
+            "explanation":"This programme isn't suitable for younger viewers",
+            "confirmation":"Please confirm you are aged 18 or older and accept our <a href=\"http://www.seesaw.com/TermsAndConditions\">Terms and Conditions</a>",
+            "parentalControlsUrl":"http://www.seesaw.com/ParentalControls/TV/Comedy/p-32181-The-Camping-Trip",
+            "findOutMoreLink":"http://www.seesaw.com/watchingtv/aboutparentalcontrols"
+        }
+
         var playerInitData:Object = {
             "programmeId":10001,
-            "guidance":true,
-            "guidanceWarning":"Strong language and adult humour",
-            "guidanceExplanation":"This programme isn't suitable for younger viewers",
-            "guidanceConfirmationMessage":"Please confirm you are aged 18 or older and accept our <a href=\"http://www.seesaw.com/TermsAndConditions\">Terms and Conditions</a>",
-            "guidanceParentalControlsUrl":"http://www.seesaw.com/ParentalControls/TV/Comedy/p-32181-The-Camping-Trip",
-            "guidanceFindOutMoreLink":"http://www.seesaw.com/watchingtv/aboutparentalcontrols"
+            "guidance":guidance
         }
         return playerInitData;
     }
