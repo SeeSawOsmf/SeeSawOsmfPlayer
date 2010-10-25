@@ -60,6 +60,8 @@ public class Player extends Sprite {
     private var _params:Object;
 
     private var guidanceBar:Sprite;
+    private var posterFrame:PosterFrame;
+
 
     // TODO: this is mocked for now
     private var _playerInitParams = new MockData().playerInit;
@@ -110,12 +112,12 @@ public class Player extends Sprite {
 
     private function showPosterFrame():void {
         //Play / resume / preview button
-        var posterFrame = new PosterFrame("http://www.seesaw.com/i/ccp/00000210/21035.jpg");
+        this.posterFrame = new PosterFrame("http://www.seesaw.com/i/ccp/00000210/21035.jpg");
 
-        posterFrame.addEventListener(PosterFrame.LOADED, function(event:Event) {
+        this.posterFrame.addEventListener(PosterFrame.LOADED, function(event:Event) {
             evaluatePreInitStages();
         });
-        addChild(posterFrame);
+        addChild(this.posterFrame);
 
     }
 
@@ -196,6 +198,11 @@ public class Player extends Sprite {
         var config:PlayerConfiguration = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, content);
         videoPlayer = new SeeSawPlayer(config);
 
+        //if there is a poster frame, hide it for playback
+        if (this.posterFrame) {
+            this.posterFrame.visible = false;
+        }
+        
         addChild(videoPlayer);
     }
 
