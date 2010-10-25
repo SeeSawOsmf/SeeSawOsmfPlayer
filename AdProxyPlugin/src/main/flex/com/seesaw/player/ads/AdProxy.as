@@ -22,6 +22,7 @@
 
 package com.seesaw.player.ads {
 import com.seesaw.player.ads.events.LiveRailEvent;
+import com.seesaw.player.events.AdEvents;
 import com.seesaw.player.traits.ads.AdState;
 import com.seesaw.player.traits.ads.AdTrait;
 
@@ -166,6 +167,16 @@ public class AdProxy extends ProxyElement {
         }
     }
 
+    private function playPauseEventHandler(event:AdEvents):void {
+        if (adTrait && adTrait.playPauseState == AdState.PLAYING) {
+            pause();
+        } else if (adTrait && adTrait.playPauseState == AdState.PAUSED) {
+            play();
+        }
+
+
+    }
+
 
     override protected function setupTraits():void {
         logger.debug("setupTraits");
@@ -248,6 +259,8 @@ public class AdProxy extends ProxyElement {
     }
 
     private function createLiverail():void {
+
+        adTrait.addEventListener(AdEvents.PLAY_PAUSE_CHANGE, playPauseEventHandler);
 
         var liverailPath:String = "http://vox-static.liverail.com/swf/v4/admanager.swf";
         var urlResource:URLRequest = new URLRequest(liverailPath);
@@ -361,6 +374,18 @@ public class AdProxy extends ProxyElement {
             }
 
         }
+    }
+
+    public function volume(vol:Number):void {
+        adManager.setVolume(vol / 10, false);
+    }
+
+    public function pause():void {
+        adManager.pauseAd();
+    }
+
+    public function play():void {
+        adManager.resumeAd();
     }
 
     public function onContentUpdate(time:Number, duration:Number):void {
