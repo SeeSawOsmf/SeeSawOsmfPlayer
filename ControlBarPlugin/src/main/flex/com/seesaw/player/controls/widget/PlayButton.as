@@ -21,6 +21,11 @@
  *****************************************************/
 
 package com.seesaw.player.controls.widget {
+import com.seesaw.player.events.AdEvent;
+import com.seesaw.player.traits.ads.AdState;
+import com.seesaw.player.traits.ads.AdTrait;
+import com.seesaw.player.traits.ads.AdTraitType;
+
 import controls.seesaw.widget.interfaces.IWidget;
 
 import flash.events.Event;
@@ -44,11 +49,12 @@ public class PlayButton extends ButtonWidget implements IWidget {
 
     /* static */
     private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.PauseButton";
-    private static const _requiredTraits:Vector.<String> = new Vector.<String>;
-    _requiredTraits[0] = MediaTraitType.PLAY;
+
+    private var _requiredTraits:Vector.<String> = new Vector.<String>;
 
     public function PlayButton() {
         logger.debug("Play Button Constructor");
+        _requiredTraits[0] = MediaTraitType.PLAY;
     }
 
     // Protected
@@ -85,7 +91,14 @@ public class PlayButton extends ButtonWidget implements IWidget {
 
     override protected function onMouseClick(event:MouseEvent):void {
         var playable:PlayTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
-        playable.play();
+        var adTrait:AdTrait = media ? media.getTrait(AdTraitType.AD_PLAY) as AdTrait : null;
+
+        if(adTrait && adTrait.playState == AdState.PLAYING) {
+            adTrait.stop();
+        }
+        else {
+            playable.play();
+        }
     }
 
     // Stubs

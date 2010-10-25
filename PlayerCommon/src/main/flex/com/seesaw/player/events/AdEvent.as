@@ -20,11 +20,25 @@
  *    Incorporated. All Rights Reserved.
  */
 
-package  com.seesaw.player.traits.ads {
+package com.seesaw.player.events {
+import flash.events.Event;
 
-public final class AdState {
-    public static const PLAYING:String = "playing";
-    public static const PAUSED:String = "paused";
-    public static const STOPPED:String = "stopped";
+/**
+ * AdEvents is dispatched when the properties of a AdTrait change.
+ */
+public class AdEvent extends Event {
+
+    public static const AD_STATE_CHANGE:String = "adStateChange";
+
+    private var _adState:String;
+
+    public function AdEvent(adState:String) {
+        super(AD_STATE_CHANGE, false, false);
+        _adState = adState;
+    }
+
+    public function get adState():String {
+        return _adState;
+    }
 }
 }

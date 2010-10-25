@@ -21,84 +21,48 @@
  */
 
 package com.seesaw.player.traits.ads {
-import com.seesaw.player.events.AdEvents;
-
-import flash.errors.IllegalOperationError;
+import com.seesaw.player.events.AdEvent;
 
 import org.osmf.traits.MediaTraitBase;
-import org.osmf.utils.OSMFStrings;
-
-[Event(name="canPauseChange",type="com.seesaw.player.events")]
-
 
 [Event(name="adStateChange",type="com.seesaw.player.events")]
 
 public class AdTrait extends MediaTraitBase {
 
-    public function AdTrait() {
-        super(AdTraitType.PLAY);
+    private var _playState:String;
 
-        _canPause = true;
+    public function AdTrait() {
+        super(AdTraitType.AD_PLAY);
         _playState = AdState.STOPPED;
     }
-
-
-    public final function play():void {
-        attemptAdStateChange(AdState.PLAYING);
-    }
-
-
-    public function get canPause():Boolean {
-        return _canPause;
-    }
-
-    public final function pause():void {
-        if (canPause) {
-            attemptAdStateChange(AdState.PAUSED);
-        }
-        else {
-            throw new IllegalOperationError(OSMFStrings.getString(OSMFStrings.PAUSE_NOT_SUPPORTED));
-        }
-    }
-
-
-    public final function stop():void {
-        attemptAdStateChange(AdState.STOPPED);
-    }
-
 
     public function get playState():String {
         return _playState;
     }
 
+    public function set playState(value:String):void {
+        if (value == null)
+            throw new ArgumentError("ad state cannot be null");
+        _playState = value;
+        dispatchEvent(new AdEvent(value));
+    }
 
-    protected final function setCanPause(value:Boolean):void {
-        if (value != _canPause) {
-            _canPause = value;
-
-            dispatchEvent(new AdEvents(AdEvents.CAN_PAUSE_CHANGE));
+    public function play():void {
+        if (playState != AdState.PLAYING) {
+            playState = AdState.PLAYING;
         }
     }
 
-    protected function adStateChangeStart(newPlayState:String):void {
-    }
-
-
-    protected function adStateChangeEnd():void {
-        dispatchEvent(new AdEvents(AdEvents.AD_STATE_CHANGE, false, false, playState));
-    }
-
-    private function attemptAdStateChange(newPlayState:String):void {
-        if (_playState != newPlayState) {
-            adStateChangeStart(newPlayState);
-
-            _playState = newPlayState;
-
-            adStateChangeEnd();
+    public function stop():void {
+        if (playState != AdState.STOPPED) {
+            playState = AdState.STOPPED;
         }
     }
 
-    private var _playState:String;
-    private var _canPause:Boolean;
+    public function pause():void {
+        if (playState != AdState.PAUSED) {
+            playState = AdState.PAUSED;
+        }
+    }
 }
 }

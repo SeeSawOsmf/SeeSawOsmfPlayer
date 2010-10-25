@@ -51,7 +51,7 @@ public class DebugProxyElement extends ProxyElement {
 
     public function DebugProxyElement() {
 
-        /// logger.debug("Initialising Proxy Element");
+        logger.debug("Initialising Proxy Element");
     }
 
     override public function set proxiedElement(value:MediaElement):void {
@@ -197,11 +197,11 @@ public class DebugProxyElement extends ProxyElement {
     }
 
     private function onMutedChange(event:AudioEvent):void {
-        /// logger.debug("Mute change: {0}", event.muted);
+        logger.debug("Mute change: {0}", event.muted);
     }
 
     private function onVolumeChange(event:AudioEvent):void {
-        /// logger.debug("Volume Change: {0}", event.volume);
+        logger.debug("Volume Change: {0}", event.volume);
     }
 
     private function toggleLoadListeners(added:Boolean):void {
@@ -220,7 +220,7 @@ public class DebugProxyElement extends ProxyElement {
     }
 
     private function onBytesTotalChange(event:LoadEvent):void {
-        /// logger.debug("Load onBytesTotal change:{0}", event.bytes);
+        logger.debug("Load onBytesTotal change:{0}", event.bytes);
     }
 
     private function onLoadableStateChange(event:LoadEvent):void {
@@ -242,11 +242,11 @@ public class DebugProxyElement extends ProxyElement {
     }
 
     private function onBufferingChange(event:BufferEvent):void {
-        /// logger.debug("On Buffering Change:{0}", event.buffering);
+        logger.debug("On Buffering Change:{0}", event.buffering);
     }
 
     private function onBufferTimeChange(event:BufferEvent):void {
-        /// logger.debug("On Buffer Time Change:{0}", event.bufferTime);
+        logger.debug("On Buffer Time Change:{0}", event.bufferTime);
     }
 
     private function togglePlayListeners(added:Boolean):void {
@@ -264,11 +264,11 @@ public class DebugProxyElement extends ProxyElement {
     }
 
     private function onCanPauseChange(event:PlayEvent):void {
-        /// logger.debug("Can Pause Change:{0}", event.canPause);
+        logger.debug("Can Pause Change:{0}", event.canPause);
     }
 
     private function onPlayStateChange(event:PlayEvent):void {
-        /// logger.debug("Play State Change:{0}", event.playState);
+        logger.debug("Play State Change:{0}", event.playState);
     }
 
 
@@ -283,7 +283,7 @@ public class DebugProxyElement extends ProxyElement {
     }
 
     private function onSeekingChange(event:SeekEvent):void {
-        /// logger.debug("On Seek Change:{0}", event.seeking);
+        logger.debug("On Seek Change:{0}", event.seeking);
     }
 
     private function toggleTimeListeners(added:Boolean):void {
@@ -301,11 +301,11 @@ public class DebugProxyElement extends ProxyElement {
     }
 
     private function onDurationChange(event:TimeEvent):void {
-        /// logger.debug("On Duration Change:{0}", event.target.duration);
+        logger.debug("On Duration Change:{0}", event.target.duration);
     }
 
     private function onCurrentTimeChange(event:TimeEvent):void {
-        /// logger.debug("On Current Time Change:{0}", event.time);
+        logger.debug("On Current Time Change:{0}", event.time);
     }
 
     private function onComplete(event:TimeEvent):void {

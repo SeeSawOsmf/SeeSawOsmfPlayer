@@ -21,17 +21,17 @@
  */
 
 package com.seesaw.player.controls.widget {
-import controls.seesaw.widget.*;
-
 import com.seesaw.player.traits.FullScreenTrait;
 
 import controls.seesaw.widget.interfaces.IWidget;
 
 import flash.display.StageDisplayState;
 import flash.events.Event;
+import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.text.TextField;
 import flash.text.TextFormat;
+import flash.ui.Keyboard;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -62,6 +62,31 @@ public class FullScreen extends ButtonWidget implements IWidget {
         this.formatLabelFont();
 
         addChild(fullScreenLabel);
+
+        addEventListener(KeyboardEvent.KEY_DOWN, KeyPressed);
+
+
+    }
+
+    private function KeyPressed(event:KeyboardEvent) {
+        switch (event.keyCode) {
+            case Keyboard.ESCAPE :
+                if (stage.displayState == StageDisplayState.NORMAL) {
+                    stage.displayState = StageDisplayState.FULL_SCREEN;
+                    fullScreenLabel.text = "Exit Fullscreen";
+                } else {
+                    stage.displayState = StageDisplayState.NORMAL;
+                    fullScreenLabel.text = "Fullscreen";
+                }
+                //var playable:PlayTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
+                //playable.play();
+
+                if (_fullscreenTrait) {
+                    _fullscreenTrait.fullscreen = !_fullscreenTrait.fullscreen;
+                }
+                break;
+
+        }
     }
 
     // Protected
