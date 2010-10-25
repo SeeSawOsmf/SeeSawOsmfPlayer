@@ -192,9 +192,9 @@ public class ScrubBar extends Widget implements IWidget {
     }
 
     private function disableScrubber(event:AdEvents):void {
-        if (adTrait.playState == AdState.PLAYING) {
+        if (adTrait.adState == AdState.AD_STARTED) {
             currentTime.visible = scrubber.visible = scrubBarTrail.visible = scrubBarTrack.visible = false;
-        } else if (adTrait.playState == AdState.STOPPED) {
+        } else if (adTrait.adState == AdState.AD_STOPPED) {
             currentTime.visible = scrubber.visible = scrubBarTrail.visible = scrubBarTrack.visible = true;
         }
 

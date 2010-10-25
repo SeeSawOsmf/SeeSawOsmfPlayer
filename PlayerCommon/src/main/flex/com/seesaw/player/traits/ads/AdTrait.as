@@ -23,10 +23,7 @@
 package com.seesaw.player.traits.ads {
 import com.seesaw.player.events.AdEvents;
 
-import flash.errors.IllegalOperationError;
-
 import org.osmf.traits.MediaTraitBase;
-import org.osmf.utils.OSMFStrings;
 
 [Event(name="canPauseChange",type="com.seesaw.player.events")]
 
@@ -38,67 +35,78 @@ public class AdTrait extends MediaTraitBase {
     public function AdTrait() {
         super(AdTraitType.AD_PLAY);
 
-        _canPause = true;
-        _playState = AdState.STOPPED;
+
+        _adState = AdState.AD_STOPPED;
     }
 
 
     public final function play():void {
-        attemptAdStateChange(AdState.PLAYING);
+        attemptAdPlayPauseChange(AdState.PLAYING);
     }
 
+    public final function adStarted():void {
+        attemptAdStateChange(AdState.AD_STARTED);
+    }
 
-    public function get canPause():Boolean {
-        return _canPause;
+    public final function adStopped():void {
+        attemptAdStateChange(AdState.AD_STOPPED);
     }
 
     public final function pause():void {
-        if (canPause) {
-            attemptAdStateChange(AdState.PAUSED);
-        }
-        else {
-            throw new IllegalOperationError(OSMFStrings.getString(OSMFStrings.PAUSE_NOT_SUPPORTED));
-        }
+
+        attemptAdPlayPauseChange(AdState.PAUSED);
+
     }
 
 
     public final function stop():void {
-        attemptAdStateChange(AdState.STOPPED);
+        attemptAdStateChange(AdState.AD_STOPPED);
     }
 
 
-    public function get playState():String {
-        return _playState;
+    public function get adState():String {
+        return _adState;
     }
 
-
-    protected final function setCanPause(value:Boolean):void {
-        if (value != _canPause) {
-            _canPause = value;
-
-            dispatchEvent(new AdEvents(AdEvents.CAN_PAUSE_CHANGE));
-        }
-    }
 
     protected function adStateChangeStart(newPlayState:String):void {
     }
 
 
     protected function adStateChangeEnd():void {
-        dispatchEvent(new AdEvents(AdEvents.AD_STATE_CHANGE, false, false, playState));
+        dispatchEvent(new AdEvents(AdEvents.AD_STATE_CHANGE, false, false, adState));
     }
 
+    protected function adPlayPauseChangeEnd():void {
+        dispatchEvent(new AdEvents(AdEvents.PLAY_PAUSE_CHANGE, false, false, adState, _playPauseState));
+    }
+
+
     private function attemptAdStateChange(newPlayState:String):void {
-        if (_playState != newPlayState) {
+        if (_adState != newPlayState) {
             adStateChangeStart(newPlayState);
 
-            _playState = newPlayState;
+            _adState = newPlayState;
 
             adStateChangeEnd();
         }
     }
 
-    private var _playState:String;
-    private var _canPause:Boolean;
+    private function attemptAdPlayPauseChange(newPlayState:String):void {
+        if (_playPauseState != newPlayState) {
+            adStateChangeStart(newPlayState);
+
+            _playPauseState = newPlayState;
+
+            adPlayPauseChangeEnd();
+        }
+    }
+
+    private var _adState:String;
+    private var _playPauseState:String;
+
+    public function get playPauseState():String {
+        return _playPauseState;
+    }
 }
 }
