@@ -36,6 +36,7 @@ import org.osmf.chrome.assets.AssetsManager;
 import org.osmf.chrome.configuration.LayoutAttributesParser;
 import org.osmf.chrome.configuration.WidgetsParser;
 import org.osmf.chrome.widgets.Widget;
+import org.osmf.events.MediaElementEvent;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaResourceBase;
@@ -125,7 +126,34 @@ public class ControlBarElement extends MediaElement {
             if (targetMetadata) {
                 if (targetMetadata.getValue(ID) != null && targetMetadata.getValue(ID) == settings.getValue(ID)) {
                     logger.debug("setting target on control bar: " + target);
+
+                    target.removeEventListener(MediaElementEvent.TRAIT_ADD, onProxiedTraitsChange);
+                    target.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onProxiedTraitsChange);
+
+                    target.addEventListener(MediaElementEvent.TRAIT_ADD, onProxiedTraitsChange);
+                    target.addEventListener(MediaElementEvent.TRAIT_REMOVE, onProxiedTraitsChange);
+
                     controlBar.media = target;
+                }
+            }
+        }
+    }
+
+    private function onProxiedTraitsChange(event:MediaElementEvent):void {
+        if (event.type == MediaElementEvent.TRAIT_ADD) {
+            // Wait for the target element to display before displaying the control bar
+            if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
+                if(controlBar) {
+                    viewable = new DisplayObjectTrait(controlBar, controlBar.measuredWidth, controlBar.measuredHeight);
+                    addTrait(MediaTraitType.DISPLAY_OBJECT, viewable);
+                    controlBar.measure();
+                }
+            }
+        } else {
+            if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
+                // Hide the control bar if the target element is hidden
+                if(controlBar) {
+                    removeTrait(MediaTraitType.DISPLAY_OBJECT);
                 }
             }
         }
@@ -161,18 +189,6 @@ public class ControlBarElement extends MediaElement {
         var layoutMetadata:LayoutMetadata = new LayoutMetadata();
         LayoutAttributesParser.parse(controlBar.configuration, layoutMetadata);
         addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layoutMetadata);
-
-        // Signal that this media element is viewable: create a DisplayObjectTrait.
-        // Assign controlBar (which is a Sprite) to be our view's displayObject.
-        // Additionally, use its current width and height for the trait's mediaWidth
-        // and mediaHeight properties:
-        viewable = new DisplayObjectTrait(controlBar, controlBar.measuredWidth, controlBar.measuredHeight);
-        // Add the trait:
-        addTrait(MediaTraitType.DISPLAY_OBJECT, viewable);
-
-        controlBar.measure();
-
-        // _playableTrait = target.getTrait(MediaTraitType.PLAY) as PlayTrait;
 
         super.setupTraits();
     }
