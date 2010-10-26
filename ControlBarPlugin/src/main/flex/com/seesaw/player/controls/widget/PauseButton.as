@@ -55,6 +55,7 @@ public class PauseButton extends ButtonWidget implements IWidget {
 
     public function PauseButton() {
         logger.debug("Pause Button Constructor");
+        buttonMode = true;
     }
 
     // Protected

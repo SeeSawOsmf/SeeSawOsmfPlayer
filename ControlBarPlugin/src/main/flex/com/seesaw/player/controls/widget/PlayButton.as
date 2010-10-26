@@ -55,6 +55,7 @@ public class PlayButton extends ButtonWidget implements IWidget {
 
     public function PlayButton() {
         logger.debug("Play Button Constructor");
+        buttonMode = true;
     }
 
     // Protected
