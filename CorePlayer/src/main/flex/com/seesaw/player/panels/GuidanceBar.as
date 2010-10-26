@@ -3,6 +3,7 @@ import flash.display.Bitmap;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
+import flash.geom.Rectangle;
 import flash.net.URLRequest;
 import flash.net.navigateToURL;
 import flash.system.Security;
@@ -14,6 +15,8 @@ public class GuidanceBar extends Sprite {
 
     //Guidance warning string passed into the constructor
     private var guidanceWarning:String;
+
+    private var panelBG:Sprite;
 
     //Embed images
     [Embed(source="resources/acceptButton_up.png")]
@@ -49,7 +52,7 @@ public class GuidanceBar extends Sprite {
 
     private function buildPanel():Sprite {
         var panel:Sprite = new Sprite();
-
+        
         panel.addChild(this.buildPanelBG());
 
         var contentContainer:Sprite = this.buildContentContainer();
@@ -63,15 +66,18 @@ public class GuidanceBar extends Sprite {
     }
 
     private function buildPanelBG():Sprite {
-        var panelBG:Sprite = new Sprite();
 
-        with (panelBG.graphics) {
+        var rectangle:Rectangle = new Rectangle();
+        //rectangle.
+        this.panelBG = new Sprite();
+
+        with (this.panelBG.graphics) {
             beginFill(0xFF0000, 0.6);
             drawRoundRect(0, 0, 530, 38, 0);
             endFill();
         }
 
-        return panelBG;
+        return this.panelBG;
     }
 
     private function buildContentContainer():Sprite {
@@ -106,6 +112,7 @@ public class GuidanceBar extends Sprite {
 
     private function applyWarningFormat(textToFormat:TextField):TextField {
         var textFormat:TextFormat = new TextFormat();
+        textFormat.font = "Arial";
         textFormat.size = 11;
         textFormat.color = 0xFFFFFF;
         textFormat.align = "left";

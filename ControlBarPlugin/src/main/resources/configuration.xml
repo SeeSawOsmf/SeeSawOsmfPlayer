@@ -109,7 +109,7 @@
             <widget
                     id="com.seesaw.player.controls.widget.SubtitlesButton"
                     type="com.seesaw.player.controls.widget.SubtitlesButton"
-                    right="100"
+                    right="120"
                     top="70"
                     />
             <widget
