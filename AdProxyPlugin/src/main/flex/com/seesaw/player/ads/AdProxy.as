@@ -68,7 +68,7 @@ public class AdProxy extends ProxyElement {
     public function AdProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
 
-        Security.allowDomain("*");
+        Security.allowDomain("vox-static.liverail.com");
 
         displayObject = new Sprite();
         outerViewable = new AdProxyDisplayObjectTrait(displayObject);
@@ -354,7 +354,6 @@ public class AdProxy extends ProxyElement {
     }
 
     private function onTimerTick(event:TimerEvent):void {
-        var labelText:String = "";
         if (proxiedElement != null) {
             var timeTrait:TimeTrait = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
             var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;

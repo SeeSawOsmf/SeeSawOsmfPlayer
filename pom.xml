@@ -45,6 +45,7 @@
         <module>FullScreenProxyPlugin</module>
         <module>AdProxyPlugin</module>
         <module>PlayerCommon</module>
+        <module>ScrubPreventionProxy</module>
     </modules>
 
     <developers>
@@ -135,6 +136,12 @@
             </dependency>
             <dependency>
                 <artifactId>AdProxyPlugin</artifactId>
+                <groupId>com.seesaw</groupId>
+                <version>${pom.version}</version>
+                <type>swc</type>
+            </dependency>
+            <dependency>
+                <artifactId>ScrubPreventionProxy</artifactId>
                 <groupId>com.seesaw</groupId>
                 <version>${pom.version}</version>
                 <type>swc</type>

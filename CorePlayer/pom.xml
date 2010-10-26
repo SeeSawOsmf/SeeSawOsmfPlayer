@@ -121,6 +121,11 @@
             <type>swc</type>
         </dependency>
         <dependency>
+            <artifactId>ScrubPreventionProxy</artifactId>
+            <groupId>com.seesaw</groupId>
+            <type>swc</type>
+        </dependency>
+        <dependency>
             <artifactId>AdProxyPlugin</artifactId>
             <groupId>com.seesaw</groupId>
             <version>${pom.version}</version>
@@ -131,7 +136,6 @@
             <groupId>com.seesaw</groupId>
             <type>swc</type>
         </dependency>
-
         <dependency>
             <groupId>org.as3commons</groupId>
             <artifactId>as3commons-logging</artifactId>
