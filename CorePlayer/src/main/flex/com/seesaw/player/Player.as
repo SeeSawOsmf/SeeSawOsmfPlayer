@@ -44,7 +44,7 @@ import org.as3commons.logging.LoggerFactory;
 import org.osmf.logging.Log;
 import org.osmf.net.StreamingURLResource;
 
-[SWF(width=PLAYER::Width, height=PLAYER::Height, backgroundColor="#222222")]
+[SWF(width=PLAYER::Width, height=PLAYER::Height, backgroundColor="#000000")]
 public class Player extends Sprite {
 
     private static const PLAYER_WIDTH:int = PLAYER::Width;
