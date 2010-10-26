@@ -102,9 +102,9 @@ public class AdProxy extends ProxyElement {
     }
 
     private function playPauseEventHandler(event:AdEvents):void {
-        if (_adTrait && _adTrait.playPauseState == AdState.PLAYING) {
+        if (_adTrait && _adTrait.playPauseState == AdState.PAUSED) {
             pause();
-        } else if (_adTrait && _adTrait.playPauseState == AdState.PAUSED) {
+        } else if (_adTrait && _adTrait.playPauseState == AdState.PLAYING) {
             play();
         }
     }
