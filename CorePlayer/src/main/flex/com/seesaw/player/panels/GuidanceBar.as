@@ -2,14 +2,12 @@ package com.seesaw.player.panels {
 import flash.display.Bitmap;
 import flash.display.Sprite;
 import flash.events.Event;
-import flash.events.MouseEvent;
 import flash.geom.Rectangle;
-import flash.net.URLRequest;
-import flash.net.navigateToURL;
 import flash.system.Security;
 import flash.text.StyleSheet;
 import flash.text.TextField;
 import flash.text.TextFormat;
+import com.seesaw.player.ui.DefaultTextFormat;
 
 public class GuidanceBar extends Sprite {
 
@@ -17,11 +15,6 @@ public class GuidanceBar extends Sprite {
     private var guidanceWarning:String;
 
     private var panelBG:Sprite;
-
-    //Embed images
-    [Embed(source="resources/acceptButton_up.png")]
-    private var acceptImageUpEmbed:Class;
-    private var acceptImageUp:Bitmap = new acceptImageUpEmbed();
 
     //css
     private var css:StyleSheet;
@@ -67,13 +60,11 @@ public class GuidanceBar extends Sprite {
 
     private function buildPanelBG():Sprite {
 
-        var rectangle:Rectangle = new Rectangle();
-        //rectangle.
         this.panelBG = new Sprite();
 
         with (this.panelBG.graphics) {
             beginFill(0xFF0000, 0.6);
-            drawRoundRect(0, 0, 530, 38, 0);
+            drawRoundRect(0, 0, 550, 38, 0);
             endFill();
         }
 
@@ -112,15 +103,16 @@ public class GuidanceBar extends Sprite {
 
     private function applyWarningFormat(textToFormat:TextField):TextField {
         var textFormat:TextFormat = new TextFormat();
-        textFormat.font = "Arial";
         textFormat.size = 11;
         textFormat.color = 0xFFFFFF;
         textFormat.align = "left";
 
         textToFormat.setTextFormat(textFormat);
 
-        return textToFormat;
+        var defaultTextFormat = new DefaultTextFormat(textToFormat);
+        defaultTextFormat.applyFontFace();
 
+        return textToFormat;
     }
 
 }
