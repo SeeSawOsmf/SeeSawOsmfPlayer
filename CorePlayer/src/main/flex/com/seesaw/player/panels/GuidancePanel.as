@@ -150,6 +150,7 @@ public class GuidancePanel extends Sprite {
 
     private function applyWarningFormat(textToFormat:TextField):TextField {
         var textFormat:TextFormat = new TextFormat();
+        textFormat.font = "Arial";
         textFormat.size = 16;
         textFormat.color = 0xF15925;
         textFormat.align = "left";
@@ -162,6 +163,7 @@ public class GuidancePanel extends Sprite {
 
     private function applyInfoFormat(textToFormat:TextField):TextField {
         var textFormat:TextFormat = new TextFormat();
+        textFormat.font = "Arial";
         textFormat.size = 14;
         textFormat.color = 0xFFFFFF;
         textFormat.align = "left";
