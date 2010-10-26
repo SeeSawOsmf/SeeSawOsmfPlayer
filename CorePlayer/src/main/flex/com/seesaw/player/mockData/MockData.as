@@ -23,7 +23,7 @@
 package com.seesaw.player.mockData {
 public class MockData {
 
-    public function get contentInfo():XML {
+    public static function get contentInfo():XML {
         var contentInfoBBC:XML = new XML('<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>' +
                 '<ns2:contentInfo xmlns:ns2=\"http:\/\/www.vodco.co.uk\/sherbet\/advertising\/v1.6\">' +
                 '<primaryGenre>TV:COMEDY:SATIRE<\/primaryGenre>' +
@@ -126,8 +126,9 @@ public class MockData {
                     "bitrate":500,
                     "type":"mp4"}},
             "geoblocked":"false",
-            "programmeId":12001018002};
-        
+            "programmeId":12001018002,
+            "contentInfo": contentInfo};
+
         return videoPlayerInfoData;
     }
 }
