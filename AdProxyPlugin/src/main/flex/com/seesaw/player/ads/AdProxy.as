@@ -97,16 +97,12 @@ public class AdProxy extends ProxyElement {
 
     override protected function setupTraits():void {
         logger.debug("setupTraits");
-
-        _adTrait = new AdTrait();
-        _adTrait.addEventListener(AdEvent.PLAY_PAUSE_CHANGE, playPauseEventHandler);
-        addTrait(AdTraitType.AD_PLAY, _adTrait);
-
+        addLocalTraits();
         super.setupTraits();
     }
 
     private function playPauseEventHandler(event:AdEvent):void {
-        if(_adTrait && _adTrait.adState == AdState.STARTED) {
+        if (_adTrait && _adTrait.adState == AdState.STARTED) {
             if (_adTrait.playState == AdState.PLAYING) {
                 play();
             } else if (_adTrait.playState == AdState.PAUSED) {
@@ -202,8 +198,7 @@ public class AdProxy extends ProxyElement {
     }
 
     private function onLoadError(e:IOErrorEvent):void {
-        removeTrait(AdTraitType.AD_PLAY);
-        _adTrait = null;
+        removeLocalTraits();
     }
 
     private function setupAdManager():void {
@@ -359,6 +354,22 @@ public class AdProxy extends ProxyElement {
             if (timeTrait && playTrait && playTrait.playState == PlayState.PLAYING) {
                 onContentUpdate(timeTrait.currentTime, timeTrait.duration);
             }
+        }
+    }
+
+    private function addLocalTraits() {
+        if (_adTrait == null) {
+            _adTrait = new AdTrait();
+            _adTrait.addEventListener(AdEvent.PLAY_PAUSE_CHANGE, playPauseEventHandler);
+            addTrait(AdTraitType.AD_PLAY, _adTrait);
+        }
+    }
+
+    private function removeLocalTraits() {
+        removeTrait(AdTraitType.AD_PLAY);
+        if (_adTrait) {
+            _adTrait.addEventListener(AdEvent.PLAY_PAUSE_CHANGE, playPauseEventHandler);
+            _adTrait = null;
         }
     }
 }
