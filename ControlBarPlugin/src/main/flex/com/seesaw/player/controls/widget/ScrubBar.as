@@ -22,10 +22,12 @@
 
 package
 com.seesaw.player.controls.widget {
-import com.seesaw.player.events.AdEvents;
+import com.seesaw.player.events.AdEvent;
 import com.seesaw.player.traits.ads.AdState;
 import com.seesaw.player.traits.ads.AdTrait;
 import com.seesaw.player.traits.ads.AdTraitType;
+
+import com.seesaw.player.ui.StyledTextField;
 
 import controls.seesaw.widget.interfaces.IWidget;
 
@@ -57,7 +59,7 @@ public class ScrubBar extends Widget implements IWidget {
     private var _adState:AdTrait;
 
     public function ScrubBar() {
-        currentTime = new TextField();
+        currentTime = new StyledTextField();
         addChild(currentTime);
 
         scrubBarClickArea = new Sprite();
@@ -186,18 +188,17 @@ public class ScrubBar extends Widget implements IWidget {
         scrubber.enabled = media ? media.hasTrait(MediaTraitType.SEEK) : false;
         adTrait = media ? media.getTrait(AdTraitType.AD_PLAY) as AdTrait : null;
         if (adTrait)
-            adTrait.addEventListener(AdEvents.AD_STATE_CHANGE, disableScrubber);
+            adTrait.addEventListener(AdEvent.AD_STATE_CHANGE, disableScrubber);
 
         updateTimerState();
     }
 
-    private function disableScrubber(event:AdEvents):void {
-        if (adTrait.adState == AdState.AD_STARTED) {
+    private function disableScrubber(event:AdEvent):void {
+        if (adTrait.adState == AdState.STARTED) {
             currentTime.visible = scrubber.visible = scrubBarTrail.visible = scrubBarTrack.visible = false;
-        } else if (adTrait.adState == AdState.AD_STOPPED) {
+        } else if (adTrait.adState == AdState.STOPPED) {
             currentTime.visible = scrubber.visible = scrubBarTrail.visible = scrubBarTrack.visible = true;
         }
-
     }
 
     private function updateTimerState():void {

@@ -97,6 +97,11 @@ public class SeeSawPlayer extends Sprite {
             throw ArgumentError("failed to create main media element for player");
         }
 
+        var fullScreen:FullScreenTrait = _videoElement.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
+        if (fullScreen) {
+            fullScreen.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
+        }
+
         logger.debug("adding video element to container");
         _rootElement.addChild(_videoElement);
     }
@@ -114,8 +119,6 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onMediaElementCreate(event:MediaFactoryEvent):void {
-        logger.debug("created media element: " + event.mediaElement);
-
         event.mediaElement.addEventListener(MediaElementEvent.TRAIT_ADD, onMediaTraitsChange);
         event.mediaElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onMediaTraitsChange);
     }
@@ -123,17 +126,16 @@ public class SeeSawPlayer extends Sprite {
     private function onMediaTraitsChange(event:MediaElementEvent):void {
         var target = event.target as MediaElement;
 
-        var fullscreen:FullScreenTrait = target.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
-        if (event.type == MediaElementEvent.TRAIT_ADD) {
-            if (fullscreen) {
+        var fullScreen:FullScreenTrait = target.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
+
+        if (fullScreen && event.traitType == FullScreenTrait.FULL_SCREEN) {
+            if (event.type == MediaElementEvent.TRAIT_ADD) {
                 logger.debug("adding handler for full screen trait: " + target);
-                fullscreen.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
+                fullScreen.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
             }
-        }
-        else {
-            if (fullscreen) {
-                logger.debug("adding handler for full screen trait: " + target);
-                fullscreen.removeEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
+            else {
+                logger.debug("removing handler for full screen trait: " + target);
+                fullScreen.removeEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
             }
         }
     }

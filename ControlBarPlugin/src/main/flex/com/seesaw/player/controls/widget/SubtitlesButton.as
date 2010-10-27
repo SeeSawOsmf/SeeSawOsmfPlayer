@@ -23,6 +23,8 @@
 package com.seesaw.player.controls.widget {
 import com.seesaw.player.traits.FullScreenTrait;
 
+import com.seesaw.player.ui.StyledTextField;
+
 import controls.seesaw.widget.interfaces.IWidget;
 
 import flash.events.Event;
@@ -57,7 +59,7 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
 
     public function SubtitlesButton() {
         logger.debug("Subtitles Constructor");
-        subtitlesLabel = new TextField();
+        subtitlesLabel = new StyledTextField();
         subtitlesLabel.text = "Subtitles are off";
         this.formatLabelFont();
 
@@ -69,7 +71,6 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
 
     private function formatLabelFont():void {
         var textFormat:TextFormat = new TextFormat();
-        textFormat.font = "Arial";
         textFormat.size = 12;
         textFormat.color = 0x00A78D;
         textFormat.align = "right";

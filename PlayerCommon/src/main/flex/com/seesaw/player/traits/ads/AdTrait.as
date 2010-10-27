@@ -21,81 +21,62 @@
  */
 
 package com.seesaw.player.traits.ads {
-import com.seesaw.player.events.AdEvents;
+import com.seesaw.player.events.AdEvent;
 
 import org.osmf.traits.MediaTraitBase;
 
-[Event(name="canPauseChange",type="com.seesaw.player.events")]
+[Event(name="canPauseChange",type="com.seesaw.player.events.AdEvent")]
 
-[Event(name="adStateChange",type="com.seesaw.player.events")]
+[Event(name="adStateChange",type="com.seesaw.player.events.AdEvent")]
 
 public class AdTrait extends MediaTraitBase {
 
     private var _adState:String;
-    private var _playPauseState:String;
+    private var _playState:String;
 
     public function AdTrait() {
         super(AdTraitType.AD_PLAY);
-        _adState = AdState.AD_STOPPED;
-    }
-
-    public final function play():void {
-        attemptAdPlayPauseChange(AdState.PLAYING);
-    }
-
-    public final function adStarted():void {
-        attemptAdStateChange(AdState.AD_STARTED);
-    }
-
-    public final function adStopped():void {
-        attemptAdStateChange(AdState.AD_STOPPED);
-    }
-
-    public final function pause():void {
-        attemptAdPlayPauseChange(AdState.PAUSED);
-    }
-
-    public final function stop():void {
-        attemptAdStateChange(AdState.AD_STOPPED);
+        _adState = AdState.STOPPED;
     }
 
     public function get adState():String {
         return _adState;
     }
 
-    protected function adStateChangeStart(newPlayState:String):void {
-    }
-
-    protected function adStateChangeEnd():void {
-        dispatchEvent(new AdEvents(AdEvents.AD_STATE_CHANGE, false, false, adState));
-    }
-
-    protected function adPlayPauseChangeEnd():void {
-        dispatchEvent(new AdEvents(AdEvents.PLAY_PAUSE_CHANGE, false, false, adState, _playPauseState));
-    }
-
-    private function attemptAdStateChange(newPlayState:String):void {
-        if (_adState != newPlayState) {
-            adStateChangeStart(newPlayState);
-
-            _adState = newPlayState;
-
-            adStateChangeEnd();
+    public function set adState(value:String):void {
+        if (value != _adState) {
+            _adState = value;
+            dispatchEvent(new AdEvent(AdEvent.AD_STATE_CHANGE, false, false, _adState));
         }
     }
 
-    private function attemptAdPlayPauseChange(newPlayState:String):void {
-        if (_playPauseState != newPlayState) {
-            adStateChangeStart(newPlayState);
+    public function get playState():String {
+        return _playState;
+    }
 
-            _playPauseState = newPlayState;
-
-            adPlayPauseChangeEnd();
+    public function set playState(value:String):void {
+        if (value != _playState && _adState == AdState.STARTED) {
+            _playState = value;
+            dispatchEvent(new AdEvent(AdEvent.PLAY_PAUSE_CHANGE, false, false, _playState));
         }
     }
 
-    public function get playPauseState():String {
-        return _playPauseState;
+    public function started():void {
+        _playState = AdState.PLAYING;
+        adState = AdState.STARTED;
+    }
+
+    public function stopped():void {
+        _playState = null;
+        adState = AdState.STOPPED;
+    }
+
+    public function play():void {
+        playState = AdState.PLAYING;
+    }
+
+    public function pause():void {
+        playState = AdState.PAUSED;
     }
 }
 }
