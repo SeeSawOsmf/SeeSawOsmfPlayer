@@ -23,6 +23,8 @@
 package com.seesaw.player.controls.widget {
 import com.seesaw.player.traits.FullScreenTrait;
 
+import com.seesaw.player.ui.StyledTextField;
+
 import controls.seesaw.widget.interfaces.IWidget;
 
 import flash.display.StageDisplayState;
@@ -57,7 +59,7 @@ public class FullScreen extends ButtonWidget implements IWidget {
 
     public function FullScreen() {
         logger.debug("Full Screen Constructor");
-        fullScreenLabel = new TextField();
+        fullScreenLabel = new StyledTextField();
         fullScreenLabel.text = "Fullscreen";
         this.formatLabelFont();
 
@@ -94,7 +96,6 @@ public class FullScreen extends ButtonWidget implements IWidget {
 
     private function formatLabelFont():void {
         var textFormat:TextFormat = new TextFormat();
-        textFormat.font = "Arial";
         textFormat.size = 12;
         textFormat.color = 0x00A78D;
         textFormat.align = "right";

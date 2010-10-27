@@ -1,4 +1,6 @@
 package com.seesaw.player.panels {
+import com.seesaw.player.ui.StyledTextField;
+
 import flash.display.Bitmap;
 import flash.display.Sprite;
 import flash.events.Event;
@@ -115,7 +117,7 @@ public class GuidancePanel extends Sprite {
     }
 
     private function buildWarning():TextField {
-        var warningLabel = new TextField();
+        var warningLabel = new StyledTextField();
         warningLabel.width = 540;
         warningLabel.htmlText = this.guidanceWarning;
         warningLabel.y = 0;
@@ -126,7 +128,7 @@ public class GuidancePanel extends Sprite {
 
     private function buildExplanation():TextField {
 
-        var explanationLabel = new TextField();
+        var explanationLabel = new StyledTextField();
         explanationLabel.width = 540;
         explanationLabel.htmlText = this.guidanceExplanation;
         explanationLabel.y = 32;
@@ -137,7 +139,7 @@ public class GuidancePanel extends Sprite {
 
     private function buildConfirmationMessage():TextField {
 
-        var confirmationLabel = new TextField();
+        var confirmationLabel = new StyledTextField();
         confirmationLabel.width = 540;
         confirmationLabel.htmlText = this.confirmationMessage;
         confirmationLabel.y = 66;
@@ -150,7 +152,6 @@ public class GuidancePanel extends Sprite {
 
     private function applyWarningFormat(textToFormat:TextField):TextField {
         var textFormat:TextFormat = new TextFormat();
-        textFormat.font = "Arial";
         textFormat.size = 16;
         textFormat.color = 0xF15925;
         textFormat.align = "left";
@@ -163,7 +164,6 @@ public class GuidancePanel extends Sprite {
 
     private function applyInfoFormat(textToFormat:TextField):TextField {
         var textFormat:TextFormat = new TextFormat();
-        textFormat.font = "Arial";
         textFormat.size = 14;
         textFormat.color = 0xFFFFFF;
         textFormat.align = "left";
@@ -252,7 +252,7 @@ public class GuidancePanel extends Sprite {
         declineButton.mouseChildren = false;
 
         //build the label
-        var buttonLabel = new TextField();
+        var buttonLabel = new StyledTextField();
         buttonLabel.text = label;
         buttonLabel.x = 25;
         buttonLabel.y = 15;
@@ -302,7 +302,7 @@ public class GuidancePanel extends Sprite {
         parentalControlsButton.mouseChildren = false;
 
         //build the label
-        var parentalControlsLabel = new TextField();
+        var parentalControlsLabel = new StyledTextField();
         parentalControlsLabel.text = "Set up Parental Controls";
         parentalControlsLabel.x = 0;
         parentalControlsLabel.y = 0;
@@ -346,7 +346,7 @@ public class GuidancePanel extends Sprite {
         findOutMoreButton.mouseChildren = false;
 
         //build the label
-        var findOutMoreLabel = new TextField();
+        var findOutMoreLabel = new StyledTextField();
         findOutMoreLabel.text = "Find out more";
         findOutMoreLabel.x = 0;
         findOutMoreLabel.y = 0;
