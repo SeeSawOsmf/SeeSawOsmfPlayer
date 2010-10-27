@@ -26,13 +26,13 @@ import flash.events.Event;
 /**
  * A AdEvents is dispatched when the properties of a AdTrait change.
  */
-public class AdEvents extends Event {
+public class AdEvent extends Event {
 
     public static const PLAY_PAUSE_CHANGE:String = "playPauseChange";
 
     public static const AD_STATE_CHANGE:String = "adStateChange";
 
-    public function AdEvents
+    public function AdEvent
             (type:String,
              bubbles:Boolean = false,
              cancelable:Boolean = false,
@@ -47,7 +47,7 @@ public class AdEvents extends Event {
     }
 
     override public function clone():Event {
-        return new AdEvents(type, bubbles, cancelable, adState, playPauseState);
+        return new AdEvent(type, bubbles, cancelable, adState, playPauseState);
     }
 
     public function get adState():String {

@@ -25,6 +25,7 @@ import com.seesaw.player.ads.AdProxyPluginInfo;
 import com.seesaw.player.components.ControlBarComponent;
 import com.seesaw.player.components.MediaComponent;
 import com.seesaw.player.events.FullScreenEvent;
+import com.seesaw.player.fullscreen.FullScreenProxyElement;
 import com.seesaw.player.fullscreen.FullScreenProxyPluginInfo;
 import com.seesaw.player.scrubPrevention.ScrubPreventionProxyPluginInfo;
 import com.seesaw.player.traits.FullScreenTrait;
@@ -121,16 +122,16 @@ public class SeeSawPlayer extends Sprite {
 
     private function onMediaTraitsChange(event:MediaElementEvent):void {
         var target = event.target as MediaElement;
-
         var fullscreen:FullScreenTrait = target.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
+
         if (event.type == MediaElementEvent.TRAIT_ADD) {
-            if (fullscreen) {
+            if (fullscreen && event.traitType == FullScreenTrait.FULL_SCREEN) {
                 logger.debug("adding handler for full screen trait: " + target);
                 fullscreen.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
             }
         }
-        else {
-            if (fullscreen) {
+        else if (event.type == MediaElementEvent.TRAIT_REMOVE) {
+            if (fullscreen && event.traitType == FullScreenTrait.FULL_SCREEN) {
                 logger.debug("adding handler for full screen trait: " + target);
                 fullscreen.removeEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
             }

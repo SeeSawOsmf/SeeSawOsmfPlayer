@@ -21,124 +21,40 @@
  */
 
 package com.seesaw.player.controls.widget {
-import com.seesaw.player.events.AdEvents;
-import com.seesaw.player.traits.ads.AdState;
-import com.seesaw.player.traits.ads.AdTrait;
-import com.seesaw.player.traits.ads.AdTraitType;
-
 import controls.seesaw.widget.interfaces.IWidget;
 
-import flash.events.Event;
 import flash.events.MouseEvent;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
-import org.osmf.chrome.widgets.ButtonWidget;
-import org.osmf.events.PlayEvent;
-import org.osmf.media.MediaElement;
-import org.osmf.traits.MediaTraitType;
-import org.osmf.traits.PlayState;
-import org.osmf.traits.PlayTrait;
 
-public class PlayButton extends ButtonWidget implements IWidget {
-    private var _logger:ILogger = LoggerFactory.getClassLogger(PauseButton);
+public class PlayButton extends PlayPauseButtonBase implements IWidget {
 
-    // Internals
+    private var logger:ILogger = LoggerFactory.getClassLogger(PlayButton);
 
-    private var _playable:PlayTrait;
-
-    /* static */
-    private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.PauseButton";
-    private static const _requiredTraits:Vector.<String> = new Vector.<String>;
-    private var _adTrait:AdTrait;
-    _requiredTraits[0] = MediaTraitType.PLAY;
+    private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.PlayButton";
 
     public function PlayButton() {
-        logger.debug("Play Button Constructor");
-        buttonMode = true;
+        logger.debug("PlayButton()");
     }
 
-    // Protected
-    //
-
-    protected function get playable():PlayTrait {
-        return _playable;
-    }
-
-    // Overrides
-    //
-
-    override protected function get requiredTraits():Vector.<String> {
-        return _requiredTraits;
-    }
-
-    override protected function processRequiredTraitsAvailable(element:MediaElement):void {
-        _playable = element.getTrait(MediaTraitType.PLAY) as PlayTrait;
-        _playable.addEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
-        _playable.addEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
-
-        adTrait = media ? media.getTrait(AdTraitType.AD_PLAY) as AdTrait : null;
-        if (adTrait) {
-            adTrait.addEventListener(AdEvents.PLAY_PAUSE_CHANGE, visibilityDeterminingAdEventHandler);
-        }
-        visibilityDeterminingEventHandler();
-    }
-
-    private function visibilityDeterminingAdEventHandler(event:AdEvents):void {
-        visible = adTrait && adTrait.playPauseState == AdState.PAUSED;
-    }
-
-    override protected function processRequiredTraitsUnavailable(element:MediaElement):void {
-        if (_playable) {
-            _playable.removeEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
-            _playable.removeEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
-            _playable = null;
-        }
-
-        visibilityDeterminingEventHandler();
+    override protected function updateVisibility():void {
+        visible = adMode ? adPaused : paused;
     }
 
     override protected function onMouseClick(event:MouseEvent):void {
-        var playable:PlayTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
-        adTrait = media ? media.getTrait(AdTraitType.AD_PLAY) as AdTrait : null;
-        if (adTrait)
-            if (adTrait.adState == AdState.AD_STARTED) {
-
-                adTrait.play();
-
-            } else if (!adTrait) {
-                playable.play();
-            }
-    }
-
-    // Stubs
-    //
-
-    protected function visibilityDeterminingEventHandler(event:Event = null):void {
-        if (adTrait)
-            if (adTrait.adState == AdState.AD_STOPPED) {
-                visible = playable && playable.playState == PlayState.PAUSED && playable.canPause;
-            }
+        if (adMode && adPaused) {
+            logger.debug("playing ad");
+            adTrait.play();
+        }
+        else if (paused) {
+            logger.debug("playing main content");
+            playTrait.play();
+        }
     }
 
     public function get classDefinition():String {
         return QUALIFIED_NAME;
-    }
-
-    public function get logger():ILogger {
-        return _logger;
-    }
-
-    public function set logger(value:ILogger):void {
-        _logger = value;
-    }
-
-    public function get adTrait():AdTrait {
-        return _adTrait;
-    }
-
-    public function set adTrait(value:AdTrait):void {
-        _adTrait = value;
     }
 }
 }

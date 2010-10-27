@@ -22,7 +22,7 @@
 
 package com.seesaw.player.ads {
 import com.seesaw.player.ads.events.LiveRailEvent;
-import com.seesaw.player.events.AdEvents;
+import com.seesaw.player.events.AdEvent;
 import com.seesaw.player.traits.ads.AdState;
 import com.seesaw.player.traits.ads.AdTrait;
 import com.seesaw.player.traits.ads.AdTraitType;
@@ -56,6 +56,8 @@ public class AdProxy extends ProxyElement {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(AdProxy);
 
+    private static const CONTENT_UPDATE_INTERVAL:int = 500;
+
     private var _adTrait:AdTrait;
     private var _innerViewable:DisplayObjectTrait;
     private var outerViewable:AdProxyDisplayObjectTrait;
@@ -76,7 +78,6 @@ public class AdProxy extends ProxyElement {
 
     public override function set proxiedElement(proxiedElement:MediaElement):void {
         if (proxiedElement) {
-
             super.proxiedElement = proxiedElement;
 
             proxiedElement.removeEventListener(MediaElementEvent.TRAIT_ADD, onProxiedTraitsChange);
@@ -96,19 +97,20 @@ public class AdProxy extends ProxyElement {
 
     override protected function setupTraits():void {
         logger.debug("setupTraits");
-
-        _adTrait = new AdTrait();
-        _adTrait.addEventListener(AdEvents.PLAY_PAUSE_CHANGE, playPauseEventHandler);
-        addTrait(AdTraitType.AD_PLAY, _adTrait);
-
+        addLocalTraits();
         super.setupTraits();
     }
 
-    private function playPauseEventHandler(event:AdEvents):void {
-        if (_adTrait && _adTrait.playPauseState == AdState.PAUSED) {
-            pause();
-        } else if (_adTrait && _adTrait.playPauseState == AdState.PLAYING) {
-            play();
+    private function playPauseEventHandler(event:AdEvent):void {
+        if (_adTrait && _adTrait.adState == AdState.STARTED) {
+            if (_adTrait.playState == AdState.PLAYING) {
+                play();
+            } else if (_adTrait.playState == AdState.PAUSED) {
+                pause();
+            }
+            else {
+                logger.warn("invalid play state: " + _adTrait.playState);
+            }
         }
     }
 
@@ -196,7 +198,7 @@ public class AdProxy extends ProxyElement {
     }
 
     private function onLoadError(e:IOErrorEvent):void {
-        removeTrait(AdTraitType.AD_PLAY);
+        removeLocalTraits();
     }
 
     private function setupAdManager():void {
@@ -223,7 +225,7 @@ public class AdProxy extends ProxyElement {
     }
 
     private function onLiveRailPrerollComplete(event:Event):void {
-        var timer:Timer = new Timer(500);
+        var timer:Timer = new Timer(CONTENT_UPDATE_INTERVAL);
         timer.addEventListener(TimerEvent.TIMER, onTimerTick);
         timer.start();
     }
@@ -238,40 +240,31 @@ public class AdProxy extends ProxyElement {
         if (proxiedElement != null) {
             var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
 
-            if (_adTrait) {
-                if (_adTrait.adState == AdState.AD_STOPPED) {
-                    _adTrait.adStarted();
-                }
-            }
             if (playTrait) {
-                if (playTrait.playState == PlayState.PLAYING) {
+                var traitsToBlock:Vector.<String> = new Vector.<String>();
+                traitsToBlock[0] = MediaTraitType.SEEK;
+                traitsToBlock[1] = MediaTraitType.TIME;
+                blockedTraits = traitsToBlock;
+                playTrait.pause();
+            }
 
-                    var traitsToBlock:Vector.<String> = new Vector.<String>();
-                    traitsToBlock[0] = MediaTraitType.SEEK;
-                    traitsToBlock[1] = MediaTraitType.TIME;
-
-                    blockedTraits = traitsToBlock;
-                    playTrait.pause();
-                }
+            if (_adTrait) {
+                _adTrait.started();
             }
         }
     }
 
     private function adbreakComplete(event:Event):void {
         if (proxiedElement != null) {
+            if (_adTrait) {
+                _adTrait.stopped();
+            }
 
             var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
 
-            if (_adTrait.adState == AdState.AD_STARTED) {
-                _adTrait.adStopped();
-            }
-
             if (playTrait) {
-                if (playTrait.playState == PlayState.PAUSED) {
-                    blockedTraits = new Vector.<String>();
-                    playTrait.play();
-
-                }
+                blockedTraits = new Vector.<String>();
+                playTrait.play();
             }
         }
     }
@@ -358,11 +351,25 @@ public class AdProxy extends ProxyElement {
             var timeTrait:TimeTrait = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
             var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
 
-            if (playTrait) {
-                if (playTrait.playState == PlayState.PLAYING) {
-                    onContentUpdate(timeTrait.currentTime, timeTrait.duration);
-                }
+            if (timeTrait && playTrait && playTrait.playState == PlayState.PLAYING) {
+                onContentUpdate(timeTrait.currentTime, timeTrait.duration);
             }
+        }
+    }
+
+    private function addLocalTraits() {
+        if (_adTrait == null) {
+            _adTrait = new AdTrait();
+            _adTrait.addEventListener(AdEvent.PLAY_PAUSE_CHANGE, playPauseEventHandler);
+            addTrait(AdTraitType.AD_PLAY, _adTrait);
+        }
+    }
+
+    private function removeLocalTraits() {
+        removeTrait(AdTraitType.AD_PLAY);
+        if (_adTrait) {
+            _adTrait.addEventListener(AdEvent.PLAY_PAUSE_CHANGE, playPauseEventHandler);
+            _adTrait = null;
         }
     }
 }
