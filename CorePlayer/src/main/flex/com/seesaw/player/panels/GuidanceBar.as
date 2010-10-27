@@ -7,7 +7,7 @@ import flash.system.Security;
 import flash.text.StyleSheet;
 import flash.text.TextField;
 import flash.text.TextFormat;
-import com.seesaw.player.ui.DefaultTextFormat;
+import com.seesaw.player.ui.StyledTextField;
 
 public class GuidanceBar extends Sprite {
 
@@ -80,7 +80,7 @@ public class GuidanceBar extends Sprite {
     }
 
     private function buildWarning():TextField {
-        var warningLabel = new TextField();
+        var warningLabel = new StyledTextField();
         warningLabel.height = 15;
         warningLabel.width = 540;
         warningLabel.htmlText = this.guidanceWarning;
@@ -91,7 +91,7 @@ public class GuidanceBar extends Sprite {
     }
 
     private function buildGuidanceLabel():TextField {
-        var guidanceLabel = new TextField();
+        var guidanceLabel = new StyledTextField();
         guidanceLabel.height = 15;
         guidanceLabel.width = 540;
         guidanceLabel.htmlText = "Guidance:";
@@ -108,9 +108,6 @@ public class GuidanceBar extends Sprite {
         textFormat.align = "left";
 
         textToFormat.setTextFormat(textFormat);
-
-        var defaultTextFormat = new DefaultTextFormat(textToFormat);
-        defaultTextFormat.applyFontFace();
 
         return textToFormat;
     }
