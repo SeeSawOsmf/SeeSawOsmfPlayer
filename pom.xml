@@ -61,6 +61,10 @@
             <id>bmeade</id>
             <name>Brendan Meade</name>
         </developer>
+        <developer>
+            <id>dmoorhou</id>
+            <name>Dave Moorhouse</name>
+        </developer>
     </developers>
 
     <issueManagement>
