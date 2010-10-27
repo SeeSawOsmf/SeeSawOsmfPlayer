@@ -27,6 +27,8 @@ import com.seesaw.player.traits.ads.AdState;
 import com.seesaw.player.traits.ads.AdTrait;
 import com.seesaw.player.traits.ads.AdTraitType;
 
+import com.seesaw.player.ui.StyledTextField;
+
 import controls.seesaw.widget.interfaces.IWidget;
 
 import flash.display.DisplayObject;
@@ -57,7 +59,7 @@ public class ScrubBar extends Widget implements IWidget {
     private var _adState:AdTrait;
 
     public function ScrubBar() {
-        currentTime = new TextField();
+        currentTime = new StyledTextField();
         addChild(currentTime);
 
         scrubBarClickArea = new Sprite();

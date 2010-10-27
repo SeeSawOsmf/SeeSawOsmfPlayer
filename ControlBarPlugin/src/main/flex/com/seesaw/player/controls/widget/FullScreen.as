@@ -23,6 +23,7 @@
 package com.seesaw.player.controls.widget {
 import com.seesaw.player.events.FullScreenEvent;
 import com.seesaw.player.traits.FullScreenTrait;
+import com.seesaw.player.ui.StyledTextField;
 
 import controls.seesaw.widget.interfaces.IWidget;
 
@@ -30,7 +31,6 @@ import flash.display.StageDisplayState;
 import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.text.TextField;
-import flash.text.TextFormat;
 import flash.ui.Keyboard;
 
 import org.as3commons.logging.ILogger;
@@ -120,18 +120,8 @@ public class FullScreen extends ButtonWidget implements IWidget {
     }
 
     private function createView():void {
-        _fullScreenLabel = new TextField();
+        _fullScreenLabel = new StyledTextField();
         _fullScreenLabel.text = FULLSCREEN_LABEL;
-        this.formatLabelFont();
-    }
-
-    private function formatLabelFont():void {
-        var textFormat:TextFormat = new TextFormat();
-        textFormat.font = "Arial";
-        textFormat.size = 12;
-        textFormat.color = 0x00A78D;
-        textFormat.align = "right";
-        _fullScreenLabel.setTextFormat(textFormat);
     }
 
     public function get classDefinition():String {
