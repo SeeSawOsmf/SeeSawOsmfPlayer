@@ -21,12 +21,12 @@
  */
 
 package com.seesaw.player.controls.widget {
+import com.seesaw.player.events.FullScreenEvent;
 import com.seesaw.player.traits.FullScreenTrait;
 
 import controls.seesaw.widget.interfaces.IWidget;
 
 import flash.display.StageDisplayState;
-import flash.events.Event;
 import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.text.TextField;
@@ -37,60 +37,93 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.chrome.widgets.ButtonWidget;
 import org.osmf.media.MediaElement;
-import org.osmf.traits.MediaTraitType;
-import org.osmf.traits.PlayTrait;
 
 public class FullScreen extends ButtonWidget implements IWidget {
+
+    private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.FullScreen";
+
+    private static const FULLSCREEN_LABEL = "Fullscreen";
+
+    private static const EXIT_FULLSCREEN_LABEL = "Exit Fullscreen";
+
     private var logger:ILogger = LoggerFactory.getClassLogger(FullScreen);
 
-    // Internals
+    private var _fullScreenTrait:FullScreenTrait;
 
-    private var _playableTrait:PlayTrait;
-    private var _fullscreenTrait:FullScreenTrait;
+    private var _fullScreenLabel:TextField;
 
-    private var fullScreenLabel:TextField;
-
-    /* static */
-    private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.PauseButton";
-    private static const _requiredTraits:Vector.<String> = new Vector.<String>;
-    _requiredTraits[0] = MediaTraitType.PLAY;
+    private var _requiredTraits:Vector.<String> = new Vector.<String>;
 
     public function FullScreen() {
-        logger.debug("Full Screen Constructor");
-        fullScreenLabel = new TextField();
-        fullScreenLabel.text = "Fullscreen";
-        this.formatLabelFont();
+        logger.debug("FullScreen()");
 
-        addChild(fullScreenLabel);
+        _requiredTraits[0] = FullScreenTrait.FULL_SCREEN;
 
-        addEventListener(KeyboardEvent.KEY_DOWN, KeyPressed);
+        createView();
+    }
 
+    override protected function get requiredTraits():Vector.<String> {
+        return _requiredTraits;
+    }
 
+    override protected function processRequiredTraitsAvailable(element:MediaElement):void {
+        _fullScreenTrait = element.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
+
+        if (_fullScreenTrait) {
+            _fullScreenTrait.addEventListener(FullScreenEvent.FULL_SCREEN, onFullScreen);
+            addEventListener(KeyboardEvent.KEY_DOWN, KeyPressed);
+            addChild(_fullScreenLabel);
+        }
+
+        visible = media.hasTrait(FullScreenTrait.FULL_SCREEN);
+    }
+
+    override protected function processRequiredTraitsUnavailable(element:MediaElement):void {
+        if (_fullScreenTrait) {
+            _fullScreenTrait.removeEventListener(FullScreenEvent.FULL_SCREEN, onFullScreen);
+            removeEventListener(KeyboardEvent.KEY_DOWN, KeyPressed);
+            removeChild(_fullScreenLabel);
+            _fullScreenTrait = null;
+        }
+
+        visible = media.hasTrait(FullScreenTrait.FULL_SCREEN);
+    }
+
+    override protected function onMouseClick(event:MouseEvent):void {
+        setFullScreen(!_fullScreenTrait.fullscreen);
     }
 
     private function KeyPressed(event:KeyboardEvent):void {
-        switch (event.keyCode) {
-            case Keyboard.ESCAPE :
-                if (stage.displayState == StageDisplayState.NORMAL) {
-                    stage.displayState = StageDisplayState.FULL_SCREEN;
-                    fullScreenLabel.text = "Exit Fullscreen";
-                } else {
-                    stage.displayState = StageDisplayState.NORMAL;
-                    fullScreenLabel.text = "Fullscreen";
-                }
-                //var playable:PlayTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
-                //playable.play();
-
-                if (_fullscreenTrait) {
-                    _fullscreenTrait.fullscreen = !_fullscreenTrait.fullscreen;
-                }
-                break;
-
+        if (_fullScreenTrait && _fullScreenTrait.fullscreen == true && event.keyCode == Keyboard.ESCAPE) {
+            _fullScreenTrait.fullscreen = false;
         }
     }
 
-    // Protected
-    //
+    private function setFullScreen(fullScreen:Boolean):void {
+        if (_fullScreenTrait) {
+            if (fullScreen && stage.displayState == StageDisplayState.NORMAL) {
+                stage.displayState = StageDisplayState.FULL_SCREEN;
+            } else if (!fullScreen && stage.displayState == StageDisplayState.FULL_SCREEN) {
+                stage.displayState = StageDisplayState.NORMAL;
+            }
+            _fullScreenTrait.fullscreen = fullScreen;
+        }
+    }
+
+    private function onFullScreen(event:FullScreenEvent):void {
+        if (event.value) {
+            _fullScreenLabel.text = EXIT_FULLSCREEN_LABEL;
+        }
+        else {
+            _fullScreenLabel.text = FULLSCREEN_LABEL;
+        }
+    }
+
+    private function createView():void {
+        _fullScreenLabel = new TextField();
+        _fullScreenLabel.text = FULLSCREEN_LABEL;
+        this.formatLabelFont();
+    }
 
     private function formatLabelFont():void {
         var textFormat:TextFormat = new TextFormat();
@@ -98,71 +131,7 @@ public class FullScreen extends ButtonWidget implements IWidget {
         textFormat.size = 12;
         textFormat.color = 0x00A78D;
         textFormat.align = "right";
-        this.fullScreenLabel.setTextFormat(textFormat);
-    }
-
-    protected function fullScreenHandler(event:Event):void {
-        if (_fullscreenTrait) {
-            logger.debug("NEW STAGE HEIGHT : " + stage.stageHeight);
-            logger.debug("NEW STAGE WIDTH : " + stage.stageWidth);
-            _fullscreenTrait.fullscreen = !_fullscreenTrait.fullscreen;
-        }
-    }
-
-    protected function get playable():PlayTrait {
-        return _playableTrait;
-    }
-
-    // Overrides
-    //
-
-    override protected function get requiredTraits():Vector.<String> {
-        return _requiredTraits;
-    }
-
-    override protected function processRequiredTraitsAvailable(element:MediaElement):void {
-        _playableTrait = element.getTrait(MediaTraitType.PLAY) as PlayTrait;
-        _fullscreenTrait = element.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
-
-        // stage.addEventListener(Event.RESIZE, fullScreenHandler);
-
-        //_playable.addEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
-        //_playable.addEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
-
-        //visibilityDeterminingEventHandler();
-    }
-
-    override protected function processRequiredTraitsUnavailable(element:MediaElement):void {
-        if (_playableTrait) {
-            //_playable.removeEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
-            //_playable.removeEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
-            //_playable = null;
-        }
-
-        //visibilityDeterminingEventHandler();
-    }
-
-    override protected function onMouseClick(event:MouseEvent):void {
-        if (stage.displayState == StageDisplayState.NORMAL) {
-            stage.displayState = StageDisplayState.FULL_SCREEN;
-            fullScreenLabel.text = "Exit Fullscreen";
-        } else {
-            stage.displayState = StageDisplayState.NORMAL;
-            fullScreenLabel.text = "Fullscreen";
-        }
-        //var playable:PlayTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
-        //playable.play();
-
-        if (_fullscreenTrait) {
-            _fullscreenTrait.fullscreen = !_fullscreenTrait.fullscreen;
-        }
-    }
-
-    // Stubs
-    //
-
-    protected function visibilityDeterminingEventHandler(event:Event = null):void {
-        //visible = playable && playable.playState != PlayState.PAUSED && playable.canPause;
+        _fullScreenLabel.setTextFormat(textFormat);
     }
 
     public function get classDefinition():String {
