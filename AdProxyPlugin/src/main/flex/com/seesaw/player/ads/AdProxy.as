@@ -22,7 +22,7 @@
 
 package com.seesaw.player.ads {
 import com.seesaw.player.ads.events.LiveRailEvent;
-import com.seesaw.player.events.AdEvents;
+import com.seesaw.player.events.AdEvent;
 import com.seesaw.player.traits.ads.AdState;
 import com.seesaw.player.traits.ads.AdTrait;
 import com.seesaw.player.traits.ads.AdTraitType;
@@ -73,7 +73,6 @@ public class AdProxy extends ProxyElement {
 
     public override function set proxiedElement(proxiedElement:MediaElement):void {
         if (proxiedElement) {
-
             super.proxiedElement = proxiedElement;
 
             proxiedElement.removeEventListener(MediaElementEvent.TRAIT_ADD, onProxiedTraitsChange);
@@ -95,17 +94,22 @@ public class AdProxy extends ProxyElement {
         logger.debug("setupTraits");
 
         _adTrait = new AdTrait();
-        _adTrait.addEventListener(AdEvents.PLAY_PAUSE_CHANGE, playPauseEventHandler);
+        _adTrait.addEventListener(AdEvent.PLAY_PAUSE_CHANGE, playPauseEventHandler);
         addTrait(AdTraitType.AD_PLAY, _adTrait);
 
         super.setupTraits();
     }
 
-    private function playPauseEventHandler(event:AdEvents):void {
-        if (_adTrait && _adTrait.playPauseState == AdState.PLAYING) {
-            pause();
-        } else if (_adTrait && _adTrait.playPauseState == AdState.PAUSED) {
-            play();
+    private function playPauseEventHandler(event:AdEvent):void {
+        if(_adTrait && _adTrait.adState == AdState.STARTED) {
+            if (_adTrait.playState == AdState.PLAYING) {
+                play();
+            } else if (_adTrait.playState == AdState.PAUSED) {
+                pause();
+            }
+            else {
+                logger.warn("invalid play state: " + _adTrait.playState);
+            }
         }
     }
 
@@ -228,22 +232,17 @@ public class AdProxy extends ProxyElement {
     private function adbreakStart(e:Event):void {
         if (proxiedElement != null) {
             var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
+            if (playTrait && playTrait.playState == PlayState.PLAYING) {
+                var traitsToBlock:Vector.<String> = new Vector.<String>();
+                traitsToBlock[0] = MediaTraitType.SEEK;
+                traitsToBlock[1] = MediaTraitType.TIME;
+
+                blockedTraits = traitsToBlock;
+                playTrait.pause();
+            }
 
             if (_adTrait) {
-                if (_adTrait.adState == AdState.AD_STOPPED) {
-                    _adTrait.adStarted();
-                }
-            }
-            if (playTrait) {    /// todo 
-                if (playTrait.playState == PlayState.PLAYING) {
-
-                    var traitsToBlock:Vector.<String> = new Vector.<String>();
-                    traitsToBlock[0] = MediaTraitType.SEEK;
-                    traitsToBlock[1] = MediaTraitType.TIME;
-
-                    blockedTraits = traitsToBlock;
-                    playTrait.pause();
-                }
+                _adTrait.started();
             }
         }
     }
@@ -251,17 +250,15 @@ public class AdProxy extends ProxyElement {
     private function adbreakComplete(e:Event):void {
         if (proxiedElement != null) {
 
-            var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
-
-            if (_adTrait.adState == AdState.AD_STARTED) {
-                _adTrait.adStopped();
+            if (_adTrait) {
+                _adTrait.stopped();
             }
 
-            if (playTrait) {
-                if (playTrait.playState == PlayState.PAUSED) {
-                    blockedTraits = new Vector.<String>();
-                    playTrait.play();
-                }
+            var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
+
+            if (playTrait && playTrait.playState == PlayState.PAUSED) {
+                blockedTraits = new Vector.<String>();
+                playTrait.play();
             }
         }
     }

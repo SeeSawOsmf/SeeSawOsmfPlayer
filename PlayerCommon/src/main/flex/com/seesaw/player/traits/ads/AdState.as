@@ -28,8 +28,8 @@ public final class AdState {
 
     public static const PAUSED:String = "paused";
 
-    public static const AD_STOPPED:String = "adStoped";
+    public static const STOPPED:String = "stopped";
 
-    public static const AD_STARTED:String = "adStarted";
+    public static const STARTED:String = "started";
 }
 }
