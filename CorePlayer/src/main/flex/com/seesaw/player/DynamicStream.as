@@ -54,11 +54,12 @@ public class DynamicStream extends DynamicStreamingResource {
         //  TODO: add metadata from video player info to the resource
 
         var metaSettings:Metadata = new Metadata();
-        metaSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);  // Use this to check the resource is the mainContent for the plugins
+        metaSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);  // Use this to check the resource is the mainContent for the AdProxypPlugins
 
         addMetadataValue(CONTENT_ID, metaSettings);
 
         addMetadataValue(PROGRAMME_ID, params.programmeId);
+        addMetadataValue(CONTENT_INFO, params.contentInfo);
         // addMetadataValue(CONTENT_INFO, params.contentInfo)
     }
 }
