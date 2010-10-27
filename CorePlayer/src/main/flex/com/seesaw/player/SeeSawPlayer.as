@@ -26,7 +26,7 @@ import com.seesaw.player.components.ControlBarComponent;
 import com.seesaw.player.components.MediaComponent;
 import com.seesaw.player.events.FullScreenEvent;
 import com.seesaw.player.fullscreen.FullScreenProxyPluginInfo;
-import com.seesaw.player.scrubPrevention.ScrubPreventionProxyPluginInfo;
+import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
 import com.seesaw.player.traits.FullScreenTrait;
 
 import flash.display.Sprite;
@@ -86,8 +86,8 @@ public class SeeSawPlayer extends Sprite {
 
         config.factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new FullScreenProxyPluginInfo()));
-        config.factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
+        config.factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
 
 
         logger.debug("creating video element");
@@ -111,7 +111,6 @@ public class SeeSawPlayer extends Sprite {
 
         _rootElement = new ParallelElement();
         layout(config.width, config.height);
-
         config.player.media = _rootElement;
 
         logger.debug("adding root element to container");

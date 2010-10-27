@@ -20,7 +20,7 @@
  *    Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.player.scrubPrevention {
+package com.seesaw.player.preventscrub {
 import flash.display.Sprite;
 
 import org.as3commons.logging.ILogger;
@@ -42,40 +42,28 @@ public class ScrubPreventionProxy extends ProxyElement {
     private var outerViewable:DisplayObjectTrait;
     private var displayObject:Sprite;
 
-    public function ScrubPreventionProxy(proxiedElement:MediaElement = null) {
-        super(proxiedElement);
+    public function ScrubPreventionProxy() {
 
-        displayObject = new Sprite();
-        outerViewable = new DisplayObjectTrait(displayObject);
     }
 
     public override function set proxiedElement(proxiedElement:MediaElement):void {
         if (proxiedElement) {
-
             super.proxiedElement = proxiedElement;
 
-            proxiedElement.removeEventListener(MediaElementEvent.TRAIT_ADD, onProxiedTraitsChange);
-            proxiedElement.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onProxiedTraitsChange);
+            proxiedElement.removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
+            proxiedElement.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
 
-            proxiedElement.addEventListener(MediaElementEvent.TRAIT_ADD, onProxiedTraitsChange);
-            proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onProxiedTraitsChange);
+            proxiedElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
+            proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
 
-            var traitType:String
-            for each (var traitType:String in proxiedElement.traitTypes) {
-                processTrait(traitType, true);
-            }
         }
     }
 
     override protected function setupTraits():void {
         logger.debug("setupTraits");
-
-        var seek:SeekTrait = proxiedElement.getTrait(MediaTraitType.SEEK) as SeekTrait;
-
-        seek.addEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
-        addTrait(MediaTraitType.SEEK, seek);
-
+        addLocalTraits();
         super.setupTraits();
+
     }
 
 
@@ -129,7 +117,19 @@ public class ScrubPreventionProxy extends ProxyElement {
     }
 
 
-    private function onProxiedTraitsChange(event:MediaElementEvent):void {
+    private function onTraitAdd(event:MediaElementEvent):void {
+        processTrait(event.traitType, true);
+    }
+
+    private function onTraitRemove(event:MediaElementEvent):void {
+        processTrait(event.traitType, false);
+    }
+
+    private function addLocalTraits() {
+
+    }
+
+    private function removeLocalTraits() {
 
     }
 

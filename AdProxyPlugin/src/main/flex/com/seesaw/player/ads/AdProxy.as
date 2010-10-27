@@ -74,6 +74,7 @@ public class AdProxy extends ProxyElement {
 
         displayObject = new Sprite();
         outerViewable = new AdProxyDisplayObjectTrait(displayObject);
+        //  outerViewable.setSize(672,378);
     }
 
     public override function set proxiedElement(proxiedElement:MediaElement):void {
@@ -86,10 +87,6 @@ public class AdProxy extends ProxyElement {
             proxiedElement.addEventListener(MediaElementEvent.TRAIT_ADD, onProxiedTraitsChange);
             proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onProxiedTraitsChange);
 
-            var traitType:String
-            for each (var traitType:String in proxiedElement.traitTypes) {
-                processTrait(traitType, true);
-            }
 
             createLiverail();
         }
@@ -233,6 +230,9 @@ public class AdProxy extends ProxyElement {
     private function onLiveRailInitComplete(event:Event):void {
         logger.debug("Liverail ---- onLiveRailInitComplete")
         _adManager.setSize(new Rectangle(0, 0, outerViewable.mediaWidth, outerViewable.mediaHeight));
+
+        //  _adManager.setSize(new Rectangle(0, 0, 672,378));   ///todo use the actual stageWidth to set the adModule.
+
         _adManager.onContentStart();
     }
 
@@ -287,18 +287,16 @@ public class AdProxy extends ProxyElement {
 
     private function onProxiedTraitsChange(event:MediaElementEvent):void {
         if (event.type == MediaElementEvent.TRAIT_ADD) {
-            if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
-                innerViewable = DisplayObjectTrait(proxiedElement.getTrait(event.traitType));
+            if (event.traitType == MediaTraitType.DISPLAY_OBJECT && !_innerViewable) {
+                innerViewable = DisplayObjectTrait(proxiedElement.getTrait(MediaTraitType.DISPLAY_OBJECT));
                 if (_innerViewable) {
+                    trace(_innerViewable.mediaHeight);
                     addTrait(MediaTraitType.DISPLAY_OBJECT, outerViewable);
                 }
             }
-        } else {
-            if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
-                innerViewable = null;
-                removeTrait(MediaTraitType.DISPLAY_OBJECT);
-            }
+
         }
+        processTrait(event.traitType, true);
     }
 
     private function set innerViewable(value:DisplayObjectTrait):void {
@@ -310,12 +308,10 @@ public class AdProxy extends ProxyElement {
 
             _innerViewable = value;
 
-            if (_innerViewable) {
-                _innerViewable.addEventListener(DisplayObjectEvent.DISPLAY_OBJECT_CHANGE, onInnerDisplayObjectChange);
-                _innerViewable.addEventListener(DisplayObjectEvent.MEDIA_SIZE_CHANGE, onInnerMediaSizeChange);
-            }
 
             updateView();
+
+
         }
     }
 
@@ -325,24 +321,14 @@ public class AdProxy extends ProxyElement {
 
     private function onInnerMediaSizeChange(event:DisplayObjectEvent):void {
         outerViewable.setSize(event.newWidth, event.newHeight);
+        //    outerViewable.setSize(672,378);
     }
 
     private function updateView():void {
-        if (_innerViewable == null
-                || _innerViewable.displayObject == null
-                || displayObject.contains(_innerViewable.displayObject) == false
-                ) {
-            if (displayObject.numChildren == 2) {
-                displayObject.removeChildAt(0);
-            }
-        }
 
-        if (_innerViewable != null
-                && _innerViewable.displayObject != null
-                && displayObject.contains(_innerViewable.displayObject) == false
-                ) {
-            displayObject.addChildAt(_innerViewable.displayObject, 0);
-        }
+
+        displayObject.addChildAt(_innerViewable.displayObject, 0);
+
 
     }
 
