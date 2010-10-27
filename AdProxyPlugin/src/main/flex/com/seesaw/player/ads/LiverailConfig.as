@@ -23,8 +23,13 @@
 package com.seesaw.player.ads {
 public class LiverailConfig {
     private var _config:Object;
+    private var contentInfo:XML;
 
-    public function LiverailConfig() {
+    public function LiverailConfig(contentInfoXml:XML) {
+        contentInfo = contentInfoXml;
+        if (contentInfo) {
+
+        }
     }
 
 

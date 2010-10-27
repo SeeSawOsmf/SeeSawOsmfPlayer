@@ -2,23 +2,19 @@ package com.seesaw.player.panels {
 import flash.display.Bitmap;
 import flash.display.Sprite;
 import flash.events.Event;
-import flash.events.MouseEvent;
-import flash.net.URLRequest;
-import flash.net.navigateToURL;
+import flash.geom.Rectangle;
 import flash.system.Security;
 import flash.text.StyleSheet;
 import flash.text.TextField;
 import flash.text.TextFormat;
+import com.seesaw.player.ui.DefaultTextFormat;
 
 public class GuidanceBar extends Sprite {
 
     //Guidance warning string passed into the constructor
     private var guidanceWarning:String;
 
-    //Embed images
-    [Embed(source="resources/acceptButton_up.png")]
-    private var acceptImageUpEmbed:Class;
-    private var acceptImageUp:Bitmap = new acceptImageUpEmbed();
+    private var panelBG:Sprite;
 
     //css
     private var css:StyleSheet;
@@ -49,7 +45,7 @@ public class GuidanceBar extends Sprite {
 
     private function buildPanel():Sprite {
         var panel:Sprite = new Sprite();
-
+        
         panel.addChild(this.buildPanelBG());
 
         var contentContainer:Sprite = this.buildContentContainer();
@@ -63,15 +59,16 @@ public class GuidanceBar extends Sprite {
     }
 
     private function buildPanelBG():Sprite {
-        var panelBG:Sprite = new Sprite();
 
-        with (panelBG.graphics) {
+        this.panelBG = new Sprite();
+
+        with (this.panelBG.graphics) {
             beginFill(0xFF0000, 0.6);
-            drawRoundRect(0, 0, 530, 38, 0);
+            drawRoundRect(0, 0, 550, 38, 0);
             endFill();
         }
 
-        return panelBG;
+        return this.panelBG;
     }
 
     private function buildContentContainer():Sprite {
@@ -112,8 +109,10 @@ public class GuidanceBar extends Sprite {
 
         textToFormat.setTextFormat(textFormat);
 
-        return textToFormat;
+        var defaultTextFormat = new DefaultTextFormat(textToFormat);
+        defaultTextFormat.applyFontFace();
 
+        return textToFormat;
     }
 
 }

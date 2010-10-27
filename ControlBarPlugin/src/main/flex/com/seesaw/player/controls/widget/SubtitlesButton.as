@@ -69,6 +69,7 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
 
     private function formatLabelFont():void {
         var textFormat:TextFormat = new TextFormat();
+        textFormat.font = "Arial";
         textFormat.size = 12;
         textFormat.color = 0x00A78D;
         textFormat.align = "right";

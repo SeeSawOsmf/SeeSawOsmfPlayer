@@ -31,9 +31,11 @@ import flash.display.Loader;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
+import flash.events.TimerEvent;
 import flash.geom.Rectangle;
 import flash.net.URLRequest;
 import flash.system.Security;
+import flash.utils.Timer;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -48,10 +50,13 @@ import org.osmf.traits.LoadTrait;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.PlayTrait;
+import org.osmf.traits.TimeTrait;
 
 public class AdProxy extends ProxyElement {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(AdProxy);
+
+    private static const CONTENT_UPDATE_INTERVAL:int = 500;
 
     private var _adTrait:AdTrait;
     private var _innerViewable:DisplayObjectTrait;
@@ -65,7 +70,7 @@ public class AdProxy extends ProxyElement {
     public function AdProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
 
-        Security.allowDomain("*");
+        Security.allowDomain("vox-static.liverail.com");
 
         displayObject = new Sprite();
         outerViewable = new AdProxyDisplayObjectTrait(displayObject);
@@ -198,16 +203,17 @@ public class AdProxy extends ProxyElement {
 
     private function onLoadError(e:IOErrorEvent):void {
         removeTrait(AdTraitType.AD_PLAY);
+        _adTrait = null;
     }
 
     private function setupAdManager():void {
         _adManager.addEventListener(LiveRailEvent.INIT_COMPLETE, onLiveRailInitComplete);
         _adManager.addEventListener(LiveRailEvent.AD_BREAK_START, adbreakStart);
         _adManager.addEventListener(LiveRailEvent.AD_BREAK_COMPLETE, adbreakComplete);
-
+        _adManager.addEventListener(LiveRailEvent.PREROLL_COMPLETE, onLiveRailPrerollComplete);
         /*adManager.addEventListener(LiveRailEvent.INIT_ERROR, onLiveRailInitError);
 
-         adManager.addEventListener(LiveRailEvent.PREROLL_COMPLETE, onLiveRailPrerollComplete);
+
          adManager.addEventListener(LiveRailEvent.POSTROLL_COMPLETE, onLiveRailPostrollComplete);
 
          adManager.addEventListener(LiveRailEvent.AD_START, onLiveRailAdStart);
@@ -218,25 +224,31 @@ public class AdProxy extends ProxyElement {
 
          adManager.addEventListener(LiveRailEvent.AD_PROGRESS,onAdProgress);
          */
-
-        liverailConfig = new LiverailConfig();
+        var contentInfo:XML = resource.getMetadataValue("contentInfo") as XML;
+        liverailConfig = new LiverailConfig(contentInfo);
         _adManager.initAds(liverailConfig.config);
     }
 
-    private function onLiveRailInitComplete(e:Event):void {
+    private function onLiveRailPrerollComplete(event:Event):void {
+        var timer:Timer = new Timer(CONTENT_UPDATE_INTERVAL);
+        timer.addEventListener(TimerEvent.TIMER, onTimerTick);
+        timer.start();
+    }
+
+    private function onLiveRailInitComplete(event:Event):void {
         logger.debug("Liverail ---- onLiveRailInitComplete")
         _adManager.setSize(new Rectangle(0, 0, outerViewable.mediaWidth, outerViewable.mediaHeight));
         _adManager.onContentStart();
     }
 
-    private function adbreakStart(e:Event):void {
+    private function adbreakStart(event:Event):void {
         if (proxiedElement != null) {
             var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
-            if (playTrait && playTrait.playState == PlayState.PLAYING) {
+
+            if (playTrait) {
                 var traitsToBlock:Vector.<String> = new Vector.<String>();
                 traitsToBlock[0] = MediaTraitType.SEEK;
                 traitsToBlock[1] = MediaTraitType.TIME;
-
                 blockedTraits = traitsToBlock;
                 playTrait.pause();
             }
@@ -247,16 +259,15 @@ public class AdProxy extends ProxyElement {
         }
     }
 
-    private function adbreakComplete(e:Event):void {
+    private function adbreakComplete(event:Event):void {
         if (proxiedElement != null) {
-
             if (_adTrait) {
                 _adTrait.stopped();
             }
 
             var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
 
-            if (playTrait && playTrait.playState == PlayState.PAUSED) {
+            if (playTrait) {
                 blockedTraits = new Vector.<String>();
                 playTrait.play();
             }
@@ -338,6 +349,17 @@ public class AdProxy extends ProxyElement {
             displayObject.addChildAt(_innerViewable.displayObject, 0);
         }
 
+    }
+
+    private function onTimerTick(event:TimerEvent):void {
+        if (proxiedElement != null) {
+            var timeTrait:TimeTrait = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
+            var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
+
+            if (timeTrait && playTrait && playTrait.playState == PlayState.PLAYING) {
+                onContentUpdate(timeTrait.currentTime, timeTrait.duration);
+            }
+        }
     }
 }
 }
