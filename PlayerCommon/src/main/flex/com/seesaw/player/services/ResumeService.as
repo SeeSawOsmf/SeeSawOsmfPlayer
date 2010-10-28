@@ -23,6 +23,11 @@ package com.seesaw.player.services {
 
 public interface ResumeService {
     function getResumeCookie():Object;
+
     function writeResumeCookie(cookie:Object);
+
+    //  function  getEncryptedValue(value:String):String;
+    //  function getDecryptedValue(value:String):String
+
 }
 }

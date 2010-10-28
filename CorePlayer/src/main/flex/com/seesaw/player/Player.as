@@ -254,6 +254,9 @@ public class Player extends Sprite {
         logger.debug("registering services");
         var provider:ObjectProvider = ObjectProvider.getInstance();
         provider.register(ResumeService, new ResumeServiceImpl());
+        //     var en:String =  provider.getObject(ResumeService).getEncryptedValue("hello");
+        //    var de:String =   provider.getObject(ResumeService).getDecryptedValue(en);
+        //     var finalVal:String =  de;
     }
 
     private function nextInitialisationStage():void {

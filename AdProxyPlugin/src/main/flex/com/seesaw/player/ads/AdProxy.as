@@ -44,7 +44,6 @@ import org.osmf.events.DisplayObjectEvent;
 import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.PlayEvent;
-import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.LoadTrait;
@@ -225,7 +224,7 @@ public class AdProxy extends ProxyElement {
     }
 
     private function onLiveRailAdStart(e:Event):void {
-        var eee:String = "333";
+
     }
 
     private function onLiveRailPrerollComplete(event:Event):void {
@@ -349,15 +348,6 @@ public class AdProxy extends ProxyElement {
         outerViewableSprite.addChildAt(_innerViewable.displayObject, 0);
         _innerViewable.displayObject.height = 378;
         _innerViewable.displayObject.width = 672;
-
-
-        var layoutMetadata:LayoutMetadata = new LayoutMetadata();
-
-        var ob:Object = proxiedElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE);
-        //   layoutMetadata.percentHeight = 100;
-        //   layoutMetadata..percentWidth  = 100;
-
-        addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layoutMetadata);
 
     }
 
