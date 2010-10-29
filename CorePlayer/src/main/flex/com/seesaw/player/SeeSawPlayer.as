@@ -21,7 +21,7 @@
  */
 
 package com.seesaw.player {
-import com.seesaw.player.ads.AdProxyPluginInfo;
+import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.components.ControlBarComponent;
 import com.seesaw.player.components.MediaComponent;
 import com.seesaw.player.events.FullScreenEvent;
@@ -86,9 +86,9 @@ public class SeeSawPlayer extends Sprite {
 
         config.factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new FullScreenProxyPluginInfo()));
-
+        config.factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
-        config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
+        //config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
 
 
         logger.debug("creating video element");

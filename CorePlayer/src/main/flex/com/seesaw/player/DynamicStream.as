@@ -33,6 +33,7 @@ public class DynamicStream extends DynamicStreamingResource {
 
     private static const PROGRAMME_ID:String = "programmeID";
     private static const CONTENT_INFO:String = "contentInfo";
+    private static const AUTO_RESUME:String = "autoResume";
     private static const CONTENT_ID:String = "contentId";
 
 
@@ -60,6 +61,7 @@ public class DynamicStream extends DynamicStreamingResource {
 
         addMetadataValue(PROGRAMME_ID, params.programmeId);
         addMetadataValue(CONTENT_INFO, params.contentInfo);
+        addMetadataValue(AUTO_RESUME, params.resumeValue);
         // addMetadataValue(CONTENT_INFO, params.contentInfo)
     }
 }

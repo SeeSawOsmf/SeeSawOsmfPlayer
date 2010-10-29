@@ -20,7 +20,7 @@
  *    Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.player.preventscrub {
+package com.seesaw.player.autoresume {
 import flash.display.Sprite;
 
 import org.as3commons.logging.ILogger;
@@ -28,6 +28,7 @@ import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ProxyElement;
 import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
+import org.osmf.events.PlayEvent;
 import org.osmf.events.SeekEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.traits.DisplayObjectTrait;
@@ -36,13 +37,13 @@ import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayTrait;
 import org.osmf.traits.SeekTrait;
 
-public class ScrubPreventionProxy extends ProxyElement {
+public class AutoResumeProxy extends ProxyElement {
 
-    private var logger:ILogger = LoggerFactory.getClassLogger(ScrubPreventionProxy);
+    private var logger:ILogger = LoggerFactory.getClassLogger(AutoResumeProxy);
     private var outerViewable:DisplayObjectTrait;
     private var displayObject:Sprite;
 
-    public function ScrubPreventionProxy() {
+    public function AutoResumeProxy() {
 
     }
 
@@ -77,12 +78,33 @@ public class ScrubPreventionProxy extends ProxyElement {
             case MediaTraitType.SEEK:
                 toggleSeekListeners(added);
                 break;
+            case MediaTraitType.PLAY:
+                togglePlayListeners(added);
+                break;
         }
     }
 
 
+    private function togglePlayListeners(added:Boolean):void {
+        var playable:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
+        if (playable) {
+            blockedTraits = new Vector.<String>();
+            playable.play();
+            if (added) {
+                playable.addEventListener(PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
+                playable.addEventListener(PlayEvent.CAN_PAUSE_CHANGE, onCanPauseChange);
+            }
+            else {
+                playable.removeEventListener(PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
+                playable.removeEventListener(PlayEvent.CAN_PAUSE_CHANGE, onCanPauseChange);
+            }
+        }
+    }
+
     private function toggleSeekListeners(added:Boolean):void {
         var seek:SeekTrait = proxiedElement.getTrait(MediaTraitType.SEEK) as SeekTrait;
+
+        seek.seek(resource.getMetadataValue("autoResume") as Number);
 
         if (seek) {
             seek.addEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
@@ -108,9 +130,25 @@ public class ScrubPreventionProxy extends ProxyElement {
         var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
 
         if (playTrait) {
+            var resume:Number = resource.getMetadataValue("autoResume") as Number;
+            if (resume == 0) {
+                blockedTraits = new Vector.<String>();
+                if (playTrait.playState) {
 
-            playTrait.pause();
+                    playTrait.play();
+                }
+
+            }
+
         }
+    }
+
+    private function onCanPauseChange(event:PlayEvent):void {
+        //   logger.debug("Can Pause Change:{0}", event.canPause);
+    }
+
+    private function onPlayStateChange(event:PlayEvent):void {
+        //   logger.debug("Play State Change:{0}", event.playState);
     }
 
     private function onSeekingChange(event:SeekEvent):void {
