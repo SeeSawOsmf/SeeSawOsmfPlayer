@@ -46,6 +46,7 @@
         <module>AdProxyPlugin</module>
         <module>PlayerCommon</module>
         <module>ScrubPreventionProxy</module>
+        <module>AutoResumeProxy</module>
     </modules>
 
     <developers>
@@ -152,6 +153,12 @@
             </dependency>
             <dependency>
                 <artifactId>PlayerCommon</artifactId>
+                <groupId>com.seesaw</groupId>
+                <version>${pom.version}</version>
+                <type>swc</type>
+            </dependency>
+            <dependency>
+                <artifactId>AutoResumeProxy</artifactId>
                 <groupId>com.seesaw</groupId>
                 <version>${pom.version}</version>
                 <type>swc</type>

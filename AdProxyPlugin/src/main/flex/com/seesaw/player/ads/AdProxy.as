@@ -230,9 +230,7 @@ public class AdProxy extends ProxyElement {
     }
 
     private function onLiveRailPrerollComplete(event:Event):void {
-        var timer:Timer = new Timer(CONTENT_UPDATE_INTERVAL);
-        timer.addEventListener(TimerEvent.TIMER, onTimerTick);
-        timer.start();
+
     }
 
     private function onLiveRailInitComplete(event:Event):void {
@@ -242,6 +240,11 @@ public class AdProxy extends ProxyElement {
         _adManager.setSize(new Rectangle(0, 0, 672, 378));   ///todo use the actual stageWidth to set the adModule.
 
         _adManager.onContentStart();
+
+        var timer:Timer = new Timer(CONTENT_UPDATE_INTERVAL);
+        timer.addEventListener(TimerEvent.TIMER, onTimerTick);
+        timer.start();
+
     }
 
     private function adbreakStart(event:Event):void {
