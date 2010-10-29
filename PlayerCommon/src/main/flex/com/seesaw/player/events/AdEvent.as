@@ -32,22 +32,24 @@ public class AdEvent extends Event {
 
     public static const AD_STATE_CHANGE:String = "adStateChange";
 
+    public static const AD_MARKERS:String = "adMarkers";
+
     public function AdEvent
             (type:String,
              bubbles:Boolean = false,
              cancelable:Boolean = false,
              adState:String = null,
-             playPauseState:String = null
+             adMarkers:Object = null
                     ) {
         super(type, bubbles, cancelable);
 
         _adState = adState;
         _canPause = canPause;
-        _playPauseState = playPauseState;
+        _adMarkers = adMarkers;
     }
 
     override public function clone():Event {
-        return new AdEvent(type, bubbles, cancelable, adState, playPauseState);
+        return new AdEvent(type, bubbles, cancelable, adState, markers);
     }
 
     public function get adState():String {
@@ -58,16 +60,16 @@ public class AdEvent extends Event {
         return _canPause;
     }
 
-    public function get playPauseState():String {
-        return _playPauseState;
+    public function get markers():Object {
+        return _adMarkers;
     }
 
-    public function set playPauseState(value:String):void {
-        _playPauseState = value;
+    public function set markers(value:Object):void {
+        _adMarkers = value;
     }
 
     private var _adState:String;
-    private var _playPauseState:String;
+    private var _adMarkers:Object;
     private var _canPause:Boolean;
 
 

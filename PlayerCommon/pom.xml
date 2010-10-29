@@ -73,5 +73,11 @@
             <version>4.0-rc-1</version>
             <type>swc</type>
         </dependency>
+        <dependency>
+            <groupId>com.hurlant.crypto</groupId>
+            <artifactId>hurlant-crypto</artifactId>
+            <version>1.0</version>
+            <type>swc</type>
+        </dependency>
     </dependencies>
 </project>

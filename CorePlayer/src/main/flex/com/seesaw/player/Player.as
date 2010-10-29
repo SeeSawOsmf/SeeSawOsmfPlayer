@@ -66,6 +66,8 @@ public class Player extends Sprite {
 
     // returned by the video info AJAX call
     private var _videoInfo:Object;
+    private var resumeService:ResumeService;
+    private var resumeValue:Number;
 
     public function Player() {
         super();
@@ -192,6 +194,8 @@ public class Player extends Sprite {
         logger.debug("received programme data for programme: " + programmeData.programmeId);
         _videoInfo = programmeData;
 
+        _videoInfo.resumeValue = resumeValue;    // add the resume value to compare to the adMarker and adMaps
+
         if (_videoInfo.geoblocked == "true") {
             // TODO: show the geoblock panel
             return;
@@ -243,7 +247,9 @@ public class Player extends Sprite {
         // VideoPlayerInfo will not return inconsistent or partial state.
 
         // TODO: This should be removed once the new video player info service is up and running
-        var resource:StreamingURLResource = createMediaResource(MockData.videoInfo);
+        var _mockData:Object = MockData.videoInfo;
+        _mockData.resumeValue = resumeValue;    // add the resume value to compare to the adMarker and adMaps
+        var resource:StreamingURLResource = createMediaResource(_mockData);
         loadVideo(resource);
     }
 
@@ -254,9 +260,8 @@ public class Player extends Sprite {
         logger.debug("registering services");
         var provider:ObjectProvider = ObjectProvider.getInstance();
         provider.register(ResumeService, new ResumeServiceImpl());
-        //     var en:String =  provider.getObject(ResumeService).getEncryptedValue("hello");
-        //    var de:String =   provider.getObject(ResumeService).getDecryptedValue(en);
-        //     var finalVal:String =  de;
+        resumeService = provider.getObject(ResumeService);
+        resumeValue = resumeService.getResumeCookie();
     }
 
     private function nextInitialisationStage():void {

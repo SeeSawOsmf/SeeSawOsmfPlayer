@@ -218,6 +218,8 @@ public class AdProxy extends ProxyElement {
 
          adManager.addEventListener(LiveRailEvent.AD_PROGRESS,onAdProgress);
          */
+
+        _adTrait.createMarkers({"markers":"in::0;in::60.04;in::1818.36;in::100%"});
         var contentInfo:XML = resource.getMetadataValue("contentInfo") as XML;
         liverailConfig = new LiverailConfig(contentInfo);
         _adManager.initAds(liverailConfig.config);

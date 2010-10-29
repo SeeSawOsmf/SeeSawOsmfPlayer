@@ -26,7 +26,6 @@ import com.seesaw.player.events.AdEvent;
 import com.seesaw.player.traits.ads.AdState;
 import com.seesaw.player.traits.ads.AdTrait;
 import com.seesaw.player.traits.ads.AdTraitType;
-
 import com.seesaw.player.ui.StyledTextField;
 
 import controls.seesaw.widget.interfaces.IWidget;
@@ -187,10 +186,15 @@ public class ScrubBar extends Widget implements IWidget {
         visible = media != null;
         scrubber.enabled = media ? media.hasTrait(MediaTraitType.SEEK) : false;
         adTrait = media ? media.getTrait(AdTraitType.AD_PLAY) as AdTrait : null;
-        if (adTrait)
+        if (adTrait) {
             adTrait.addEventListener(AdEvent.AD_STATE_CHANGE, disableScrubber);
-
+            adTrait.addEventListener(AdEvent.AD_MARKERS, createAdMarkers);
+        }
         updateTimerState();
+    }
+
+    private function createAdMarkers(event:AdEvent):void {
+        trace("hello");
     }
 
     private function disableScrubber(event:AdEvent):void {

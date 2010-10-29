@@ -33,14 +33,24 @@ public class AdTrait extends MediaTraitBase {
 
     private var _adState:String;
     private var _playState:String;
+    private var _markers:Object;
 
     public function AdTrait() {
+
+
         super(AdTraitType.AD_PLAY);
+
         _adState = AdState.STOPPED;
+
+
     }
 
     public function get adState():String {
         return _adState;
+    }
+
+    public function get markers():Object {
+        return _markers;
     }
 
     public function set adState(value:String):void {
@@ -64,6 +74,11 @@ public class AdTrait extends MediaTraitBase {
     public function started():void {
         _playState = AdState.PLAYING;
         adState = AdState.STARTED;
+    }
+
+    public function createMarkers(object:Object):void {
+        _markers = object;
+        dispatchEvent(new AdEvent(AdEvent.AD_MARKERS, false, false, _adState, object));
     }
 
     public function stopped():void {
