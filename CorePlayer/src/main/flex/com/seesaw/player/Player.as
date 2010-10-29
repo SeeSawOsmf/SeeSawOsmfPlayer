@@ -137,6 +137,9 @@ public class Player extends Sprite {
 
     private function showGuidancePanel():void {
         if (_playerInit.guidance) {
+            if (_guidanceBar) {
+                _guidanceBar.visible = false;
+            }
             var guidancePanel = new GuidancePanel(
                     _playerInit.guidance.warning,
                     _playerInit.guidance.explanation,
