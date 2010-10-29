@@ -20,7 +20,7 @@
  *    Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.player.scrubPrevention {
+package com.seesaw.player.preventscrub {
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.media.MediaElement;
@@ -34,11 +34,11 @@ public class ScrubPreventionProxyPluginInfo extends PluginInfo {
 
     private static var logger:ILogger = LoggerFactory.getClassLogger(ScrubPreventionProxyPluginInfo);
 
-    public static const ID:String = "com.seesaw.player.scrubPrevention.ScrubPreventionProxy";
+    public static const ID:String = "com.seesaw.player.preventscrub.ScrubPreventionProxyTest";
     private static var scrubPreventionProxy:ScrubPreventionProxy;
 
     public function ScrubPreventionProxyPluginInfo() {
-        logger.debug("com.seesaw.player.scrubPrevention.ScrubPreventionProxyPluginInfo()");
+        logger.debug("com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo()");
 
         var item:MediaFactoryItem = new MediaFactoryItem(
                 ID,

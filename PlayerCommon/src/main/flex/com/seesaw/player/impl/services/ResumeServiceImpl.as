@@ -20,10 +20,11 @@
  *    Incorporated. All Rights Reserved.
  */
 package com.seesaw.player.impl.services {
-
 import com.seesaw.player.services.ResumeService;
 
 public class ResumeServiceImpl implements ResumeService {
+    // private var tripleDESKey:TripleDESKey;
+    private static const ENCRYTION_KEY:String = "this%is%the%new%static%encryption%key%";
 
     public function ResumeServiceImpl() {
     }
@@ -31,7 +32,28 @@ public class ResumeServiceImpl implements ResumeService {
     public function getResumeCookie():Object {
         return null;
     }
+
     public function writeResumeCookie(cookie:Object) {
     }
+
+    /*
+     public function getEncryptedValue(value:String):String
+     {
+     var data:ByteArray = Hex.toArray(Hex.fromString(value));
+     tripleDESKey.encrypt(data);
+     var encryptedValue:String = Hex.fromArray(data);
+
+     return encryptedValue;
+     }
+
+     public function getDecryptedValue(value:String):String
+     {
+     var data:ByteArray = Hex.toArray(value);
+     tripleDESKey.decrypt(data);
+     var decryptedValue:String = data.readUTFBytes(data.length);
+
+     return decryptedValue;
+     }
+     */
 }
 }

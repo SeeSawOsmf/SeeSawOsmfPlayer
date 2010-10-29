@@ -20,15 +20,19 @@
  *    Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.player.ads {
-import flash.display.DisplayObject;
+package com.seesaw.player.preventscrub {
+import org.flexunit.assertThat;
+import org.hamcrest.object.notNullValue;
 
-import org.osmf.traits.DisplayObjectTrait;
+public class ScrubPreventionProxyTest {
 
-public class AdProxyDisplayObjectTrait extends DisplayObjectTrait {
-    public function AdProxyDisplayObjectTrait(displayObject:DisplayObject, mediaWidth:Number = 0, mediaHeight:Number = 0) {
-        super(displayObject, mediaWidth, mediaHeight);
+    private var scrubPrevention:ScrubPreventionProxy;
+
+    [Test]
+    public function testScrubConstructor() {
+
+        scrubPrevention = new ScrubPreventionProxy();
+        assertThat(scrubPrevention, notNullValue());
     }
-
 }
 }

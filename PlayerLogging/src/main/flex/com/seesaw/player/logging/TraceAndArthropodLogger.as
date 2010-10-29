@@ -43,6 +43,7 @@ public class TraceAndArthropodLogger extends AbstractLogger {
         colours.push(new ColourMap("com.seesaw.player.ads", 0x07ff13));
         colours.push(new ColourMap("uk.co.vodco.osmfDebugProxy", 0xff00f0));
         colours.push(new ColourMap("com.seesaw.player.control", 0xfffc00));
+        colours.push(new ColourMap("com.seesaw.player.scrubPrevention", 0xadf8ff));
 
         for each (var map:ColourMap in colours) {
             if (name.search(map.category) == 0) {

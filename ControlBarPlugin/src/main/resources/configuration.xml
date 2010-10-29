@@ -62,11 +62,6 @@
                     left="20"
                     >
                 <widget
-                        id="qualityLabel"
-                        type="qualityLabel"
-                        input="Low res"
-                        />
-                <widget
                         id="com.seesaw.player.controls.widget.PauseButton"
                         type="com.seesaw.player.controls.widget.PauseButton"
                         upFace="pauseUp"

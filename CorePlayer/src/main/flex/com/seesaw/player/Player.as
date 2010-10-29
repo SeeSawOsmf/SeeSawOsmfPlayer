@@ -138,6 +138,9 @@ public class Player extends Sprite {
 
     private function showGuidancePanel():void {
         if (_playerInit.guidance) {
+            if (_guidanceBar) {
+                _guidanceBar.visible = false;
+            }
             var guidancePanel = new GuidancePanel(
                     _playerInit.guidance.warning,
                     _playerInit.guidance.explanation,
@@ -271,6 +274,9 @@ public class Player extends Sprite {
         logger.debug("registering services");
         var provider:ObjectProvider = ObjectProvider.getInstance();
         provider.register(ResumeService, new ResumeServiceImpl());
+        //     var en:String =  provider.getObject(ResumeService).getEncryptedValue("hello");
+        //    var de:String =   provider.getObject(ResumeService).getDecryptedValue(en);
+        //     var finalVal:String =  de;
     }
 
     private function nextInitialisationStage():void {
