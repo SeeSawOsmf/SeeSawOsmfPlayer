@@ -1,4 +1,4 @@
-package com.seesaw.player.posterFrame {
+package com.seesaw.player.panels {
 import flash.display.Bitmap;
 import flash.display.Loader;
 import flash.display.Sprite;

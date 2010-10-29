@@ -36,9 +36,7 @@ public class PlayerInitialiser extends Sprite {
 
     public function PlayerInitialiser() {
         var requestUrl:String = "http://localhost:8080/player.videoplayerinfo:getvideoplayerinfo?t:ac=TV:COMEDY/p/16001003001/Eighteen-Age-Rating-programme-1";
-        var request:ServiceRequest = new ServiceRequest(requestUrl);
-        request.successCallback = onSuccess;
-        request.failCallback = onFail;
+        var request:ServiceRequest = new ServiceRequest(requestUrl, onSuccess, onFail);
         request.submit();
     }
 

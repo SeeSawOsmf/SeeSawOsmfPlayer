@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<videoInfo xmlns="http://www.seesaw.com/api/contentinfo/v1.0">
+    <asset>
+        <path>e5/dev/ccp/p/LOW_RES/testing/big_buck_bunny_1080p_h264.mp4?s=1288365189&amp;e=1288365939&amp;h=2badd6fd8f7a8fd95625577584b2f23e</path>
+        <bitrate>500</bitrate>
+        <quality>1</quality>
+        <width>512</width>
+        <height>288</height>
+        <type>mp4</type>
+        <profile>low</profile>
+    </asset>
+    <geoblocked>false</geoblocked>
+    <cdnPath>rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703</cdnPath>
+</videoInfo>

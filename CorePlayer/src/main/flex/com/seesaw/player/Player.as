@@ -27,10 +27,10 @@ import com.seesaw.player.init.ServiceRequest;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
-import com.seesaw.player.mockData.MockData;
+import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.panels.GuidanceBar;
 import com.seesaw.player.panels.GuidancePanel;
-import com.seesaw.player.posterFrame.PosterFrame;
+import com.seesaw.player.panels.PosterFrame;
 import com.seesaw.player.services.ResumeService;
 
 import flash.display.LoaderInfo;
@@ -42,10 +42,13 @@ import flash.events.Event;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.logging.Log;
+import org.osmf.metadata.Metadata;
 import org.osmf.net.StreamingURLResource;
 
 [SWF(width=PLAYER::Width, height=PLAYER::Height, backgroundColor="#000000")]
 public class Player extends Sprite {
+
+    use namespace contentinfo;
 
     private static const PLAYER_WIDTH:int = PLAYER::Width;
     private static const PLAYER_HEIGHT:int = PLAYER::Height;
@@ -61,11 +64,11 @@ public class Player extends Sprite {
     private var _posterFrame:PosterFrame;
     private var _guidanceBar:Sprite;
 
-    // returned by the player initialiser AJAX call
-    private var _playerInit:Object;
+    // Returned by the player initialiser AJAX call
+    private var _playerInit:XML;
 
-    // returned by the video info AJAX call
-    private var _videoInfo:Object;
+    // Returned by the video info AJAX call
+    private var _videoInfo:XML;
 
     public function Player() {
         super();
@@ -90,7 +93,7 @@ public class Player extends Sprite {
         logger.debug("added to stage");
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 
-        requestPlayerInitData();
+        requestPlayerInitData(_loaderParams.playerInitUrl);
     }
 
     private function resetInitialisationStages() {
@@ -106,7 +109,7 @@ public class Player extends Sprite {
 
     private function showPosterFrame():void {
         //Play / resume / preview button
-        _posterFrame = new PosterFrame(_playerInit.programme.largeImageUrl);
+        _posterFrame = new PosterFrame(_playerInit.largeImageUrl);
         _posterFrame.addEventListener(PosterFrame.LOADED, function(event:Event) {
             nextInitialisationStage();
         });
@@ -160,44 +163,49 @@ public class Player extends Sprite {
     }
 
     private function attemptPlaybackStart():void {
-        requestProgrammeData();
+        requestProgrammeData(_playerInit.videoInfoUrl);
     }
 
-    private function requestPlayerInitData():void {
-        logger.debug("requesting programme data: " + _loaderParams.playerInitUrl);
+    private function requestPlayerInitData(playerInitUrl:String):void {
+        logger.debug("requesting programme data from: " + playerInitUrl);
 
-        var request:ServiceRequest = new ServiceRequest(_loaderParams.playerInitUrl);
-        request.successCallback = onSuccessFromPlayerInit;
-        request.failCallback = onFailFromPlayerInit;
+        var request:ServiceRequest = new ServiceRequest(playerInitUrl, onSuccessFromPlayerInit, onFailFromPlayerInit);
         request.submit();
     }
 
-    private function onSuccessFromPlayerInit(playerInit:Object):void {
-        logger.debug("received player init data for programme: " + playerInit.programme.id);
-        _playerInit = playerInit;
+    private function onSuccessFromPlayerInit(response:Object):void {
+        logger.debug("received player init data for programme: " + response);
+
+        var xmlDoc:XML = new XML(response);
+        xmlDoc.ignoreWhitespace = true;
+
+        _playerInit = xmlDoc;
+
         resetInitialisationStages();
         nextInitialisationStage();
     }
 
-    private function requestProgrammeData():void {
-        logger.debug("requesting programme data: " + _playerInit.videoPlayerInfoUrl);
+    private function requestProgrammeData(videoInfoUrl:String):void {
+        logger.debug("requesting programme data: " + videoInfoUrl);
 
-        var request:ServiceRequest = new ServiceRequest(_playerInit.videoPlayerInfoUrl);
-        request.successCallback = onSuccessFromVideoInfo;
-        request.failCallback = onFailFromVideoInfo;
+        var request:ServiceRequest = new ServiceRequest(videoInfoUrl, onSuccessFromVideoInfo, onFailFromVideoInfo);
         request.submit();
     }
 
-    private function onSuccessFromVideoInfo(programmeData:Object):void {
-        logger.debug("received programme data for programme: " + programmeData.programmeId);
-        _videoInfo = programmeData;
+    private function onSuccessFromVideoInfo(response:Object):void {
+        logger.debug("received programme data for programme: " + response);
+
+        var xmlDoc:XML = new XML(response);
+        xmlDoc.ignoreWhitespace = true;
+
+        _videoInfo = xmlDoc;
 
         if (_videoInfo.geoblocked == "true") {
             // TODO: show the geoblock panel
             return;
         }
 
-        if (_videoInfo.assets != null) {
+        if (_videoInfo.asset.length() > 0) {
             var resource:StreamingURLResource = createMediaResource(_videoInfo);
             loadVideo(resource);
         }
@@ -223,28 +231,37 @@ public class Player extends Sprite {
         addChild(videoPlayer);
     }
 
-    private function createMediaResource(programmeData:Object):StreamingURLResource {
+    private function createMediaResource(videoInfo:XML):StreamingURLResource {
         logger.debug("creating media resource");
-        return new DynamicStream(programmeData);
+        var resource:DynamicStream = new DynamicStream(videoInfo);
+
+        var metaSettings:Metadata = new Metadata();
+        // Use this to check the resource is the mainContent, e.g. for the AdProxypPlugins
+        metaSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
+
+        resource.addMetadataValue(PlayerConstants.CONTENT_ID, metaSettings);
+        resource.addMetadataValue(PlayerConstants.CONTENT_INFO, _playerInit);
+        resource.addMetadataValue(PlayerConstants.VIDEO_INFO, _videoInfo);
+
+        return resource;
     }
 
     private function onFailFromPlayerInit():void {
         logger.debug("failed to retrieve init data");
         // TODO: set the error ('programme not playing') panel as the main content
-        _playerInit = MockData.playerInit;
-        resetInitialisationStages();
-        nextInitialisationStage();
+
+        // TODO: request a test file but this should be removed eventually
+        var request:ServiceRequest = new ServiceRequest("../src/test/resources/contentInfo.xml", onSuccessFromPlayerInit, null);
+        request.submit();
     }
 
     private function onFailFromVideoInfo():void {
         logger.debug("failed to retrieve programme data");
         // TODO: set the error ('programme not playing') panel as the main content
-        // Note that this is the function that will be called when VideoPlayerInfo throws an exception.
-        // VideoPlayerInfo will not return inconsistent or partial state.
 
-        // TODO: This should be removed once the new video player info service is up and running
-        var resource:StreamingURLResource = createMediaResource(MockData.videoInfo);
-        loadVideo(resource);
+        // TODO: request a test file but this should be removed eventually
+        var request:ServiceRequest = new ServiceRequest("../src/test/resources/videoInfo.xml", onSuccessFromVideoInfo, null);
+        request.submit();
     }
 
     /**
