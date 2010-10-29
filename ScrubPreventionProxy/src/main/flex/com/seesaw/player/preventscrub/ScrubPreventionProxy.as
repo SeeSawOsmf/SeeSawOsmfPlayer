@@ -125,11 +125,11 @@ public class ScrubPreventionProxy extends ProxyElement {
         processTrait(event.traitType, false);
     }
 
-    private function addLocalTraits() {
+    private function addLocalTraits():void {
 
     }
 
-    private function removeLocalTraits() {
+    private function removeLocalTraits():void {
 
     }
 

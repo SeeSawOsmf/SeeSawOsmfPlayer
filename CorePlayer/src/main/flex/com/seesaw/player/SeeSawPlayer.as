@@ -86,12 +86,14 @@ public class SeeSawPlayer extends Sprite {
 
         config.factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new FullScreenProxyPluginInfo()));
-        config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
+
         config.factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
+        config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
 
 
         logger.debug("creating video element");
         _videoElement = config.factory.createMediaElement(config.resource);
+
 
         if (_videoElement == null) {
             throw ArgumentError("failed to create main media element for player");
@@ -127,6 +129,7 @@ public class SeeSawPlayer extends Sprite {
 
         var fullScreen:FullScreenTrait = target.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
 
+
         if (fullScreen && event.traitType == FullScreenTrait.FULL_SCREEN) {
             if (event.type == MediaElementEvent.TRAIT_ADD) {
                 logger.debug("adding handler for full screen trait: " + target);
@@ -135,6 +138,7 @@ public class SeeSawPlayer extends Sprite {
             else {
                 logger.debug("removing handler for full screen trait: " + target);
                 fullScreen.removeEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
+
             }
         }
     }

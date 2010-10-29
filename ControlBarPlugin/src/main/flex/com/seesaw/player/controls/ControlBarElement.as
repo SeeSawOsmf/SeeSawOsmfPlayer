@@ -108,6 +108,8 @@ public class ControlBarElement extends MediaElement {
 
     // Public interface
     //
+    public function ControlBarElement():void {
+    }
 
     public function addReference(target:MediaElement):void {
         logger.debug("adding target reference: " + target);
@@ -143,7 +145,7 @@ public class ControlBarElement extends MediaElement {
         if (event.type == MediaElementEvent.TRAIT_ADD) {
             // Wait for the target element to display before displaying the control bar
             if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
-                if(controlBar) {
+                if (controlBar) {
                     viewable = new DisplayObjectTrait(controlBar, controlBar.measuredWidth, controlBar.measuredHeight);
                     addTrait(MediaTraitType.DISPLAY_OBJECT, viewable);
                     controlBar.measure();
@@ -152,7 +154,7 @@ public class ControlBarElement extends MediaElement {
         } else {
             if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
                 // Hide the control bar if the target element is hidden
-                if(controlBar) {
+                if (controlBar) {
                     removeTrait(MediaTraitType.DISPLAY_OBJECT);
                 }
             }
