@@ -21,6 +21,8 @@
  */
 
 package com.seesaw.player {
+import com.seesaw.player.namespaces.contentinfo;
+
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.metadata.Metadata;
@@ -29,40 +31,27 @@ import org.osmf.net.DynamicStreamingResource;
 
 public class DynamicStream extends DynamicStreamingResource {
 
+    use namespace contentinfo;
+
     private var logger:ILogger = LoggerFactory.getClassLogger(DynamicStream);
 
-    private static const PROGRAMME_ID:String = "programmeID";
-    private static const CONTENT_INFO:String = "contentInfo";
-    private static const AUTO_RESUME:String = "autoResume";
-    private static const CONTENT_ID:String = "contentId";
+    public function DynamicStream(videoInfo:XML) {
+        super(videoInfo.cdnPath);
 
+        logger.debug("using cdn: " + videoInfo.cdnPath);
 
-    public function DynamicStream(params:Object) {
-        var asset:Object = params.assets.low;
+        var items:Vector.<DynamicStreamingItem> = new Vector.<DynamicStreamingItem>();
+        for each (var asset:XML in videoInfo.asset) {
+            logger.debug("creating streaming item: " + asset.type + ":" + asset.path);
+            items.push(new DynamicStreamingItem(asset.type + ":" + asset.path, asset.bitrate, asset.width, asset.height));
+        }
 
-        super(asset.cdn);
-
-        logger.debug("cdn: " + asset.cdn);
-        logger.debug("asset: " + asset.path);
-
-        streamItems = Vector.<DynamicStreamingItem>(
-                [
-                    new DynamicStreamingItem(asset.type + ":" + asset.path, asset.bitrate, asset.width, asset.height)
-                ]);
-
-        logger.debug("created " + streamItems.length + " stream item(s)");
-
-        //  TODO: add metadata from video player info to the resource
-
+        streamItems = items;
         var metaSettings:Metadata = new Metadata();
         metaSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);  // Use this to check the resource is the mainContent for the AdProxypPlugins
 
-        addMetadataValue(CONTENT_ID, metaSettings);
 
-        addMetadataValue(PROGRAMME_ID, params.programmeId);
-        addMetadataValue(CONTENT_INFO, params.contentInfo);
-        addMetadataValue(AUTO_RESUME, params.resumeValue);
-        // addMetadataValue(CONTENT_INFO, params.contentInfo)
+        logger.debug("created " + streamItems.length + " streaming item(s)");
     }
 }
 }

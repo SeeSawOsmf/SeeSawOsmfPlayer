@@ -21,8 +21,6 @@
  */
 
 package com.seesaw.player.preventscrub {
-import flash.display.Sprite;
-
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ProxyElement;
@@ -30,7 +28,6 @@ import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.SeekEvent;
 import org.osmf.media.MediaElement;
-import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.LoadTrait;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayTrait;
@@ -39,8 +36,7 @@ import org.osmf.traits.SeekTrait;
 public class ScrubPreventionProxy extends ProxyElement {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(ScrubPreventionProxy);
-    private var outerViewable:DisplayObjectTrait;
-    private var displayObject:Sprite;
+
 
     public function ScrubPreventionProxy() {
 

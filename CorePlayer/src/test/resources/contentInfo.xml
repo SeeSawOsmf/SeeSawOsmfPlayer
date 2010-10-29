@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  ~ Copyright 2010 ioko365 Ltd.  All Rights Reserved.
+  ~
+  ~    The contents of this file are subject to the Mozilla Public License
+  ~    Version 1.1 (the "License"); you may not use this file except in
+  ~    compliance with the License. You may obtain a copy of the
+  ~    License athttp://www.mozilla.org/MPL/
+  ~
+  ~    Software distributed under the License is distributed on an "AS IS"
+  ~    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+  ~    License for the specific language governing rights and limitations
+  ~    under the License.
+  ~
+  ~    The Initial Developer of the Original Code is ioko365 Ltd.
+  ~    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
+  ~    Incorporated. All Rights Reserved.
+  ~
+  ~    The Initial Developer of the Original Code is ioko365 Ltd.
+  ~    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
+  ~    Incorporated. All Rights Reserved.
+  -->
+
+<contentInfo xmlns="http://www.seesaw.com/api/contentinfo/v1.0">
+    <primaryGenre>TV:ENTERTAINMENT:OTHER_ENTERTAINMENT</primaryGenre>
+    <sourceId>CHANNEL4</sourceId>
+    <firstPresentationBrand>BBC</firstPresentationBrand>
+    <seriesId>12001018</seriesId>
+    <seriesTitle>South Park Season 5</seriesTitle>
+    <programmeId>prg12001018002</programmeId>
+    <programmeTitle>South Park programme 2</programmeTitle>
+    <tvAgeRating>16</tvAgeRating>
+    <filmAgeRating>U</filmAgeRating>
+    <duration>1800</duration>
+    <adRule>UNSPECIFIED</adRule>
+    <catchup>false</catchup>
+    <loggingSheet>
+        <break>
+            <breakOffset>00:00:00.10</breakOffset>
+            <resumeOffset>00:00:00.20</resumeOffset>
+            <data>a break</data>
+        </break>
+    </loggingSheet>
+    <guidance>
+        <warning>Strong language and adult humour</warning>
+        <explanation>This programme isn't suitable for younger viewers</explanation>
+        <message>guidance</message>
+    </guidance>
+    <parentalControls>
+        <parentalControlsPageURL>/Parental_Controls</parentalControlsPageURL>
+    </parentalControls>
+    <unavailablePageUrl>http://kgd-red-dev-zxtm01.dev.vodco.co.uk/unavailable</unavailablePageUrl>
+    <videoInfoUrl>
+        http://kgd-red-dev-zxtm01.dev.vodco.co.uk/player.playerinitialisation:videoinfo?t:ac=TV:ENTERTAINMENT/p/12001018002/South-Park-programme-2
+    </videoInfoUrl>
+    <largeImageUrl>http://kgd-red-dev-zxtm01.dev.vodco.co.uk/i/ccp/programs/Large.jpg</largeImageUrl>
+</contentInfo> 

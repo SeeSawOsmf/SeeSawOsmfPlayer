@@ -1,16 +1,33 @@
-package com.seesaw.player.posterFrame {
+/*
+ * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
+ *
+ *    The contents of this file are subject to the Mozilla Public License
+ *    Version 1.1 (the "License"); you may not use this file except in
+ *    compliance with the License. You may obtain a copy of the
+ *    License athttp://www.mozilla.org/MPL/
+ *
+ *    Software distributed under the License is distributed on an "AS IS"
+ *    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *    License for the specific language governing rights and limitations
+ *    under the License.
+ *
+ *    The Initial Developer of the Original Code is ioko365 Ltd.
+ *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
+ *    Incorporated. All Rights Reserved.
+ *
+ *    The Initial Developer of the Original Code is ioko365 Ltd.
+ *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
+ *    Incorporated. All Rights Reserved.
+ */
+
+package com.seesaw.player.panels {
 import flash.display.Bitmap;
 import flash.display.Loader;
 import flash.display.Sprite;
 import flash.events.Event;
-import flash.events.MouseEvent;
 import flash.net.URLRequest;
-import flash.net.navigateToURL;
 import flash.system.LoaderContext;
 import flash.system.Security;
-import flash.text.StyleSheet;
-import flash.text.TextField;
-import flash.text.TextFormat;
 
 public class PosterFrame extends Sprite {
 
@@ -22,9 +39,9 @@ public class PosterFrame extends Sprite {
     private var loadedImage:Loader;
 
     /*Constructor
-    * Takes: warning:String - the guidance warning that appears at the top of the panel
-    *
-    */
+     * Takes: warning:String - the guidance warning that appears at the top of the panel
+     *
+     */
     public function PosterFrame(posterFrameURL:String) {
 
         this.posterFrameURL = posterFrameURL;
@@ -49,10 +66,10 @@ public class PosterFrame extends Sprite {
         var loaderContext = new LoaderContext(true);
 
         var pictLdr:Loader = new Loader();
-		var pictURL:String = this.posterFrameURL;
+        var pictURL:String = this.posterFrameURL;
 
-		var pictURLReq:URLRequest = new URLRequest(pictURL);
-		pictLdr.load(pictURLReq, loaderContext);
+        var pictURLReq:URLRequest = new URLRequest(pictURL);
+        pictLdr.load(pictURLReq, loaderContext);
 
         return pictLdr;
 
@@ -73,7 +90,7 @@ public class PosterFrame extends Sprite {
         image.height = stage.stageHeight;
         image.smoothing = true;
         this.dispatchEvent(new Event(LOADED));
-        
+
     }
 
 }
