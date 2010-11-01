@@ -43,7 +43,8 @@ public class GuidanceBar extends Sprite {
 
     private function positionPanel(event:Event):void {
         this.y = stage.stageHeight - this.height;
-        this.width = stage.stageWidth;
+        this.panelBG.width = stage.stageWidth;
+        this.addChild(this.buildWarningIcon())
     }
 
     private function buildPanel():Sprite {
@@ -54,7 +55,6 @@ public class GuidanceBar extends Sprite {
         var contentContainer:Sprite = this.buildContentContainer();
         contentContainer.addChild(this.buildGuidanceLabel());
         contentContainer.addChild(this.buildWarning());
-        contentContainer.addChild(this.buildWarningIcon());
 
         panel.addChild(contentContainer);
 
@@ -108,8 +108,8 @@ public class GuidanceBar extends Sprite {
     private function buildWarningIcon():Sprite {
         var warningIconHolder = new Sprite();
         warningIconHolder.addChild(this.guidanceCircle);
-        warningIconHolder.x = 510;
-        warningIconHolder.y = 4;
+        warningIconHolder.x = 639;
+        warningIconHolder.y = 10;
         return warningIconHolder;
     }
 
