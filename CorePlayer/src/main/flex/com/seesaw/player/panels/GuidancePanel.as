@@ -31,6 +31,9 @@ public class GuidancePanel extends Sprite {
     [Embed(source="resources/acceptButton_over.png")]
     private var acceptImageOverEmbed:Class;
     private var acceptImageOver:Bitmap = new acceptImageOverEmbed();
+    [Embed(source="resources/Gcircle.png")]
+    private var guidanceCircleEmbed:Class;
+    private var guidanceCircle:Bitmap = new guidanceCircleEmbed();
 
     //css
     private var css:StyleSheet;
@@ -82,13 +85,13 @@ public class GuidancePanel extends Sprite {
 
         var contentContainer:Sprite = this.buildContentContainer();
         contentContainer.addChild(this.buildWarning());
+        contentContainer.addChild(this.buildWarningIcon());
         contentContainer.addChild(this.buildExplanation());
         contentContainer.addChild(this.buildConfirmationMessage());
         contentContainer.addChild(this.buildAcceptButton("Accept"));
         contentContainer.addChild(this.buildDeclineButton("Decline"));
         contentContainer.addChild(this.buildParentalControlsLink());
         contentContainer.addChild(this.buildFindOutMoreLink());
-
         panel.addChild(contentContainer);
 
         return panel;
@@ -124,6 +127,14 @@ public class GuidancePanel extends Sprite {
         var formattedWarningLabel:TextField = this.applyWarningFormat(warningLabel);
 
         return warningLabel;
+    }
+
+    private function buildWarningIcon():Sprite {
+        var warningIconHolder = new Sprite();
+        warningIconHolder.addChild(this.guidanceCircle);
+        warningIconHolder.x = -23;
+        warningIconHolder.y = -1;
+        return warningIconHolder;
     }
 
     private function buildExplanation():TextField {
