@@ -36,11 +36,15 @@ import org.osmf.traits.LoadTrait;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayTrait;
 import org.osmf.traits.SeekTrait;
+import org.osmf.traits.TimeTrait;
 
 public class ScrubPreventionProxy extends ProxyElement {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(ScrubPreventionProxy);
     private var _adTrait:AdTrait;
+    private var time:TimeTrait;
+    private var adMarkers:Array;
+    private var seekable:SeekTrait;
 
     public function ScrubPreventionProxy() {
 
@@ -82,12 +86,12 @@ public class ScrubPreventionProxy extends ProxyElement {
 
 
     private function toggleSeekListeners(added:Boolean):void {
-        var seek:SeekTrait = proxiedElement.getTrait(MediaTraitType.SEEK) as SeekTrait;
+        seekable = proxiedElement.getTrait(MediaTraitType.SEEK) as SeekTrait;
 
-        if (seek) {
-            seek.addEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
+        if (seekable) {
+            seekable.addEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
         } else {
-            seek.removeEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
+            seekable.removeEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
         }
     }
 
@@ -110,6 +114,8 @@ public class ScrubPreventionProxy extends ProxyElement {
 
         if (_adTrait)_adTrait.addEventListener(AdEvent.AD_MARKERS, adMarkerEvent);
 
+
+        time = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
         if (playTrait) {
 
             ///  playTrait.pause();
@@ -118,10 +124,22 @@ public class ScrubPreventionProxy extends ProxyElement {
 
     private function onSeekingChange(event:SeekEvent):void {
         logger.debug("On Seek Change:{0}", event.time);
+        var finalSeekPoint:Number;
+        var forceSeek:Boolean;
+        for each (var value:Number in adMarkers) {
+            if (event.time > (value * time.duration)) {
+                forceSeek = true;
+                finalSeekPoint = value * time.duration;
+            }
+        }
+        if (forceSeek) {
+            seekable.seek((finalSeekPoint));
+        }
+
     }
 
     private function adMarkerEvent(event:AdEvent):void {
-        logger.debug(event.markers[0]);
+        adMarkers = event.markers;
     }
 
     private function onTraitAdd(event:MediaElementEvent):void {
