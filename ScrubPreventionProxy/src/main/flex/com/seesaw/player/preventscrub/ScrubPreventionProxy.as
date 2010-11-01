@@ -21,6 +21,10 @@
  */
 
 package com.seesaw.player.preventscrub {
+import com.seesaw.player.events.AdEvent;
+import com.seesaw.player.traits.ads.AdTrait;
+import com.seesaw.player.traits.ads.AdTraitType;
+
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ProxyElement;
@@ -36,7 +40,7 @@ import org.osmf.traits.SeekTrait;
 public class ScrubPreventionProxy extends ProxyElement {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(ScrubPreventionProxy);
-
+    private var _adTrait:AdTrait;
 
     public function ScrubPreventionProxy() {
 
@@ -102,10 +106,13 @@ public class ScrubPreventionProxy extends ProxyElement {
 
     private function onLoadableStateChange(event:LoadEvent):void {
         var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
+        _adTrait = proxiedElement ? proxiedElement.getTrait(AdTraitType.AD_PLAY) as AdTrait : null;
+
+        if (_adTrait)_adTrait.addEventListener(AdEvent.AD_MARKERS, adMarkerEvent);
 
         if (playTrait) {
 
-            playTrait.pause();
+            ///  playTrait.pause();
         }
     }
 
@@ -113,6 +120,9 @@ public class ScrubPreventionProxy extends ProxyElement {
         logger.debug("On Seek Change:{0}", event.time);
     }
 
+    private function adMarkerEvent(event:AdEvent):void {
+        logger.debug(event.markers[0]);
+    }
 
     private function onTraitAdd(event:MediaElementEvent):void {
         processTrait(event.traitType, true);
@@ -129,7 +139,6 @@ public class ScrubPreventionProxy extends ProxyElement {
     private function removeLocalTraits():void {
 
     }
-
 
 }
 }

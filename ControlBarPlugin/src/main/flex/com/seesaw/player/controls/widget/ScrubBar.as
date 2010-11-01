@@ -215,6 +215,7 @@ public class ScrubBar extends Widget implements IWidget {
         }
     }
 
+
     private function disableScrubber(event:AdEvent):void {
         if (adTrait.adState == AdState.STARTED) {
             currentTime.visible = scrubber.visible = scrubBarTrail.visible = markerContainer.visible = scrubBarTrack.visible = false;

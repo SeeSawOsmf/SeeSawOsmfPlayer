@@ -88,8 +88,8 @@ public class AutoResumeProxy extends ProxyElement {
     private function togglePlayListeners(added:Boolean):void {
         var playable:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
         if (playable) {
-            blockedTraits = new Vector.<String>();
-            playable.play();
+            //  blockedTraits = new Vector.<String>();
+            //   playable.play();
             if (added) {
                 playable.addEventListener(PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
                 playable.addEventListener(PlayEvent.CAN_PAUSE_CHANGE, onCanPauseChange);
@@ -129,18 +129,18 @@ public class AutoResumeProxy extends ProxyElement {
     private function onLoadableStateChange(event:LoadEvent):void {
         var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
 
-        if (playTrait) {
-            var resume:Number = resource.getMetadataValue("autoResume") as Number;
-            if (resume == 0) {
-                blockedTraits = new Vector.<String>();
-                if (playTrait.playState) {
+        /*  if (playTrait) {
+         var resume:Number = resource.getMetadataValue("autoResume") as Number;
+         if (resume == 0) {
+         blockedTraits = new Vector.<String>();
+         if (playTrait.playState) {
 
-                    playTrait.play();
-                }
+         playTrait.play();
+         }
 
-            }
+         }
 
-        }
+         }*/
     }
 
     private function onCanPauseChange(event:PlayEvent):void {

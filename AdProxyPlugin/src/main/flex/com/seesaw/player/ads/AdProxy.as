@@ -245,11 +245,12 @@ public class AdProxy extends ProxyElement {
 
         _adManager.setSize(new Rectangle(0, 0, 672, 378));   ///todo use the actual stageWidth to set the adModule.
 
-        if (_contentInfoResource.resume <= 0) {
+        if (_contentInfoResource.resume == 0) {
             _adManager.onContentStart();
         } else {
             adbreakComplete();
         }
+
         var timer:Timer = new Timer(CONTENT_UPDATE_INTERVAL);
         timer.addEventListener(TimerEvent.TIMER, onTimerTick);
         timer.start();
@@ -387,7 +388,7 @@ public class AdProxy extends ProxyElement {
     private function removeLocalTraits():void {
         removeTrait(AdTraitType.AD_PLAY);
         if (_adTrait) {
-            _adTrait.addEventListener(AdEvent.PLAY_PAUSE_CHANGE, playPauseEventHandler);
+            _adTrait.removeEventListener(AdEvent.PLAY_PAUSE_CHANGE, playPauseEventHandler);
             _adTrait = null;
         }
     }
