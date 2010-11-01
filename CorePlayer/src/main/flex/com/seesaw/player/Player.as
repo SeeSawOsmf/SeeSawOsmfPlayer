@@ -204,7 +204,7 @@ public class Player extends Sprite {
         xmlDoc.ignoreWhitespace = true;
 
         _videoInfo = xmlDoc;
-        _videoInfo.appendChild(<resume>{resumeValue}</resume>);
+        _playerInit.appendChild(<resume>{resumeValue}</resume>);
         if (_videoInfo.geoblocked == "true") {
             // TODO: show the geoblock panel
             return;

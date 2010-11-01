@@ -188,13 +188,23 @@ public class ScrubBar extends Widget implements IWidget {
         adTrait = media ? media.getTrait(AdTraitType.AD_PLAY) as AdTrait : null;
         if (adTrait) {
             adTrait.addEventListener(AdEvent.AD_STATE_CHANGE, disableScrubber);
-            adTrait.addEventListener(AdEvent.AD_MARKERS, createAdMarkers);
+            adTrait.addEventListener(AdEvent.AD_MARKERS, adMarkerEvent);
         }
         updateTimerState();
     }
 
-    private function createAdMarkers(event:AdEvent):void {
-        trace("hello");
+    private function adMarkerEvent(event:AdEvent):void {
+        createAdMarkers(event.markers);
+    }
+
+    private function createAdMarkers(markers:Array):void {
+        for each (var value:Number in markers) {
+            var sprite:Sprite = new Sprite();
+            sprite.graphics.beginFill(0xffffff);
+            sprite.graphics.drawRect(scrubBarTrack.width * value + (scrubBarTrack.x) - 2, scrubBarTrack.y, 6, 3);
+            sprite.graphics.endFill();
+            addChildAt(sprite, 3);
+        }
     }
 
     private function disableScrubber(event:AdEvent):void {

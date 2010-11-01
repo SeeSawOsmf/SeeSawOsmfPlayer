@@ -21,19 +21,141 @@
  */
 
 package com.seesaw.player.ads {
+import com.seesaw.player.namespaces.contentinfo;
+
 public class LiverailConfig {
     private var _config:Object;
     private var contentInfo:XML;
+    private var liveRailAdMap:String = "";
+    private var liveRailTags:String = "";
+    private var genres:Array;
+    private var ageRating:int;
+    private var _adPositions:Array = [];
+    private var _totalAdPositions:Array = [];
+    private var adSlots:int = 0;
+
+    use namespace contentinfo;
 
     public function LiverailConfig(contentInfoXml:XML) {
-        contentInfo = contentInfoXml;
-        if (contentInfo) {
 
+
+        contentInfo = contentInfoXml as XML;
+        if (contentInfo) {
+            generateMap();
         }
     }
 
+    public function generateMap():void {
+
+
+        var autoResumePoint:Number = 0;
+
+
+        liveRailAdMap = "";
+        liveRailTags = "";
+        if (contentInfo != null) {
+
+
+            liveRailTags += "sourceId_" + stripSpecialChars(contentInfo.sourceId);
+            liveRailTags += ",firstPresentationBrand_" + stripSpecialChars(contentInfo.firstPresentationBrand);
+            liveRailTags += ",minimumAge_" + ageRating.toString();
+            liveRailTags += ",catchup_" + stripSpecialChars(contentInfo.catchup);
+
+
+            for each(var genre:String in genres) {
+                liveRailTags += "," + stripSpecialChars(genre);
+            }
+
+            var duration:Number = Number(contentInfo.duration);
+            if (duration < 900) {
+                liveRailTags += ",duration_less_than_15_min";
+            } else if (duration < 3600) {
+                liveRailTags += ",duration_less_than_1_hour";
+            } else {
+                liveRailTags += ",duration_greater_than_1_hour";
+            }
+
+
+            for each(var item:XML in contentInfo.loggingSheet.children()) {
+                var name:String = item.name().localName;
+                switch (name) {
+                    case "break":
+                        if (item.breakOffset != null) {
+                            var pos:Number = convertDuration(item.breakOffset);
+                            if (!(pos < autoResumePoint)) {
+
+                                liveRailAdMap += "in::" + pos.toString();
+
+                                if (Math.abs(pos) > 0) {
+                                    _adPositions.push(convertPercenage(pos));
+                                }
+
+
+                            }
+                            _totalAdPositions.push(pos);
+                        }
+                        liveRailAdMap += ";";
+                        adSlots++;
+                        break;
+                }
+            }
+
+            //hardcode the preroll if not exist in string already
+            if (!liveRailAdMap.match("in::0")) {
+                liveRailAdMap = "in::0;" + liveRailAdMap + "in::100%;";
+                _totalAdPositions.push(0);
+            }
+
+            //remove the last semi-colon in the string, apparently there is a reason for this as LR asked us to do it
+            liveRailAdMap = liveRailAdMap.substring(0, liveRailAdMap.lastIndexOf(";"));
+        }
+
+
+    }
+
+    private static function convertDuration(str:String):Number {
+        var arrDuration:Array = str.split(":");
+        var iHours:Number = Number(arrDuration[0]);
+        var iMinutes:Number = Number(arrDuration[1]);
+        var iSeconds:Number = Number(arrDuration[2]);
+        var finalSeconds:Number = ((iHours * (60 * 60)) + (iMinutes * 60) + iSeconds);
+        return finalSeconds;
+    }
+
+    private function convertPercenage(num:Number):Number {
+        var duration:Number = contentInfo.duration;
+
+        return (num / duration);
+    }
+
+
+    private function stripSpecialChars(original:String):String {
+        original = original.replace(/_|:/ig, "");
+        return original;
+    }
+
+    private function extractMidLevelGenresAndAddToGenresArray(genre:*, index:int, original:Array):void {
+
+        var startPositionToFindSecondColon:int;
+
+        if (genre.indexOf("TV:") == 0) {
+            startPositionToFindSecondColon = 3;
+        } else {
+            startPositionToFindSecondColon = 5;
+        }
+
+        var positionOfSecondColon:int = genre.indexOf(":", startPositionToFindSecondColon);
+        if (positionOfSecondColon > 0) {
+            var midLevelGenre:String = genre.substring(0, positionOfSecondColon);
+            if (genres.indexOf(midLevelGenre) <= 0) {
+                genres[genres.length] = midLevelGenre;
+            }
+        }
+    }
 
     public function get config():Object {
+
+
 
         /*  // set to true if you are using Junction or false if you are using AdServer
          config["LR_USE_JUNCTION"] = false;
@@ -95,7 +217,9 @@ public class LiverailConfig {
 
          */
         _config = {
-            "LR_ADMAP": "in::0;in::60.04;in::1818.36;in::100%",
+            "LR_ADMAP" : liveRailAdMap,
+
+            "LR_TAGS" : liveRailTags,
             "LR_BITRATE" :    "low",
             "LR_BUMPER_MIDROLL_ADONLY"    :"default",
             "LR_BUMPER_MIDROLL_POST_HIGH"    :"default",
@@ -121,13 +245,17 @@ public class LiverailConfig {
             "LR_LAYOUT_LINEAR_PAUSEONCLICKTHRU" :    false  ,
             "LR_LAYOUT_SKIN_ID" :    1 ,
             "LR_PARTNERS" :    "SHERBET" ,
-            "LR_PUBLISHER_ID" :    "1332" ,
-            "LR_TAGS" :    "sourceId_BBCWORLDWIDE,firstPresentationBrand_BBC,minimumAge_18,catchup_false,TVDRAMACONTEMPORARYBRITISH,TVDRAMA,duration_less_than_1_hour",
+            "LR_PUBLISHER_ID" :    contentInfo.publisherId ,
+            /// "LR_TAGS" :    "sourceId_BBCWORLDWIDE,firstPresentationBrand_BBC,minimumAge_18,catchup_false,TVDRAMACONTEMPORARYBRITISH,TVDRAMA,duration_less_than_1_hour",
             "LR_USE_JUNCTION" :    false,
             "LR_VERSION" :    "4.1",
-            "LR_VIDEO_ID"    : 11291
+            "LR_VIDEO_ID"    : contentInfo.programmeId
         }
         return _config;
+    }
+
+    public function get adPositions():Array {
+        return _adPositions;
     }
 }
 }

@@ -23,6 +23,7 @@
 package com.seesaw.player.ads {
 import com.seesaw.player.ads.events.LiveRailEvent;
 import com.seesaw.player.events.AdEvent;
+import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.traits.ads.AdState;
 import com.seesaw.player.traits.ads.AdTrait;
 import com.seesaw.player.traits.ads.AdTraitType;
@@ -54,6 +55,8 @@ import org.osmf.traits.TimeTrait;
 
 public class AdProxy extends ProxyElement {
 
+    use namespace contentinfo;
+
     private var logger:ILogger = LoggerFactory.getClassLogger(AdProxy);
 
     private static const CONTENT_UPDATE_INTERVAL:int = 500;
@@ -66,6 +69,7 @@ public class AdProxy extends ProxyElement {
     private var _adManager:*;
     private var liverailLoader:Loader;
     private var liverailConfig:LiverailConfig;
+    private var _contentInfoResource:XML;
 
     public function AdProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -219,10 +223,12 @@ public class AdProxy extends ProxyElement {
          adManager.addEventListener(LiveRailEvent.AD_PROGRESS,onAdProgress);
          */
 
-        _adTrait.createMarkers({"markers":"in::0;in::60.04;in::1818.36;in::100%"});
-        var contentInfo:XML = resource.getMetadataValue("contentInfo") as XML;
-        liverailConfig = new LiverailConfig(contentInfo);
+
+        _contentInfoResource = resource.getMetadataValue("contentInfo") as XML;
+        liverailConfig = new LiverailConfig(_contentInfoResource);
         _adManager.initAds(liverailConfig.config);
+        _adTrait.createMarkers(liverailConfig.adPositions);
+
     }
 
     private function onLiveRailAdStart(e:Event):void {
@@ -239,8 +245,11 @@ public class AdProxy extends ProxyElement {
 
         _adManager.setSize(new Rectangle(0, 0, 672, 378));   ///todo use the actual stageWidth to set the adModule.
 
-        _adManager.onContentStart();
-
+        if (_contentInfoResource.resume <= 0) {
+            _adManager.onContentStart();
+        } else {
+            adbreakComplete();
+        }
         var timer:Timer = new Timer(CONTENT_UPDATE_INTERVAL);
         timer.addEventListener(TimerEvent.TIMER, onTimerTick);
         timer.start();
@@ -266,7 +275,7 @@ public class AdProxy extends ProxyElement {
         }
     }
 
-    private function adbreakComplete(event:Event):void {
+    private function adbreakComplete(event:Event = null):void {
         if (proxiedElement != null) {
             if (_adTrait) {
                 _adTrait.stopped();
@@ -367,7 +376,7 @@ public class AdProxy extends ProxyElement {
         }
     }
 
-    private function addLocalTraits() {
+    private function addLocalTraits():void {
         if (_adTrait == null) {
             _adTrait = new AdTrait();
             _adTrait.addEventListener(AdEvent.PLAY_PAUSE_CHANGE, playPauseEventHandler);
@@ -375,7 +384,7 @@ public class AdProxy extends ProxyElement {
         }
     }
 
-    private function removeLocalTraits() {
+    private function removeLocalTraits():void {
         removeTrait(AdTraitType.AD_PLAY);
         if (_adTrait) {
             _adTrait.addEventListener(AdEvent.PLAY_PAUSE_CHANGE, playPauseEventHandler);

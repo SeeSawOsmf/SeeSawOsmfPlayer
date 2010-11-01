@@ -33,7 +33,7 @@ public class AdTrait extends MediaTraitBase {
 
     private var _adState:String;
     private var _playState:String;
-    private var _markers:Object;
+    private var _markers:Array;
 
     public function AdTrait() {
 
@@ -76,7 +76,7 @@ public class AdTrait extends MediaTraitBase {
         adState = AdState.STARTED;
     }
 
-    public function createMarkers(object:Object):void {
+    public function createMarkers(object:Array):void {
         _markers = object;
         dispatchEvent(new AdEvent(AdEvent.AD_MARKERS, false, false, _adState, object));
     }

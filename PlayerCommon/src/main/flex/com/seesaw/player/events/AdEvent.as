@@ -39,7 +39,7 @@ public class AdEvent extends Event {
              bubbles:Boolean = false,
              cancelable:Boolean = false,
              adState:String = null,
-             adMarkers:Object = null
+             adMarkers:Array = null
                     ) {
         super(type, bubbles, cancelable);
 
@@ -60,16 +60,16 @@ public class AdEvent extends Event {
         return _canPause;
     }
 
-    public function get markers():Object {
+    public function get markers():Array {
         return _adMarkers;
     }
 
-    public function set markers(value:Object):void {
+    public function set markers(value:Array):void {
         _adMarkers = value;
     }
 
     private var _adState:String;
-    private var _adMarkers:Object;
+    private var _adMarkers:Array;
     private var _canPause:Boolean;
 
 

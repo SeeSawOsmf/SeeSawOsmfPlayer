@@ -22,23 +22,36 @@
   -->
 
 <contentInfo xmlns="http://www.seesaw.com/api/contentinfo/v1.0">
-    <primaryGenre>TV:ENTERTAINMENT:OTHER_ENTERTAINMENT</primaryGenre>
-    <sourceId>CHANNEL4</sourceId>
+    <primaryGenre>TV:DRAMA:CONTEMPORARY_BRITISH</primaryGenre>
+    <sourceId>BBC_WORLDWIDE</sourceId>
     <firstPresentationBrand>BBC</firstPresentationBrand>
-    <seriesId>12001018</seriesId>
+    <seriesId>11288</seriesId>
     <seriesTitle>South Park Season 5</seriesTitle>
-    <programmeId>prg12001018002</programmeId>
+    <programmeId>11291</programmeId>
     <programmeTitle>South Park programme 2</programmeTitle>
     <tvAgeRating>16</tvAgeRating>
     <filmAgeRating>U</filmAgeRating>
-    <duration>1800</duration>
-    <adRule>UNSPECIFIED</adRule>
+    <duration>596</duration>
+    <adRule>ALWAYS</adRule>
     <catchup>false</catchup>
+    <brandId>05d80ae8-42c0-496f-a0ae-5a8cd1ddbe09</brandId>
+    <brandTitle>The Line of Beauty</brandTitle>
+    <publisherId>1332</publisherId>
     <loggingSheet>
         <break>
-            <breakOffset>00:00:00.10</breakOffset>
-            <resumeOffset>00:00:00.20</resumeOffset>
-            <data>a break</data>
+            <breakOffset>00:03:00.00</breakOffset>
+            <resumeOffset>00:03:00.00</resumeOffset>
+            <data>RSTRCT=NONE</data>
+        </break>
+        <break>
+            <breakOffset>00:05:00.00</breakOffset>
+            <resumeOffset>00:05:00.00</resumeOffset>
+            <data>RSTRCT=NONE</data>
+        </break>
+        <break>
+            <breakOffset>00:07:00.00</breakOffset>
+            <resumeOffset>00:07:00.00</resumeOffset>
+            <data>RSTRCT=NONE</data>
         </break>
     </loggingSheet>
     <guidance>
