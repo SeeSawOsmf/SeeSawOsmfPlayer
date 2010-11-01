@@ -2,7 +2,6 @@ package com.seesaw.player.panels {
 import flash.display.Bitmap;
 import flash.display.Sprite;
 import flash.events.Event;
-import flash.geom.Rectangle;
 import flash.system.Security;
 import flash.text.StyleSheet;
 import flash.text.TextField;
@@ -18,6 +17,10 @@ public class GuidanceBar extends Sprite {
 
     //css
     private var css:StyleSheet;
+
+    [Embed(source="resources/Gcircle.png")]
+    private var guidanceCircleEmbed:Class;
+    private var guidanceCircle:Bitmap = new guidanceCircleEmbed();
 
     /*Constructor
     * Takes: warning:String - the guidance warning that appears at the top of the panel
@@ -40,7 +43,8 @@ public class GuidanceBar extends Sprite {
 
     private function positionPanel(event:Event):void {
         this.y = stage.stageHeight - this.height;
-        this.width = stage.stageWidth;
+        this.panelBG.width = stage.stageWidth;
+        this.addChild(this.buildWarningIcon())
     }
 
     private function buildPanel():Sprite {
@@ -63,7 +67,7 @@ public class GuidanceBar extends Sprite {
         this.panelBG = new Sprite();
 
         with (this.panelBG.graphics) {
-            beginFill(0xFF0000, 0.6);
+            beginFill(0xA51B29, 0.7);
             drawRoundRect(0, 0, 550, 38, 0);
             endFill();
         }
@@ -74,20 +78,9 @@ public class GuidanceBar extends Sprite {
     private function buildContentContainer():Sprite {
         var contentContainer:Sprite = new Sprite();
         //the x and y of this container are the equivalent to padding in CSS
-        contentContainer.x = 5;
+        contentContainer.x = 10;
         contentContainer.y = 5;
         return contentContainer;
-    }
-
-    private function buildWarning():TextField {
-        var warningLabel = new StyledTextField();
-        warningLabel.height = 15;
-        warningLabel.width = 540;
-        warningLabel.htmlText = this.guidanceWarning;
-        warningLabel.y = 15;
-        this.applyWarningFormat(warningLabel);
-
-        return warningLabel;
     }
 
     private function buildGuidanceLabel():TextField {
@@ -99,6 +92,25 @@ public class GuidanceBar extends Sprite {
         this.applyWarningFormat(guidanceLabel);
 
         return guidanceLabel;
+    }
+
+    private function buildWarning():TextField {
+        var warningLabel = new StyledTextField();
+        warningLabel.height = 18;
+        warningLabel.width = 540;
+        warningLabel.htmlText = this.guidanceWarning;
+        warningLabel.y = 11;
+        this.applyWarningFormat(warningLabel);
+
+        return warningLabel;
+    }
+
+    private function buildWarningIcon():Sprite {
+        var warningIconHolder = new Sprite();
+        warningIconHolder.addChild(this.guidanceCircle);
+        warningIconHolder.x = 639;
+        warningIconHolder.y = 10;
+        return warningIconHolder;
     }
 
     private function applyWarningFormat(textToFormat:TextField):TextField {
