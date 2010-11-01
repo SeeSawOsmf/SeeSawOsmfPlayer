@@ -56,6 +56,8 @@ import org.osmf.traits.TimeTrait;
 
 public class ScrubBar extends Widget implements IWidget {
     private var _adState:AdTrait;
+    private var adMarkers:Array;
+    private var markerContainer:Sprite;
 
     public function ScrubBar() {
         currentTime = new StyledTextField();
@@ -65,6 +67,8 @@ public class ScrubBar extends Widget implements IWidget {
         scrubBarClickArea.addEventListener(MouseEvent.MOUSE_DOWN, onTrackMouseDown);
         addChild(scrubBarClickArea);
 
+        markerContainer = new Sprite();
+        addChild(markerContainer);
         super();
     }
 
@@ -198,20 +202,24 @@ public class ScrubBar extends Widget implements IWidget {
     }
 
     private function createAdMarkers(markers:Array):void {
-        for each (var value:Number in markers) {
+
+
+        adMarkers = markers;
+
+        for each (var value:Number in adMarkers) {
             var sprite:Sprite = new Sprite();
             sprite.graphics.beginFill(0xffffff);
-            sprite.graphics.drawRect(scrubBarTrack.width * value + (scrubBarTrack.x) - 2, scrubBarTrack.y, 6, 3);
+            sprite.graphics.drawRect(scrubBarTrack.width * value + (scrubBarTrack.x) - 2, scrubBarTrack.y - 0.5, 6, 4);
             sprite.graphics.endFill();
-            addChildAt(sprite, 3);
+            markerContainer.addChild(sprite);
         }
     }
 
     private function disableScrubber(event:AdEvent):void {
         if (adTrait.adState == AdState.STARTED) {
-            currentTime.visible = scrubber.visible = scrubBarTrail.visible = scrubBarTrack.visible = false;
+            currentTime.visible = scrubber.visible = scrubBarTrail.visible = markerContainer.visible = scrubBarTrack.visible = false;
         } else if (adTrait.adState == AdState.STOPPED) {
-            currentTime.visible = scrubber.visible = scrubBarTrail.visible = scrubBarTrack.visible = true;
+            currentTime.visible = scrubber.visible = scrubBarTrail.visible = markerContainer.visible = scrubBarTrack.visible = true;
         }
     }
 
