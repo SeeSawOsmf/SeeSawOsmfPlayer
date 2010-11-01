@@ -27,7 +27,7 @@ public class GeoBlockPanel extends Sprite {
     public function GeoBlockPanel(warning:String) {
 
         //set the private variables
-        this.guidanceWarning = "<p>We're sorry...</p><br /><p>You need to be located in the UK to watch programmes on SeeSaw. This is because we haven't been given permission by the programme makers and rights holders to show the content outside of the UK.</p><br /><p>If you're located in the UK and think that you've received this message in error, there may be a problem with your Internet Service Provider (ISP). <a href='www.seesaw.com/help'>Find out more</a>.</p>";
+        this.guidanceWarning = "<p>We're sorry...</p><br /><p>You need to be located in the UK to watch programmes on SeeSaw. This is because we haven't been given permission by the programme makers and rights holders to show the content outside of the UK.</p><br /><p>If you're located in the UK and think that you've received this message in error, there may be a problem with your Internet Service Provider (ISP). <font color='#00A88E'><a href='/help'>Find out more</a></font>.</p>";
 
         Security.allowDomain("*");
         super();
@@ -95,14 +95,16 @@ public class GeoBlockPanel extends Sprite {
     }
 
     private function buildWarning():TextField {
-        var warningLabel = new TextField();
+        var warningLabel = new StyledTextField();
         warningLabel.width = 260;
         warningLabel.height = 230;
         warningLabel.multiline = true;
         warningLabel.wordWrap = true;
         warningLabel.htmlText = this.guidanceWarning;
-        warningLabel.styleSheet = this.css;
+        //warningLabel.styleSheet = this.css;
         warningLabel.y = 0;
+
+        this.applyWarningFormat(warningLabel);
         //var formattedWarningLabel:TextField = this.applyWarningFormat(warningLabel);
 
         return warningLabel;
@@ -113,6 +115,7 @@ public class GeoBlockPanel extends Sprite {
         textFormat.size = 12;
         textFormat.color = 0xFFFFFF;
         textFormat.align = "left";
+        textFormat.leading = 3;
 
         textToFormat.setTextFormat(textFormat);
 

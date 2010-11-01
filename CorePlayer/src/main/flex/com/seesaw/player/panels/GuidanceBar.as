@@ -67,7 +67,7 @@ public class GuidanceBar extends Sprite {
         this.panelBG = new Sprite();
 
         with (this.panelBG.graphics) {
-            beginFill(0xFF0000, 0.6);
+            beginFill(0xA51B29, 0.7);
             drawRoundRect(0, 0, 550, 38, 0);
             endFill();
         }
