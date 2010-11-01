@@ -31,6 +31,7 @@ import flash.display.StageDisplayState;
 import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.text.TextField;
+import flash.text.TextFormat;
 import flash.ui.Keyboard;
 
 import org.as3commons.logging.ILogger;
@@ -72,10 +73,19 @@ public class FullScreen extends ButtonWidget implements IWidget {
         if (_fullScreenTrait) {
             _fullScreenTrait.addEventListener(FullScreenEvent.FULL_SCREEN, onFullScreen);
             addEventListener(KeyboardEvent.KEY_DOWN, KeyPressed);
+            this.formatLabelFont();
             addChild(_fullScreenLabel);
         }
 
         visible = media.hasTrait(FullScreenTrait.FULL_SCREEN);
+    }
+
+    private function formatLabelFont():void {
+        var textFormat:TextFormat = new TextFormat();
+        textFormat.size = 12;
+        textFormat.color = 0x00A78D;
+        textFormat.align = "right";
+        this._fullScreenLabel.setTextFormat(textFormat);
     }
 
     override protected function processRequiredTraitsUnavailable(element:MediaElement):void {
