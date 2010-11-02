@@ -203,7 +203,6 @@ public class ScrubBar extends Widget implements IWidget {
 
     private function createAdMarkers(markers:Array):void {
 
-
         adMarkers = markers;
 
         for each (var value:Number in adMarkers) {

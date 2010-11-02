@@ -45,6 +45,7 @@ public class ScrubPreventionProxy extends ProxyElement {
     private var time:TimeTrait;
     private var adMarkers:Array;
     private var seekable:SeekTrait;
+    private var offset:Number = 0.5;
 
     public function ScrubPreventionProxy() {
 
@@ -124,18 +125,36 @@ public class ScrubPreventionProxy extends ProxyElement {
 
     private function onSeekingChange(event:SeekEvent):void {
         logger.debug("On Seek Change:{0}", event.time);
-        var finalSeekPoint:Number;
-        var forceSeek:Boolean;
-        for each (var value:Number in adMarkers) {
-            if (event.time > (value * time.duration)) {
-                forceSeek = true;
-                finalSeekPoint = value * time.duration;
+
+        if (!event.seeking) {
+
+            var finalSeekPoint:Number;
+            var forceSeek:Boolean;
+            for each (var value:Number in adMarkers) {
+                if (event.time > (value * time.duration)) {
+                    forceSeek = true;
+                    finalSeekPoint = value * time.duration;
+                    seekable.removeEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
+                }
+            }
+            if (forceSeek) {
+
+                seekable.seek((finalSeekPoint - offset));
+                createNewMarkers();
+                seekable.addEventListener(SeekEvent.SEEKING_CHANGE, reinstateSeek);
             }
         }
-        if (forceSeek) {
-            seekable.seek((finalSeekPoint));
-        }
+    }
 
+    private function createNewMarkers():void {
+        // _adTrait.markers
+    }
+
+    private function reinstateSeek(event:SeekEvent):void {
+        if (!event.seeking) {
+            seekable.removeEventListener(SeekEvent.SEEKING_CHANGE, reinstateSeek);
+            seekable.addEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
+        }
     }
 
     private function adMarkerEvent(event:AdEvent):void {
