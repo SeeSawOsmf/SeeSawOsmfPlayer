@@ -149,7 +149,7 @@ public class ScrubBar extends Widget implements IWidget {
                         , assetManager.getDisplayObject(xml.@scrubberDisabled) || new Sprite()
                         );
 
-        scrubber.enabled = false;
+        // scrubber.enabled = false;
         scrubber.addEventListener(ScrubberEvent.SCRUB_START, onScrubberStart);
         scrubber.addEventListener(ScrubberEvent.SCRUB_UPDATE, onScrubberUpdate);
         scrubber.addEventListener(ScrubberEvent.SCRUB_END, onScrubberEnd);
@@ -188,7 +188,7 @@ public class ScrubBar extends Widget implements IWidget {
 
     private function updateState():void {
         visible = media != null;
-        scrubber.enabled = media ? media.hasTrait(MediaTraitType.SEEK) : false;
+        // scrubber.enabled = media ? media.hasTrait(MediaTraitType.SEEK) : false;
         adTrait = media ? media.getTrait(AdTraitType.AD_PLAY) as AdTrait : null;
         if (adTrait) {
             adTrait.addEventListener(AdEvent.AD_STATE_CHANGE, disableScrubber);
@@ -371,7 +371,6 @@ public class ScrubBar extends Widget implements IWidget {
     private static const _requiredTraits:Vector.<String> = new Vector.<String>;
     _requiredTraits[0] = MediaTraitType.TIME;
     _requiredTraits[1] = AdTraitType.AD_PLAY;
-
 
     public function get adTrait():AdTrait {
         return _adState;

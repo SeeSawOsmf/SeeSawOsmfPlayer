@@ -41,11 +41,13 @@ import flash.utils.Timer;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ProxyElement;
+import org.osmf.events.AudioEvent;
 import org.osmf.events.DisplayObjectEvent;
 import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.PlayEvent;
 import org.osmf.media.MediaElement;
+import org.osmf.traits.AudioTrait;
 import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.LoadTrait;
 import org.osmf.traits.MediaTraitType;
@@ -126,6 +128,7 @@ public class AdProxy extends ProxyElement {
                 togglePlayListeners(added);
                 break;
             case MediaTraitType.AUDIO:
+                toggleAudioListeners(added);
                 break;
         }
     }
@@ -140,6 +143,20 @@ public class AdProxy extends ProxyElement {
             else {
                 playable.removeEventListener(PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
                 playable.removeEventListener(PlayEvent.CAN_PAUSE_CHANGE, onCanPauseChange);
+            }
+        }
+    }
+
+    private function toggleAudioListeners(added:Boolean):void {
+        var audible:AudioTrait = proxiedElement.getTrait(MediaTraitType.AUDIO) as AudioTrait;
+        if (audible) {
+            if (added) {
+                audible.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
+                audible.addEventListener(AudioEvent.MUTED_CHANGE, onMutedChange);
+            }
+            else {
+                audible.removeEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
+                audible.removeEventListener(AudioEvent.MUTED_CHANGE, onMutedChange);
             }
         }
     }
@@ -177,6 +194,15 @@ public class AdProxy extends ProxyElement {
 
     private function onPlayStateChange(event:PlayEvent):void {
         logger.debug("Play State Change:{0}", event.playState);
+    }
+
+    private function onMutedChange(event:AudioEvent):void {
+        logger.debug("Mute change: {0}", event.muted);
+    }
+
+    private function onVolumeChange(event:AudioEvent):void {
+
+        _adManager.setVolume(event.volume, false);
     }
 
     private function createLiverail():void {
@@ -278,6 +304,9 @@ public class AdProxy extends ProxyElement {
 
     private function adbreakComplete(event:Event = null):void {
         if (proxiedElement != null) {
+
+            blockedTraits = new Vector.<String>();
+
             if (_adTrait) {
                 _adTrait.stopped();
             }
@@ -285,7 +314,7 @@ public class AdProxy extends ProxyElement {
             var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
 
             if (playTrait) {
-                blockedTraits = new Vector.<String>();
+
                 playTrait.play();
             }
         }
@@ -294,7 +323,7 @@ public class AdProxy extends ProxyElement {
     }
 
     public function volume(vol:Number):void {
-        _adManager.setVolume(vol / 10, false);
+
     }
 
     public function pause():void {

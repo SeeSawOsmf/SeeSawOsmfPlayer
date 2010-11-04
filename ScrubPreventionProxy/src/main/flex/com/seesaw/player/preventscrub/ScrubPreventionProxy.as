@@ -22,6 +22,7 @@
 
 package com.seesaw.player.preventscrub {
 import com.seesaw.player.events.AdEvent;
+import com.seesaw.player.traits.ads.AdState;
 import com.seesaw.player.traits.ads.AdTrait;
 import com.seesaw.player.traits.ads.AdTraitType;
 
@@ -46,6 +47,11 @@ public class ScrubPreventionProxy extends ProxyElement {
     private var adMarkers:Array;
     private var seekable:SeekTrait;
     private var offset:Number = 0.5;
+    private var finalSeekPoint:Number;
+    private var blockedSeekable:BlockableSeekTrait;
+    private var localTraitAdded:Boolean;
+    private var temporaryAdMarkers:Array;
+
 
     public function ScrubPreventionProxy() {
 
@@ -66,7 +72,7 @@ public class ScrubPreventionProxy extends ProxyElement {
 
     override protected function setupTraits():void {
         logger.debug("setupTraits");
-        addLocalTraits();
+
         super.setupTraits();
 
     }
@@ -82,17 +88,60 @@ public class ScrubPreventionProxy extends ProxyElement {
             case MediaTraitType.SEEK:
                 toggleSeekListeners(added);
                 break;
+            case MediaTraitType.TIME:
+                toggleTimeListeners(added);
+                break;
         }
+    }
+
+    private function toggleTimeListeners(added:Boolean):void {
+        time = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
+
     }
 
 
     private function toggleSeekListeners(added:Boolean):void {
         seekable = proxiedElement.getTrait(MediaTraitType.SEEK) as SeekTrait;
-
         if (seekable) {
-            seekable.addEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
-        } else {
-            seekable.removeEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
+            if (added) {
+                //  seekable.removeEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
+                seekable.addEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
+
+                blockedSeekable = new BlockableSeekTrait(time, seekable);
+                addTrait(MediaTraitType.SEEK, blockedSeekable);
+            } else {
+                seekable.removeEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
+                removeTrait(MediaTraitType.SEEK);
+            }
+
+
+        }
+
+    }
+
+    private function onSeekingChange(event:SeekEvent):void {
+        var adjustedSeekPoint:Number;
+        var forceSeek:Boolean;
+
+        for each (var value:Number in adMarkers) {
+            if (event.time > (value * time.duration)) {
+                forceSeek = true;
+                adjustedSeekPoint = value * time.duration;
+
+            }
+        }
+        if (forceSeek) {
+
+            finalSeekPoint = event.time;
+            blockedSeekable.blocking = true;
+            seekable.seek((adjustedSeekPoint - offset));
+
+            temporaryAdMarkers = adMarkers;
+            adMarkers = null;
+
+
+            forceSeek = false;
+
         }
     }
 
@@ -113,36 +162,14 @@ public class ScrubPreventionProxy extends ProxyElement {
         var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
         _adTrait = proxiedElement ? proxiedElement.getTrait(AdTraitType.AD_PLAY) as AdTrait : null;
 
-        if (_adTrait)_adTrait.addEventListener(AdEvent.AD_MARKERS, adMarkerEvent);
+        if (_adTrait) {
+            _adTrait.addEventListener(AdEvent.AD_MARKERS, adMarkerEvent);
+            _adTrait.addEventListener(AdEvent.AD_STATE_CHANGE, finalSeek);
+        }
 
-
-        time = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
         if (playTrait) {
 
             ///  playTrait.pause();
-        }
-    }
-
-    private function onSeekingChange(event:SeekEvent):void {
-        logger.debug("On Seek Change:{0}", event.time);
-
-        if (!event.seeking) {
-
-            var finalSeekPoint:Number;
-            var forceSeek:Boolean;
-            for each (var value:Number in adMarkers) {
-                if (event.time > (value * time.duration)) {
-                    forceSeek = true;
-                    finalSeekPoint = value * time.duration;
-                    seekable.removeEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
-                }
-            }
-            if (forceSeek) {
-
-                seekable.seek((finalSeekPoint - offset));
-                createNewMarkers();
-                seekable.addEventListener(SeekEvent.SEEKING_CHANGE, reinstateSeek);
-            }
         }
     }
 
@@ -153,12 +180,27 @@ public class ScrubPreventionProxy extends ProxyElement {
     private function reinstateSeek(event:SeekEvent):void {
         if (!event.seeking) {
             seekable.removeEventListener(SeekEvent.SEEKING_CHANGE, reinstateSeek);
-            seekable.addEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
+
         }
     }
 
     private function adMarkerEvent(event:AdEvent):void {
         adMarkers = event.markers;
+    }
+
+    private function finalSeek(event:AdEvent):void {
+
+        if (_adTrait.adState == AdState.STOPPED) {
+            if (finalSeekPoint > 0) {
+
+                createNewMarkers();
+                seekable.seek((finalSeekPoint));
+
+                blockedSeekable.blocking = false;
+
+
+            }
+        }
     }
 
     private function onTraitAdd(event:MediaElementEvent):void {
@@ -169,7 +211,33 @@ public class ScrubPreventionProxy extends ProxyElement {
         processTrait(event.traitType, false);
     }
 
-    private function addLocalTraits():void {
+
+    private function newSeekChange(event:SeekEvent):void {
+
+
+        var adjustedSeekPoint:Number;
+        var forceSeek:Boolean;
+
+        /*    for each (var value:Number in adMarkers) {
+         if (event.time > (value * time.duration)) {
+         forceSeek = true;
+         adjustedSeekPoint = value * time.duration;
+
+         }
+         }
+         if (forceSeek) {
+
+         finalSeekPoint = event.time;
+         blockedSeekable.blocking = true;
+         blockedSeekable.seek((adjustedSeekPoint - offset));
+
+         temporaryAdMarkers = adMarkers;
+         adMarkers = null;
+
+
+         forceSeek = false;
+
+         }  */
 
     }
 

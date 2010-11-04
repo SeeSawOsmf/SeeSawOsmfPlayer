@@ -165,6 +165,12 @@
             </dependency>
 
             <!-- 3rd Party Dependencies -->
+            <dependency>
+                <groupId>org.floxy</groupId>
+                <artifactId>floxy</artifactId>
+                <version>1.0</version>
+                <type>swc</type>
+            </dependency>
 
             <dependency>
                 <groupId>org.osmf</groupId>
