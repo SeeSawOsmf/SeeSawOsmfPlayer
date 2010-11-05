@@ -82,8 +82,8 @@ public class Player extends Sprite {
         _loaderParams = LoaderInfo(this.root.loaderInfo).parameters;
 
         // TODO: this needs to be in a flashvar from the page
-        _loaderParams.playerInitUrl = "http://localhost:8080/player.playerinitialisation:playerinit" +
-                "?t:ac=TV:ENTERTAINMENT/p/12001018002/South-Park-programme-2";
+        _loaderParams.playerInitUrl = "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/" +
+                "player.playerinitialisation:playerinit?t:ac=TV:DRAMA/b/13599/Waterloo-Road";
 
         stage.scaleMode = StageScaleMode.NO_SCALE;
         stage.align = StageAlign.TOP_LEFT;
@@ -256,8 +256,8 @@ public class Player extends Sprite {
         // TODO: set the error ('programme not playing') panel as the main content
 
         // TODO: request a test file but this should be removed eventually
-        var request:ServiceRequest = new ServiceRequest("../src/test/resources/contentInfo.xml", onSuccessFromPlayerInit, null);
-        request.submit();
+        // var request:ServiceRequest = new ServiceRequest("../src/test/resources/contentInfo.xml", onSuccessFromPlayerInit, null);
+        // request.submit();
     }
 
     private function onFailFromVideoInfo():void {
@@ -265,8 +265,8 @@ public class Player extends Sprite {
         // TODO: set the error ('programme not playing') panel as the main content
 
         // TODO: request a test file but this should be removed eventually
-        var request:ServiceRequest = new ServiceRequest("../src/test/resources/videoInfo.xml", onSuccessFromVideoInfo, null);
-        request.submit();
+        // var request:ServiceRequest = new ServiceRequest("../src/test/resources/videoInfo.xml", onSuccessFromVideoInfo, null);
+        // request.submit();
     }
 
     /**
