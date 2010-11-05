@@ -41,6 +41,7 @@ import org.osmf.traits.DRMTrait;
 import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.DynamicStreamTrait;
 import org.osmf.traits.LoadTrait;
+import org.osmf.traits.MediaTraitBase;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayTrait;
 import org.osmf.traits.SeekTrait;
@@ -141,11 +142,14 @@ public class DebugProxyElement extends ProxyElement {
     }
 
     private function onSwitchingChange(event:DynamicStreamEvent):void {
-        /// logger.debug("On Switching Change:{0}", event.switching);
+        var trait:DynamicStreamTrait = getTrait(MediaTraitType.DYNAMIC_STREAM) as DynamicStreamTrait;
+        if(trait && trait.switching) {
+            logger.debug("Switching dynamic stream: bitrate = {0}", trait.getBitrateForIndex(trait.currentIndex));   
+        }
     }
 
     private function onAutoSwitchChange(event:DynamicStreamEvent):void {
-        /// logger.debug("On Auto Switch Change:{0}", event.autoSwitch);
+        logger.debug("On Auto Switch Change: {0}", event.autoSwitch);
     }
 
     private function toggleDrmListeners(added:Boolean):void {
@@ -159,7 +163,7 @@ public class DebugProxyElement extends ProxyElement {
     }
 
     private function onDrmStateChange(event:DRMEvent):void {
-        /// logger.debug("On DRM Stage Change:{0}", event.drmState);
+        logger.debug("On DRM Stage Change:{0}", event.drmState);
     }
 
     private function toggleDisplayListeners(added:Boolean):void {
