@@ -205,6 +205,8 @@ public class ScrubBar extends Widget implements IWidget {
 
         adMarkers = markers;
 
+        removeAllChildren(markerContainer);
+
         for each (var value:Number in adMarkers) {
             var sprite:Sprite = new Sprite();
             sprite.graphics.beginFill(0xffffff);
@@ -214,6 +216,10 @@ public class ScrubBar extends Widget implements IWidget {
         }
     }
 
+    public function removeAllChildren(target:Sprite):void {
+        while (target.numChildren)
+            target.removeChildAt(0);
+    }
 
     private function disableScrubber(event:AdEvent):void {
         if (adTrait.adState == AdState.STARTED) {

@@ -37,6 +37,7 @@ import org.osmf.traits.SeekTrait;
 public class AutoResumeProxy extends ProxyElement {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(AutoResumeProxy);
+    private var seek:SeekTrait;
 
 
     public function AutoResumeProxy() {
@@ -95,11 +96,16 @@ public class AutoResumeProxy extends ProxyElement {
     }
 
     private function toggleSeekListeners(added:Boolean):void {
-        var seek:SeekTrait = proxiedElement.getTrait(MediaTraitType.SEEK) as SeekTrait;
+
+        if (seek) {
+            seek.removeEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
+        }
+
+        seek = proxiedElement.getTrait(MediaTraitType.SEEK) as SeekTrait;
 
         if (seek) {
             if (added) {
-                seek.removeEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
+
                 seek.addEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
             } else {
                 seek.removeEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
