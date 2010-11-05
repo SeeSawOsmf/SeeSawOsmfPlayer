@@ -27,8 +27,8 @@
     <firstPresentationBrand>BBC</firstPresentationBrand>
     <seriesId>11288</seriesId>
     <seriesTitle>South Park Season 5</seriesTitle>
-    <!-- <programmeId>8973</programmeId>  -->
-    <programmeId>11291</programmeId>
+    <programmeId>8973</programmeId>
+    <!--  <programmeId>11291</programmeId>-->
     <programmeTitle>South Park programme 2</programmeTitle>
     <tvAgeRating>16</tvAgeRating>
     <filmAgeRating>U</filmAgeRating>
@@ -37,8 +37,8 @@
     <catchup>false</catchup>
     <brandId>05d80ae8-42c0-496f-a0ae-5a8cd1ddbe09</brandId>
     <brandTitle>The Line of Beauty</brandTitle>
-    <!--  <publisherId>1373</publisherId>  -->
-    <publisherId>1332</publisherId>
+    <publisherId>1373</publisherId>
+    <!--   <publisherId>1332</publisherId> -->
     <loggingSheet>
         <break>
             <breakOffset>00:03:00.00</breakOffset>

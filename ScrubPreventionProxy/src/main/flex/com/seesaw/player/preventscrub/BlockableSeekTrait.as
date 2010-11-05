@@ -39,12 +39,17 @@ public class BlockableSeekTrait extends SeekTrait {
 
     private function echoSeekChange(event:SeekEvent):void {
         if (!blocking && event.seeking) {
-            //   setSeeking(_seekTrait.seeking, event.time) ;
+            //  seekingChangeStart(_seekTrait.seeking, event.time) ;
             _seekTrait.seek(event.time);
         }
 
     }
 
+    /*	override protected function seekingChangeStart(newSeeking:Boolean, time:Number):void
+     {
+     _seekTrait.seek(time);
+     }
+     */
     public function get blocking():Boolean {
         return _blocking;
     }

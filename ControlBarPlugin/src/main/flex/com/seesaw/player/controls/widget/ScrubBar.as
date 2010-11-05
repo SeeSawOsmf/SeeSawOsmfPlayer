@@ -245,7 +245,7 @@ public class ScrubBar extends Widget implements IWidget {
         var temporal:TimeTrait = media ? media.getTrait(MediaTraitType.TIME) as TimeTrait : null;
         if (temporal != null) {
             var duration:Number = temporal.duration;
-            var position:Number = isNaN(seekToTime) ? temporal.currentTime : seekToTime;
+            var position:Number = temporal.currentTime;
 
             currentTime.text
                     = prettyPrintSeconds(position) + " / " + prettyPrintSeconds(duration);
@@ -281,6 +281,7 @@ public class ScrubBar extends Widget implements IWidget {
             preScrubPlayState = playable.playState;
             if (playable.canPause && playable.playState != PlayState.PAUSED) {
                 playable.pause();
+                currentPositionTimer.stop();
             }
         }
     }
@@ -318,6 +319,7 @@ public class ScrubBar extends Widget implements IWidget {
         if (preScrubPlayState) {
             var playable:PlayTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
             if (playable) {
+                currentPositionTimer.start();
                 if (playable.playState != preScrubPlayState) {
                     switch (preScrubPlayState) {
                         case PlayState.STOPPED:

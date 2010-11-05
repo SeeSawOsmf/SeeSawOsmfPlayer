@@ -49,7 +49,6 @@ public class ScrubPreventionProxy extends ProxyElement {
     private var offset:Number = 0.5;
     private var finalSeekPoint:Number;
     private var blockedSeekable:BlockableSeekTrait;
-    private var localTraitAdded:Boolean;
     private var temporaryAdMarkers:Array;
 
 
@@ -79,7 +78,6 @@ public class ScrubPreventionProxy extends ProxyElement {
 
 
     private function processTrait(traitType:String, added:Boolean):void {
-        logger.debug(" --------- traitType -----------" + traitType);
 
         switch (traitType) {
             case MediaTraitType.LOAD:
@@ -104,7 +102,6 @@ public class ScrubPreventionProxy extends ProxyElement {
         seekable = proxiedElement.getTrait(MediaTraitType.SEEK) as SeekTrait;
         if (seekable) {
             if (added) {
-                //  seekable.removeEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
                 seekable.addEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
 
                 blockedSeekable = new BlockableSeekTrait(time, seekable);
@@ -122,12 +119,10 @@ public class ScrubPreventionProxy extends ProxyElement {
     private function onSeekingChange(event:SeekEvent):void {
         var adjustedSeekPoint:Number;
         var forceSeek:Boolean;
-
         for each (var value:Number in adMarkers) {
             if (event.time > (value * time.duration)) {
                 forceSeek = true;
                 adjustedSeekPoint = value * time.duration;
-
             }
         }
         if (forceSeek) {
@@ -135,6 +130,14 @@ public class ScrubPreventionProxy extends ProxyElement {
             finalSeekPoint = event.time;
             blockedSeekable.blocking = true;
             seekable.seek((adjustedSeekPoint - offset));
+
+
+            for (var i:Number = 0; i < adMarkers.length; i++) {
+                var index:Number = adMarkers[i];
+                if (index == (adjustedSeekPoint / time.duration)) {
+                    adMarkers.splice(i, 1);
+                }
+            }
 
             temporaryAdMarkers = adMarkers;
             adMarkers = null;
@@ -166,15 +169,11 @@ public class ScrubPreventionProxy extends ProxyElement {
             _adTrait.addEventListener(AdEvent.AD_MARKERS, adMarkerEvent);
             _adTrait.addEventListener(AdEvent.AD_STATE_CHANGE, finalSeek);
         }
-
-        if (playTrait) {
-
-            ///  playTrait.pause();
-        }
     }
 
     private function createNewMarkers():void {
-        // _adTrait.markers
+
+        _adTrait.createMarkers(temporaryAdMarkers);
     }
 
     private function reinstateSeek(event:SeekEvent):void {
@@ -185,6 +184,7 @@ public class ScrubPreventionProxy extends ProxyElement {
     }
 
     private function adMarkerEvent(event:AdEvent):void {
+        temporaryAdMarkers = null;
         adMarkers = event.markers;
     }
 
@@ -209,40 +209,6 @@ public class ScrubPreventionProxy extends ProxyElement {
 
     private function onTraitRemove(event:MediaElementEvent):void {
         processTrait(event.traitType, false);
-    }
-
-
-    private function newSeekChange(event:SeekEvent):void {
-
-
-        var adjustedSeekPoint:Number;
-        var forceSeek:Boolean;
-
-        /*    for each (var value:Number in adMarkers) {
-         if (event.time > (value * time.duration)) {
-         forceSeek = true;
-         adjustedSeekPoint = value * time.duration;
-
-         }
-         }
-         if (forceSeek) {
-
-         finalSeekPoint = event.time;
-         blockedSeekable.blocking = true;
-         blockedSeekable.seek((adjustedSeekPoint - offset));
-
-         temporaryAdMarkers = adMarkers;
-         adMarkers = null;
-
-
-         forceSeek = false;
-
-         }  */
-
-    }
-
-    private function removeLocalTraits():void {
-
     }
 
 }

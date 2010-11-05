@@ -283,7 +283,7 @@ public class DebugProxyElement extends ProxyElement {
     }
 
     private function onSeekingChange(event:SeekEvent):void {
-        logger.debug("On Seek Change:{0}", event.seeking);
+        //   logger.debug("On Seek Change:{0}", event.seeking);
     }
 
     private function toggleTimeListeners(added:Boolean):void {
@@ -301,11 +301,11 @@ public class DebugProxyElement extends ProxyElement {
     }
 
     private function onDurationChange(event:TimeEvent):void {
-        logger.debug("On Duration Change:{0}", event.target.duration);
+        //     logger.debug("On Duration Change:{0}", event.target.duration);
     }
 
     private function onCurrentTimeChange(event:TimeEvent):void {
-        logger.debug("On Current Time Change:{0}", event.time);
+        //    logger.debug("On Current Time Change:{0}", event.time);
     }
 
     private function onComplete(event:TimeEvent):void {
