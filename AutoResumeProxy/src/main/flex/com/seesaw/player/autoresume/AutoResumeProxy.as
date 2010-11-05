@@ -98,6 +98,8 @@ public class AutoResumeProxy extends ProxyElement {
     private function toggleSeekListeners(added:Boolean):void {
 
         if (seek) {
+            // this is required because the seekTrait gets delegated in the ScrubPreventionProxy
+            // this should ensure that the new SeekTrait has listeners associated in this class
             seek.removeEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
         }
 
