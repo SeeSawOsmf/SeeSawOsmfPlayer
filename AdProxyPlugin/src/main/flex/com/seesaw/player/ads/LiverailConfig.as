@@ -245,11 +245,11 @@ public class LiverailConfig {
             "LR_LAYOUT_LINEAR_PAUSEONCLICKTHRU" :    false  ,
             "LR_LAYOUT_SKIN_ID" :    1 ,
             "LR_PARTNERS" :    "SHERBET" ,
-            "LR_PUBLISHER_ID" :    contentInfo.publisherId ,
+            "LR_PUBLISHER_ID" :    contentInfo.liverail.publisherId ,
             /// "LR_TAGS" :    "sourceId_BBCWORLDWIDE,firstPresentationBrand_BBC,minimumAge_18,catchup_false,TVDRAMACONTEMPORARYBRITISH,TVDRAMA,duration_less_than_1_hour",
             "LR_USE_JUNCTION" :    false,
-            "LR_VERSION" :    "4.1",
-            "LR_VIDEO_ID"    : contentInfo.programmeId
+            "LR_VERSION" :    contentInfo.liverail.version,
+            "LR_VIDEO_ID"    : contentInfo.liverail.programme
         }
         return _config;
     }
