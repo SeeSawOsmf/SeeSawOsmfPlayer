@@ -42,6 +42,7 @@ import flash.events.Event;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.logging.Log;
+import org.osmf.media.URLResource;
 import org.osmf.metadata.Metadata;
 import org.osmf.net.StreamingURLResource;
 
@@ -238,6 +239,7 @@ public class Player extends Sprite {
 
     private function createMediaResource(videoInfo:XML):StreamingURLResource {
         logger.debug("creating media resource");
+
         var resource:DynamicStream = new DynamicStream(videoInfo);
 
         var metaSettings:Metadata = new Metadata();
