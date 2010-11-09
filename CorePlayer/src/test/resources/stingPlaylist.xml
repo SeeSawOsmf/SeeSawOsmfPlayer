@@ -22,7 +22,11 @@
 
 <ASX version="3.0">
     <ENTRY>
-        <REF HREF="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703/e5/test/cms/clips/Gravity_small.mp4"/>
+        <REF HREF="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Idents_Diner_5s.mp4"/>
+        <!--    <REF HREF="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703/mp4:e5/test/cms/clips/ideal_28_v2_trimmed_17"/>-->
+    </ENTRY>
+    <ENTRY>
+        <REF HREF="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703/mp4:e5/test/cms/clips/ideal_28_v2_trimmed_17"/>
     </ENTRY>
     <ENTRY>
         <MAINCONTENT/>

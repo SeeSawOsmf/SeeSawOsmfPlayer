@@ -27,6 +27,7 @@ import com.seesaw.player.components.ControlBarComponent;
 import com.seesaw.player.components.MediaComponent;
 import com.seesaw.player.events.FullScreenEvent;
 import com.seesaw.player.fullscreen.FullScreenProxyPluginInfo;
+import com.seesaw.player.playlist.PlaylistPluginInfo;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
 import com.seesaw.player.traits.FullScreenTrait;
 
@@ -89,8 +90,12 @@ public class SeeSawPlayer extends Sprite {
         config.factory.loadPlugin(new PluginInfoResource(new FullScreenProxyPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
-        config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
 
+        if (config.adModuleType == "com.seesaw.player.ads.liverail")
+            config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
+
+        if (config.adModuleType == "com.seesaw.player.ads.serial")
+            config.factory.loadPlugin(new PluginInfoResource(new PlaylistPluginInfo()));
 
         logger.debug("creating video element");
         _videoElement = config.factory.createMediaElement(config.resource);

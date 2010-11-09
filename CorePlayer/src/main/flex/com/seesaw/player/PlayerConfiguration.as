@@ -25,7 +25,6 @@ import org.osmf.containers.MediaContainer;
 import org.osmf.media.DefaultMediaFactory;
 import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaPlayer;
-import org.osmf.media.MediaResourceBase;
 import org.osmf.net.StreamingURLResource;
 
 public class PlayerConfiguration {
@@ -33,6 +32,7 @@ public class PlayerConfiguration {
     private var _factory:MediaFactory;
     private var _player:MediaPlayer;
     private var _container:MediaContainer;
+    private var _adModuleType:String = "com.seesaw.player.ads.serial"
 
     private var _width:int;
     private var _height:int;
@@ -100,6 +100,14 @@ public class PlayerConfiguration {
 
     public function set container(value:MediaContainer):void {
         _container = value;
+    }
+
+    public function get adModuleType():String {
+        return _adModuleType;
+    }
+
+    public function set adModuleType(value:String):void {
+        _adModuleType = value;
     }
 }
 }

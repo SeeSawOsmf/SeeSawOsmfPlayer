@@ -47,6 +47,7 @@
         <module>PlayerCommon</module>
         <module>ScrubPreventionProxy</module>
         <module>AutoResumeProxy</module>
+        <module>PlaylistPlugin</module>
     </modules>
 
     <developers>
@@ -192,7 +193,12 @@
                 <version>1.1.1</version>
                 <type>swc</type>
             </dependency>
-
+            <dependency>
+                <artifactId>PlaylistPlugin</artifactId>
+                <groupId>com.seesaw</groupId>
+                <version>${pom.version}</version>
+                <type>swc</type>
+            </dependency>
             <dependency>
                 <groupId>com.adobe.flex.framework</groupId>
                 <artifactId>flex-framework</artifactId>

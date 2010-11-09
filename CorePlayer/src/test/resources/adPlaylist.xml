@@ -22,87 +22,44 @@
 
 <ASX version="3.0">
     <ENTRY>
-        <REF HREF="rtmp://vodco.fcod.llnwd.net/a4371/e1/flv:crane/adasset/179/455/me"/>
-        <PARAM NAME="vodco.interactiveAdvertisingUrl" VALUE="http://www.google.com"/>
-        <PARAM NAME="vodco.interactiveAdvertisingCaption"
-               VALUE="Interactive AD that goes to Google with some extra long text"/>
+        <TITLE>ads</TITLE>
         <PARAM NAME="CanSeek" VALUE="No"/>
         <PARAM NAME="CanSkipBack" VALUE="No"/>
         <PARAM NAME="CanSkipForward" VALUE="No"/>
-        <PARAM NAME="capping" VALUE="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703/e5/test/cms/clips/Gravity_small.mp4"/>
+        <PARAM NAME="Prebuffer" VALUE="true"/>
+        <PARAM NAME="trackback"
+               VALUE="http://kgd-red-test-zxtm01.dev.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/17170494/x12/4OD/OAKFURNITURELAN_102310_12130_2/OAKFURNITURELAN_102310_12130_2_x12/5532494162557958586b77414364414e"/>
+        <PARAM NAME="vodco.popupAdvertisingUrl"
+               VALUE="http://realmedia.channel4.com/5c/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/7170494/x60/4OD/OAKFURNITURELAN_102310_12130_2/OAKFURNITURELAN_102310_12130_2.html/5532494162557958586b77414364414e"/>
+        <REF HREF="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/PRA-OFLG002-030.mp4"/>
     </ENTRY>
     <ENTRY>
-        <REF HREF="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703/e5/test/cms/clips/Gravity_small.mp4"/>
-        <PARAM NAME="vodco.popupAdvertisingUrl" VALUE="http://www.google.com"/>
-        <PARAM NAME="vodco.interactiveAdvertisingCaption" VALUE="Popup AD that goes to Google"/>
+        <TITLE>ads</TITLE>
         <PARAM NAME="CanSeek" VALUE="No"/>
         <PARAM NAME="CanSkipBack" VALUE="No"/>
         <PARAM NAME="CanSkipForward" VALUE="No"/>
-        <DURATION VALUE="00:00:20.0"/>
-    </ENTRY>
-    <ENTRY>
-        <REF HREF="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703/e5/test/cms/clips/Gravity_small.mp4"/>
-        <PARAM NAME="vodco.interactiveAdvertisingUrl" VALUE="http://www.google.com"/>
-        <PARAM NAME="vodco.interactiveAdvertisingCaption"
-               VALUE="Interactive AD that goes to Google with some extra long text just to give us a bit of of dodgy display aspect..."/>
-        <PARAM NAME="CanSeek" VALUE="No"/>
-        <PARAM NAME="CanSkipBack" VALUE="No"/>
-        <PARAM NAME="CanSkipForward" VALUE="No"/>
-        <PARAM NAME="capping"
-               VALUE="http%253A//realmedia.channel4.com/RealMedia/ads/adstream.cap%253F515125917%2526c%253Dbrunocap%2526dv%253D1%2526e%253D1d"/>
+        <PARAM NAME="Prebuffer" VALUE="true"/>
+        <PARAM NAME="trackback"
+               VALUE="http://kgd-red-test-zxtm01.dev.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/11512583790/x13/4OD/SS_IDENT_Feb10_x90_Ents/2680327/5532494162557958586b77414364414e"/>
+        <REF HREF="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Idents_Diner_5s.mp4"/>
     </ENTRY>
     <ENTRY>
         <MAINCONTENT/>
-        <STARTTIME VALUE="00:00:00.0"/>
-        <DURATION VALUE="00:10:15.0"/>
+        <STARTTIME VALUE="00:00:00.00"/>
+        <DURATION VALUE="00:11:17.00"/>
     </ENTRY>
     <ENTRY>
-        <REF HREF="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703/e5/test/cms/clips/Gravity_small.mp4"/>
-        <PARAM NAME="vodco.popupAdvertisingUrl" VALUE="http://www.google.com"/>
-        <PARAM NAME="vodco.interactiveAdvertisingCaption" VALUE="Popup AD that goes to Google"/>
+        <TITLE>ads</TITLE>
         <PARAM NAME="CanSeek" VALUE="No"/>
         <PARAM NAME="CanSkipBack" VALUE="No"/>
         <PARAM NAME="CanSkipForward" VALUE="No"/>
-        <DURATION VALUE="00:00:20.0"/>
+        <PARAM NAME="Prebuffer" VALUE="true"/>
+        <PARAM NAME="trackback"
+               VALUE="http://kgd-red-test-zxtm01.dev.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/11512583790/x13/4OD/SS_IDENT_Feb10_x90_Ents/2680327/5532494162557958586b77414364414e"/>
+        <REF HREF="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Idents_Diner_5s.mp4"/>
     </ENTRY>
     <ENTRY>
         <MAINCONTENT/>
-        <STARTTIME VALUE="00:10:13.0"/>
-        <DURATION VALUE="00:10:20.0"/>
-    </ENTRY>
-    <ENTRY>
-        <REF HREF="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703/e5/test/cms/clips/Gravity_small.mp4"/>
-        <PARAM NAME="vodco.interactiveAdvertisingUrl" VALUE="http://www.google.com"/>
-        <PARAM NAME="vodco.interactiveAdvertisingCaption"
-               VALUE="Interactive AD that goes to Google with some extra long text"/>
-        <PARAM NAME="CanSeek" VALUE="No"/>
-        <PARAM NAME="CanSkipBack" VALUE="No"/>
-        <PARAM NAME="CanSkipForward" VALUE="No"/>
-        <PARAM NAME="capping"
-               VALUE="http%253A//realmedia.channel4.com/RealMedia/ads/adstream.cap%253F515125917%2526c%253Dbrunocap%2526dv%253D1%2526e%253D1d"/>
-    </ENTRY>
-    <ENTRY>
-        <REF HREF="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703/e5/test/cms/clips/Gravity_small.mp4"/>
-        <REF HREF="rtmp://vodco.fcod.llnwd.net/a4371/e1/flv:crane/adasset/179/455/me"/>
-        <PARAM NAME="vodco.interactiveAdvertisingUrl" VALUE="http://www.google.com"/>
-        <PARAM NAME="vodco.interactiveAdvertisingCaption"
-               VALUE="Interactive AD that goes to Google with some extra long text"/>
-        <PARAM NAME="CanSeek" VALUE="No"/>
-        <PARAM NAME="CanSkipBack" VALUE="No"/>
-        <PARAM NAME="CanSkipForward" VALUE="No"/>
-        <PARAM NAME="capping"
-               VALUE="http%253A//realmedia.channel4.com/RealMedia/ads/adstream.cap%253F515125917%2526c%253Dbrunocap%2526dv%253D1%2526e%253D1d"/>
-    </ENTRY>
-    <ENTRY>
-        <REF HREF="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703/e5/test/cms/clips/Gravity_small.mp4"/>
-        <PARAM NAME="vodco.interactiveAdvertisingUrl" VALUE="http://www.google.com"/>
-        <PARAM NAME="vodco.interactiveAdvertisingCaption" VALUE="Interactive Ad that goes to Google"/>
-        <PARAM NAME="CanSeek" VALUE="No"/>
-        <PARAM NAME="CanSkipBack" VALUE="No"/>
-        <PARAM NAME="CanSkipForward" VALUE="No"/>
-    </ENTRY>
-    <ENTRY>
-        <MAINCONTENT/>
-        <STARTTIME VALUE="00:20:20.0"/>
+        <STARTTIME VALUE="00:11:17.00"/>
     </ENTRY>
 </ASX>

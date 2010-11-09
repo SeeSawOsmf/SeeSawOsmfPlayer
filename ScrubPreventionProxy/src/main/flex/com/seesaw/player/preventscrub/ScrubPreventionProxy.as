@@ -35,7 +35,6 @@ import org.osmf.events.SeekEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.traits.LoadTrait;
 import org.osmf.traits.MediaTraitType;
-import org.osmf.traits.PlayTrait;
 import org.osmf.traits.SeekTrait;
 import org.osmf.traits.TimeTrait;
 
@@ -162,7 +161,6 @@ public class ScrubPreventionProxy extends ProxyElement {
     }
 
     private function onLoadableStateChange(event:LoadEvent):void {
-        var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
         _adTrait = proxiedElement ? proxiedElement.getTrait(AdTraitType.AD_PLAY) as AdTrait : null;
 
         if (_adTrait) {
@@ -193,9 +191,9 @@ public class ScrubPreventionProxy extends ProxyElement {
         if (_adTrait.adState == AdState.STOPPED) {
             if (finalSeekPoint > 0) {
 
-                createNewMarkers();
-                seekable.seek((finalSeekPoint));
 
+                seekable.seek((finalSeekPoint));
+                createNewMarkers();
                 blockedSeekable.blocking = false;
 
 
