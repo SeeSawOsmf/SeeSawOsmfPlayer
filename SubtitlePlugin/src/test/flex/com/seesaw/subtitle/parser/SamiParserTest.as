@@ -1,13 +1,15 @@
 package com.seesaw.subtitle.parser {
+import com.seesaw.subtitle.sami.SAMIParser;
+
 import org.hamcrest.assertThat;
 import org.hamcrest.object.equalTo;
 import org.hamcrest.object.notNullValue;
 
-public class SamiParserTest {
+public class SAMIParserTest {
 
     [Test]
-    public function canParseSami() {
-        var parser:CaptionParser = new SamiParser();
+    public function canParseSAMI() {
+        var parser:CaptionParser = new SAMIParser();
         var captions:Vector.<CaptionSync> = parser.parse(VALID_SAMI);
 
         assertThat(captions, notNullValue());

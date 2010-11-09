@@ -1,4 +1,5 @@
-package com.seesaw.subtitle.parser {
+package com.seesaw.subtitle.sami {
+import com.seesaw.subtitle.parser.*;
 import com.seesaw.subtitle.*;
 import com.seesaw.subtitle.*;
 import com.seesaw.player.init.ServiceRequest;
@@ -8,9 +9,9 @@ import flash.display.Sprite;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 
-public class SamiParser implements CaptionParser {
+public class SAMIParser implements CaptionParser {
 
-    private var logger:ILogger = LoggerFactory.getClassLogger(SamiParser);
+    private var logger:ILogger = LoggerFactory.getClassLogger(SAMIParser);
 
     // A new caption is displayed every second (1000ms).
     public static const CAPTION_INTERVAL:int = 1000;
