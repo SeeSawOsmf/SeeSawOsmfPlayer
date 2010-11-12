@@ -49,6 +49,7 @@
         <module>AutoResumeProxy</module>
         <module>PlaylistPlugin</module>
         <module>SMILObjectProxy</module>
+        <module>SubtitlePlugin</module>
     </modules>
 
     <developers>
@@ -200,6 +201,7 @@
                 <version>1.1.1</version>
                 <type>swc</type>
             </dependency>
+
             <dependency>
                 <groupId>com.adobe.flex.framework</groupId>
                 <artifactId>flex-framework</artifactId>
