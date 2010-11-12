@@ -20,7 +20,6 @@
  *    Incorporated. All Rights Reserved.
  */
 package com.seesaw.player.smil.loader {
-import com.seesaw.player.smil.media.SMILMediaGenerator;
 import com.seesaw.player.smil.resource.DynamicSMILResource;
 
 import org.osmf.elements.proxyClasses.LoadFromDocumentLoadTrait;
@@ -32,6 +31,7 @@ import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.metadata.MetadataNamespaces;
+import org.osmf.smil.media.SMILMediaGenerator;
 import org.osmf.smil.model.SMILDocument;
 import org.osmf.smil.parser.SMILParser;
 import org.osmf.traits.LoadState;
