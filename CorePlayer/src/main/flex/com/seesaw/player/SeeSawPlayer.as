@@ -23,12 +23,13 @@
 package com.seesaw.player {
 import com.seesaw.player.ads.AdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
+import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.components.ControlBarComponent;
 import com.seesaw.player.components.MediaComponent;
 import com.seesaw.player.events.FullScreenEvent;
 import com.seesaw.player.fullscreen.FullScreenProxyPluginInfo;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
-import com.seesaw.player.traits.FullScreenTrait;
+import com.seesaw.player.traits.fullscreen.FullScreenTrait;
 
 import flash.display.Sprite;
 
@@ -37,9 +38,12 @@ import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ParallelElement;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MediaFactoryEvent;
+import org.osmf.events.TimelineMetadataEvent;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.media.PluginInfoResource;
+import org.osmf.metadata.CuePoint;
+import org.osmf.metadata.TimelineMetadata;
 
 import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
 
@@ -50,6 +54,7 @@ public class SeeSawPlayer extends Sprite {
     private var _config:PlayerConfiguration;
     private var _rootElement:ParallelElement;
     private var _videoElement:MediaElement;
+    private var _captionMetadata:TimelineMetadata;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
@@ -90,23 +95,37 @@ public class SeeSawPlayer extends Sprite {
         config.factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
-
+        config.factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
 
         logger.debug("creating video element");
         _videoElement = config.factory.createMediaElement(config.resource);
-
 
         if (_videoElement == null) {
             throw ArgumentError("failed to create main media element for player");
         }
 
+        setLocalEventHandlers();
+
+        logger.debug("adding video element to container");
+        _rootElement.addChild(_videoElement);
+    }
+
+    private function setLocalEventHandlers():void {
+
         var fullScreen:FullScreenTrait = _videoElement.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
+
         if (fullScreen) {
             fullScreen.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
         }
 
-        logger.debug("adding video element to container");
-        _rootElement.addChild(_videoElement);
+        _captionMetadata = _videoElement.getMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) as TimelineMetadata;
+
+        if (_captionMetadata == null) {
+            _videoElement.addEventListener(MediaElementEvent.METADATA_ADD, onMetadataAdd);
+        }
+        else {
+            processTimelineMetadata(_videoElement);
+        }
     }
 
     private function createRootElement():void {
@@ -129,7 +148,6 @@ public class SeeSawPlayer extends Sprite {
         var target = event.target as MediaElement;
 
         var fullScreen:FullScreenTrait = target.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
-
 
         if (fullScreen && event.traitType == FullScreenTrait.FULL_SCREEN) {
             if (event.type == MediaElementEvent.TRAIT_ADD) {
@@ -164,6 +182,30 @@ public class SeeSawPlayer extends Sprite {
         rootElementLayout.height = height;
 
         config.container.layout(width, height, true);
+    }
+
+    private function onMetadataAdd(event:MediaElementEvent):void {
+        if (event.namespaceURL == CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) {
+            processTimelineMetadata(event.target as MediaElement);
+        }
+    }
+
+    private function processTimelineMetadata(mediaElement:MediaElement):void {
+        if (_captionMetadata == null) {
+            _captionMetadata = mediaElement.getMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) as TimelineMetadata;
+            _captionMetadata.addEventListener(TimelineMetadataEvent.MARKER_TIME_REACHED, onCuePoint);
+        }
+    }
+
+    private function onCuePoint(event:TimelineMetadataEvent):void {
+        var cuePoint:CuePoint = event.marker as CuePoint;
+        if (cuePoint) {
+            logger.debug("cuePoint.time=" + cuePoint.time + ", value = " + cuePoint.parameters);
+        }
+    }
+
+    private function onCuePointAdd(event:TimelineMetadataEvent):void {
+        logger.debug("cue point added: " + event.marker.time);
     }
 
     public function get config():PlayerConfiguration {

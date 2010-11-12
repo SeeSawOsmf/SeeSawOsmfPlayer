@@ -19,7 +19,7 @@
  *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
  *    Incorporated. All Rights Reserved.
  */
-package com.seesaw.player.traits {
+package com.seesaw.player.traits.fullscreen {
 import com.seesaw.player.events.FullScreenEvent;
 
 import org.osmf.traits.MediaTraitBase;

@@ -1,11 +1,13 @@
-package com.seesaw.subtitle.parser {
+package com.seesaw.player.parsers.captioning {
 public class CaptionSync {
 
     private var _display:String;
 
     private var _time:Number;
 
-    public function CaptionSync(display:String = "", time:Number = 0.0) {
+    private var _duration:Number;
+
+    public function CaptionSync(display:String = "", time:Number = 0.0, duration:Number = 1.0) {
         _display = display;
         _time = time;
     }
@@ -24,6 +26,14 @@ public class CaptionSync {
 
     public function set time(value:Number):void {
         _time = value;
+    }
+
+    public function get duration():Number {
+        return _duration;
+    }
+
+    public function set duration(value:Number):void {
+        _duration = value;
     }
 }
 }

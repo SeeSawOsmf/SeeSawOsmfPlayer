@@ -1,5 +1,8 @@
 package com.seesaw.subtitle.parser {
-import com.seesaw.subtitle.sami.SAMIParser;
+import com.seesaw.player.parsers.captioning.CaptionDocument;
+import com.seesaw.player.parsers.captioning.CaptionParser;
+import com.seesaw.player.parsers.captioning.CaptionSync;
+import com.seesaw.player.captioning.sami.SAMIParser;
 
 import org.hamcrest.assertThat;
 import org.hamcrest.object.equalTo;
@@ -10,7 +13,8 @@ public class SAMIParserTest {
     [Test]
     public function canParseSAMI() {
         var parser:CaptionParser = new SAMIParser();
-        var captions:Vector.<CaptionSync> = parser.parse(VALID_SAMI);
+        var captionDoc:CaptionDocument = parser.parse(VALID_SAMI);
+        var captions:Vector.<CaptionSync> = captionDoc.captions;
 
         assertThat(captions, notNullValue());
         assertThat(captions.length, equalTo(3));

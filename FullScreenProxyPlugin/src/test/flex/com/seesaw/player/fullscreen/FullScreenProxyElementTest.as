@@ -21,7 +21,7 @@
  */
 
 package com.seesaw.player.fullscreen {
-import com.seesaw.player.traits.FullScreenTrait;
+import com.seesaw.player.traits.fullscreen.FullScreenTrait;
 
 import flash.display.Sprite;
 

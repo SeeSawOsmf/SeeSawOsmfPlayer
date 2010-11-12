@@ -1,7 +1,7 @@
 package com.seesaw.subtitle.parser {
-import com.seesaw.subtitle.sami.SAMILoader;
+import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 
-import com.seesaw.subtitle.sami.SAMIPluginInfo;
+import flash.display.Sprite;
 
 import org.hamcrest.assertThat;
 import org.hamcrest.object.equalTo;
@@ -13,7 +13,6 @@ import org.osmf.media.PluginInfoResource;
 import org.osmf.media.URLResource;
 import org.osmf.traits.LoadState;
 import org.osmf.traits.LoadTrait;
-import org.osmf.traits.MediaTraitBase;
 import org.osmf.traits.MediaTraitType;
 
 public class SAMIPluginTest {
@@ -22,16 +21,7 @@ public class SAMIPluginTest {
 
     [Test]
     public function canLoadSAMI() {
-        var factory:MediaFactory = new DefaultMediaFactory();
 
-        factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
-        var element:MediaElement = factory.createMediaElement(new URLResource(RESOURCE_URL));
-
-        assertThat(element, notNullValue());
-        assertThat(element.hasTrait(MediaTraitType.LOAD), equalTo(true));
-
-        var loadTrait:LoadTrait = element.getTrait(MediaTraitType.LOAD) as LoadTrait;
-        assertThat(loadTrait.loadState, equalTo(LoadState.READY));
     }
 }
 }

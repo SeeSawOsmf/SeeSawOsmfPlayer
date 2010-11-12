@@ -162,6 +162,12 @@
                 <version>${pom.version}</version>
                 <type>swc</type>
             </dependency>
+            <dependency>
+                <artifactId>SubtitlePlugin</artifactId>
+                <groupId>com.seesaw</groupId>
+                <version>${pom.version}</version>
+                <type>swc</type>
+            </dependency>
 
             <!-- 3rd Party Dependencies -->
             <dependency>
