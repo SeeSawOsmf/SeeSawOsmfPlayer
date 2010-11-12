@@ -23,12 +23,13 @@
 package com.seesaw.player {
 import com.seesaw.player.ads.AdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
+import com.seesaw.player.buffering.BufferManager;
 import com.seesaw.player.components.ControlBarComponent;
 import com.seesaw.player.components.MediaComponent;
 import com.seesaw.player.events.FullScreenEvent;
 import com.seesaw.player.fullscreen.FullScreenProxyPluginInfo;
-import com.seesaw.player.playlist.PlaylistPluginInfo;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
+import com.seesaw.player.smil.SMILPluginInfo;
 import com.seesaw.player.traits.FullScreenTrait;
 
 import flash.display.Sprite;
@@ -85,7 +86,7 @@ public class SeeSawPlayer extends Sprite {
 
     private function createVideoElement():void {
         logger.debug("loading the proxy plugins that wrap the video element");
-
+        config.factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new FullScreenProxyPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
@@ -94,11 +95,11 @@ public class SeeSawPlayer extends Sprite {
         if (config.adModuleType == "com.seesaw.player.ads.liverail")
             config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
 
-        if (config.adModuleType == "com.seesaw.player.ads.serial")
-            config.factory.loadPlugin(new PluginInfoResource(new PlaylistPluginInfo()));
+        ///      if (config.adModuleType == "com.seesaw.player.ads.serial")
+        ///       config.factory.loadPlugin(new PluginInfoResource(new PlaylistPluginInfo()));
 
         logger.debug("creating video element");
-        _videoElement = config.factory.createMediaElement(config.resource);
+        _videoElement = new BufferManager(0.5, 5, config.factory.createMediaElement(config.resource));
 
 
         if (_videoElement == null) {
@@ -120,6 +121,7 @@ public class SeeSawPlayer extends Sprite {
         _rootElement = new ParallelElement();
         layout(config.width, config.height);
         config.player.media = _rootElement;
+
 
         logger.debug("adding root element to container");
         config.container.addMediaElement(_rootElement);

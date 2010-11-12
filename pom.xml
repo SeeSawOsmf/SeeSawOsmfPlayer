@@ -48,6 +48,7 @@
         <module>ScrubPreventionProxy</module>
         <module>AutoResumeProxy</module>
         <module>PlaylistPlugin</module>
+        <module>SMILObjectProxy</module>
     </modules>
 
     <developers>
@@ -164,14 +165,20 @@
                 <version>${pom.version}</version>
                 <type>swc</type>
             </dependency>
-
-            <!-- 3rd Party Dependencies -->
             <dependency>
-                <groupId>org.floxy</groupId>
-                <artifactId>floxy</artifactId>
-                <version>1.0</version>
+                <artifactId>PlaylistPlugin</artifactId>
+                <groupId>com.seesaw</groupId>
+                <version>${pom.version}</version>
                 <type>swc</type>
             </dependency>
+            <dependency>
+                <artifactId>SMILObjectProxy</artifactId>
+                <groupId>com.seesaw</groupId>
+                <version>${pom.version}</version>
+                <type>swc</type>
+            </dependency>
+
+            <!-- 3rd Party Dependencies -->
 
             <dependency>
                 <groupId>org.osmf</groupId>
@@ -191,12 +198,6 @@
                 <groupId>org.as3commons</groupId>
                 <artifactId>as3commons-logging</artifactId>
                 <version>1.1.1</version>
-                <type>swc</type>
-            </dependency>
-            <dependency>
-                <artifactId>PlaylistPlugin</artifactId>
-                <groupId>com.seesaw</groupId>
-                <version>${pom.version}</version>
                 <type>swc</type>
             </dependency>
             <dependency>

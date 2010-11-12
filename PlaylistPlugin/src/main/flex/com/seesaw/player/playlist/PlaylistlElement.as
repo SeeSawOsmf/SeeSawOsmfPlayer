@@ -94,7 +94,7 @@ public class PlaylistlElement extends ProxyElement {
         trace("onVastLoaded");
 
         var data:XML = XML(e.currentTarget.data);
-        var url:String = String(data.ENTRY[0].REF.@HREF);
+        var url:String = String(data.ENTRY[1].REF.@HREF);
         adList = new AdMap().createPlaylistEntry(data);
 
         _instreamAdElement = new VideoElement(new StreamingURLResource(url), new NetLoader);

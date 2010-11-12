@@ -30,9 +30,9 @@
         <groupId>com.seesaw</groupId>
         <version>7.0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>ScrubPreventionProxy</artifactId>
+    <artifactId>SMILObjectProxy</artifactId>
     <packaging>swc</packaging>
-    <name>ScrubPreventionProxy</name>
+    <name>SMILObjectProxy</name>
     <build>
         <sourceDirectory>src/main/flex</sourceDirectory>
         <testSourceDirectory>src/test/flex</testSourceDirectory>
@@ -40,16 +40,18 @@
             <plugin>
                 <groupId>org.sonatype.flexmojos</groupId>
                 <artifactId>flexmojos-maven-plugin</artifactId>
-                <configuration></configuration>
+                <configuration>
+                    <definesDeclaration>
+                        <property>
+                            <name>CONFIG::LOGGING</name>
+                            <value>false</value>
+                        </property>
+                    </definesDeclaration>
+                </configuration>
             </plugin>
         </plugins>
     </build>
     <dependencies>
-        <dependency>
-            <artifactId>PlayerCommon</artifactId>
-            <groupId>com.seesaw</groupId>
-            <type>swc</type>
-        </dependency>
         <dependency>
             <groupId>com.adobe.flex.framework</groupId>
             <artifactId>flex-framework</artifactId>
@@ -78,6 +80,16 @@
             <version>4.0-rc-1</version>
             <type>swc</type>
         </dependency>
-
+        <dependency>
+            <artifactId>org.osmf.smil</artifactId>
+            <groupId>org.osmf.smil</groupId>
+            <version>1.5</version>
+            <type>swc</type>
+        </dependency>
+        <dependency>
+            <artifactId>PlayerCommon</artifactId>
+            <groupId>com.seesaw</groupId>
+            <type>swc</type>
+        </dependency>
     </dependencies>
 </project>

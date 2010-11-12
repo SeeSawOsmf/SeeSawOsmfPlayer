@@ -27,11 +27,13 @@ import com.seesaw.player.init.ServiceRequest;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
+import com.seesaw.player.mockData.MockData;
 import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.panels.GuidanceBar;
 import com.seesaw.player.panels.GuidancePanel;
 import com.seesaw.player.panels.PosterFrame;
 import com.seesaw.player.services.ResumeService;
+import com.seesaw.player.smil.resource.DynamicSMILResource;
 
 import flash.display.LoaderInfo;
 import flash.display.Sprite;
@@ -42,8 +44,8 @@ import flash.events.Event;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.logging.Log;
+import org.osmf.media.MediaResourceBase;
 import org.osmf.metadata.Metadata;
-import org.osmf.net.StreamingURLResource;
 
 [SWF(width=PLAYER::Width, height=PLAYER::Height, backgroundColor="#000000")]
 public class Player extends Sprite {
@@ -211,7 +213,7 @@ public class Player extends Sprite {
         }
 
         if (_videoInfo.asset.length() > 0) {
-            var resource:StreamingURLResource = createMediaResource(_videoInfo);
+            var resource:MediaResourceBase = createMediaResource(_videoInfo);
             loadVideo(resource);
         }
         else {
@@ -219,7 +221,7 @@ public class Player extends Sprite {
         }
     }
 
-    private function loadVideo(content:StreamingURLResource):void {
+    private function loadVideo(content:MediaResourceBase):void {
         logger.debug("loading video");
 
         if (videoPlayer) {
@@ -236,9 +238,10 @@ public class Player extends Sprite {
         addChild(videoPlayer);
     }
 
-    private function createMediaResource(videoInfo:XML):StreamingURLResource {
+    private function createMediaResource(videoInfo:XML):DynamicSMILResource {
         logger.debug("creating media resource");
-        var resource:DynamicStream = new DynamicStream(videoInfo);
+        // var resource:DynamicStream = new DynamicStream(videoInfo);
+        var resource:DynamicSMILResource = new DynamicSMILResource((MockData.smil));
 
         var metaSettings:Metadata = new Metadata();
         // Use this to check the resource is the mainContent, e.g. for the AdProxypPlugins
@@ -256,8 +259,8 @@ public class Player extends Sprite {
         // TODO: set the error ('programme not playing') panel as the main content
 
         // TODO: request a test file but this should be removed eventually
-        // var request:ServiceRequest = new ServiceRequest("../src/test/resources/contentInfo.xml", onSuccessFromPlayerInit, null);
-        // request.submit();
+        var request:ServiceRequest = new ServiceRequest("../src/test/resources/contentInfo.xml", onSuccessFromPlayerInit, null);
+        request.submit();
     }
 
     private function onFailFromVideoInfo():void {
@@ -265,8 +268,8 @@ public class Player extends Sprite {
         // TODO: set the error ('programme not playing') panel as the main content
 
         // TODO: request a test file but this should be removed eventually
-        // var request:ServiceRequest = new ServiceRequest("../src/test/resources/videoInfo.xml", onSuccessFromVideoInfo, null);
-        // request.submit();
+        var request:ServiceRequest = new ServiceRequest("../src/test/resources/videoInfo.xml", onSuccessFromVideoInfo, null);
+        request.submit();
     }
 
     /**
