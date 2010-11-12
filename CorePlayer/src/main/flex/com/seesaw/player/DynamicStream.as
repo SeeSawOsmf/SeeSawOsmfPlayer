@@ -50,10 +50,6 @@ public class DynamicStream extends DynamicStreamingResource {
         streamItems = items;
 
         logger.debug("created " + streamItems.length + " streaming item(s)");
-
-        var subtitleMetadata:Metadata = new Metadata();
-        subtitleMetadata.addValue(SAMIPluginInfo.METADATA_KEY_URI, "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/s/ccp/00000025/2540.smi");
-        addMetadataValue(SAMIPluginInfo.METADATA_NAMESPACE, subtitleMetadata);
     }
 }
 }

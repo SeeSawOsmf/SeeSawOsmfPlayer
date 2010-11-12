@@ -73,5 +73,19 @@ public class MockData {
         return contentInfoBBC;
 
     }
+
+
+    public static function get smil():XML {
+        var xml:XML = new XML('<smil><head><meta base="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703" /></head>' +
+                '<body><switch>' +
+                '<video src="mp4:e5/INTERNAL/sintel-2048-stereo_1500kbs.mp4" system-bitrate="500000" width="512" />' +
+                '<video src="mp4:e5/INTERNAL/sintel-2048-stereo_1500kbs.mp4" system-bitrate="800000" width="720" />' +
+                '<video src="mp4:e5/INTERNAL/sintel-2048-stereo_1500kbs.mp4" system-bitrate="1500000" width="1080"/>' +
+                '</switch></body></smil>');
+
+        return xml;
+
+
+    }
 }
 }

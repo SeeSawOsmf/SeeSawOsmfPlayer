@@ -45,6 +45,8 @@
         <module>PlayerCommon</module>
         <module>ScrubPreventionProxy</module>
         <module>AutoResumeProxy</module>
+        <module>PlaylistPlugin</module>
+        <module>SMILObjectProxy</module>
         <module>SubtitlePlugin</module>
   </modules>
 
@@ -168,14 +170,20 @@
                 <version>${pom.version}</version>
                 <type>swc</type>
             </dependency>
-
-            <!-- 3rd Party Dependencies -->
             <dependency>
-                <groupId>org.floxy</groupId>
-                <artifactId>floxy</artifactId>
-                <version>1.0</version>
+                <artifactId>PlaylistPlugin</artifactId>
+                <groupId>com.seesaw</groupId>
+                <version>${pom.version}</version>
                 <type>swc</type>
             </dependency>
+            <dependency>
+                <artifactId>SMILObjectProxy</artifactId>
+                <groupId>com.seesaw</groupId>
+                <version>${pom.version}</version>
+                <type>swc</type>
+            </dependency>
+
+            <!-- 3rd Party Dependencies -->
 
             <dependency>
                 <groupId>org.osmf</groupId>

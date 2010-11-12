@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <!--
   ~ Copyright 2010 ioko365 Ltd.  All Rights Reserved.
   ~
@@ -21,16 +20,15 @@
   ~    Incorporated. All Rights Reserved.
   -->
 
-<videoInfo xmlns="http://www.seesaw.com/api/contentinfo/v1.0" mimeType="application/smil+xml">
-    <asset>
-        <path>e5/INTERNAL/sintel-2048-stereo_1500kbs.mp4?s=1288365189&amp;e=1288365939&amp;h=2badd6fd8f7a8fd95625577584b2f23e</path>
-        <bitrate>1500</bitrate>
-        <quality>1</quality>
-        <width>512</width>
-        <height>288</height>
-        <type>mp4</type>
-        <profile>high</profile>
-    </asset>
-    <geoblocked>false</geoblocked>
-    <cdnPath>rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703</cdnPath>
-</videoInfo>
+<ASX version="3.0">
+    <ENTRY>
+        <REF HREF="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Idents_Diner_5s.mp4"/>
+        <!--    <REF HREF="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703/mp4:e5/test/cms/clips/ideal_28_v2_trimmed_17"/>-->
+    </ENTRY>
+    <ENTRY>
+        <REF HREF="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703/mp4:e5/test/cms/clips/ideal_28_v2_trimmed_17"/>
+    </ENTRY>
+    <ENTRY>
+        <MAINCONTENT/>
+    </ENTRY>
+</ASX>

@@ -1,0 +1,65 @@
+<!--
+  ~ Copyright 2010 ioko365 Ltd.  All Rights Reserved.
+  ~
+  ~    The contents of this file are subject to the Mozilla Public License
+  ~    Version 1.1 (the "License"); you may not use this file except in
+  ~    compliance with the License. You may obtain a copy of the
+  ~    License athttp://www.mozilla.org/MPL/
+  ~
+  ~    Software distributed under the License is distributed on an "AS IS"
+  ~    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+  ~    License for the specific language governing rights and limitations
+  ~    under the License.
+  ~
+  ~    The Initial Developer of the Original Code is ioko365 Ltd.
+  ~    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
+  ~    Incorporated. All Rights Reserved.
+  ~
+  ~    The Initial Developer of the Original Code is ioko365 Ltd.
+  ~    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
+  ~    Incorporated. All Rights Reserved.
+  -->
+
+<ASX version="3.0">
+    <ENTRY>
+        <TITLE>ads</TITLE>
+        <PARAM NAME="CanSeek" VALUE="No"/>
+        <PARAM NAME="CanSkipBack" VALUE="No"/>
+        <PARAM NAME="CanSkipForward" VALUE="No"/>
+        <PARAM NAME="Prebuffer" VALUE="true"/>
+        <PARAM NAME="trackback"
+               VALUE="http://kgd-red-test-zxtm01.dev.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/17170494/x12/4OD/OAKFURNITURELAN_102310_12130_2/OAKFURNITURELAN_102310_12130_2_x12/5532494162557958586b77414364414e"/>
+        <PARAM NAME="vodco.popupAdvertisingUrl"
+               VALUE="http://realmedia.channel4.com/5c/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/7170494/x60/4OD/OAKFURNITURELAN_102310_12130_2/OAKFURNITURELAN_102310_12130_2.html/5532494162557958586b77414364414e"/>
+        <REF HREF="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/PRA-OFLG002-030.mp4"/>
+    </ENTRY>
+    <ENTRY>
+        <TITLE>ads</TITLE>
+        <PARAM NAME="CanSeek" VALUE="No"/>
+        <PARAM NAME="CanSkipBack" VALUE="No"/>
+        <PARAM NAME="CanSkipForward" VALUE="No"/>
+        <PARAM NAME="Prebuffer" VALUE="true"/>
+        <PARAM NAME="trackback"
+               VALUE="http://kgd-red-test-zxtm01.dev.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/11512583790/x13/4OD/SS_IDENT_Feb10_x90_Ents/2680327/5532494162557958586b77414364414e"/>
+        <REF HREF="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Idents_Diner_5s.mp4"/>
+    </ENTRY>
+    <ENTRY>
+        <MAINCONTENT/>
+        <STARTTIME VALUE="00:00:00.00"/>
+        <DURATION VALUE="00:11:17.00"/>
+    </ENTRY>
+    <ENTRY>
+        <TITLE>ads</TITLE>
+        <PARAM NAME="CanSeek" VALUE="No"/>
+        <PARAM NAME="CanSkipBack" VALUE="No"/>
+        <PARAM NAME="CanSkipForward" VALUE="No"/>
+        <PARAM NAME="Prebuffer" VALUE="true"/>
+        <PARAM NAME="trackback"
+               VALUE="http://kgd-red-test-zxtm01.dev.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/11512583790/x13/4OD/SS_IDENT_Feb10_x90_Ents/2680327/5532494162557958586b77414364414e"/>
+        <REF HREF="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Idents_Diner_5s.mp4"/>
+    </ENTRY>
+    <ENTRY>
+        <MAINCONTENT/>
+        <STARTTIME VALUE="00:11:17.00"/>
+    </ENTRY>
+</ASX>

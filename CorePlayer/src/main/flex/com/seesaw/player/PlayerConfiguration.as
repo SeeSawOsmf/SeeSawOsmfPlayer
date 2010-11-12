@@ -26,32 +26,34 @@ import org.osmf.media.DefaultMediaFactory;
 import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaPlayer;
 import org.osmf.media.MediaResourceBase;
-import org.osmf.net.StreamingURLResource;
 
 public class PlayerConfiguration {
 
     private var _factory:MediaFactory;
     private var _player:MediaPlayer;
     private var _container:MediaContainer;
+    private var _adModuleType:String = "com.seesaw.player.ads.liverail--"
 
     private var _width:int;
     private var _height:int;
-    private var _resource:StreamingURLResource;
+    private var _resource:MediaResourceBase;
 
-    public function PlayerConfiguration(playerWidth:int, playerHeight:int, mediaResource:StreamingURLResource) {
+    public function PlayerConfiguration(playerWidth:int, playerHeight:int, mediaResource:MediaResourceBase) {
         player = new MediaPlayer();
         container = new MediaContainer();
 
         width = playerWidth;
         height = playerHeight;
         resource = mediaResource;
+
+
     }
 
-    public function set resource(value:StreamingURLResource):void {
+    public function set resource(value:MediaResourceBase):void {
         _resource = value;
     }
 
-    public function get resource():StreamingURLResource {
+    public function get resource():MediaResourceBase {
         return _resource;
     }
 
@@ -100,6 +102,14 @@ public class PlayerConfiguration {
 
     public function set container(value:MediaContainer):void {
         _container = value;
+    }
+
+    public function get adModuleType():String {
+        return _adModuleType;
+    }
+
+    public function set adModuleType(value:String):void {
+        _adModuleType = value;
     }
 }
 }

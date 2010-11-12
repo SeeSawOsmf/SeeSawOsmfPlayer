@@ -19,43 +19,19 @@
  *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
  *    Incorporated. All Rights Reserved.
  */
+package com.seesaw.player.smil.elements {
+import com.seesaw.player.smil.loader.SMILLoader;
 
-package com.seesaw.player.parsers.captioning {
-public class CaptionSync {
+import org.osmf.elements.LoadFromDocumentElement;
+import org.osmf.media.MediaResourceBase;
 
-    private var _display:String;
-
-    private var _time:Number;
-
-    private var _duration:Number;
-
-    public function CaptionSync(display:String = "", time:Number = 0.0, duration:Number = 1.0) {
-        _display = display;
-        _time = time;
+public class SMILElement extends LoadFromDocumentElement {
+    public function SMILElement(resource:MediaResourceBase = null, loader:SMILLoader = null) {
+        if (loader == null) {
+            loader = new SMILLoader();
+        }
+        super(resource, loader);
     }
 
-    public function get display():String {
-        return _display;
-    }
-
-    public function set display(value:String):void {
-        _display = value;
-    }
-
-    public function get time():Number {
-        return _time;
-    }
-
-    public function set time(value:Number):void {
-        _time = value;
-    }
-
-    public function get duration():Number {
-        return _duration;
-    }
-
-    public function set duration(value:Number):void {
-        _duration = value;
-    }
 }
 }

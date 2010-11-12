@@ -20,42 +20,31 @@
  *    Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.player.parsers.captioning {
-public class CaptionSync {
+package com.seesaw.player.smil.resource {
+import com.seesaw.player.namespaces.contentinfo;
 
-    private var _display:String;
+import org.osmf.media.MediaResourceBase;
 
-    private var _time:Number;
+public class DynamicSMILResource extends MediaResourceBase {
 
-    private var _duration:Number;
+    use namespace contentinfo;
 
-    public function CaptionSync(display:String = "", time:Number = 0.0, duration:Number = 1.0) {
-        _display = display;
-        _time = time;
+    private static const _mimeType:String = "application/smil+xml";
+
+    private var _data:XML;
+
+    public function DynamicSMILResource(xml:XML) {
+        data = xml;
+        mimeType = _mimeType;
     }
 
-    public function get display():String {
-        return _display;
+
+    public function get data():XML {
+        return _data;
     }
 
-    public function set display(value:String):void {
-        _display = value;
-    }
-
-    public function get time():Number {
-        return _time;
-    }
-
-    public function set time(value:Number):void {
-        _time = value;
-    }
-
-    public function get duration():Number {
-        return _duration;
-    }
-
-    public function set duration(value:Number):void {
-        _duration = value;
+    public function set data(value:XML):void {
+        _data = value;
     }
 }
 }

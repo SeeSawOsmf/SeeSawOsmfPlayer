@@ -23,6 +23,7 @@
 package com.seesaw.player {
 import com.seesaw.player.ads.AdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
+import com.seesaw.player.buffering.BufferManager;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.components.ControlBarComponent;
 import com.seesaw.player.components.MediaComponent;
@@ -33,8 +34,14 @@ import com.seesaw.player.traits.fullscreen.FullScreenTrait;
 
 import flash.display.Sprite;
 
+import flash.text.TextField;
+import flash.text.TextFormat;
+
+import flash.text.TextFormatAlign;
+
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
+import org.osmf.elements.HTMLElement;
 import org.osmf.elements.ParallelElement;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MediaFactoryEvent;
@@ -90,14 +97,22 @@ public class SeeSawPlayer extends Sprite {
     private function createVideoElement():void {
         logger.debug("loading the proxy plugins that wrap the video element");
 
+        // config.factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new FullScreenProxyPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
-        config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
+        // config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
 
+       // if (config.adModuleType == "com.seesaw.player.ads.liverail")
+        //    config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
+
+        ///      if (config.adModuleType == "com.seesaw.player.ads.serial")
+        ///       config.factory.loadPlugin(new PluginInfoResource(new PlaylistPluginInfo()));
+
         logger.debug("creating video element");
+        // _videoElement = new BufferManager(0.5, 5, config.factory.createMediaElement(config.resource));
         _videoElement = config.factory.createMediaElement(config.resource);
 
         if (_videoElement == null) {
