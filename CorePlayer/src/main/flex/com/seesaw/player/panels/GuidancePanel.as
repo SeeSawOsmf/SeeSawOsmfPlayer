@@ -39,9 +39,9 @@ public class GuidancePanel extends Sprite {
     private var css:StyleSheet;
 
     /*Constructor
-    * Takes: warning:String - the guidance warning that appears at the top of the panel
-    *
-    */
+     * Takes: warning:String - the guidance warning that appears at the top of the panel
+     *
+     */
     public function GuidancePanel(warning:String, explanation:String, confirmationMessage:String, parentalControlsSetup:String, findOutMore:String) {
 
         //set the private variables
@@ -65,7 +65,7 @@ public class GuidancePanel extends Sprite {
     }
 
     private function positionPanel(event:Event):void {
-        this.x = (stage.stageWidth/2) - (this.width / 2);
+        this.x = (stage.stageWidth / 2) - (this.width / 2);
         this.y = (stage.stageHeight / 2) - (this.height / 2);
     }
 
@@ -216,13 +216,13 @@ public class GuidancePanel extends Sprite {
 
         //build the label
         /*var buttonLabel = new TextField();
-        buttonLabel.text = label;
-        buttonLabel.x = 25;
-        buttonLabel.y = 15;
-        var formattedButtonLabel:TextField = this.applyInfoFormat(buttonLabel);
+         buttonLabel.text = label;
+         buttonLabel.x = 25;
+         buttonLabel.y = 15;
+         var formattedButtonLabel:TextField = this.applyInfoFormat(buttonLabel);
 
-        //add the label to the button
-        acceptButton.addChild(formattedButtonLabel);*/
+         //add the label to the button
+         acceptButton.addChild(formattedButtonLabel);*/
 
         acceptButton.addChild(this.acceptImageUp);
 
@@ -390,7 +390,7 @@ public class GuidancePanel extends Sprite {
         }
 
     }
-    
+
 }
 
 }

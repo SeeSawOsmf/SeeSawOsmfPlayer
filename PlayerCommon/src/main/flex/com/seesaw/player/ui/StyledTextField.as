@@ -15,7 +15,7 @@ public class StyledTextField extends TextField {
         //apply the styles to the TextField
         defaultTextFormat = format;
     }
-    
+
 }
 
 }

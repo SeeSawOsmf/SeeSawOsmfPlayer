@@ -26,8 +26,7 @@ import flash.utils.getQualifiedClassName;
 
 public class ObjectProvider {
 
-    public static function getInstance():ObjectProvider
-    {
+    public static function getInstance():ObjectProvider {
         instance ||= new ObjectProvider(ConstructorLock);
         return instance;
     }
@@ -53,4 +52,6 @@ public class ObjectProvider {
 }
 }
 
-class ConstructorLock {};
+class ConstructorLock {
+}
+;

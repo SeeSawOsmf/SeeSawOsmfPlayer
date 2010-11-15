@@ -32,8 +32,6 @@ import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
 import org.osmf.metadata.Metadata;
 
-import uk.vodco.liverail.LiverailPlugin;
-
 public class LiverailComponent implements MediaComponent {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(LiverailComponent);

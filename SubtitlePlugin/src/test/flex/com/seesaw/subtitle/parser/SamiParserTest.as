@@ -21,10 +21,10 @@
  */
 
 package com.seesaw.subtitle.parser {
+import com.seesaw.player.captioning.sami.SAMIParser;
 import com.seesaw.player.parsers.captioning.CaptionDocument;
 import com.seesaw.player.parsers.captioning.CaptionParser;
 import com.seesaw.player.parsers.captioning.CaptionSync;
-import com.seesaw.player.captioning.sami.SAMIParser;
 
 import org.hamcrest.assertThat;
 import org.hamcrest.object.equalTo;

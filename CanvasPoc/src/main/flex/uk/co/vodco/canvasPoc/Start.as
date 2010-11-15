@@ -19,13 +19,11 @@
 
 package uk.co.vodco.canvasPoc {
 import flash.display.Sprite;
-
 import flash.text.TextField;
 import flash.text.TextFieldAutoSize;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
-
 
 [SWF(width=1280, height=720)]
 public class Start extends Sprite {

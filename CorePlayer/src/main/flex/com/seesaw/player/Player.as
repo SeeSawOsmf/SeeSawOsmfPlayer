@@ -28,13 +28,11 @@ import com.seesaw.player.init.ServiceRequest;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
-import com.seesaw.player.mockData.MockData;
 import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.panels.GuidanceBar;
 import com.seesaw.player.panels.GuidancePanel;
 import com.seesaw.player.panels.PosterFrame;
 import com.seesaw.player.services.ResumeService;
-import com.seesaw.player.smil.resource.DynamicSMILResource;
 
 import flash.display.LoaderInfo;
 import flash.display.Sprite;

@@ -22,7 +22,6 @@
 
 package com.seesaw.player.components {
 import com.seesaw.player.PlayerConstants;
-
 import com.seesaw.player.controls.ControlBarPlugin;
 
 import org.as3commons.logging.ILogger;

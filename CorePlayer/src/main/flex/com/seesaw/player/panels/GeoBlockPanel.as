@@ -1,12 +1,8 @@
 package com.seesaw.player.panels {
 import com.seesaw.player.ui.StyledTextField;
 
-import flash.display.Bitmap;
 import flash.display.Sprite;
 import flash.events.Event;
-import flash.events.MouseEvent;
-import flash.net.URLRequest;
-import flash.net.navigateToURL;
 import flash.system.Security;
 import flash.text.StyleSheet;
 import flash.text.TextField;
@@ -21,9 +17,9 @@ public class GeoBlockPanel extends Sprite {
     private var css:StyleSheet;
 
     /*Constructor
-    * Takes: warning:String - the guidance warning that appears at the top of the panel
-    *
-    */
+     * Takes: warning:String - the guidance warning that appears at the top of the panel
+     *
+     */
     public function GeoBlockPanel(warning:String) {
 
         //set the private variables
@@ -43,7 +39,7 @@ public class GeoBlockPanel extends Sprite {
     }
 
     private function positionPanel(event:Event):void {
-        this.x = (stage.stageWidth/2) - (this.width / 2);
+        this.x = (stage.stageWidth / 2) - (this.width / 2);
         this.y = (stage.stageHeight / 2) - (this.height / 2);
     }
 

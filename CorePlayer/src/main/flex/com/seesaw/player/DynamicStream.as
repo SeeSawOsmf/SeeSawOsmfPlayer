@@ -22,11 +22,9 @@
 
 package com.seesaw.player {
 import com.seesaw.player.namespaces.contentinfo;
-import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
-import org.osmf.metadata.Metadata;
 import org.osmf.net.DynamicStreamingItem;
 import org.osmf.net.DynamicStreamingResource;
 

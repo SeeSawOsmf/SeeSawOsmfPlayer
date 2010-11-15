@@ -44,6 +44,6 @@ public final class AdTraitType {
                 , AD_PLAY
                 , SEEK
                 , TIME
-            ] );
+            ]);
 }
 }
