@@ -21,14 +21,16 @@
  */
 
 package com.seesaw.player {
-import com.seesaw.player.ads.AdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
+import com.seesaw.player.buffering.BufferManager;
+import com.seesaw.player.captioning.sami.SAMIPluginInfo;
+import com.seesaw.player.captions.CaptionManager;
 import com.seesaw.player.components.ControlBarComponent;
 import com.seesaw.player.components.MediaComponent;
 import com.seesaw.player.events.FullScreenEvent;
 import com.seesaw.player.fullscreen.FullScreenProxyPluginInfo;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
-import com.seesaw.player.traits.FullScreenTrait;
+import com.seesaw.player.traits.fullscreen.FullScreenTrait;
 
 import flash.display.Sprite;
 
@@ -69,12 +71,14 @@ public class SeeSawPlayer extends Sprite {
 
         logger.debug("adding container to stage");
         addChild(config.container);
+
+        var captionManager:CaptionManager = new CaptionManager(_videoElement);
+        addChild(captionManager)
     }
 
     private function createMediaElementPlugins():void {
         logger.debug("adding control bar media element to container");
         addMediaElement(new ControlBarComponent());
-
     }
 
     private function addMediaElement(component:MediaComponent) {
@@ -85,28 +89,39 @@ public class SeeSawPlayer extends Sprite {
     private function createVideoElement():void {
         logger.debug("loading the proxy plugins that wrap the video element");
 
+        // config.factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new FullScreenProxyPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
-        config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
+        // config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
+        config.factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
 
+        // if (config.adModuleType == "com.seesaw.player.ads.liverail")
+        //    config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
+
+        ///      if (config.adModuleType == "com.seesaw.player.ads.serial")
+        ///       config.factory.loadPlugin(new PluginInfoResource(new PlaylistPluginInfo()));
 
         logger.debug("creating video element");
-        _videoElement = config.factory.createMediaElement(config.resource);
-
+        _videoElement = new BufferManager(0.5, 5, config.factory.createMediaElement(config.resource));
 
         if (_videoElement == null) {
             throw ArgumentError("failed to create main media element for player");
         }
 
-        var fullScreen:FullScreenTrait = _videoElement.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
-        if (fullScreen) {
-            fullScreen.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
-        }
+        setLocalEventHandlers();
 
         logger.debug("adding video element to container");
         _rootElement.addChild(_videoElement);
+    }
+
+    private function setLocalEventHandlers():void {
+        var fullScreen:FullScreenTrait = _videoElement.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
+
+        if (fullScreen) {
+            fullScreen.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
+        }
     }
 
     private function createRootElement():void {
@@ -130,7 +145,6 @@ public class SeeSawPlayer extends Sprite {
 
         var fullScreen:FullScreenTrait = target.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
 
-
         if (fullScreen && event.traitType == FullScreenTrait.FULL_SCREEN) {
             if (event.type == MediaElementEvent.TRAIT_ADD) {
                 logger.debug("adding handler for full screen trait: " + target);
@@ -139,7 +153,6 @@ public class SeeSawPlayer extends Sprite {
             else {
                 logger.debug("removing handler for full screen trait: " + target);
                 fullScreen.removeEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
-
             }
         }
     }

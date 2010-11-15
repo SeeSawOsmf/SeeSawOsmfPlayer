@@ -41,18 +41,16 @@
  *
  *****************************************************/
 package uk.co.vodco.osmfDebugProxy {
-
 import flash.display.Sprite;
 
 import org.osmf.media.PluginInfo;
 
 public class DebugPlugin extends Sprite {
     public function DebugPlugin() {
-       _pluginInfo = new DebugPluginInfo();
+        _pluginInfo = new DebugPluginInfo();
     }
 
-    public function get pluginInfo():PluginInfo
-    {
+    public function get pluginInfo():PluginInfo {
         return _pluginInfo;
     }
 

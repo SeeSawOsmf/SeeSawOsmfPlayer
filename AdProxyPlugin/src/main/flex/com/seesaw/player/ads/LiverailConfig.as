@@ -155,67 +155,6 @@ public class LiverailConfig {
 
     public function get config():Object {
 
-
-
-        /*  // set to true if you are using Junction or false if you are using AdServer
-         config["LR_USE_JUNCTION"] = false;
-
-         // the Junction or the AdServer Publisher ID, located on the Account page of the Publisher;
-         config["LR_PUBLISHER_ID"] = liverailPublisherId;
-         //once we migrate to next platform version
-         config["LR_VERSION"] = liverailVersion;
-
-         //Partner ID maps to CP id
-         config["LR_PARTNERS"] = "SHERBET";
-
-         // a unique code identifying the video played by your Flash player;
-         config["LR_VIDEO_ID"] = programmeId;
-
-         config["LR_LAYOUT_LINEAR_PAUSEONCLICKTHRU"] = false;
-         config["LR_LAYOUT_SKIN_ID"] = 1;
-
-         // ADMAP (optional param)
-         // admap string is: [ad-type]:[timings(start-time,end-time)];
-         // for more details on how to generate the ADMAP please see "Run-time Parameters Specification" pdf document
-         config["LR_ADMAP"] = liveRailAdMap;
-
-         config["LR_TAGS"] = liveRailTags;
-
-         //For now we will set the sting and ident (bumpers) param to default, causing LiveRail to use the defaults
-         //stored in their system. Once we are ready to specify these, then this can be changed.
-         var defaultValue:String = "default";
-
-         config["LR_BUMPER_PREROLL_PRE_HIGH"] = defaultValue;
-         config["LR_BUMPER_PREROLL_POST_HIGH"] = defaultValue;
-         config["LR_BUMPER_PREROLL_PRE_MED"] = defaultValue;
-         config["LR_BUMPER_PREROLL_POST_MED"] = defaultValue;
-         config["LR_BUMPER_PREROLL_PRE_LOW"] = defaultValue;
-         config["LR_BUMPER_PREROLL_POST_LOW"] = defaultValue;
-         config["LR_BUMPER_PREROLL_ADONLY"] = defaultValue;
-
-         config["LR_BUMPER_MIDROLL_PRE_HIGH"] = defaultValue;
-         config["LR_BUMPER_MIDROLL_POST_HIGH"] = defaultValue;
-         config["LR_BUMPER_MIDROLL_PRE_MED"] = defaultValue;
-         config["LR_BUMPER_MIDROLL_POST_MED"] = defaultValue;
-         config["LR_BUMPER_MIDROLL_PRE_LOW"] = defaultValue;
-         config["LR_BUMPER_MIDROLL_POST_LOW"] = defaultValue;
-         config["LR_BUMPER_MIDROLL_ADONLY"] = defaultValue;
-
-         config["LR_BUMPER_POSTROLL_PRE_HIGH"] = defaultValue;
-         config["LR_BUMPER_POSTROLL_POST_HIGH"] = defaultValue;
-         config["LR_BUMPER_POSTROLL_PRE_MED"] = defaultValue;
-         config["LR_BUMPER_POSTROLL_POST_MED"] = defaultValue;
-         config["LR_BUMPER_POSTROLL_PRE_LOW"] = defaultValue;
-         config["LR_BUMPER_POSTROLL_POST_LOW"] = defaultValue;
-         config["LR_BUMPER_POSTROLL_ADONLY"] = defaultValue;
-
-         ////	liveRailConfig["LR_ALLOWDUPLICATES"] = 1;
-
-
-         config["LR_BITRATE"] = "medium";
-         //StatusService.info("Setting LiveRail ad bitrate to "+liveRailConfig["LR_BITRATE"]);
-
-         */
         _config = {
             "LR_ADMAP" : liveRailAdMap,
 
@@ -245,11 +184,10 @@ public class LiverailConfig {
             "LR_LAYOUT_LINEAR_PAUSEONCLICKTHRU" :    false  ,
             "LR_LAYOUT_SKIN_ID" :    1 ,
             "LR_PARTNERS" :    "SHERBET" ,
-            "LR_PUBLISHER_ID" :    contentInfo.publisherId ,
-            /// "LR_TAGS" :    "sourceId_BBCWORLDWIDE,firstPresentationBrand_BBC,minimumAge_18,catchup_false,TVDRAMACONTEMPORARYBRITISH,TVDRAMA,duration_less_than_1_hour",
+            "LR_PUBLISHER_ID" :    contentInfo.liverail.publisherId ,
             "LR_USE_JUNCTION" :    false,
-            "LR_VERSION" :    "4.1",
-            "LR_VIDEO_ID"    : contentInfo.programmeId
+            "LR_VERSION" :    contentInfo.liverail.version,
+            "LR_VIDEO_ID"    : contentInfo.liverail.programme
         }
         return _config;
     }

@@ -78,11 +78,6 @@
             <version>4.0-rc-1</version>
             <type>swc</type>
         </dependency>
-        <dependency>
-            <groupId>org.floxy</groupId>
-            <artifactId>floxy</artifactId>
-            <type>swc</type>
-        </dependency>
 
     </dependencies>
 </project>

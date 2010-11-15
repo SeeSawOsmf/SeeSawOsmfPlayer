@@ -20,6 +20,8 @@
  *    Incorporated. All Rights Reserved.
  */
 package com.seesaw.player.fullscreen {
+import com.seesaw.player.PlayerConstants;
+
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.media.MediaElement;
@@ -27,6 +29,7 @@ import org.osmf.media.MediaFactoryItem;
 import org.osmf.media.MediaFactoryItemType;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfo;
+import org.osmf.metadata.Metadata;
 
 public class FullScreenProxyPluginInfo extends PluginInfo {
 
@@ -51,7 +54,14 @@ public class FullScreenProxyPluginInfo extends PluginInfo {
 
     private static function canHandleResourceFunction(resource:MediaResourceBase):Boolean {
         logger.debug("can handle this resource: " + resource);
-        return true;
+        var result:Boolean;
+
+        if (resource != null) {
+            var settings:Metadata = resource.getMetadataValue(PlayerConstants.CONTENT_ID) as Metadata;
+            result = settings != null;
+        }
+
+        return result;
     }
 
     private static function mediaElementCreationFunction():MediaElement {

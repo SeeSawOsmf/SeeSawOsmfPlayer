@@ -22,6 +22,7 @@
 
 package com.seesaw.player {
 import com.seesaw.player.buttons.PlayStartButton;
+import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.impl.services.ResumeServiceImpl;
 import com.seesaw.player.init.ServiceRequest;
 import com.seesaw.player.ioc.ObjectProvider;
@@ -43,8 +44,8 @@ import flash.events.Event;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.logging.Log;
+import org.osmf.media.MediaResourceBase;
 import org.osmf.metadata.Metadata;
-import org.osmf.net.StreamingURLResource;
 
 [SWF(width=PLAYER::Width, height=PLAYER::Height, backgroundColor="#000000")]
 public class Player extends Sprite {
@@ -83,8 +84,7 @@ public class Player extends Sprite {
         _loaderParams = LoaderInfo(this.root.loaderInfo).parameters;
 
         // TODO: this needs to be in a flashvar from the page
-        _loaderParams.playerInitUrl = "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/" +
-                "player.playerinitialisation:playerinit?t:ac=TV:DRAMA/b/13599/Waterloo-Road";
+        _loaderParams.playerInitUrl = "http://localhost:8080/player.playerinitialisation:playerinit?t:ac=TV:COMEDY/p/33532/Test-Programme";
 
         stage.scaleMode = StageScaleMode.NO_SCALE;
         stage.align = StageAlign.TOP_LEFT;
@@ -206,13 +206,14 @@ public class Player extends Sprite {
 
         _videoInfo = xmlDoc;
         _playerInit.appendChild(<resume>{resumeValue}</resume>);
+
         if (_videoInfo.geoblocked == "true") {
             // TODO: show the geoblock panel
             return;
         }
 
         if (_videoInfo.asset.length() > 0) {
-            var resource:StreamingURLResource = createMediaResource(_videoInfo);
+            var resource:MediaResourceBase = createMediaResource(_videoInfo);
             loadVideo(resource);
         }
         else {
@@ -220,7 +221,7 @@ public class Player extends Sprite {
         }
     }
 
-    private function loadVideo(content:StreamingURLResource):void {
+    private function loadVideo(content:MediaResourceBase):void {
         logger.debug("loading video");
 
         if (videoPlayer) {
@@ -237,9 +238,11 @@ public class Player extends Sprite {
         addChild(videoPlayer);
     }
 
-    private function createMediaResource(videoInfo:XML):StreamingURLResource {
+    protected function createMediaResource(videoInfo:XML):MediaResourceBase {
         logger.debug("creating media resource");
+
         var resource:DynamicStream = new DynamicStream(videoInfo);
+        // var resource:MediaResourceBase = new DynamicSMILResource((MockData.smil));
 
         var metaSettings:Metadata = new Metadata();
         // Use this to check the resource is the mainContent, e.g. for the AdProxypPlugins
@@ -249,6 +252,11 @@ public class Player extends Sprite {
         resource.addMetadataValue(PlayerConstants.CONTENT_INFO, _playerInit);
         resource.addMetadataValue(PlayerConstants.VIDEO_INFO, _videoInfo);
 
+        var subtitleMetadata:Metadata = new Metadata();
+        // TODO: this is here for dev purposes - not all videos will have subtitles
+        subtitleMetadata.addValue(SAMIPluginInfo.METADATA_KEY_URI, "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/s/ccp/00000025/2540.smi");
+        resource.addMetadataValue(SAMIPluginInfo.METADATA_NAMESPACE, subtitleMetadata);
+
         return resource;
     }
 
@@ -257,8 +265,8 @@ public class Player extends Sprite {
         // TODO: set the error ('programme not playing') panel as the main content
 
         // TODO: request a test file but this should be removed eventually
-        // var request:ServiceRequest = new ServiceRequest("../src/test/resources/contentInfo.xml", onSuccessFromPlayerInit, null);
-        // request.submit();
+        var request:ServiceRequest = new ServiceRequest("../src/test/resources/contentInfo.xml", onSuccessFromPlayerInit, null);
+        request.submit();
     }
 
     private function onFailFromVideoInfo():void {
@@ -266,8 +274,8 @@ public class Player extends Sprite {
         // TODO: set the error ('programme not playing') panel as the main content
 
         // TODO: request a test file but this should be removed eventually
-        // var request:ServiceRequest = new ServiceRequest("../src/test/resources/videoInfo.xml", onSuccessFromVideoInfo, null);
-        // request.submit();
+        var request:ServiceRequest = new ServiceRequest("../src/test/resources/videoInfo.xml", onSuccessFromVideoInfo, null);
+        request.submit();
     }
 
     /**

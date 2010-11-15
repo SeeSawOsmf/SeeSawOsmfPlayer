@@ -1,4 +1,6 @@
 package com.seesaw.player.panels {
+import com.seesaw.player.ui.StyledTextField;
+
 import flash.display.Bitmap;
 import flash.display.Sprite;
 import flash.events.Event;
@@ -6,7 +8,6 @@ import flash.system.Security;
 import flash.text.StyleSheet;
 import flash.text.TextField;
 import flash.text.TextFormat;
-import com.seesaw.player.ui.StyledTextField;
 
 public class GuidanceBar extends Sprite {
 
@@ -23,9 +24,9 @@ public class GuidanceBar extends Sprite {
     private var guidanceCircle:Bitmap = new guidanceCircleEmbed();
 
     /*Constructor
-    * Takes: warning:String - the guidance warning that appears at the top of the panel
-    *
-    */
+     * Takes: warning:String - the guidance warning that appears at the top of the panel
+     *
+     */
     public function GuidanceBar(warning:String) {
 
         //set the private variables
@@ -49,7 +50,7 @@ public class GuidanceBar extends Sprite {
 
     private function buildPanel():Sprite {
         var panel:Sprite = new Sprite();
-        
+
         panel.addChild(this.buildPanelBG());
 
         var contentContainer:Sprite = this.buildContentContainer();

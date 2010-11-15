@@ -41,7 +41,6 @@ import org.osmf.traits.DRMTrait;
 import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.DynamicStreamTrait;
 import org.osmf.traits.LoadTrait;
-import org.osmf.traits.MediaTraitBase;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayTrait;
 import org.osmf.traits.SeekTrait;
@@ -143,8 +142,8 @@ public class DebugProxyElement extends ProxyElement {
 
     private function onSwitchingChange(event:DynamicStreamEvent):void {
         var trait:DynamicStreamTrait = getTrait(MediaTraitType.DYNAMIC_STREAM) as DynamicStreamTrait;
-        if(trait && trait.switching) {
-            logger.debug("Switching dynamic stream: bitrate = {0}", trait.getBitrateForIndex(trait.currentIndex));   
+        if (trait && trait.switching) {
+            logger.debug("Switching dynamic stream: bitrate = {0}", trait.getBitrateForIndex(trait.currentIndex));
         }
     }
 
@@ -305,15 +304,15 @@ public class DebugProxyElement extends ProxyElement {
     }
 
     private function onDurationChange(event:TimeEvent):void {
-        //     logger.debug("On Duration Change:{0}", event.target.duration);
+        logger.debug("On Duration Change:{0}", event.target.duration);
     }
 
     private function onCurrentTimeChange(event:TimeEvent):void {
-        //    logger.debug("On Current Time Change:{0}", event.time);
+        logger.debug("On Current Time Change:{0}", event.time);
     }
 
     private function onComplete(event:TimeEvent):void {
-        /// logger.debug("On Complete");
+        logger.debug("On Complete");
     }
 
 }

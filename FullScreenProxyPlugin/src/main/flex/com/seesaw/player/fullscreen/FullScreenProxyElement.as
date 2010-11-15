@@ -20,7 +20,7 @@
  *    Incorporated. All Rights Reserved.
  */
 package com.seesaw.player.fullscreen {
-import com.seesaw.player.traits.FullScreenTrait;
+import com.seesaw.player.traits.fullscreen.FullScreenTrait;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;

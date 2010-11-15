@@ -19,30 +19,19 @@
  *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
  *    Incorporated. All Rights Reserved.
  */
-package com.seesaw.player.traits {
-import com.seesaw.player.events.FullScreenEvent;
+package com.seesaw.player.smil.elements {
+import com.seesaw.player.smil.loader.SMILLoader;
 
-import org.osmf.traits.MediaTraitBase;
+import org.osmf.elements.LoadFromDocumentElement;
+import org.osmf.media.MediaResourceBase;
 
-[Event(name="fullscreenChange", type="com.seesaw.player.events.FullScreenEvent")]
-
-public class FullScreenTrait extends MediaTraitBase {
-
-    private var _fullscreen:Boolean;
-
-    public static const FULL_SCREEN:String = "fullscreen";
-
-    public function FullScreenTrait() {
-        super(FULL_SCREEN);
+public class SMILElement extends LoadFromDocumentElement {
+    public function SMILElement(resource:MediaResourceBase = null, loader:SMILLoader = null) {
+        if (loader == null) {
+            loader = new SMILLoader();
+        }
+        super(resource, loader);
     }
 
-    public function get fullscreen():Boolean {
-        return _fullscreen;
-    }
-
-    public function set fullscreen(value:Boolean):void {
-        _fullscreen = value;
-        dispatchEvent(new FullScreenEvent(value));
-    }
 }
 }
