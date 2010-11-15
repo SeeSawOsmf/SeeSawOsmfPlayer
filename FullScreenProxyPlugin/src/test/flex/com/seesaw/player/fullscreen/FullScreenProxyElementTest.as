@@ -21,6 +21,7 @@
  */
 
 package com.seesaw.player.fullscreen {
+import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.traits.fullscreen.FullScreenTrait;
 
 import flash.display.Sprite;
@@ -32,6 +33,7 @@ import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
+import org.osmf.metadata.Metadata;
 
 public class FullScreenProxyElementTest extends Sprite {
 
@@ -42,6 +44,10 @@ public class FullScreenProxyElementTest extends Sprite {
         factory.loadPlugin(new PluginInfoResource(new FullScreenProxyPluginInfo()));
 
         var resource:MediaResourceBase = new MediaResourceBase();
+        var metaSettings:Metadata = new Metadata();
+        metaSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
+        resource.addMetadataValue(PlayerConstants.CONTENT_ID, metaSettings);
+
         var element:MediaElement = factory.createMediaElement(resource);
         assertNotNull(element);
 
