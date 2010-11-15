@@ -30,6 +30,7 @@ import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.panels.GuidanceBar;
 import com.seesaw.player.panels.GuidancePanel;
+import com.seesaw.player.panels.ParentalControlsPanel;
 import com.seesaw.player.panels.PosterFrame;
 import com.seesaw.player.services.ResumeService;
 
@@ -143,7 +144,7 @@ public class Player extends Sprite {
             if (_guidanceBar) {
                 _guidanceBar.visible = false;
             }
-            var guidancePanel = new GuidancePanel(
+            var guidancePanel = new GuidancePanel (
                     _playerInit.guidance.warning,
                     _playerInit.guidance.explanation,
                     _playerInit.guidance.guidance,
