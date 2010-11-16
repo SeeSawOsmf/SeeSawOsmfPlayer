@@ -34,6 +34,7 @@ import com.seesaw.player.panels.GuidanceBar;
 import com.seesaw.player.panels.GuidancePanel;
 import com.seesaw.player.panels.PosterFrame;
 import com.seesaw.player.services.ResumeService;
+import com.seesaw.player.smil.resource.DynamicSMILResource;
 
 import flash.display.LoaderInfo;
 import flash.display.Sprite;
@@ -87,7 +88,8 @@ public class Player extends Sprite {
         _loaderParams = LoaderInfo(this.root.loaderInfo).parameters;
 
         // TODO: this needs to be in a flashvar from the page
-        _loaderParams.playerInitUrl = "http://localhost:8080/player.playerinitialisation:playerinit?t:ac=TV:COMEDY/p/33532/Test-Programme";
+        _loaderParams.playerInitUrl = "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/" +
+                "player.playerinitialisation:playerinit?t:ac=TV:DRAMA/b/13599/Waterloo-Road";
 
         stage.scaleMode = StageScaleMode.NO_SCALE;
         stage.align = StageAlign.TOP_LEFT;
@@ -241,11 +243,10 @@ public class Player extends Sprite {
         addChild(videoPlayer);
     }
 
-    protected function createMediaResource(videoInfo:XML):MediaResourceBase {
+    private function createMediaResource(videoInfo:XML):DynamicSMILResource {
         logger.debug("creating media resource");
-
-        var resource:DynamicStream = new DynamicStream(videoInfo);
-        // var resource:MediaResourceBase = new DynamicSMILResource((MockData.smil));
+        // var resource:DynamicStream = new DynamicStream(videoInfo);
+        var resource:DynamicSMILResource = new DynamicSMILResource((videoInfo));
 
         var metaSettings:Metadata = new Metadata();
         // Use this to check the resource is the mainContent, e.g. for the AdProxypPlugins

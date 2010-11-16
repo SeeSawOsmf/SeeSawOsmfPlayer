@@ -32,7 +32,7 @@ public class PlayerConfiguration {
     private var _factory:MediaFactory;
     private var _player:MediaPlayer;
     private var _container:MediaContainer;
-    private var _adModuleType:String = "com.seesaw.player.ads.liverail--"
+    private var _adModuleType:String = "liverail"
 
     private var _width:int;
     private var _height:int;

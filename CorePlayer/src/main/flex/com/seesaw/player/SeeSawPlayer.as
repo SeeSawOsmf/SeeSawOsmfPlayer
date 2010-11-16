@@ -21,6 +21,7 @@
  */
 
 package com.seesaw.player {
+import com.seesaw.player.ads.AdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.buffering.BufferManager;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
@@ -30,6 +31,7 @@ import com.seesaw.player.components.MediaComponent;
 import com.seesaw.player.events.FullScreenEvent;
 import com.seesaw.player.fullscreen.FullScreenProxyPluginInfo;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
+import com.seesaw.player.smil.SMILPluginInfo;
 import com.seesaw.player.traits.fullscreen.FullScreenTrait;
 
 import flash.display.Sprite;
@@ -88,8 +90,7 @@ public class SeeSawPlayer extends Sprite {
 
     private function createVideoElement():void {
         logger.debug("loading the proxy plugins that wrap the video element");
-
-        // config.factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo()));
+        config.factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new FullScreenProxyPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
@@ -97,8 +98,8 @@ public class SeeSawPlayer extends Sprite {
         // config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
 
-        // if (config.adModuleType == "com.seesaw.player.ads.liverail")
-        //    config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
+        if (config.resource.getMetadataValue("contentInfo").adType == config.adModuleType)
+            config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
 
         ///      if (config.adModuleType == "com.seesaw.player.ads.serial")
         ///       config.factory.loadPlugin(new PluginInfoResource(new PlaylistPluginInfo()));
@@ -106,6 +107,7 @@ public class SeeSawPlayer extends Sprite {
         logger.debug("creating video element");
         _videoElement = config.factory.createMediaElement(config.resource);
         //_videoElement = new BufferManager(0.5, 5, _videoElement);
+
 
         if (_videoElement == null) {
             throw ArgumentError("failed to create main media element for player");

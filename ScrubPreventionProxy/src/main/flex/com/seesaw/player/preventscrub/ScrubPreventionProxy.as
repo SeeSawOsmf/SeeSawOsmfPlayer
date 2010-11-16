@@ -130,14 +130,14 @@ public class ScrubPreventionProxy extends ProxyElement {
             blockedSeekable.blocking = true;
             seekable.seek((adjustedSeekPoint - offset));
 
-
-            for (var i:Number = 0; i < adMarkers.length; i++) {
-                var index:Number = adMarkers[i];
-                if (index == (adjustedSeekPoint / time.duration)) {
-                    adMarkers.splice(i, 1);
+            if (adMarkers) {
+                for (var i:Number = 0; i < adMarkers.length; i++) {
+                    var index:Number = adMarkers[i];
+                    if (index == (adjustedSeekPoint / time.duration)) {
+                        adMarkers.splice(i, 1);
+                    }
                 }
             }
-
             temporaryAdMarkers = adMarkers;
             adMarkers = null;
 
