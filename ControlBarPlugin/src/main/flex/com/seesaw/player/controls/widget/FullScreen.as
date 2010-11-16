@@ -22,7 +22,7 @@
 
 package com.seesaw.player.controls.widget {
 import com.seesaw.player.events.FullScreenEvent;
-import com.seesaw.player.traits.FullScreenTrait;
+import com.seesaw.player.traits.fullscreen.FullScreenTrait;
 import com.seesaw.player.ui.StyledTextField;
 
 import controls.seesaw.widget.interfaces.IWidget;

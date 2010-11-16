@@ -1,0 +1,547 @@
+<SAMI>
+<Head>
+<STYLE TYPE="text/css+">
+
+<!--
+
+P {	margin-left:  1pt;
+margin-right: 1pt;
+margin-bottom: 2pt;
+margin-top: 2pt;
+text-align: center;
+font-size: 1.4em;
+font-family: Tahoma;
+font-weight: normal;
+font-style: normal;
+color: #ffffff; }
+
+#Small {Name:SmallTxt; font-family:Tahoma;font-weight:normal;font-size:1.4em;color:#ffffff;}
+#Big {Name:BigTxt; font-family:Tahoma;font-weight:bold;font-size:1.5em;color:#ffffff;}
+.ENCC {Name:English; lang: en-US; SAMI_Type: CC;}
+
+-->
+
+</Style>
+
+</Head>
+
+<BODY>
+
+
+<Sync Start="0"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1040"><P class="ENCC"><span style=color:yellow;> Welcome to the Coach Trip - </span><br><span style=color:yellow;> seven couples on a 30-day tour </span></P></Sync>
+<Sync Start="4440"><P class="ENCC"><span style=color:yellow;> in the Mediterranean sun. </span></P></Sync>
+<Sync Start="6080"><P class="ENCC"><span style=color:yellow;> For some of them, it could be </span><br><span style=color:yellow;> the holiday of a lifetime, </span></P></Sync>
+<Sync Start="9120"><P class="ENCC"><span style=color:yellow;> taking in some amazing sights </span><br><span style=color:yellow;> and cities. </span></P></Sync>
+<Sync Start="12920"><P class="ENCC"><span style=color:white;> It's fun, exhilarating. </span></P></Sync>
+<Sync Start="15240"><P class="ENCC"><span style=color:white;> We're laughing, </span><br><span style=color:white;> and every day is a surprise. </span></P></Sync>
+<Sync Start="18080"><P class="ENCC"><span style=color:cyan;> It's going to be one holiday </span><br><span style=color:cyan;> of a lifetime you can't do again. </span></P></Sync>
+<Sync Start="22080"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="23640"><P class="ENCC"><span style=color:yellow;> But for others, it could </span><br><span style=color:yellow;> be a complete nightmare. </span></P></Sync>
+<Sync Start="27520"><P class="ENCC"><span style=color:white;> You want to vote for me, vote for me! </span></P></Sync>
+<Sync Start="30360"><P class="ENCC"><span style=color:white;> I haven't come here </span><br><span style=color:white;> giving it out to anybody, </span></P></Sync>
+<Sync Start="32840"><P class="ENCC"><span style=color:white;> and I'm not taking it </span><br><span style=color:white;> from anybody neither. </span></P></Sync>
+<Sync Start="35120"><P class="ENCC"><span style=color:yellow;> This is no ordinary coach trip, </span><br><span style=color:yellow;> because if you don't like </span></P></Sync>
+<Sync Start="37840"><P class="ENCC"><span style=color:yellow;> the people you're travelling with, </span><br><span style=color:yellow;> you can send them home. </span></P></Sync>
+<Sync Start="40800"><P class="ENCC"><span style=color:white;> I don't tell lies, ever. </span></P></Sync>
+<Sync Start="42600"><P class="ENCC"><span style=color:cyan;> I'm just asking who authorised you </span></P></Sync>
+<Sync Start="44480"><P class="ENCC"><span style=color:cyan;> to go round the group </span><br><span style=color:cyan;> making enquiries on my behalf? </span></P></Sync>
+<Sync Start="48480"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="58480"><P class="ENCC"><span style=color:yellow;> There are currently seven couples </span></P></Sync>
+<Sync Start="60520"><P class="ENCC"><span style=color:yellow;> travelling on the coach - </span><br><span style=color:yellow;> husband and wife, Eileen and Alan. </span></P></Sync>
+<Sync Start="64520"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="64720"><P class="ENCC"><span style=color:white;> I was rubbish. </span><br><span style=color:white;> Absolute rubbish. </span></P></Sync>
+<Sync Start="67880"><P class="ENCC"><span style=color:cyan;> Not rubbish, darling. </span><br><span style=color:cyan;> Total rubbish. </span></P></Sync>
+<Sync Start="70160"><P class="ENCC"><span style=color:yellow;> Friends John and Kerrie. </span></P></Sync>
+<Sync Start="72400"><P class="ENCC"><span style=color:white;> We have only known </span><br><span style=color:white;> these people for a week... </span></P></Sync>
+<Sync Start="74760"><P class="ENCC"><span style=color:cyan;> Eight days. </span></P></Sync>
+<Sync Start="76600"><P class="ENCC"><span style=color:white;> Eight days, sorry. </span><br><span style=color:white;> As much as I'd like to trust them, </span></P></Sync>
+<Sync Start="79560"><P class="ENCC"><span style=color:white;> I never trust anybody 100%. </span></P></Sync>
+<Sync Start="82440"><P class="ENCC"><span style=color:yellow;> Husband and wife, Jacky and Phil. </span></P></Sync>
+<Sync Start="85040"><P class="ENCC"><span style=color:white;> When she's had a couple, she will </span><br><span style=color:white;> pole-dance up door frames. </span></P></Sync>
+<Sync Start="88520"><P class="ENCC"><span style=color:white;> So give her another one. </span></P></Sync>
+<Sync Start="90080"><P class="ENCC"><span style=color:yellow;> Barbers Alan and Lorenzo. </span></P></Sync>
+<Sync Start="92120"><P class="ENCC"><span style=color:white;> People that don't like public </span><br><span style=color:white;> shows of affection, don't watch. </span></P></Sync>
+<Sync Start="96120"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="96160"><P class="ENCC"><span style=color:cyan;> Between a man and woman, </span><br><span style=color:cyan;> not two men, OK? </span></P></Sync>
+<Sync Start="98600"><P class="ENCC"><span style=color:yellow;> Friends Kat and Clare. </span></P></Sync>
+<Sync Start="100920"><P class="ENCC"><span style=color:white;> Damn it! </span></P></Sync>
+<Sync Start="104320"><P class="ENCC"><span style=color:cyan;> That was wrong, though. I win. </span></P></Sync>
+<Sync Start="106240"><P class="ENCC"><span style=color:yellow;> Husband and wife, Bill and Rae. </span></P></Sync>
+<Sync Start="108640"><P class="ENCC"><span style=color:white;> When I first met my wife here, </span></P></Sync>
+<Sync Start="110880"><P class="ENCC"><span style=color:white;> I thought she was </span><br><span style=color:white;> roundishly attractive. </span></P></Sync>
+<Sync Start="114640"><P class="ENCC"><span style=color:yellow;> Father and son, Marlon and Joe. </span></P></Sync>
+<Sync Start="116320"><P class="ENCC"><span style=color:white;> I'm looking for love </span><br><span style=color:white;> from a lot of people. </span></P></Sync>
+<Sync Start="118920"><P class="ENCC"><span style=color:white;> I'm looking for love from the </span><br><span style=color:white;> whole coach and the whole world. </span></P></Sync>
+<Sync Start="122800"><P class="ENCC"><span style=color:white;> What are you getting at, madam? </span></P></Sync>
+<Sync Start="124320"><P class="ENCC"><span style=color:white;> (LAUGHS) </span></P></Sync>
+<Sync Start="127880"><P class="ENCC"><span style=color:yellow;> And always on hand to help out in a </span><br><span style=color:yellow;> crisis is Brendan, their tour guide. </span></P></Sync>
+<Sync Start="131880"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="133280"><P class="ENCC"><span style=color:white;> Ooh! </span></P></Sync>
+<Sync Start="135040"><P class="ENCC"><span style=color:white;> I must admit, I've never done this </span><br><span style=color:white;> with a woman before in my life! </span></P></Sync>
+<Sync Start="139040"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="140120"><P class="ENCC"><span style=color:white;> I'll do it for you. </span></P></Sync>
+<Sync Start="144120"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="144360"><P class="ENCC"><span style=color:yellow;> Yesterday, the coach trip arrived </span><br><span style=color:yellow;> in the capital of Portugal, Lisbon, </span></P></Sync>
+<Sync Start="147640"><P class="ENCC"><span style=color:yellow;> where the passengers toured </span><br><span style=color:yellow;> an impressive oceanarium. </span></P></Sync>
+<Sync Start="150840"><P class="ENCC"><span style=color:white;> Whoa! </span></P></Sync>
+<Sync Start="152200"><P class="ENCC"><span style=color:yellow;> And tasted some port </span><br><span style=color:yellow;> on a special tram ride. </span></P></Sync>
+<Sync Start="155080"><P class="ENCC"><span style=color:yellow;> New arrivals Phil and Jacky and Rae </span><br><span style=color:yellow;> and Bill found it tricky </span></P></Sync>
+<Sync Start="159080"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="159560"><P class="ENCC"><span style=color:yellow;> to mix with the other passengers. </span></P></Sync>
+<Sync Start="161440"><P class="ENCC"><span style=color:white;> They separate themselves away </span><br><span style=color:white;> again. Why? </span></P></Sync>
+<Sync Start="164840"><P class="ENCC"><span style=color:yellow;> And at voting time, Jacky </span><br><span style=color:yellow;> and Phil received a yellow card. </span></P></Sync>
+<Sync Start="168840"><P class="ENCC"><span style=color:yellow;> The coach trip then said hello to </span><br><span style=color:yellow;> two new passengers, Joe and Marlon. </span></P></Sync>
+<Sync Start="172840"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="173040"><P class="ENCC"><span style=color:white;> Nice to have two good-looking </span><br><span style=color:white;> guys to look at, a bit of eye candy. </span></P></Sync>
+<Sync Start="176720"><P class="ENCC"><span style=color:yellow;> And they get to spend their first </span><br><span style=color:yellow;> full day on the tour </span></P></Sync>
+<Sync Start="179920"><P class="ENCC"><span style=color:yellow;> on day seven of the Coach Trip. </span></P></Sync>
+<Sync Start="183920"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="184640"><P class="ENCC"><span style=color:yellow;> It's 7:20am in Lisbon. </span></P></Sync>
+<Sync Start="187080"><P class="ENCC"><span style=color:yellow;> Today's first stop is the exclusive </span><br><span style=color:yellow;> San Lorenzo Golf Club in Faro. </span></P></Sync>
+<Sync Start="191080"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="191640"><P class="ENCC"><span style=color:yellow;> The group are booked in for a golf </span><br><span style=color:yellow;> lesson, so Brendan's up early, </span></P></Sync>
+<Sync Start="194720"><P class="ENCC"><span style=color:yellow;> hoping all the passengers </span><br><span style=color:yellow;> have heeded yesterday's warning. </span></P></Sync>
+<Sync Start="197960"><P class="ENCC"><span style=color:white;> We're leaving at </span><br><span style=color:white;> 7:30 for 8 o'clock. </span></P></Sync>
+<Sync Start="201440"><P class="ENCC"><span style=color:white;> So if you're not by this coach, </span></P></Sync>
+<Sync Start="203360"><P class="ENCC"><span style=color:white;> consider yourself </span><br><span style=color:white;> with an instant yellow card. </span></P></Sync>
+<Sync Start="206440"><P class="ENCC"><span style=color:yellow;> However, it seems his words </span><br><span style=color:yellow;> may have fallen on deaf ears. </span></P></Sync>
+<Sync Start="210440"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="210920"><P class="ENCC"><span style=color:white;> By my watch, it's 28 minutes, </span><br><span style=color:white;> and we're short of two. </span></P></Sync>
+<Sync Start="214920"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="217600"><P class="ENCC"><span style=color:white;> It looks like it's </span><br><span style=color:white;> gonna be Kerrie and John. </span></P></Sync>
+<Sync Start="221600"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="222200"><P class="ENCC"><span style=color:white;> I love my tea. </span></P></Sync>
+<Sync Start="225640"><P class="ENCC"><span style=color:white;> There's literally one minute to go, </span></P></Sync>
+<Sync Start="229360"><P class="ENCC"><span style=color:white;> so I've got my yellow card ready... </span></P></Sync>
+<Sync Start="233360"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="233960"><P class="ENCC"><span style=color:white;> ..and it looks like </span><br><span style=color:white;> they're gonna get it. </span></P></Sync>
+<Sync Start="236480"><P class="ENCC"><span style=color:white;> They go partying, and </span><br><span style=color:white;> partying takes the priority... </span></P></Sync>
+<Sync Start="240480"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="241040"><P class="ENCC"><span style=color:cyan;> Whooh! Whooh! Whooh! Whooh! </span></P></Sync>
+<Sync Start="244520"><P class="ENCC"><span style=color:white;> ..over punctuality. </span><br><span style=color:white;> You know what I mean? </span></P></Sync>
+<Sync Start="247920"><P class="ENCC"><span style=color:white;> To keep the whole coach waiting, </span><br><span style=color:white;> it's not really on. </span></P></Sync>
+<Sync Start="251920"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="258600"><P class="ENCC"><span style=color:cyan;> Come in. </span></P></Sync>
+<Sync Start="260360"><P class="ENCC"><span style=color:white;> I know. Told you, didn't I? </span></P></Sync>
+<Sync Start="262640"><P class="ENCC"><span style=color:white;> But it is 7:32. </span></P></Sync>
+<Sync Start="266320"><P class="ENCC"><span style=color:white;> Nearly 7:35. </span></P></Sync>
+<Sync Start="268040"><P class="ENCC"><span style=color:white;> There you are, John. </span></P></Sync>
+<Sync Start="269680"><P class="ENCC"><span style=color:white;> Yellow card, </span></P></Sync>
+<Sync Start="271840"><P class="ENCC"><span style=color:white;> because of your timekeeping. </span></P></Sync>
+<Sync Start="273920"><P class="ENCC"><span style=color:white;> I'm sorry, </span><br><span style=color:white;> but everybody else is down. </span></P></Sync>
+<Sync Start="277800"><P class="ENCC"><span style=color:white;> You were warned. </span><br><span style=color:white;> We said, "You must be down for 7:30." </span></P></Sync>
+<Sync Start="281800"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="283080"><P class="ENCC"><span style=color:white;> That is the simplest, basic </span><br><span style=color:white;> travel requirement </span></P></Sync>
+<Sync Start="287080"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="287960"><P class="ENCC"><span style=color:white;> when you're on a trip like this. </span></P></Sync>
+<Sync Start="289880"><P class="ENCC"><span style=color:white;> With all respect, </span></P></Sync>
+<Sync Start="292840"><P class="ENCC"><span style=color:white;> Kerrie looks as if she's fallen </span><br><span style=color:white;> where she's laid, cos she's dressed. </span></P></Sync>
+<Sync Start="296640"><P class="ENCC"><span style=color:white;> It's 7:35. </span></P></Sync>
+<Sync Start="298280"><P class="ENCC"><span style=color:white;> We've got to leave </span></P></Sync>
+<Sync Start="300560"><P class="ENCC"><span style=color:white;> in 20 minutes. </span></P></Sync>
+<Sync Start="302600"><P class="ENCC"><span style=color:yellow;> John and Kerrie eventually </span><br><span style=color:yellow;> surface 15 minutes later. </span></P></Sync>
+<Sync Start="306600"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="306720"><P class="ENCC"><span style=color:white;> Quick, we're going. </span></P></Sync>
+<Sync Start="308920"><P class="ENCC"><span style=color:yellow;> The coach finally gets on the road, </span><br><span style=color:yellow;> heading 171 miles to Faro. </span></P></Sync>
+<Sync Start="312920"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="319480"><P class="ENCC"><span style=color:white;> Good morning, ladies and gentlemen. </span></P></Sync>
+<Sync Start="321600"><P class="ENCC"><span style=color:white;> First of all, I have to apologise to </span><br><span style=color:white;> John and Kerrie, who are holding up </span></P></Sync>
+<Sync Start="325600"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="329120"><P class="ENCC"><span style=color:white;> their prize this morning. </span></P></Sync>
+<Sync Start="330800"><P class="ENCC"><span style=color:white;> I'm sorry I had to do it, </span><br><span style=color:white;> but it's one of those things. </span></P></Sync>
+<Sync Start="333520"><P class="ENCC"><span style=color:cyan;> We're gonna go on a time-management </span><br><span style=color:cyan;> course when we get home. </span></P></Sync>
+<Sync Start="337080"><P class="ENCC"><span style=color:white;> You are? </span></P></Sync>
+<Sync Start="338360"><P class="ENCC"><span style=color:cyan;> Both of us are, so... </span></P></Sync>
+<Sync Start="340480"><P class="ENCC"><span style=color:white;> I hope you learn something. </span><br><span style=color:white;> Good, good. Good. </span></P></Sync>
+<Sync Start="344480"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="345280"><P class="ENCC"><span style=color:yellow;> John and Kerrie's day may have </span><br><span style=color:yellow;> started off badly, </span></P></Sync>
+<Sync Start="348360"><P class="ENCC"><span style=color:yellow;> but for new arrivals Joe and Marlon, </span></P></Sync>
+<Sync Start="350680"><P class="ENCC"><span style=color:yellow;> their first full day </span><br><span style=color:yellow;> on the coach is going well. </span></P></Sync>
+<Sync Start="353800"><P class="ENCC"><span style=color:yellow;> They already seem to be fitting </span><br><span style=color:yellow;> in with the other passengers. </span></P></Sync>
+<Sync Start="356800"><P class="ENCC"><span style=color:cyan;> Oh, my God! </span></P></Sync>
+<Sync Start="358960"><P class="ENCC"><span style=color:cyan;> His sense of humour is fantastic. </span></P></Sync>
+<Sync Start="362160"><P class="ENCC"><span style=color:#11FF11;> It's not the sense of humour, </span><br><span style=color:#11FF11;> it's his actions as well. </span></P></Sync>
+<Sync Start="365400"><P class="ENCC"><span style=color:#11FF11;> Even a door creaking... "Ee-ee-ee"! </span></P></Sync>
+<Sync Start="369160"><P class="ENCC"><span style=color:cyan;> The gate is open... </span></P></Sync>
+<Sync Start="370960"><P class="ENCC"><span style=color:white;> <span style=background-color:red;> LAUGHTER </span></span></P></Sync>
+<Sync Start="372920"><P class="ENCC"><span style=color:#11FF11;> The new guys are really good guys. </span></P></Sync>
+<Sync Start="376080"><P class="ENCC"><span style=color:#11FF11;> I would like them to stay </span><br><span style=color:#11FF11;> for as long as we're staying. </span></P></Sync>
+<Sync Start="380080"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="381360"><P class="ENCC"><span style=color:yellow;> Joe and Marlon seen to have made </span><br><span style=color:yellow;> a positive impact on the group. </span></P></Sync>
+<Sync Start="384480"><P class="ENCC"><span style=color:yellow;> To make sure that doesn't </span><br><span style=color:yellow;> disappear at voting time, </span></P></Sync>
+<Sync Start="387520"><P class="ENCC"><span style=color:yellow;> they've brought a secret weapon. </span></P></Sync>
+<Sync Start="389280"><P class="ENCC"><span style=color:cyan;> Freddie the dread. </span><br><span style=color:cyan;> He's the person we've brought. </span></P></Sync>
+<Sync Start="393080"><P class="ENCC"><span style=color:cyan;> When we come to voting time, </span><br><span style=color:cyan;> he'll do the voting for us. </span></P></Sync>
+<Sync Start="397080"><P class="ENCC"><span style=color:cyan;> He's a... </span></P></Sync>
+<Sync Start="398880"><P class="ENCC"><span style=color:cyan;> good friend of ours, </span><br><span style=color:cyan;> been around a long time. </span></P></Sync>
+<Sync Start="402120"><P class="ENCC"><span style=color:cyan;> As you can see, he's got the </span><br><span style=color:cyan;> same hairdo like me. Freddie. </span></P></Sync>
+<Sync Start="406120"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="406320"><P class="ENCC"><span style=color:yellow;> Let's hope Freddie proves </span><br><span style=color:yellow;> his worth at today's vote. </span></P></Sync>
+<Sync Start="409800"><P class="ENCC"><span style=color:yellow;> For now, Joe and Marlon </span><br><span style=color:yellow;> and and Freddie </span></P></Sync>
+<Sync Start="412000"><P class="ENCC"><span style=color:yellow;> must sit back, as Brendan tells </span><br><span style=color:yellow;> the group about today's destination. </span></P></Sync>
+<Sync Start="415800"><P class="ENCC"><span style=color:white;> We're on our way to Faro. </span></P></Sync>
+<Sync Start="418800"><P class="ENCC"><span style=color:white;> I first worked in Faro when I was 18. </span></P></Sync>
+<Sync Start="421480"><P class="ENCC"><span style=color:white;> That was my first winter season. </span></P></Sync>
+<Sync Start="423800"><P class="ENCC"><span style=color:white;> It was only ten years ago. </span></P></Sync>
+<Sync Start="425600"><P class="ENCC"><span style=color:white;> It's a city as well as </span><br><span style=color:white;> a southern district in Portugal. </span></P></Sync>
+<Sync Start="429600"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="430000"><P class="ENCC"><span style=color:white;> Faro's the capital of the Algarve, </span></P></Sync>
+<Sync Start="431880"><P class="ENCC"><span style=color:white;> and this region runs from Cabo </span><br><span style=color:white;> San Vicente, which is the most </span></P></Sync>
+<Sync Start="435880"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="436440"><P class="ENCC"><span style=color:white;> western point of Europe, right to </span><br><span style=color:white;> the Spanish border with Ayamonte. </span></P></Sync>
+<Sync Start="440440"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="441760"><P class="ENCC"><span style=color:white;> The old part of the city </span><br><span style=color:white;> is very nice, </span></P></Sync>
+<Sync Start="444600"><P class="ENCC"><span style=color:white;> and they have a Roman forum </span><br><span style=color:white;> and a 13th-century cathedral. </span></P></Sync>
+<Sync Start="448600"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="450440"><P class="ENCC"><span style=color:white;> There are a few old </span><br><span style=color:white;> churches dating back </span></P></Sync>
+<Sync Start="452520"><P class="ENCC"><span style=color:white;> to the 13th and 14th century. </span><br><span style=color:white;> They're in the centre of town. </span></P></Sync>
+<Sync Start="456400"><P class="ENCC"><span style=color:white;> If there's any questions, </span><br><span style=color:white;> let me know. </span></P></Sync>
+<Sync Start="459280"><P class="ENCC"><span style=color:white;> If not, relax and enjoy the ride. </span></P></Sync>
+<Sync Start="463280"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="465400"><P class="ENCC"><span style=color:yellow;> It's 11:15, </span></P></Sync>
+<Sync Start="467080"><P class="ENCC"><span style=color:yellow;> and the coach has arrived </span><br><span style=color:yellow;> at the San Lorenzo golf club. </span></P></Sync>
+<Sync Start="469960"><P class="ENCC"><span style=color:yellow;> Due to this morning's delayed </span><br><span style=color:yellow;> departure, the passengers </span></P></Sync>
+<Sync Start="472600"><P class="ENCC"><span style=color:yellow;> are already late </span><br><span style=color:yellow;> for their golf lesson. </span></P></Sync>
+<Sync Start="474720"><P class="ENCC"><span style=color:yellow;> To make matters worse, some of the </span><br><span style=color:yellow;> group have not dressed correctly, </span></P></Sync>
+<Sync Start="478360"><P class="ENCC"><span style=color:yellow;> and now the club won't let them in. </span></P></Sync>
+<Sync Start="480160"><P class="ENCC"><span style=color:white;> You were told yesterday </span><br><span style=color:white;> what you needed, so we'll have to </span></P></Sync>
+<Sync Start="483120"><P class="ENCC"><span style=color:white;> unload everything </span><br><span style=color:white;> from the back of the coach so that </span></P></Sync>
+<Sync Start="487080"><P class="ENCC"><span style=color:white;> Lorenzo can change his jeans, you can </span><br><span style=color:white;> get a proper shirt... No laughing! </span></P></Sync>
+<Sync Start="491080"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="492280"><P class="ENCC"><span style=color:white;> I told them, "You must dress </span><br><span style=color:white;> accordingly. You must have socks on. </span></P></Sync>
+<Sync Start="495840"><P class="ENCC"><span style=color:white;> "You must wear long </span><br><span style=color:white;> trousers, not shorts." </span></P></Sync>
+<Sync Start="498200"><P class="ENCC"><span style=color:white;> What happens? We arrive, </span><br><span style=color:white;> we've got to get the luggage out, </span></P></Sync>
+<Sync Start="501560"><P class="ENCC"><span style=color:white;> we've got to look for shoes </span><br><span style=color:white;> and socks and shirts with collars. </span></P></Sync>
+<Sync Start="505560"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="507200"><P class="ENCC"><span style=color:white;> And people don't listen. </span></P></Sync>
+<Sync Start="509920"><P class="ENCC"><span style=color:white;> Trainers. Get the trainers out. </span></P></Sync>
+<Sync Start="512360"><P class="ENCC"><span style=color:white;> What a colour they are. </span></P></Sync>
+<Sync Start="514280"><P class="ENCC"><span style=color:cyan;> Trousers.  </span><span style=color:#11FF11;> Yeah. </span></P></Sync>
+<Sync Start="516280"><P class="ENCC"><span style=color:white;> I don't tell you </span><br><span style=color:white;> all this for nothing. </span></P></Sync>
+<Sync Start="518240"><P class="ENCC"><span style=color:white;> I don't tell you </span><br><span style=color:white;> all this for nothing. </span><br><span style=color:cyan;> You can still see skin. </span></P></Sync>
+<Sync Start="519600"><P class="ENCC"><span style=color:#11FF11;> You just like </span><br><span style=color:#11FF11;> the sound of your own voice. </span></P></Sync>
+<Sync Start="521880"><P class="ENCC"><span style=color:white;> They must have thought we'd come from </span><br><span style=color:white;> the back of beyond. </span></P></Sync>
+<Sync Start="525480"><P class="ENCC"><span style=color:cyan;> I want you to take that back, </span><br><span style=color:cyan;> because... </span></P></Sync>
+<Sync Start="528200"><P class="ENCC"><span style=color:white;> You are having a little strop </span><br><span style=color:white;> because you got </span></P></Sync>
+<Sync Start="530560"><P class="ENCC"><span style=color:white;> a yellow card this morning, </span><br><span style=color:white;> aren't you? </span></P></Sync>
+<Sync Start="532640"><P class="ENCC"><span style=color:white;> And you missed your breakfast. </span></P></Sync>
+<Sync Start="534480"><P class="ENCC"><span style=color:white;> And you missed your breakfast. </span></P></Sync>
+<Sync Start="536920"><P class="ENCC"><span style=color:white;> Stop having a strop, </span><br><span style=color:white;> and let's get on. </span></P></Sync>
+<Sync Start="540200"><P class="ENCC"><span style=color:white;> We make up time, </span><br><span style=color:white;> and then we lose time. </span></P></Sync>
+<Sync Start="543160"><P class="ENCC"><span style=color:white;> We eventually sorted people out </span><br><span style=color:white;> with the proper dress code, </span></P></Sync>
+<Sync Start="547160"><P class="ENCC"><span style=color:white;> and then went in </span><br><span style=color:white;> and met the golf pro. </span></P></Sync>
+<Sync Start="550520"><P class="ENCC"><span style=color:yellow;> The San Lorenzo golf club is widely </span><br><span style=color:yellow;> considered to have one of the best </span></P></Sync>
+<Sync Start="553960"><P class="ENCC"><span style=color:yellow;> courses in Europe, and is set in </span><br><span style=color:yellow;> the beautiful </span></P></Sync>
+<Sync Start="556880"><P class="ENCC"><span style=color:yellow;> Rio Formosa nature reserve. </span></P></Sync>
+<Sync Start="560680"><P class="ENCC"><span style=color:yellow;> The 6,822-yard course </span></P></Sync>
+<Sync Start="563080"><P class="ENCC"><span style=color:yellow;> was designed by well-known </span><br><span style=color:yellow;> golf architect, Joseph Lee. </span></P></Sync>
+<Sync Start="566960"><P class="ENCC"><span style=color:yellow;> It features fast greens and </span><br><span style=color:yellow;> fairways, along with </span></P></Sync>
+<Sync Start="569840"><P class="ENCC"><span style=color:yellow;> stunning scenery, such as </span><br><span style=color:yellow;> pine woods, lakes and lagoons. </span></P></Sync>
+<Sync Start="573840"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="573960"><P class="ENCC"><span style=color:white;> Here we are in the San Lorenzo </span><br><span style=color:white;> golf course in the Algarve. </span></P></Sync>
+<Sync Start="577960"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="578400"><P class="ENCC"><span style=color:white;> I'd like to introduce to you Albano, </span><br><span style=color:white;> who's going to be your teacher today. </span></P></Sync>
+<Sync Start="582280"><P class="ENCC"><span style=color:yellow;> Albano wastes no time in </span><br><span style=color:yellow;> demonstrating the technique </span></P></Sync>
+<Sync Start="585600"><P class="ENCC"><span style=color:yellow;> of the strong grip, and how to </span><br><span style=color:yellow;> follow through with a steady swing. </span></P></Sync>
+<Sync Start="589080"><P class="ENCC"><span style=color:cyan;> Believe me, </span><br><span style=color:cyan;> it's easy to hit the ball. </span></P></Sync>
+<Sync Start="591320"><P class="ENCC"><span style=color:yellow;> Then it's time for the group </span><br><span style=color:yellow;> to hit the green, quite literally. </span></P></Sync>
+<Sync Start="595320"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="607720"><P class="ENCC"><span style=color:cyan;> Wow. </span></P></Sync>
+<Sync Start="609080"><P class="ENCC"><span style=color:#11FF11;> Sorry about that. > </span></P></Sync>
+<Sync Start="610320"><P class="ENCC"><span style=color:cyan;> No problem. </span><br><span style=color:cyan;> That's some work for the green. </span></P></Sync>
+<Sync Start="614040"><P class="ENCC"><span style=color:#11FF11;> Last time I played golf, </span><br><span style=color:#11FF11;> he took me to a driving range once. </span></P></Sync>
+<Sync Start="617360"><P class="ENCC"><span style=color:#11FF11;> I needed the osteopath </span><br><span style=color:#11FF11;> twice after that. </span></P></Sync>
+<Sync Start="619440"><P class="ENCC"><span style=color:cyan;> But you were going crazy. </span></P></Sync>
+<Sync Start="621880"><P class="ENCC"><span style=color:#11FF11;> Really whacking it hard, so I'm </span><br><span style=color:#11FF11;> trying to hit it with less power. </span></P></Sync>
+<Sync Start="625880"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="628040"><P class="ENCC"><span style=color:cyan;> A lot of power, yes, </span><br><span style=color:cyan;> but technique, not much. </span></P></Sync>
+<Sync Start="632040"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="632320"><P class="ENCC"><span style=color:white;> Alan and Lorenzo hit the ball. </span><br><span style=color:white;> It went flying off the green, </span></P></Sync>
+<Sync Start="635960"><P class="ENCC"><span style=color:white;> and 16 kilometres away, </span><br><span style=color:white;> they retrieved the ball. </span></P></Sync>
+<Sync Start="638880"><P class="ENCC"><span style=color:white;> But that's what they're like. </span></P></Sync>
+<Sync Start="640560"><P class="ENCC"><span style=color:white;> They're know-it-alls, </span><br><span style=color:white;> and yet they don't know jack. </span></P></Sync>
+<Sync Start="644560"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="645400"><P class="ENCC"><span style=color:yellow;> It's not every day you get the </span><br><span style=color:yellow;> chance to ask a golf pro for advice, </span></P></Sync>
+<Sync Start="649400"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="649480"><P class="ENCC"><span style=color:yellow;> so Bill's hoping to pick up </span><br><span style=color:yellow;> some handy tips. </span></P></Sync>
+<Sync Start="653080"><P class="ENCC"><span style=color:#11FF11;> Now he's taught me </span><br><span style=color:#11FF11;> how to handle the club, </span></P></Sync>
+<Sync Start="657080"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="657320"><P class="ENCC"><span style=color:#11FF11;> I think I should be able </span><br><span style=color:#11FF11;> to do better. </span></P></Sync>
+<Sync Start="661320"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="677520"><P class="ENCC"><span style=color:white;> Could we kindly thank Albano </span><br><span style=color:white;> and the organisers </span></P></Sync>
+<Sync Start="681520"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="682280"><P class="ENCC"><span style=color:white;> for giving you a lesson? Thank you. </span></P></Sync>
+<Sync Start="684480"><P class="ENCC"><span style=color:white;> <span style=background-color:red;> APPLAUSE </span></span></P></Sync>
+<Sync Start="686160"><P class="ENCC"><span style=color:cyan;> My pleasure. </span></P></Sync>
+<Sync Start="686600"><P class="ENCC"><span style=color:cyan;> My pleasure. </span><br><span style=color:white;> If you'd make your way to </span><br><span style=color:white;> the clubhouse for lunch. </span></P></Sync>
+<Sync Start="690600"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="693800"><P class="ENCC"><span style=color:yellow;> Coming up in part two - the group </span><br><span style=color:yellow;> get wet and wild at a water park. </span></P></Sync>
+<Sync Start="697800"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="701880"><P class="ENCC"><span style=color:yellow;> And some passengers get hot </span><br><span style=color:yellow;> under the collar at voting time. </span></P></Sync>
+<Sync Start="705440"><P class="ENCC"><span style=color:cyan;> It might be his sense of humour. </span></P></Sync>
+<Sync Start="706680"><P class="ENCC"><span style=color:cyan;> He might think he's being funny. </span></P></Sync>
+<Sync Start="709800"><P class="ENCC"><span style=color:cyan;> But no, he's just horrible. </span></P></Sync>
+<Sync Start="712960"><P class="ENCC"><span style=color:#11FF11;> We don't like him. </span></P></Sync><span style=color:white;>  </span>
+<Sync Start="716960"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="720000"><P class="ENCC">&nbsp;</P></Sync>
+
+<Sync Start="724680"><P class="ENCC"><span style=color:yellow;> Today the coach trip </span><br><span style=color:yellow;> has travelled to the Algarve </span></P></Sync>
+<Sync Start="727280"><P class="ENCC"><span style=color:yellow;> and hit the city of Faro, </span></P></Sync>
+<Sync Start="728720"><P class="ENCC"><span style=color:yellow;> where the passengers have teed </span><br><span style=color:yellow;> off at an exclusive golf club, </span></P></Sync>
+<Sync Start="732120"><P class="ENCC"><span style=color:yellow;> and are now on their way </span><br><span style=color:yellow;> to their next destination, </span></P></Sync>
+<Sync Start="735200"><P class="ENCC"><span style=color:yellow;> which is a short coach ride away. </span></P></Sync>
+<Sync Start="737280"><P class="ENCC"><span style=color:yellow;> Just enough time for some </span><br><span style=color:yellow;> of the passengers to settle down </span></P></Sync>
+<Sync Start="740680"><P class="ENCC"><span style=color:yellow;> and play a little game... </span></P></Sync>
+<Sync Start="742920"><P class="ENCC"><span style=color:white;> We brought a dice game with us -  </span><br><span style=color:white;> we've played a couple of times, </span></P></Sync>
+<Sync Start="746120"><P class="ENCC"><span style=color:white;> but we're novices at it, you know, </span><br><span style=color:white;> so we do... the rules are not </span></P></Sync>
+<Sync Start="750120"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="750160"><P class="ENCC"><span style=color:white;> absolutely clear to us at the moment, </span></P></Sync>
+<Sync Start="752360"><P class="ENCC"><span style=color:white;> and I thought we would be friendly </span></P></Sync>
+<Sync Start="754800"><P class="ENCC"><span style=color:white;> and ask Phil and Jacky </span><br><span style=color:white;> if they'd like to play. </span></P></Sync>
+<Sync Start="757760"><P class="ENCC"><span style=color:white;> Jacky declined, </span><br><span style=color:white;> but Phil said he would. </span></P></Sync>
+<Sync Start="760480"><P class="ENCC"><span style=color:yellow;> But it seems Phil's </span><br><span style=color:yellow;> not happy with the rules. </span></P></Sync>
+<Sync Start="763120"><P class="ENCC"><span style=color:cyan;> Since it's got to me, there's </span><br><span style=color:cyan;> been three changes in the rules. </span></P></Sync>
+<Sync Start="766400"><P class="ENCC"><span style=color:cyan;> Well, you've gone up, </span><br><span style=color:cyan;> down, sideways... </span></P></Sync>
+<Sync Start="769520"><P class="ENCC"><span style=color:yellow;> His competitive nature </span><br><span style=color:yellow;> isn't impressing Eileen. </span></P></Sync>
+<Sync Start="772240"><P class="ENCC"><span style=color:white;> From the very start, </span><br><span style=color:white;> he was just so objectionable, </span></P></Sync>
+<Sync Start="775520"><P class="ENCC"><span style=color:white;> almost accusing us of cheating. </span></P></Sync>
+<Sync Start="778240"><P class="ENCC"><span style=color:cyan;> He give me one lot of rules, </span><br><span style=color:cyan;> and then as he got... </span></P></Sync>
+<Sync Start="780720"><P class="ENCC"><span style=color:cyan;> it changed round, you know. </span></P></Sync>
+<Sync Start="782200"><P class="ENCC"><span style=color:cyan;> Sideways betting, </span><br><span style=color:cyan;> downwards betting. </span></P></Sync>
+<Sync Start="784760"><P class="ENCC"><span style=color:white;> And we kept getting the rules out </span><br><span style=color:white;> and we weren't, it wasn't cheating. </span></P></Sync>
+<Sync Start="788760"><P class="ENCC"><span style=color:white;> There's no money, </span><br><span style=color:white;> it's a silly little game. </span></P></Sync>
+<Sync Start="791040"><P class="ENCC"><span style=color:white;> Wait till he reads the rules, he'll </span><br><span style=color:white;> know we're not trying to fiddle him. </span></P></Sync>
+<Sync Start="794760"><P class="ENCC"><span style=color:#11FF11;> Very rude to Alan and Eileen, when </span><br><span style=color:#11FF11;> we were playing our shaky dice game. </span></P></Sync>
+<Sync Start="798760"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="799440"><P class="ENCC"><span style=color:#11FF11;> And it annoyed me. Because </span><br><span style=color:#11FF11;> he's rude and it spoiled the game. </span></P></Sync>
+<Sync Start="802560"><P class="ENCC"><span style=color:cyan;> But you can't, </span><br><span style=color:cyan;> the ones are out of play. </span></P></Sync>
+<Sync Start="805080"><P class="ENCC"><span style=color:#11FF11;> But you could also say, two fives. </span></P></Sync>
+<Sync Start="806080"><P class="ENCC"><span style=color:#11FF11;> But you could also say, two fives. </span><br><span style=color:cyan;> No. </span></P></Sync>
+<Sync Start="808320"><P class="ENCC"><span style=color:#11FF11;> He was just being </span><br><span style=color:#11FF11;> supercilious towards us... </span></P></Sync>
+<Sync Start="811000"><P class="ENCC"><span style=color:white;> And sarcastic. </span><br><span style=color:white;> And I did say to him, you know, </span></P></Sync>
+<Sync Start="814200"><P class="ENCC"><span style=color:white;> "It's all right, if you don't </span><br><span style=color:white;> want to play, that's fine. </span></P></Sync>
+<Sync Start="817160"><P class="ENCC"><span style=color:white;> "But if you want to play, </span><br><span style=color:white;> at least be friendly about it." </span></P></Sync>
+<Sync Start="821160"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="821600"><P class="ENCC"><span style=color:white;> We're trying to show you how to play. </span></P></Sync>
+<Sync Start="823480"><P class="ENCC"><span style=color:white;> But if you don't want to play, </span><br><span style=color:white;> don't bother. </span></P></Sync>
+<Sync Start="826040"><P class="ENCC"><span style=color:yellow;> It seems the harmless dice game </span><br><span style=color:yellow;> has caused more friction than fun. </span></P></Sync>
+<Sync Start="830040"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="830160"><P class="ENCC"><span style=color:yellow;> Thankfully the coach has </span><br><span style=color:yellow;> arrived at its next stop... </span></P></Sync>
+<Sync Start="833440"><P class="ENCC"><span style=color:yellow;> where fun is definitely </span><br><span style=color:yellow;> on the cards. </span></P></Sync>
+<Sync Start="835640"><P class="ENCC"><span style=color:white;> Here we are in Atlantic Park, </span><br><span style=color:white;> on the Algarve, </span></P></Sync>
+<Sync Start="838680"><P class="ENCC"><span style=color:white;> and we've brought you here </span><br><span style=color:white;> for some rest and relaxation, </span></P></Sync>
+<Sync Start="841960"><P class="ENCC"><span style=color:white;> and a lot of fun this afternoon. OK? </span></P></Sync>
+<Sync Start="843880"><P class="ENCC"><span style=color:white;> All water-based, </span><br><span style=color:white;> so it's all nice and clean. </span></P></Sync>
+<Sync Start="846560"><P class="ENCC"><span style=color:white;> So, when you're ready, guys, </span><br><span style=color:white;> let's go! </span></P></Sync>
+<Sync Start="850560"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="851880"><P class="ENCC"><span style=color:yellow;> As an added bonus, </span></P></Sync>
+<Sync Start="853120"><P class="ENCC"><span style=color:yellow;> Brendan has come to a special </span><br><span style=color:yellow;> arrangement with the park owner, </span></P></Sync>
+<Sync Start="856320"><P class="ENCC"><span style=color:yellow;> so no-one on the coach trip </span><br><span style=color:yellow;> will have to queue for a slide. </span></P></Sync>
+<Sync Start="860320"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="877640"><P class="ENCC"><span style=color:yellow;> Even Freddie gets </span><br><span style=color:yellow;> in on the action. </span></P></Sync>
+<Sync Start="881640"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="887000"><P class="ENCC"><span style=color:white;> Go get him! Yeah! </span></P></Sync>
+<Sync Start="891000"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="895800"><P class="ENCC"><span style=color:cyan;> Freddie! Freddie! </span></P></Sync>
+<Sync Start="899240"><P class="ENCC"><span style=color:cyan;> Yeah, Freddie's got wet. </span><br><span style=color:cyan;> He's just been with me, up there, </span></P></Sync>
+<Sync Start="902920"><P class="ENCC"><span style=color:cyan;> to that large slide, all the way </span><br><span style=color:cyan;> down. He loved it! </span></P></Sync>
+<Sync Start="906920"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="907960"><P class="ENCC"><span style=color:cyan;> Still got his hat on. </span><br><span style=color:cyan;> I don't know how he does it. </span></P></Sync>
+<Sync Start="910600"><P class="ENCC"><span style=color:white;> Joe's doll, muneca, puppet, </span><br><span style=color:white;> whatever you want to call it, </span></P></Sync>
+<Sync Start="914600"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="914760"><P class="ENCC"><span style=color:white;> Freddie, goes with him everywhere. </span></P></Sync>
+<Sync Start="917760"><P class="ENCC"><span style=color:white;> I get quite concerned, </span><br><span style=color:white;> a man of his age, </span></P></Sync>
+<Sync Start="920800"><P class="ENCC"><span style=color:white;> should show such importance </span><br><span style=color:white;> to an innate object like that. </span></P></Sync>
+<Sync Start="924800"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="925040"><P class="ENCC"><span style=color:#11FF11;> Joe, I think might be a little... </span></P></Sync>
+<Sync Start="927360"><P class="ENCC"><span style=color:#11FF11;> Joe, I think might be a little... </span><br><span style=color:white;> You can't say that! </span></P></Sync>
+<Sync Start="928040"><P class="ENCC"><span style=color:#11FF11;> Joe, I think might be a little... </span><br><span style=color:white;> You can't say that! </span><br><span style=color:#11FF11;> Potty, I don't know! </span></P></Sync>
+<Sync Start="929120"><P class="ENCC"><span style=color:#11FF11;> With the little Freddie doll. </span><br><span style=color:#11FF11;> I'm not sure what that's about! </span></P></Sync>
+<Sync Start="932320"><P class="ENCC"><span style=color:white;> Little bit old to be having toys, </span><br><span style=color:white;> I feel... </span></P></Sync>
+<Sync Start="933520"><P class="ENCC"><span style=color:white;> Little bit old to be having toys, </span><br><span style=color:white;> I feel... </span><br><span style=color:#11FF11;> Interesting. </span></P></Sync>
+<Sync Start="934200"><P class="ENCC"><span style=color:white;> Little bit old to be having toys, </span><br><span style=color:white;> I feel... </span><br><span style=color:#11FF11;> Interesting. </span><br><span style=color:white;> ..possibly. </span></P></Sync>
+<Sync Start="935240"><P class="ENCC"><span style=color:#11FF11;> It's like, you know, the sock thing. </span></P></Sync>
+<Sync Start="936280"><P class="ENCC"><span style=color:#11FF11;> It's like, you know, the sock thing. </span><br><span style=color:white;> As long as he's having fun! </span></P></Sync>
+<Sync Start="937800"><P class="ENCC"><span style=color:yellow;> But not all the passengers </span><br><span style=color:yellow;> are enjoying themselves. </span></P></Sync>
+<Sync Start="941440"><P class="ENCC"><span style=color:yellow;> Bill and Rae find the youngsters' </span><br><span style=color:yellow;> tactile behaviour unacceptable. </span></P></Sync>
+<Sync Start="945440"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="945640"><P class="ENCC"><span style=color:cyan;> Alan is making advances all the </span><br><span style=color:cyan;> time, putting his arms round them </span></P></Sync>
+<Sync Start="949360"><P class="ENCC"><span style=color:cyan;> and touching here </span><br><span style=color:cyan;> and touching there. </span></P></Sync>
+<Sync Start="951560"><P class="ENCC"><span style=color:cyan;> They're not pushing him away </span><br><span style=color:cyan;> at all, you know. </span></P></Sync>
+<Sync Start="954000"><P class="ENCC"><span style=color:cyan;> It's very embarrassing, </span><br><span style=color:cyan;> seeing it all the time. </span></P></Sync>
+<Sync Start="956520"><P class="ENCC"><span style=color:white;> Clare's quite a dirty little </span><br><span style=color:white;> madam as well. </span></P></Sync>
+<Sync Start="959120"><P class="ENCC"><span style=color:cyan;> Well you don't know that, don't </span><br><span style=color:cyan;> say that, love, it's incriminating. </span></P></Sync>
+<Sync Start="962200"><P class="ENCC"><span style=color:cyan;> Well you don't know that, don't </span><br><span style=color:cyan;> say that, love, it's incriminating. </span><br><span style=color:white;> What we have seen directly. </span></P></Sync>
+<Sync Start="964280"><P class="ENCC"><span style=color:white;> They actually came here, </span></P></Sync>
+<Sync Start="967120"><P class="ENCC"><span style=color:white;> on the grass, </span><br><span style=color:white;> they've only been here five minutes, </span></P></Sync>
+<Sync Start="970200"><P class="ENCC"><span style=color:white;> Lorenzo's flat on his back, </span><br><span style=color:white;> legs slightly apart </span></P></Sync>
+<Sync Start="974120"><P class="ENCC"><span style=color:white;> and she's sat right on his privates. </span></P></Sync>
+<Sync Start="976320"><P class="ENCC"><span style=color:white;> Here, behind me. </span></P></Sync>
+<Sync Start="977920"><P class="ENCC"><span style=color:#11FF11;> If they don't like public shows </span><br><span style=color:#11FF11;> of affection, </span></P></Sync>
+<Sync Start="980320"><P class="ENCC"><span style=color:#11FF11;> if they don't like that, </span><br><span style=color:#11FF11;> change channel or... </span></P></Sync>
+<Sync Start="982840"><P class="ENCC"><span style=color:cyan;> Don't do it, but people who do </span><br><span style=color:cyan;> like doing it, like doing it. </span></P></Sync>
+<Sync Start="985840"><P class="ENCC"><span style=color:cyan;> They're doing it, </span><br><span style=color:cyan;> cos they like doing it. </span></P></Sync>
+<Sync Start="988400"><P class="ENCC"><span style=color:#11FF11;> We're flirting, but they know they </span><br><span style=color:#11FF11;> won't get any further with us, so... </span></P></Sync>
+<Sync Start="992400"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="992560"><P class="ENCC"><span style=color:#11FF11;> ..they know the situation. </span></P></Sync>
+<Sync Start="994000"><P class="ENCC"><span style=color:#11FF11;> It's not a problem. </span></P></Sync>
+<Sync Start="996080"><P class="ENCC"><span style=color:white;> She laid across Lorenzo's crutch </span></P></Sync>
+<Sync Start="997920"><P class="ENCC"><span style=color:white;> and was obviously manipulating </span><br><span style=color:white;> his crutch in the process. </span></P></Sync>
+<Sync Start="1001120"><P class="ENCC"><span style=color:cyan;> Oh, you don't know that... </span></P></Sync>
+<Sync Start="1001760"><P class="ENCC"><span style=color:cyan;> Oh, you don't know that... </span><br><span style=color:white;> She was! </span></P></Sync>
+<Sync Start="1002800"><P class="ENCC"><span style=color:cyan;> Oh, you saw it! I don't know. </span></P></Sync>
+<Sync Start="1005240"><P class="ENCC"><span style=color:white;> Sorry, I think it's </span><br><span style=color:white;> outrageously disgusting. </span></P></Sync>
+<Sync Start="1007720"><P class="ENCC"><span style=color:yellow;> And things aren't going </span><br><span style=color:yellow;> that well for Brendan either. </span></P></Sync>
+<Sync Start="1011160"><P class="ENCC"><span style=color:yellow;> It appears that Joe has </span><br><span style=color:yellow;> spent too long in the sun </span></P></Sync>
+<Sync Start="1013640"><P class="ENCC"><span style=color:yellow;> and is now suffering. </span></P></Sync>
+<Sync Start="1015360"><P class="ENCC"><span style=color:white;> Yeah, we think that Joe's </span><br><span style=color:white;> a bit dehydrated, actually, </span></P></Sync>
+<Sync Start="1018480"><P class="ENCC"><span style=color:white;> because he hasn't eaten </span><br><span style=color:white;> much today, really. </span></P></Sync>
+<Sync Start="1022400"><P class="ENCC"><span style=color:white;> And he's been running around </span><br><span style=color:white;> in the sunshine </span></P></Sync>
+<Sync Start="1024760"><P class="ENCC"><span style=color:white;> and he hasn't been drinking much. </span></P></Sync>
+<Sync Start="1026640"><P class="ENCC"><span style=color:white;> And, with the onset of the heat, </span></P></Sync>
+<Sync Start="1030640"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1030840"><P class="ENCC"><span style=color:white;> I think he's just dehydrated. </span></P></Sync>
+<Sync Start="1032800"><P class="ENCC"><span style=color:white;> He needs to go, obviously, </span><br><span style=color:white;> to the clinic </span></P></Sync>
+<Sync Start="1035560"><P class="ENCC"><span style=color:white;> and just be checked out by a doctor. </span></P></Sync>
+<Sync Start="1037360"><P class="ENCC"><span style=color:yellow;> Marlon accompanies his dad </span><br><span style=color:yellow;> to the medical centre </span></P></Sync>
+<Sync Start="1040280"><P class="ENCC"><span style=color:yellow;> as Brendan gathers the rest of the </span><br><span style=color:yellow;> passengers together for the vote. </span></P></Sync>
+<Sync Start="1044280"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1046640"><P class="ENCC"><span style=color:yellow;> On this coach trip, </span><br><span style=color:yellow;> the passengers vote for who </span><br><span style=color:yellow;> they don't like travelling with. </span></P></Sync>
+<Sync Start="1050640"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1051120"><P class="ENCC"><span style=color:yellow;> Whoever gets the most votes </span><br><span style=color:yellow;> is awarded a yellow card. </span></P></Sync>
+<Sync Start="1055040"><P class="ENCC"><span style=color:yellow;> If they get another yellow card, </span></P></Sync>
+<Sync Start="1056840"><P class="ENCC"><span style=color:yellow;> it becomes red and they are sent </span><br><span style=color:yellow;> home and replaced by a new pair. </span></P></Sync>
+<Sync Start="1060840"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1065800"><P class="ENCC"><span style=color:yellow;> Brendan gathers the group </span><br><span style=color:yellow;> together to hear the result. </span></P></Sync>
+<Sync Start="1069600"><P class="ENCC"><span style=color:yellow;> Currently Jacky and Phil, and Kerrie </span><br><span style=color:yellow;> and John are both on yellow cards. </span></P></Sync>
+<Sync Start="1073600"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1073680"><P class="ENCC"><span style=color:white;> Once again, we need to know who you </span><br><span style=color:white;> are voting for, and your reasons why. </span></P></Sync>
+<Sync Start="1077680"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1078440"><P class="ENCC"><span style=color:white;> Because Marlon and Joe </span><br><span style=color:white;> aren't with us this evening, </span></P></Sync>
+<Sync Start="1081320"><P class="ENCC"><span style=color:white;> I'll be casting their vote. </span><br><span style=color:white;> Thank you. </span></P></Sync>
+<Sync Start="1084720"><P class="ENCC"><span style=color:yellow;> Bill and Rae are the first to vote. </span></P></Sync>
+<Sync Start="1087360"><P class="ENCC"><span style=color:cyan;> Today, we vote for Clare and Kath. </span></P></Sync>
+<Sync Start="1091360"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1091560"><P class="ENCC"><span style=color:cyan;> The reason being that Clare and </span><br><span style=color:cyan;> Kath were canoodling with the boys, </span></P></Sync>
+<Sync Start="1095560"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1097440"><P class="ENCC"><span style=color:cyan;> on the grass, in front </span><br><span style=color:cyan;> of infant schoolchildren, </span></P></Sync>
+<Sync Start="1101440"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1102800"><P class="ENCC"><span style=color:cyan;> and the parents </span><br><span style=color:cyan;> showed signs of disgust. </span></P></Sync>
+<Sync Start="1105640"><P class="ENCC"><span style=color:cyan;> They were oblivious </span><br><span style=color:cyan;> to where they were. </span></P></Sync>
+<Sync Start="1108680"><P class="ENCC"><span style=color:cyan;> And that really embarrassed us. </span></P></Sync>
+<Sync Start="1112680"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1113480"><P class="ENCC"><span style=color:white;> Sorry. </span></P></Sync>
+<Sync Start="1114520"><P class="ENCC"><span style=color:white;> Really? </span></P></Sync>
+<Sync Start="1115680"><P class="ENCC"><span style=color:white;> Really? </span><br><span style=color:#11FF11;> I can't remember that! </span></P></Sync>
+<Sync Start="1116720"><P class="ENCC"><span style=color:white;> Really? </span><br><span style=color:#11FF11;> I can't remember that! </span><br><span style=color:white;> I missed that bit! </span></P></Sync>
+<Sync Start="1118240"><P class="ENCC"><span style=color:#11FF11;> You missed out then. </span></P></Sync>
+<Sync Start="1120320"><P class="ENCC"><span style=color:white;> I know! </span></P></Sync>
+<Sync Start="1123720"><P class="ENCC"><span style=color:white;> Fair enough! </span></P></Sync>
+<Sync Start="1125120"><P class="ENCC"><span style=color:#11FF11;> Today we are voting </span><br><span style=color:#11FF11;> for Kat and Clare. </span></P></Sync>
+<Sync Start="1129000"><P class="ENCC"><span style=color:cyan;> Since we've been here, your actions </span><br><span style=color:cyan;> in front of and behind the camera </span></P></Sync>
+<Sync Start="1132560"><P class="ENCC"><span style=color:cyan;> have been worthy and we think </span><br><span style=color:cyan;> you deserve an Oscar. </span></P></Sync>
+<Sync Start="1136560"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1136600"><P class="ENCC"><span style=color:cyan;> Every time we do an activity, </span><br><span style=color:cyan;> who's in the front? </span></P></Sync>
+<Sync Start="1140600"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1140640"><P class="ENCC"><span style=color:cyan;> Every time we do something, </span><br><span style=color:cyan;> who's in the front? </span></P></Sync>
+<Sync Start="1143120"><P class="ENCC"><span style=color:cyan;> It's like, "Look at me! </span><br><span style=color:cyan;> I'm in front of the camera! Hello!" </span></P></Sync>
+<Sync Start="1147120"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1147680"><P class="ENCC"><span style=color:white;> On behalf of Joe and Marlon, </span></P></Sync>
+<Sync Start="1150600"><P class="ENCC"><span style=color:white;> they would like their vote to </span><br><span style=color:white;> go this evening to Bill and Rae. </span></P></Sync>
+<Sync Start="1154600"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1155320"><P class="ENCC"><span style=color:white;> They feel they don't really </span><br><span style=color:white;> have anything in common with you, </span></P></Sync>
+<Sync Start="1159320"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1159360"><P class="ENCC"><span style=color:white;> and don't really know you that well. </span></P></Sync>
+<Sync Start="1161680"><P class="ENCC"><span style=color:cyan;> That's OK. </span></P></Sync>
+<Sync Start="1162760"><P class="ENCC"><span style=color:white;> That's their vote cast. Thank you. </span></P></Sync>
+<Sync Start="1166520"><P class="ENCC"><span style=color:cyan;> Today, our vote goes out </span><br><span style=color:cyan;> to Phil and Jacky. </span></P></Sync>
+<Sync Start="1170240"><P class="ENCC"><span style=color:cyan;> The reason for it </span><br><span style=color:cyan;> is nothing personal, </span></P></Sync>
+<Sync Start="1173120"><P class="ENCC"><span style=color:cyan;> other than we've not </span><br><span style=color:cyan;> got to know them </span></P></Sync>
+<Sync Start="1175760"><P class="ENCC"><span style=color:cyan;> as much as the other </span><br><span style=color:cyan;> people within the group. </span></P></Sync>
+<Sync Start="1178360"><P class="ENCC"><span style=color:#11FF11;> Today, we're voting </span><br><span style=color:#11FF11;> for Phil and Jacky. </span></P></Sync>
+<Sync Start="1181320"><P class="ENCC"><span style=color:white;> Today we've done some fun activities, </span></P></Sync>
+<Sync Start="1183840"><P class="ENCC"><span style=color:white;> we have been at a </span><br><span style=color:white;> water park this afternoon, </span></P></Sync>
+<Sync Start="1186240"><P class="ENCC"><span style=color:white;> and you just were moaning </span><br><span style=color:white;> all the time. </span></P></Sync>
+<Sync Start="1189120"><P class="ENCC"><span style=color:white;> I mean, you can't not have fun here! </span></P></Sync>
+<Sync Start="1191680"><P class="ENCC"><span style=color:white;> Jacky didn't want to do </span><br><span style=color:white;> any of the rides. </span></P></Sync>
+<Sync Start="1194240"><P class="ENCC"><span style=color:white;> Phil was complaining </span><br><span style=color:white;> cos he'd done it before, </span></P></Sync>
+<Sync Start="1196640"><P class="ENCC"><span style=color:white;> but he hadn't done it here, he'd </span><br><span style=color:white;> done it at another place years ago. </span></P></Sync>
+<Sync Start="1199160"><P class="ENCC"><span style=color:white;> but he hadn't done it here, he'd </span><br><span style=color:white;> done it at another place years ago. </span><br><span style=color:#11FF11;> He was very scared! </span></P></Sync>
+<Sync Start="1200200"><P class="ENCC"><span style=color:white;> Just lighten up, man! </span></P></Sync>
+<Sync Start="1201400"><P class="ENCC"><span style=color:white;> If you can't lighten up </span><br><span style=color:white;> about this, then... </span></P></Sync>
+<Sync Start="1204120"><P class="ENCC"><span style=color:white;> I can't be doing with moaning, mate. </span></P></Sync>
+<Sync Start="1207520"><P class="ENCC"><span style=color:cyan;> I thought I didn't moan. </span><br><span style=color:cyan;> It must have been someone else. </span></P></Sync>
+<Sync Start="1210640"><P class="ENCC"><span style=color:cyan;> That leaves two. </span></P></Sync>
+<Sync Start="1212000"><P class="ENCC"><span style=color:white;> Clever. </span></P></Sync>
+<Sync Start="1213960"><P class="ENCC"><span style=color:white;> Today, our vote also goes </span><br><span style=color:white;> to Jacky and Phil. </span></P></Sync>
+<Sync Start="1217960"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1221000"><P class="ENCC"><span style=color:#11FF11;> We're all quite irritated by 'em </span></P></Sync>
+<Sync Start="1222800"><P class="ENCC"><span style=color:#11FF11;> and we can't vote </span><br><span style=color:#11FF11;> for Joe and Marlon, </span></P></Sync>
+<Sync Start="1225560"><P class="ENCC"><span style=color:#11FF11;> not that I think anyone would, </span></P></Sync>
+<Sync Start="1227720"><P class="ENCC"><span style=color:#11FF11;> and Rae and Bill </span><br><span style=color:#11FF11;> are quite inoffensive. </span></P></Sync>
+<Sync Start="1229880"><P class="ENCC"><span style=color:white;> Yeah, they've been really trying </span><br><span style=color:white;> today and yesterday as well. </span></P></Sync>
+<Sync Start="1233200"><P class="ENCC"><span style=color:white;> So, Phil and Jacky, sorry. </span></P></Sync>
+<Sync Start="1237200"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1237800"><P class="ENCC"><span style=color:#11FF11;> Today, we are voting </span><br><span style=color:#11FF11;> for Phil and Jacky. </span></P></Sync>
+<Sync Start="1240920"><P class="ENCC"><span style=color:#11FF11;> The reason being we have found Phil </span><br><span style=color:#11FF11;> has a bad attitude to the group </span></P></Sync>
+<Sync Start="1244920"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1247440"><P class="ENCC"><span style=color:#11FF11;> and all the activities that </span><br><span style=color:#11FF11;> seem to be going on for them. </span></P></Sync>
+<Sync Start="1250440"><P class="ENCC"><span style=color:white;> We've tried and he just comes back </span><br><span style=color:white;> at you with something </span></P></Sync>
+<Sync Start="1254440"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1254880"><P class="ENCC"><span style=color:white;> quite horrible every time. </span></P></Sync>
+<Sync Start="1256480"><P class="ENCC"><span style=color:white;> It might be his sense of humour, </span><br><span style=color:white;> he might think he's being funny. </span></P></Sync>
+<Sync Start="1260480"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1261560"><P class="ENCC"><span style=color:white;> But no, he's just horrible! </span></P></Sync>
+<Sync Start="1264280"><P class="ENCC"><span style=color:cyan;> We don't like him. </span></P></Sync>
+<Sync Start="1266360"><P class="ENCC"><span style=color:white;> Well, ladies and gentlemen, </span><br><span style=color:white;> the results of this evening's vote, </span></P></Sync>
+<Sync Start="1269960"><P class="ENCC"><span style=color:white;> with four votes and your second </span><br><span style=color:white;> yellow card goes to Jacky and Phil, </span></P></Sync>
+<Sync Start="1273960"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1274200"><P class="ENCC"><span style=color:white;> and unfortunately </span><br><span style=color:white;> that turns into a red card, </span></P></Sync>
+<Sync Start="1277560"><P class="ENCC"><span style=color:white;> so unfortunately I ask you to go </span><br><span style=color:white;> to the coach and take your bags off. </span></P></Sync>
+<Sync Start="1281080"><P class="ENCC"><span style=color:yellow;> So with four votes Phil and Jacky </span><br><span style=color:yellow;> receive their second yellow card </span></P></Sync>
+<Sync Start="1284960"><P class="ENCC"><span style=color:yellow;> and must now leave the trip, </span></P></Sync>
+<Sync Start="1286600"><P class="ENCC"><span style=color:yellow;> although it comes as no surprise. </span></P></Sync>
+<Sync Start="1289280"><P class="ENCC"><span style=color:cyan;> It was as clear as day. </span></P></Sync>
+<Sync Start="1291280"><P class="ENCC"><span style=color:cyan;> I want you to go, because we </span><br><span style=color:cyan;> want the original eight to stay. </span></P></Sync>
+<Sync Start="1295280"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1296680"><P class="ENCC"><span style=color:cyan;> To me that sounds like bad news, </span><br><span style=color:cyan;> stale show, the viewers turn off. </span></P></Sync>
+<Sync Start="1300680"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1304080"><P class="ENCC"><span style=color:white;> I think the finger thing was Phil </span><br><span style=color:white;> going, well it's the four couples, </span></P></Sync>
+<Sync Start="1308080"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1308960"><P class="ENCC"><span style=color:white;> we've got one vote, </span><br><span style=color:white;> I think he was counting us all off. </span></P></Sync>
+<Sync Start="1312000"><P class="ENCC"><span style=color:white;> But we're all stood in line </span><br><span style=color:white;> after one another, </span></P></Sync>
+<Sync Start="1314400"><P class="ENCC"><span style=color:white;> you don't need to make it obvious </span><br><span style=color:white;> we're all voting the same way. </span></P></Sync>
+<Sync Start="1317720"><P class="ENCC"><span style=color:white;> He didn't need to count... </span><br><span style=color:white;> Oh, whatever! </span></P></Sync>
+<Sync Start="1321240"><P class="ENCC"><span style=color:white;> He has actually annoyed me, </span><br><span style=color:white;> and I didn't think he would. </span></P></Sync>
+<Sync Start="1324200"><P class="ENCC"><span style=color:cyan;> We come on the show, because we </span><br><span style=color:cyan;> thought it would be interesting </span></P></Sync>
+<Sync Start="1328040"><P class="ENCC"><span style=color:cyan;> and we have found it interesting. </span><br><span style=color:cyan;> We've had a thoroughly good time. </span></P></Sync>
+<Sync Start="1331520"><P class="ENCC"><span style=color:cyan;> Not necessarily with </span><br><span style=color:cyan;> some of the people, </span></P></Sync>
+<Sync Start="1333680"><P class="ENCC"><span style=color:cyan;> but we've had </span><br><span style=color:cyan;> a thoroughly good time. </span></P></Sync>
+<Sync Start="1336680"><P class="ENCC"><span style=color:cyan;> And we'll go home now, </span><br><span style=color:cyan;> book a holiday, </span></P></Sync>
+<Sync Start="1338960"><P class="ENCC"><span style=color:cyan;> and go away for a couple of weeks. </span></P></Sync>
+<Sync Start="1340640"><P class="ENCC"><span style=color:yellow;> Having only been </span><br><span style=color:yellow;> on the tour for three days, </span></P></Sync>
+<Sync Start="1343120"><P class="ENCC"><span style=color:yellow;> Phil and Jacky didn't quite hit it </span><br><span style=color:yellow;> off with the other passengers </span></P></Sync>
+<Sync Start="1346360"><P class="ENCC"><span style=color:yellow;> and now in Faro they leave the trip </span></P></Sync>
+<Sync Start="1348840"><P class="ENCC"><span style=color:yellow;> and a new couple will take </span><br><span style=color:yellow;> their place on the coach. </span></P></Sync>
+<Sync Start="1352840"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1353200"><P class="ENCC"><span style=color:yellow;> Next Time on Coach Trip. </span></P></Sync>
+<Sync Start="1355240"><P class="ENCC"><span style=color:yellow;> The tourists continue </span><br><span style=color:yellow;> through the Algarve </span></P></Sync>
+<Sync Start="1358000"><P class="ENCC"><span style=color:yellow;> and arrive at the town of Lagos, </span></P></Sync>
+<Sync Start="1360680"><P class="ENCC"><span style=color:yellow;> where Brendan gets time to himself. </span></P></Sync>
+<Sync Start="1362720"><P class="ENCC"><span style=color:white;> You know what it's like, </span><br><span style=color:white;> when the cat's away, the mice play. </span></P></Sync>
+<Sync Start="1366720"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1367800"><P class="ENCC"><span style=color:yellow;> And it's time for some home </span><br><span style=color:yellow;> truths at voting time. </span></P></Sync>
+<Sync Start="1371800"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1371960"><P class="ENCC"><span style=color:white;> I'd like anybody to tell me, </span><br><span style=color:white;> honestly, </span></P></Sync>
+<Sync Start="1375440"><P class="ENCC"><span style=color:white;> whether you was going to </span><br><span style=color:white;> start voting for 'em now. </span></P></Sync>
+<Sync Start="1379440"><P class="ENCC">&nbsp;</P></Sync>
+<Sync Start="1387440"><P class="ENCC"><span style=color:white;> Subtitles by </span><br><span style=color:white;> Red Bee Media Ltd </span></P></Sync><span style=color:white;>  </span>
+<Sync Start="1391000"><P class="ENCC">&nbsp;</P></Sync>
+
+
+</Body>
+</SAMI>
+
+
+

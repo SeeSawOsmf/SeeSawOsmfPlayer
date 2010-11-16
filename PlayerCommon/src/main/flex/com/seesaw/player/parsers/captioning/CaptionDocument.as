@@ -20,32 +20,24 @@
  *    Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.subtitle.parser {
-public class CaptionSync {
+package com.seesaw.player.parsers.captioning {
+public class CaptionDocument {
 
-    private var _display:String;
+    private var _captions:Vector.<CaptionSync>;
 
-    private var _time:Number;
-
-    public function CaptionSync(display:String = "", time:Number = 0.0) {
-        _display = display;
-        _time = time;
+    public function CaptionDocument(captions:Vector.<CaptionSync> = null) {
+        if (captions == null) {
+            captions = new Vector.<CaptionSync>;
+        }
+        _captions = captions;
     }
 
-    public function get display():String {
-        return _display;
+    public function get captions():Vector.<CaptionSync> {
+        return _captions;
     }
 
-    public function set display(value:String):void {
-        _display = value;
-    }
-
-    public function get time():Number {
-        return _time;
-    }
-
-    public function set time(value:Number):void {
-        _time = value;
+    public function set captions(value:Vector.<CaptionSync>):void {
+        _captions = value;
     }
 }
 }

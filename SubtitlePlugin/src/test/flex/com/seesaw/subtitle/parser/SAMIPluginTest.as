@@ -20,13 +20,14 @@
  *    Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.subtitle {
-import org.osmf.media.MediaElement;
+package com.seesaw.subtitle.parser {
+public class SAMIPluginTest {
 
-public class SubtitlePlugin extends MediaElement {
-    public function SubtitlePlugin() {
+    private static const RESOURCE_URL = "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/s/ccp/00000025/2540.smi";
+
+    [Test]
+    public function canLoadSAMI() {
+
     }
-
-
 }
 }

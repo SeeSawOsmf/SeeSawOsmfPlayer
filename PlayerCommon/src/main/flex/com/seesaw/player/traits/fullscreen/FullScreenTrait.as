@@ -19,30 +19,30 @@
  *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
  *    Incorporated. All Rights Reserved.
  */
+package com.seesaw.player.traits.fullscreen {
+import com.seesaw.player.events.FullScreenEvent;
 
-package uk.co.vodco.canvasPoc {
-import flash.display.Sprite;
-import flash.text.TextField;
-import flash.text.TextFieldAutoSize;
+import org.osmf.traits.MediaTraitBase;
 
-import org.as3commons.logging.ILogger;
-import org.as3commons.logging.LoggerFactory;
+[Event(name="fullscreenChange", type="com.seesaw.player.events.FullScreenEvent")]
 
-[SWF(width=1280, height=720)]
-public class Start extends Sprite {
+public class FullScreenTrait extends MediaTraitBase {
 
-    private var logger:ILogger = LoggerFactory.getClassLogger(Start);
+    private var _fullscreen:Boolean;
 
+    public static const FULL_SCREEN:String = "fullscreen";
 
-    public function Start() {
+    public function FullScreenTrait() {
+        super(FULL_SCREEN);
+    }
 
-        var textField:TextField = new TextField();
-        textField.text = "Hello World";
-        textField.autoSize = TextFieldAutoSize.LEFT;
-        textField.visible = true;
-        textField.textColor = 0xFF0000;
-        addChild(textField);
+    public function get fullscreen():Boolean {
+        return _fullscreen;
+    }
 
+    public function set fullscreen(value:Boolean):void {
+        _fullscreen = value;
+        dispatchEvent(new FullScreenEvent(value));
     }
 }
 }

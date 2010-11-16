@@ -21,16 +21,22 @@
  */
 
 package com.seesaw.subtitle.parser {
+import com.seesaw.player.captioning.sami.SAMIParser;
+import com.seesaw.player.parsers.captioning.CaptionDocument;
+import com.seesaw.player.parsers.captioning.CaptionParser;
+import com.seesaw.player.parsers.captioning.CaptionSync;
+
 import org.hamcrest.assertThat;
 import org.hamcrest.object.equalTo;
 import org.hamcrest.object.notNullValue;
 
-public class SamiParserTest {
+public class SAMIParserTest {
 
     [Test]
-    public function canParseSami() {
-        var parser:CaptionParser = new SamiParser();
-        var captions:Vector.<CaptionSync> = parser.parse(VALID_SAMI);
+    public function canParseSAMI() {
+        var parser:CaptionParser = new SAMIParser();
+        var captionDoc:CaptionDocument = parser.parse(VALID_SAMI);
+        var captions:Vector.<CaptionSync> = captionDoc.captions;
 
         assertThat(captions, notNullValue());
         assertThat(captions.length, equalTo(3));

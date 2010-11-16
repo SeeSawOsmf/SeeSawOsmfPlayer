@@ -128,7 +128,6 @@
         <dependency>
             <artifactId>AdProxyPlugin</artifactId>
             <groupId>com.seesaw</groupId>
-            <version>${pom.version}</version>
             <type>swc</type>
         </dependency>
         <dependency>
@@ -139,7 +138,11 @@
         <dependency>
             <artifactId>AutoResumeProxy</artifactId>
             <groupId>com.seesaw</groupId>
-            <version>${pom.version}</version>
+            <type>swc</type>
+        </dependency>
+        <dependency>
+            <artifactId>SubtitlePlugin</artifactId>
+            <groupId>com.seesaw</groupId>
             <type>swc</type>
         </dependency>
         <dependency>

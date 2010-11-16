@@ -20,10 +20,8 @@
  *    Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.subtitle.parser {
-import com.seesaw.subtitle.parser.CaptionSync;
-
+package com.seesaw.player.parsers.captioning {
 public interface CaptionParser {
-    function parse(strSubs:String):Vector.<CaptionSync>;
+    function parse(strSubs:String):CaptionDocument;
 }
 }

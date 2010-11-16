@@ -21,6 +21,8 @@
  */
 
 package com.seesaw.player.preventscrub {
+import com.seesaw.player.PlayerConstants;
+
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.media.MediaElement;
@@ -57,9 +59,7 @@ public class ScrubPreventionProxyPluginInfo extends PluginInfo {
         var result:Boolean;
 
         if (resource != null) {
-            var settings:Metadata
-                    = resource.getMetadataValue("contentId") as Metadata;
-
+            var settings:Metadata = resource.getMetadataValue(PlayerConstants.CONTENT_ID) as Metadata;
             result = settings != null;
         }
 

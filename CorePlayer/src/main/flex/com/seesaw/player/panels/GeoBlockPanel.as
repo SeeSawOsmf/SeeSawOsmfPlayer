@@ -1,12 +1,30 @@
+/*
+ * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
+ *
+ *    The contents of this file are subject to the Mozilla Public License
+ *    Version 1.1 (the "License"); you may not use this file except in
+ *    compliance with the License. You may obtain a copy of the
+ *    License athttp://www.mozilla.org/MPL/
+ *
+ *    Software distributed under the License is distributed on an "AS IS"
+ *    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *    License for the specific language governing rights and limitations
+ *    under the License.
+ *
+ *    The Initial Developer of the Original Code is ioko365 Ltd.
+ *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
+ *    Incorporated. All Rights Reserved.
+ *
+ *    The Initial Developer of the Original Code is ioko365 Ltd.
+ *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
+ *    Incorporated. All Rights Reserved.
+ */
+
 package com.seesaw.player.panels {
 import com.seesaw.player.ui.StyledTextField;
 
-import flash.display.Bitmap;
 import flash.display.Sprite;
 import flash.events.Event;
-import flash.events.MouseEvent;
-import flash.net.URLRequest;
-import flash.net.navigateToURL;
 import flash.system.Security;
 import flash.text.StyleSheet;
 import flash.text.TextField;
@@ -21,9 +39,9 @@ public class GeoBlockPanel extends Sprite {
     private var css:StyleSheet;
 
     /*Constructor
-    * Takes: warning:String - the guidance warning that appears at the top of the panel
-    *
-    */
+     * Takes: warning:String - the guidance warning that appears at the top of the panel
+     *
+     */
     public function GeoBlockPanel(warning:String) {
 
         //set the private variables
@@ -43,7 +61,7 @@ public class GeoBlockPanel extends Sprite {
     }
 
     private function positionPanel(event:Event):void {
-        this.x = (stage.stageWidth/2) - (this.width / 2);
+        this.x = (stage.stageWidth / 2) - (this.width / 2);
         this.y = (stage.stageHeight / 2) - (this.height / 2);
     }
 

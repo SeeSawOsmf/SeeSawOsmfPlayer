@@ -22,6 +22,7 @@
 
 package com.seesaw.player {
 import com.seesaw.player.buttons.PlayStartButton;
+import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.impl.services.ResumeServiceImpl;
 import com.seesaw.player.init.ServiceRequest;
 import com.seesaw.player.ioc.ObjectProvider;
@@ -206,6 +207,7 @@ public class Player extends Sprite {
 
         _videoInfo = xmlDoc;
         _playerInit.appendChild(<resume>{resumeValue}</resume>);
+
         if (_videoInfo.geoblocked == "true") {
             // TODO: show the geoblock panel
             return;
@@ -249,6 +251,11 @@ public class Player extends Sprite {
         resource.addMetadataValue(PlayerConstants.CONTENT_ID, metaSettings);
         resource.addMetadataValue(PlayerConstants.CONTENT_INFO, _playerInit);
         resource.addMetadataValue(PlayerConstants.VIDEO_INFO, _videoInfo);
+
+        var subtitleMetadata:Metadata = new Metadata();
+        // TODO: this is here for dev purposes - not all videos will have subtitles
+        subtitleMetadata.addValue(SAMIPluginInfo.METADATA_KEY_URI, "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/s/ccp/00000025/2540.smi");
+        resource.addMetadataValue(SAMIPluginInfo.METADATA_NAMESPACE, subtitleMetadata);
 
         return resource;
     }
