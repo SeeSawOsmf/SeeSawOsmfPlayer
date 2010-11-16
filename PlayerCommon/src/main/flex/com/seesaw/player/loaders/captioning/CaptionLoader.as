@@ -67,15 +67,14 @@ public class CaptionLoader extends LoaderBase {
 
                 try {
                     captioningDocument = parser.parse(httpLoadTrait.urlLoader.data.toString());
+
+                    CaptionLoadTrait(loadTrait).document = captioningDocument;
+                    updateLoadTrait(loadTrait, LoadState.READY);
                 }
                 catch(e:Error) {
                     logger.debug("Error parsing captioning document: " + e.errorID + "-" + e.message);
                     updateLoadTrait(loadTrait, LoadState.LOAD_ERROR);
                 }
-
-                CaptionLoadTrait(loadTrait).document = captioningDocument;
-                updateLoadTrait(loadTrait, LoadState.READY);
-
             }
             else if (event.newState == LoadState.LOAD_ERROR) {
                 // This is a terminal state, so remove the listener.  But

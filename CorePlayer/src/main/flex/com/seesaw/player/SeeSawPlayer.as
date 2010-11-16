@@ -104,7 +104,8 @@ public class SeeSawPlayer extends Sprite {
         ///       config.factory.loadPlugin(new PluginInfoResource(new PlaylistPluginInfo()));
 
         logger.debug("creating video element");
-        _videoElement = new BufferManager(0.5, 5, config.factory.createMediaElement(config.resource));
+        _videoElement = config.factory.createMediaElement(config.resource);
+        //_videoElement = new BufferManager(0.5, 5, _videoElement);
 
         if (_videoElement == null) {
             throw ArgumentError("failed to create main media element for player");

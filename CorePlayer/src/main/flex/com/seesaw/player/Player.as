@@ -25,6 +25,7 @@ import com.seesaw.player.buttons.PlayStartButton;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.impl.services.ResumeServiceImpl;
 import com.seesaw.player.init.ServiceRequest;
+import com.seesaw.player.init.VideoInfoPluginInfo;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
@@ -43,7 +44,10 @@ import flash.events.Event;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.logging.Log;
+import org.osmf.media.MediaElement;
 import org.osmf.media.MediaResourceBase;
+import org.osmf.media.PluginInfoResource;
+import org.osmf.media.URLResource;
 import org.osmf.metadata.Metadata;
 
 [SWF(width=PLAYER::Width, height=PLAYER::Height, backgroundColor="#000000")]
@@ -179,7 +183,7 @@ public class Player extends Sprite {
     }
 
     private function onSuccessFromPlayerInit(response:Object):void {
-        logger.debug("received player init data for programme: " + response);
+        logger.debug("received player init data");
 
         var xmlDoc:XML = new XML(response);
         xmlDoc.ignoreWhitespace = true;
@@ -198,7 +202,7 @@ public class Player extends Sprite {
     }
 
     private function onSuccessFromVideoInfo(response:Object):void {
-        logger.debug("received programme data for programme: " + response);
+        logger.debug("received programme data");
 
         var xmlDoc:XML = new XML(response);
         xmlDoc.ignoreWhitespace = true;

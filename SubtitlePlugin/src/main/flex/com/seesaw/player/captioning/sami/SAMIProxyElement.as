@@ -69,7 +69,7 @@ public class SAMIProxyElement extends ProxyElement {
 
     private function onLoadStateChange(event:LoadEvent):void {
         if (event.loadState == LoadState.READY) {
-            var timelineMetadata:TimelineMetadata = proxiedElement.getMetadata(SAMIPluginInfo.METADATA_NAMESPACE) as TimelineMetadata;
+            var timelineMetadata:TimelineMetadata = proxiedElement.getMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) as TimelineMetadata;
 
             if (timelineMetadata == null) {
                 timelineMetadata = new TimelineMetadata(proxiedElement);
