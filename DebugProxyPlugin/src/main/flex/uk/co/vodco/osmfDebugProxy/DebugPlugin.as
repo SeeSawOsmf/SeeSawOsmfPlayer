@@ -20,7 +20,7 @@
  *    Incorporated. All Rights Reserved.
  */
 
-ackage uk.co.vodco.osmfDebugProxy {
+package uk.co.vodco.osmfDebugProxy {
 import flash.display.Sprite;
 
 import org.osmf.media.PluginInfo;

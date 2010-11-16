@@ -189,10 +189,12 @@ public class SeesawSMILMediaGenerator {
         var dsr:DynamicStreamingResource = null;
         var streamItems:Vector.<DynamicStreamingItem> = new Vector.<DynamicStreamingItem>();
 
+        var videoElement:SMILMediaElement = null;
+
         for (var i:int = 0; i < switchElement.numChildren; i++) {
             var smilElement:SMILElement = switchElement.getChildAt(i);
             if (smilElement.type == SMILElementType.VIDEO) {
-                var videoElement:SMILMediaElement = smilElement as SMILMediaElement;
+                videoElement = smilElement as SMILMediaElement;
 
                 // We need to divide the bitrate by 1000 because the DynamicStreamingItem class
                 // requires the bitrate in kilobits per second.
@@ -202,7 +204,15 @@ public class SeesawSMILMediaGenerator {
         }
 
         if (streamItems.length) {
+
             dsr = new DynamicStreamingResource(hostURL);
+
+            if (!isNaN(videoElement.clipBegin) && videoElement.clipBegin > 0 &&
+                    !isNaN(videoElement.clipEnd) && videoElement.clipEnd > 0) {
+                dsr.clipStartTime = videoElement.clipBegin;
+                dsr.clipEndTime = videoElement.clipEnd;
+            }
+
             dsr.streamItems = streamItems;
             dsr.streamType = StreamType.LIVE_OR_RECORDED;
         }
