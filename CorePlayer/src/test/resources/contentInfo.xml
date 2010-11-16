@@ -27,8 +27,6 @@
     <firstPresentationBrand>BBC</firstPresentationBrand>
     <seriesId>11288</seriesId>
     <seriesTitle>South Park Season 5</seriesTitle>
-    <programmeId>8973</programmeId>
-    <!--  <programmeId>11291</programmeId>-->
     <programmeTitle>South Park programme 2</programmeTitle>
     <tvAgeRating>16</tvAgeRating>
     <filmAgeRating>U</filmAgeRating>
@@ -37,8 +35,6 @@
     <catchup>false</catchup>
     <brandId>05d80ae8-42c0-496f-a0ae-5a8cd1ddbe09</brandId>
     <brandTitle>The Line of Beauty</brandTitle>
-    <publisherId>1373</publisherId>
-    <!--   <publisherId>1332</publisherId> -->
     <loggingSheet>
         <break>
             <breakOffset>00:03:00.00</breakOffset>
@@ -69,4 +65,11 @@
         http://kgd-red-dev-zxtm01.dev.vodco.co.uk/player.playerinitialisation:videoinfo?t:ac=TV:ENTERTAINMENT/p/12001018002/South-Park-programme-2
     </videoInfoUrl>
     <largeImageUrl>http://kgd-red-dev-zxtm01.dev.vodco.co.uk/i/ccp/programs/Large.jpg</largeImageUrl>
+    <adType>not-liverail</adType>
+    <liverail>
+        <publisherId>1373</publisherId>
+        <!--   <publisherId>1332</publisherId> -->
+        <programmeId>8973</programmeId>
+        <!--  <programmeId>11291</programmeId>-->
+    </liverail>
 </contentInfo> 

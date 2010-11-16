@@ -155,7 +155,8 @@ public class PlaylistlElement extends ProxyElement {
             if (value) {
                 _proxiedElement = value;
                 if (!autoResume) {
-                    autoResume = _proxiedElement.resource.getMetadataValue("contentInfo").resume as Number;
+                    //   autoResume = _proxiedElement.resource.getMetadataValue("contentInfo").resume as Number;
+                    autoResume = 3000;
                 }
                 _proxiedElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
                 _proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
@@ -230,27 +231,30 @@ public class PlaylistlElement extends ProxyElement {
     }
 
     private function setUpTimeListeners(added:Boolean):void {
-        instreamAdProxiedElementTimeTrait = _instreamAdElement.getTrait(MediaTraitType.TIME) as TimeTrait;
-        if (instreamAdProxiedElementTimeTrait) {
-            instreamAdProxiedElementTimeTrait.addEventListener(TimeEvent.COMPLETE, onComplete);
+        if (_instreamAdElement) {
+            instreamAdProxiedElementTimeTrait = _instreamAdElement.getTrait(MediaTraitType.TIME) as TimeTrait;
+            if (instreamAdProxiedElementTimeTrait) {
+                instreamAdProxiedElementTimeTrait.addEventListener(TimeEvent.COMPLETE, onComplete);
+            }
         }
     }
 
 
     private function togglePlayListeners(added:Boolean):void {
-        var play:PlayTrait = _instreamAdElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
+        if (_instreamAdElement) {
+            var play:PlayTrait = _instreamAdElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
 
-        if (play) {
+            if (play) {
 
-            ( _instreamAdElement.getTrait(MediaTraitType.PLAY) as PlayTrait ).play();
-            _adTrait.started();
+                ( _instreamAdElement.getTrait(MediaTraitType.PLAY) as PlayTrait ).play();
+                _adTrait.started();
 
+            }
         }
     }
 
     private function toggleSeekListeners(added:Boolean):void {
         var seek:SeekTrait = _proxiedElement.getTrait(MediaTraitType.SEEK) as SeekTrait;
-
         if (seek) {
             seek.seek(autoResume);
             seek.addEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
@@ -329,6 +333,7 @@ public class PlaylistlElement extends ProxyElement {
         if (_proxiedElement.hasTrait(MediaTraitType.PLAY)) {
             ( _proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait ).play();
             _adTrait.stopped();
+
             _timer.start();
         }
     }

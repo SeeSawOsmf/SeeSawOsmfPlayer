@@ -27,7 +27,6 @@ import com.seesaw.player.init.ServiceRequest;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
-import com.seesaw.player.mockData.MockData;
 import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.panels.GuidanceBar;
 import com.seesaw.player.panels.GuidancePanel;
@@ -241,7 +240,7 @@ public class Player extends Sprite {
     private function createMediaResource(videoInfo:XML):DynamicSMILResource {
         logger.debug("creating media resource");
         // var resource:DynamicStream = new DynamicStream(videoInfo);
-        var resource:DynamicSMILResource = new DynamicSMILResource((MockData.smil));
+        var resource:DynamicSMILResource = new DynamicSMILResource((videoInfo));
 
         var metaSettings:Metadata = new Metadata();
         // Use this to check the resource is the mainContent, e.g. for the AdProxypPlugins

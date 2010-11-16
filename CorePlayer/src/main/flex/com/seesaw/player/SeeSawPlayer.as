@@ -28,6 +28,7 @@ import com.seesaw.player.components.ControlBarComponent;
 import com.seesaw.player.components.MediaComponent;
 import com.seesaw.player.events.FullScreenEvent;
 import com.seesaw.player.fullscreen.FullScreenProxyPluginInfo;
+import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
 import com.seesaw.player.smil.SMILPluginInfo;
 import com.seesaw.player.traits.FullScreenTrait;
@@ -46,6 +47,8 @@ import org.osmf.media.PluginInfoResource;
 import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
 
 public class SeeSawPlayer extends Sprite {
+
+    use namespace contentinfo;
 
     private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
 
@@ -92,11 +95,11 @@ public class SeeSawPlayer extends Sprite {
         config.factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         config.factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
 
-        if (config.adModuleType == "com.seesaw.player.ads.liverail")
+        if (config.resource.getMetadataValue("contentInfo").adType == config.adModuleType)
             config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
 
         ///      if (config.adModuleType == "com.seesaw.player.ads.serial")
-        ///       config.factory.loadPlugin(new PluginInfoResource(new PlaylistPluginInfo()));
+        //      config.factory.loadPlugin(new PluginInfoResource(new PlaylistPluginInfo()));
 
         logger.debug("creating video element");
         _videoElement = new BufferManager(0.5, 5, config.factory.createMediaElement(config.resource));

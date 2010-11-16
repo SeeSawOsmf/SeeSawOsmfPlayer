@@ -77,11 +77,21 @@ public class MockData {
 
     public static function get smil():XML {
         var xml:XML = new XML('<smil><head><meta base="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703" /></head>' +
-                '<body><switch>' +
-                '<video src="mp4:e5/INTERNAL/sintel-2048-stereo_1500kbs.mp4" system-bitrate="500000" width="512" />' +
-                '<video src="mp4:e5/INTERNAL/sintel-2048-stereo_1500kbs.mp4" system-bitrate="800000" width="720" />' +
-                '<video src="mp4:e5/INTERNAL/sintel-2048-stereo_1500kbs.mp4" system-bitrate="1500000" width="1080"/>' +
-                '</switch></body></smil>');
+                '<body><seq>' +
+                '<switch>' +
+                '<video src="mp4:e5/INTERNAL/sintel-2048-stereo_500kbs.mp4" system-bitrate="500000" width="512" clipEnd="60s" dur="60s"/>' +
+                '<video src="mp4:e5/INTERNAL/sintel-2048-stereo_796kbs.mp4" system-bitrate="800000" width="720"  clipEnd="60s" dur="60s"/>' +
+                '<video src="mp4:e5/INTERNAL/sintel-2048-stereo_1500kbs.mp4" system-bitrate="1500000" width="1080"  clipEnd="60s" dur="60s"/>' +
+                '</switch>' +
+                '<seq>' +
+                '<par> ' +
+                '<video region="content" src="http://mediapm.edgesuite.net/strobe/content/test/SpaceAloneHD_sounas_640_500_short.flv" />  ' +
+                '</par>' +
+                '<video region="content" src="http://mediapm.edgesuite.net/strobe/content/test/AFaerysTale_sylviaApostol_640_500_short.flv" />  ' +
+                '<video region="content" src="http://mediapm.edgesuite.net/strobe/content/test/elephants_dream_768x428_24_short.flv" />   ' +
+                '</seq></seq>' +
+                '</body>' +
+                '</smil>');
 
         return xml;
 
