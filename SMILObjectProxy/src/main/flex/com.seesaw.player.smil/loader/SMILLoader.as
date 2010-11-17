@@ -20,6 +20,7 @@
  *    Incorporated. All Rights Reserved.
  */
 package com.seesaw.player.smil.loader {
+import com.seesaw.player.smil.media.SeesawSMILMediaGenerator;
 import com.seesaw.player.smil.resource.DynamicSMILResource;
 
 import org.osmf.elements.proxyClasses.LoadFromDocumentLoadTrait;
@@ -31,7 +32,6 @@ import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.metadata.MetadataNamespaces;
-import org.osmf.smil.media.SMILMediaGenerator;
 import org.osmf.smil.model.SMILDocument;
 import org.osmf.smil.parser.SMILParser;
 import org.osmf.traits.LoadState;
@@ -113,8 +113,8 @@ public class SMILLoader extends LoaderBase {
     /**
      * Override to provide a custom media generator.
      */
-    protected function createMediaGenerator():SMILMediaGenerator {
-        return new SMILMediaGenerator();
+    protected function createMediaGenerator():SeesawSMILMediaGenerator {
+        return new SeesawSMILMediaGenerator();
     }
 
     /**
@@ -125,7 +125,7 @@ public class SMILLoader extends LoaderBase {
     }
 
     private function finishLoad(loadTrait:LoadTrait, smilDocument:SMILDocument):void {
-        var mediaGenerator:SMILMediaGenerator = createMediaGenerator();
+        var mediaGenerator:SeesawSMILMediaGenerator = createMediaGenerator();
 
         // Listen for created elements so that we can add the "derived" resource metadata
         // to them.  Use a high priority so that we can add the metadata before clients

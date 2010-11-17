@@ -56,6 +56,11 @@
             <groupId>com.seesaw</groupId>
             <type>swc</type>
         </dependency>
+        <dependency>
+            <artifactId>PlayerCommon</artifactId>
+            <groupId>com.seesaw</groupId>
+            <type>swc</type>
+        </dependency>
 
         <dependency>
             <groupId>com.adobe</groupId>

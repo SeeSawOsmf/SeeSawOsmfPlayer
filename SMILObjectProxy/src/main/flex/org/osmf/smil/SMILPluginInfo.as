@@ -19,41 +19,45 @@
  * Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
  * Incorporated. All Rights Reserved.
  */
-package com.seesaw.player.smil {
-import com.seesaw.player.smil.elements.SMILElement;
-import com.seesaw.player.smil.loader.SMILLoader;
-
+package org.osmf.smil
+{
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaFactoryItem;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfo;
+import org.osmf.smil.elements.SMILElement;
+import org.osmf.smil.loader.SMILLoader;
 
 /**
- * Encapsulation of the SMIL plugin.
- */
-public class SMILPluginInfo extends PluginInfo {
-    /**
-     * Constructor.
-     */
-    public function SMILPluginInfo() {
-        var items:Vector.<MediaFactoryItem> = new Vector.<MediaFactoryItem>();
-
-        var item:MediaFactoryItem = new MediaFactoryItem("org.osmf.smil.SMILPluginInfo", new SMILLoader().canHandleResource, createSMILProxyElement);
-        items.push(item);
-
-        super(items);
-    }
-
-    private function createSMILProxyElement():MediaElement {
-        return new SMILElement(null, new SMILLoader(mediaFactory));
-    }
-
-    override public function initializePlugin(resource:MediaResourceBase):void {
-        // We'll use the player-supplied MediaFactory for creating all MediaElements.
-        mediaFactory = resource.getMetadataValue(PluginInfo.PLUGIN_MEDIAFACTORY_NAMESPACE) as MediaFactory;
-    }
-
-    private var mediaFactory:MediaFactory;
-}
+	 * Encapsulation of the SMIL plugin.
+	 */
+	public class SMILPluginInfo extends PluginInfo
+	{
+		/**
+		 * Constructor.
+		 */
+		public function SMILPluginInfo()
+		{
+			var items:Vector.<MediaFactoryItem> = new Vector.<MediaFactoryItem>();
+			
+			var item:MediaFactoryItem = new MediaFactoryItem("org.osmf.smil.SMILPluginInfo", new SMILLoader().canHandleResource, createSMILProxyElement);
+			items.push(item);
+			
+			super(items);
+		}
+		
+		private function createSMILProxyElement():MediaElement
+		{
+			return new SMILElement(null, new SMILLoader(mediaFactory));
+		}
+		
+		override public function initializePlugin(resource:MediaResourceBase):void
+		{
+			// We'll use the player-supplied MediaFactory for creating all MediaElements.
+			mediaFactory = resource.getMetadataValue(PluginInfo.PLUGIN_MEDIAFACTORY_NAMESPACE) as MediaFactory;
+		}
+		
+		private var mediaFactory:MediaFactory;
+	}
 }
