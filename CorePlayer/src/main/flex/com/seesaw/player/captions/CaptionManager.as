@@ -22,7 +22,11 @@
 
 package com.seesaw.player.captions {
 import flash.display.Sprite;
+import flash.events.Event;
+import flash.filters.BitmapFilterQuality;
+import flash.filters.GlowFilter;
 import flash.text.TextField;
+import flash.text.TextFieldAutoSize;
 import flash.text.TextFormat;
 import flash.text.TextFormatAlign;
 
@@ -30,6 +34,7 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.TimelineMetadataEvent;
+import org.osmf.logging.Logger;
 import org.osmf.media.MediaElement;
 import org.osmf.metadata.CuePoint;
 import org.osmf.metadata.TimelineMetadata;
@@ -71,27 +76,42 @@ public class CaptionManager extends Sprite {
     private function onCuePoint(event:TimelineMetadataEvent):void {
         var cuePoint:CuePoint = event.marker as CuePoint;
         if (cuePoint) {
-            logger.debug("cuePoint.time=" + cuePoint.time + ", value = " + cuePoint.parameters);
+            //logger.debug("cuePoint.time=" + cuePoint.time + ", value = " + cuePoint.parameters);
             _captionField.htmlText = cuePoint.parameters as String;
+            _captionField.dispatchEvent(new Event('REPOSITION'));
         }
     }
 
     private function createCaptions():void {
         if (_captionField == null) {
-            var captionSprite:Sprite = new Sprite();
 
             _captionField = new TextField();
-            _captionField.width = stage.width;
+            _captionField.width = stage.stageWidth;
             _captionField.htmlText = "";
-            _captionField.y = stage.height - 25;
+            _captionField.multiline = true;
+            _captionField.autoSize = TextFieldAutoSize.CENTER;
 
             var format:TextFormat = new TextFormat();
             format.align = TextFormatAlign.CENTER;
+            format.size = 16;
+            format.font = 'Arial';
             _captionField.defaultTextFormat = format;
 
-            captionSprite.addChild(_captionField);
-            addChild(captionSprite);
+            var outline:GlowFilter=new GlowFilter(0x000000,1.0,2.0,2.0,10);
+
+            outline.quality=BitmapFilterQuality.MEDIUM;
+
+            _captionField.filters=[outline];
+
+            _captionField.addEventListener(Event.ADDED_TO_STAGE, this.positionSubtitles);
+            _captionField.addEventListener("REPOSITION", this.positionSubtitles);
+
+            addChild(_captionField);
         }
+    }
+
+    private function positionSubtitles(event:Event):void {
+        event.target.y = stage.stageHeight - (event.target.height + 27);
     }
 }
 }
