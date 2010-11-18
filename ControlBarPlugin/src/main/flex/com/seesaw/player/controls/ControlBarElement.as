@@ -20,6 +20,7 @@
  *    Incorporated. All Rights Reserved.
  */
 package com.seesaw.player.controls {
+import com.seesaw.player.controls.widget.ControlBar;
 import com.seesaw.player.controls.widget.FullScreen;
 import com.seesaw.player.controls.widget.PauseButton;
 import com.seesaw.player.controls.widget.PlayButton;
@@ -28,6 +29,7 @@ import com.seesaw.player.controls.widget.SubtitlesButton;
 import com.seesaw.player.controls.widget.Volume;
 import com.seesaw.player.controls.widget.VolumeScrubBar;
 
+import flash.events.Event;
 import flash.utils.Dictionary;
 
 import org.as3commons.logging.ILogger;
@@ -234,6 +236,7 @@ public class ControlBarElement extends MediaElement {
         customWidgetList["com.seesaw.player.controls.widget.fullscreen"] = FullScreen;
         customWidgetList["com.seesaw.player.controls.widget.volume"] = Volume;
         customWidgetList["com.seesaw.player.controls.widget.volumescrubbar"] = VolumeScrubBar;
+        customWidgetList["com.seesaw.player.controls.widget.controlbar"] = ControlBar;
         //   customWidgetList["com.seesaw.player.controls.widget.lights"] = Lights;
         //   customWidgetList["com.seesaw.player.controls.widget.subtitles"] = SubTitles;
         //   customWidgetList["com.seesaw.player.controls.widget.tooltips"] = ToolTips;
