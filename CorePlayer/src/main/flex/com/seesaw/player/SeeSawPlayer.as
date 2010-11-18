@@ -23,11 +23,9 @@
 package com.seesaw.player {
 import com.seesaw.player.ads.AdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
-import com.seesaw.player.buffering.BufferManager;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.captions.CaptionManager;
 import com.seesaw.player.components.ControlBarComponent;
-import com.seesaw.player.components.MediaComponent;
 import com.seesaw.player.events.FullScreenEvent;
 import com.seesaw.player.fullscreen.FullScreenProxyPluginInfo;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
@@ -44,6 +42,8 @@ import org.osmf.events.MediaFactoryEvent;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.media.PluginInfoResource;
+
+import org.osmf.traits.MediaTraitType;
 
 import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
 
@@ -80,12 +80,24 @@ public class SeeSawPlayer extends Sprite {
 
     private function createMediaElementPlugins():void {
         logger.debug("adding control bar media element to container");
-        addMediaElement(new ControlBarComponent());
+
+        var controlBarComponent:ControlBarComponent = new ControlBarComponent();
+        var controlBarElement:MediaElement = controlBarComponent.createMediaElement(config.factory, _videoElement);
+        _rootElement.addChild(controlBarElement);
+
+       // controlBarElement.addEventListener(MediaElementEvent.TRAIT_ADD, onControlBarTraitsChange);
     }
 
-    private function addMediaElement(component:MediaComponent) {
-        var mediaElement:MediaElement = component.createMediaElement(config.factory, _videoElement);
-        _rootElement.addChild(mediaElement);
+    private function onControlBarTraitsChange(event:MediaElementEvent):void {
+        if (event.type == MediaElementEvent.TRAIT_ADD) {
+            if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
+
+            }
+        } else {
+            if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
+
+            }
+        }
     }
 
     private function createVideoElement():void {

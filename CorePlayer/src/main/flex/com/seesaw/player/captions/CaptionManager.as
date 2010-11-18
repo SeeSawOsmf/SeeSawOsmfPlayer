@@ -21,6 +21,8 @@
  */
 
 package com.seesaw.player.captions {
+import com.seesaw.player.controls.ControlBarMetadata;
+
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.filters.BitmapFilterQuality;
@@ -34,9 +36,9 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.TimelineMetadataEvent;
-import org.osmf.logging.Logger;
 import org.osmf.media.MediaElement;
 import org.osmf.metadata.CuePoint;
+import org.osmf.metadata.MetadataWatcher;
 import org.osmf.metadata.TimelineMetadata;
 
 public class CaptionManager extends Sprite {
@@ -44,11 +46,14 @@ public class CaptionManager extends Sprite {
     private var logger:ILogger = LoggerFactory.getClassLogger(CaptionManager);
 
     private var _captionMetadata:TimelineMetadata;
-
     private var _captionField:TextField;
+    private var _autoHideWatcher:MetadataWatcher;
+    private var _media:MediaElement;
+    private var _hidden:Boolean;
 
     public function CaptionManager(mediaElement:MediaElement) {
 
+        _media = mediaElement;
         _captionMetadata = mediaElement.getMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) as TimelineMetadata;
 
         if (_captionMetadata == null) {
@@ -57,6 +62,7 @@ public class CaptionManager extends Sprite {
         else {
             processTimelineMetadata(mediaElement);
         }
+        setupControlBarWatcher();
     }
 
     private function onMetadataAdd(event:MediaElementEvent):void {
@@ -82,6 +88,29 @@ public class CaptionManager extends Sprite {
         }
     }
 
+    private function setupControlBarWatcher():void {
+        if (_autoHideWatcher) {
+            _autoHideWatcher.unwatch();
+            _autoHideWatcher = null;
+        }
+
+        if (_media != null) {
+            _autoHideWatcher
+                    = new MetadataWatcher
+                    (_media.metadata
+                            , ControlBarMetadata.CONTROL_BAR_METADATA
+                            , ControlBarMetadata.CONTROL_BAR_HIDDEN
+                            , controlBarHiddenChangeCallback
+                            );
+            _autoHideWatcher.watch();
+        }
+    }
+
+    private function controlBarHiddenChangeCallback(value:Boolean):void {
+        logger.debug("control bar hidden: " + value);
+        _hidden = value;
+    }
+
     private function createCaptions():void {
         if (_captionField == null) {
 
@@ -97,11 +126,11 @@ public class CaptionManager extends Sprite {
             format.font = 'Arial';
             _captionField.defaultTextFormat = format;
 
-            var outline:GlowFilter=new GlowFilter(0x000000,1.0,2.0,2.0,10);
+            var outline:GlowFilter = new GlowFilter(0x000000, 1.0, 2.0, 2.0, 10);
 
-            outline.quality=BitmapFilterQuality.MEDIUM;
+            outline.quality = BitmapFilterQuality.MEDIUM;
 
-            _captionField.filters=[outline];
+            _captionField.filters = [outline];
 
             _captionField.addEventListener(Event.ADDED_TO_STAGE, this.positionSubtitles);
             _captionField.addEventListener("REPOSITION", this.positionSubtitles);
