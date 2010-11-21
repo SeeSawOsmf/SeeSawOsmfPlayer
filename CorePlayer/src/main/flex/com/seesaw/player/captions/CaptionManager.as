@@ -21,8 +21,14 @@
  */
 
 package com.seesaw.player.captions {
+import com.seesaw.player.controls.ControlBarMetadata;
+
 import flash.display.Sprite;
+import flash.events.Event;
+import flash.filters.BitmapFilterQuality;
+import flash.filters.GlowFilter;
 import flash.text.TextField;
+import flash.text.TextFieldAutoSize;
 import flash.text.TextFormat;
 import flash.text.TextFormatAlign;
 
@@ -32,6 +38,7 @@ import org.osmf.events.MediaElementEvent;
 import org.osmf.events.TimelineMetadataEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.metadata.CuePoint;
+import org.osmf.metadata.MetadataWatcher;
 import org.osmf.metadata.TimelineMetadata;
 
 public class CaptionManager extends Sprite {
@@ -39,11 +46,14 @@ public class CaptionManager extends Sprite {
     private var logger:ILogger = LoggerFactory.getClassLogger(CaptionManager);
 
     private var _captionMetadata:TimelineMetadata;
-
     private var _captionField:TextField;
+    private var _autoHideWatcher:MetadataWatcher;
+    private var _media:MediaElement;
+    private var _hidden:Boolean;
 
     public function CaptionManager(mediaElement:MediaElement) {
 
+        _media = mediaElement;
         _captionMetadata = mediaElement.getMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) as TimelineMetadata;
 
         if (_captionMetadata == null) {
@@ -52,6 +62,7 @@ public class CaptionManager extends Sprite {
         else {
             processTimelineMetadata(mediaElement);
         }
+        setupControlBarWatcher();
     }
 
     private function onMetadataAdd(event:MediaElementEvent):void {
@@ -71,27 +82,65 @@ public class CaptionManager extends Sprite {
     private function onCuePoint(event:TimelineMetadataEvent):void {
         var cuePoint:CuePoint = event.marker as CuePoint;
         if (cuePoint) {
-            logger.debug("cuePoint.time=" + cuePoint.time + ", value = " + cuePoint.parameters);
+            //logger.debug("cuePoint.time=" + cuePoint.time + ", value = " + cuePoint.parameters);
             _captionField.htmlText = cuePoint.parameters as String;
+            _captionField.dispatchEvent(new Event('REPOSITION'));
         }
+    }
+
+    private function setupControlBarWatcher():void {
+        if (_autoHideWatcher) {
+            _autoHideWatcher.unwatch();
+            _autoHideWatcher = null;
+        }
+
+        if (_media != null) {
+            _autoHideWatcher
+                    = new MetadataWatcher
+                    (_media.metadata
+                            , ControlBarMetadata.CONTROL_BAR_METADATA
+                            , ControlBarMetadata.CONTROL_BAR_HIDDEN
+                            , controlBarHiddenChangeCallback
+                            );
+            _autoHideWatcher.watch();
+        }
+    }
+
+    private function controlBarHiddenChangeCallback(value:Boolean):void {
+        logger.debug("control bar hidden: " + value);
+        _hidden = value;
     }
 
     private function createCaptions():void {
         if (_captionField == null) {
-            var captionSprite:Sprite = new Sprite();
 
             _captionField = new TextField();
-            _captionField.width = stage.width;
+            _captionField.width = stage.stageWidth;
             _captionField.htmlText = "";
-            _captionField.y = stage.height - 25;
+            _captionField.multiline = true;
+            _captionField.autoSize = TextFieldAutoSize.CENTER;
 
             var format:TextFormat = new TextFormat();
             format.align = TextFormatAlign.CENTER;
+            format.size = 16;
+            format.font = 'Arial';
             _captionField.defaultTextFormat = format;
 
-            captionSprite.addChild(_captionField);
-            addChild(captionSprite);
+            var outline:GlowFilter = new GlowFilter(0x000000, 1.0, 2.0, 2.0, 10);
+
+            outline.quality = BitmapFilterQuality.MEDIUM;
+
+            _captionField.filters = [outline];
+
+            _captionField.addEventListener(Event.ADDED_TO_STAGE, this.positionSubtitles);
+            _captionField.addEventListener("REPOSITION", this.positionSubtitles);
+
+            addChild(_captionField);
         }
+    }
+
+    private function positionSubtitles(event:Event):void {
+        event.target.y = stage.stageHeight - (event.target.height + 27);
     }
 }
 }

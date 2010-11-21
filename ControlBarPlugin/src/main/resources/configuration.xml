@@ -46,7 +46,7 @@
     <widgets>
         <widget
                 id="controlBar"
-                type="autoHideWidget"
+                type="com.seesaw.player.controls.widget.ControlBar"
                 face="backdrop"
                 fadeSteps="15"
                 width="650"

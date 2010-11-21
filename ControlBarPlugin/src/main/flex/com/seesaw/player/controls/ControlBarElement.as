@@ -20,6 +20,7 @@
  *    Incorporated. All Rights Reserved.
  */
 package com.seesaw.player.controls {
+import com.seesaw.player.controls.widget.ControlBar;
 import com.seesaw.player.controls.widget.FullScreen;
 import com.seesaw.player.controls.widget.PauseButton;
 import com.seesaw.player.controls.widget.PlayButton;
@@ -35,6 +36,7 @@ import org.as3commons.logging.LoggerFactory;
 import org.osmf.chrome.assets.AssetsManager;
 import org.osmf.chrome.configuration.LayoutAttributesParser;
 import org.osmf.chrome.configuration.WidgetsParser;
+import org.osmf.chrome.metadata.ChromeMetadata;
 import org.osmf.chrome.widgets.Widget;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.layout.LayoutMetadata;
@@ -129,11 +131,11 @@ public class ControlBarElement extends MediaElement {
                 if (targetMetadata.getValue(ID) != null && targetMetadata.getValue(ID) == settings.getValue(ID)) {
                     logger.debug("setting target on control bar: " + target);
 
-                    target.removeEventListener(MediaElementEvent.TRAIT_ADD, onProxiedTraitsChange);
-                    target.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onProxiedTraitsChange);
+                    target.removeEventListener(MediaElementEvent.TRAIT_ADD, onMediaTraitsChange);
+                    target.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onMediaTraitsChange);
 
-                    target.addEventListener(MediaElementEvent.TRAIT_ADD, onProxiedTraitsChange);
-                    target.addEventListener(MediaElementEvent.TRAIT_REMOVE, onProxiedTraitsChange);
+                    target.addEventListener(MediaElementEvent.TRAIT_ADD, onMediaTraitsChange);
+                    target.addEventListener(MediaElementEvent.TRAIT_REMOVE, onMediaTraitsChange);
 
                     controlBar.media = target;
                 }
@@ -141,7 +143,7 @@ public class ControlBarElement extends MediaElement {
         }
     }
 
-    private function onProxiedTraitsChange(event:MediaElementEvent):void {
+    private function onMediaTraitsChange(event:MediaElementEvent):void {
         if (event.type == MediaElementEvent.TRAIT_ADD) {
             // Wait for the target element to display before displaying the control bar
             if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
@@ -153,7 +155,7 @@ public class ControlBarElement extends MediaElement {
             }
         } else {
             if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
-                // Hide the control bar if the target element is hidden
+                // Remove the control bar if the target element is removed
                 if (controlBar) {
                     removeTrait(MediaTraitType.DISPLAY_OBJECT);
                 }
@@ -234,6 +236,7 @@ public class ControlBarElement extends MediaElement {
         customWidgetList["com.seesaw.player.controls.widget.fullscreen"] = FullScreen;
         customWidgetList["com.seesaw.player.controls.widget.volume"] = Volume;
         customWidgetList["com.seesaw.player.controls.widget.volumescrubbar"] = VolumeScrubBar;
+        customWidgetList["com.seesaw.player.controls.widget.controlbar"] = ControlBar;
         //   customWidgetList["com.seesaw.player.controls.widget.lights"] = Lights;
         //   customWidgetList["com.seesaw.player.controls.widget.subtitles"] = SubTitles;
         //   customWidgetList["com.seesaw.player.controls.widget.tooltips"] = ToolTips;

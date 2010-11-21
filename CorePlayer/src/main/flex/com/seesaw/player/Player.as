@@ -88,8 +88,7 @@ public class Player extends Sprite {
         _loaderParams = LoaderInfo(this.root.loaderInfo).parameters;
 
         // TODO: this needs to be in a flashvar from the page
-        _loaderParams.playerInitUrl = "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/" +
-                "player.playerinitialisation:playerinit?t:ac=TV:DRAMA/b/13599/Waterloo-Road";
+        _loaderParams.playerInitUrl = "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player.playerinitialisation:playerinit?t:ac=TV:DRAMA/b/13599/Waterloo-Road";
 
         stage.scaleMode = StageScaleMode.NO_SCALE;
         stage.align = StageAlign.TOP_LEFT;
