@@ -22,12 +22,14 @@
 
 package com.seesaw.player.smil.resource {
 import com.seesaw.player.namespaces.contentinfo;
+import com.seesaw.player.namespaces.smil;
 
 import org.osmf.media.MediaResourceBase;
 
 public class DynamicSMILResource extends MediaResourceBase {
 
     use namespace contentinfo;
+    use namespace smil;
 
     private static const _mimeType:String = "application/smil+xml";
 
