@@ -24,7 +24,6 @@ package com.seesaw.player {
 import com.seesaw.player.ads.AdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
-import com.seesaw.player.captions.CaptionManager;
 import com.seesaw.player.components.ControlBarComponent;
 import com.seesaw.player.events.FullScreenEvent;
 import com.seesaw.player.fullscreen.FullScreenProxyPluginInfo;
@@ -36,118 +35,109 @@ import flash.display.Sprite;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
+import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MediaFactoryEvent;
+import org.osmf.layout.HorizontalAlign;
 import org.osmf.layout.LayoutMetadata;
+import org.osmf.layout.VerticalAlign;
 import org.osmf.media.MediaElement;
+import org.osmf.media.MediaFactory;
+import org.osmf.media.MediaPlayer;
 import org.osmf.media.PluginInfoResource;
-
-import org.osmf.traits.MediaTraitType;
-
-import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
+import org.osmf.media.URLResource;
 
 public class SeeSawPlayer extends Sprite {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
 
-    private var _config:PlayerConfiguration;
-    private var _rootElement:ParallelElement;
-    private var _videoElement:MediaElement;
+    private var config:PlayerConfiguration;
+    private var rootElement:ParallelElement;
+    private var videoElement:MediaElement;
+
+    private var factory:MediaFactory;
+    private var player:MediaPlayer;
+    private var rootContainer:MediaContainer;
+    private var mainContainer:MediaContainer;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
 
         config = playerConfig;
+
+        factory = config.factory;
+        player = new MediaPlayer();
+
+        rootContainer = new MediaContainer();
+        mainContainer = new MediaContainer();
+
         initialisePlayer();
     }
 
     private function initialisePlayer():void {
         logger.debug("initialising media player");
 
-        config.factory.addEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onMediaElementCreate);
+        factory.addEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onMediaElementCreate);
 
-        createRootElement();
+        rootElement = new ParallelElement();
+
         createVideoElement();
-        createMediaElementPlugins();
+        createControlBarElement();
+        createSubtitleElement();
+
+        logger.debug("adding root parallel element to container");
+        player.media = rootElement;
+        layout(config.width, config.height);
+        mainContainer.addMediaElement(rootElement);
+
+        rootContainer.layoutRenderer.addTarget(mainContainer);
 
         logger.debug("adding container to stage");
-        addChild(config.container);
-
-        var captionManager:CaptionManager = new CaptionManager(_videoElement);
-        addChild(captionManager)
+        addChild(rootContainer);
     }
 
-    private function createMediaElementPlugins():void {
-        logger.debug("adding control bar media element to container");
-
-        var controlBarComponent:ControlBarComponent = new ControlBarComponent();
-        var controlBarElement:MediaElement = controlBarComponent.createMediaElement(config.factory, _videoElement);
-        _rootElement.addChild(controlBarElement);
-
-       // controlBarElement.addEventListener(MediaElementEvent.TRAIT_ADD, onControlBarTraitsChange);
-    }
-
-    private function onControlBarTraitsChange(event:MediaElementEvent):void {
-        if (event.type == MediaElementEvent.TRAIT_ADD) {
-            if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
-
-            }
-        } else {
-            if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
-
-            }
-        }
+    private function createSubtitleElement():void {
+        var subtitleElement:MediaElement = factory.createMediaElement(
+                new URLResource("http://kgd-blue-test-zxtm01.dev.vodco.co.uk/s/ccp/00000025/2540.smi"));
+        rootElement.addChild(subtitleElement);
     }
 
     private function createVideoElement():void {
         logger.debug("loading the proxy plugins that wrap the video element");
-        config.factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo()));
-        config.factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
-        config.factory.loadPlugin(new PluginInfoResource(new FullScreenProxyPluginInfo()));
-        config.factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
-        config.factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
-        // config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
-        config.factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo()));
+        // factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new FullScreenProxyPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
+        // factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
 
         if (config.resource.getMetadataValue("contentInfo").adType == config.adModuleType)
-            config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
+            factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
 
         ///      if (config.adModuleType == "com.seesaw.player.ads.serial")
-        ///       config.factory.loadPlugin(new PluginInfoResource(new PlaylistPluginInfo()));
+        ///       factory.loadPlugin(new PluginInfoResource(new PlaylistPluginInfo()));
 
         logger.debug("creating video element");
-        _videoElement = config.factory.createMediaElement(config.resource);
+        videoElement = factory.createMediaElement(config.resource);
         //_videoElement = new BufferManager(0.5, 5, _videoElement);
 
-
-        if (_videoElement == null) {
-            throw ArgumentError("failed to create main media element for player");
-        }
-
-        setLocalEventHandlers();
-
-        logger.debug("adding video element to container");
-        _rootElement.addChild(_videoElement);
-    }
-
-    private function setLocalEventHandlers():void {
-        var fullScreen:FullScreenTrait = _videoElement.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
-
+        var fullScreen:FullScreenTrait = videoElement.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
         if (fullScreen) {
             fullScreen.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
         }
+
+        logger.debug("adding video element to container");
+        rootElement.addChild(videoElement);
     }
 
-    private function createRootElement():void {
-        logger.debug("creating root element");
+    private function createControlBarElement():void {
+        logger.debug("adding control bar media element to container");
 
-        _rootElement = new ParallelElement();
-        layout(config.width, config.height);
-        config.player.media = _rootElement;
-
-        logger.debug("adding root element to container");
-        config.container.addMediaElement(_rootElement);
+        var controlBarComponent:ControlBarComponent = new ControlBarComponent();
+        var controlBarElement:MediaElement = controlBarComponent.createMediaElement(factory, videoElement);
+        rootElement.addChild(controlBarElement);
     }
 
     private function onMediaElementCreate(event:MediaFactoryEvent):void {
@@ -161,13 +151,9 @@ public class SeeSawPlayer extends Sprite {
         var fullScreen:FullScreenTrait = target.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
 
         if (fullScreen && event.traitType == FullScreenTrait.FULL_SCREEN) {
+            fullScreen.removeEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
             if (event.type == MediaElementEvent.TRAIT_ADD) {
-                logger.debug("adding handler for full screen trait: " + target);
                 fullScreen.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
-            }
-            else {
-                logger.debug("removing handler for full screen trait: " + target);
-                fullScreen.removeEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
             }
         }
     }
@@ -183,23 +169,15 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function layout(width:int, height:int):void {
-        logger.debug("setting new layout for root media element: " + width + "x" + height);
+        logger.debug("setting new layout for main media element: " + width + "x" + height);
 
         var rootElementLayout:LayoutMetadata = new LayoutMetadata();
-        _rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, rootElementLayout);
+        rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, rootElementLayout);
 
         rootElementLayout.width = width;
         rootElementLayout.height = height;
 
-        config.container.layout(width, height, true);
-    }
-
-    public function get config():PlayerConfiguration {
-        return _config;
-    }
-
-    public function set config(value:PlayerConfiguration):void {
-        _config = value;
+        mainContainer.layout(width, height, true);
     }
 }
 }

@@ -40,6 +40,7 @@
         <body>
 
             <seq>
+                <!--
                 <seq>
                     <video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Idents_Diner_5s.mp4" width="512"
                            contentType="instreamAd">
@@ -51,6 +52,7 @@
                            contentType="instreamAd">
                     </video>
                 </seq>
+                -->
                 <seq dur="2m" clipBegin="3m" clipEnd="5m">
                     <switch>
                         <video region="content" src="mp4:e5/INTERNAL/sintel-2048-stereo_500kbs.mp4"

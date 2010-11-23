@@ -21,6 +21,7 @@
  */
 
 package com.seesaw.player.captioning.sami {
+import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 
@@ -29,10 +30,11 @@ import org.as3commons.logging.LoggerFactory;
 import org.osmf.logging.Log;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactoryItem;
-import org.osmf.media.MediaFactoryItemType;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfo;
+import org.osmf.media.URLResource;
 import org.osmf.metadata.Metadata;
+import org.osmf.utils.URL;
 
 public class SAMIPluginInfo extends PluginInfo {
 
@@ -44,29 +46,49 @@ public class SAMIPluginInfo extends PluginInfo {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(SAMIPluginInfo);
 
+    private var samiElement:SAMIElement;
+    private var targetElement:MediaElement;
+
     public function SAMIPluginInfo() {
         var items:Vector.<MediaFactoryItem> = new Vector.<MediaFactoryItem>();
 
         var item:MediaFactoryItem = new MediaFactoryItem("com.seesaw.player.captioning.sami.SAMIPluginInfo",
-                canHandleResource, createSAMIProxyElement, MediaFactoryItemType.PROXY);
+                canHandleResource, createSAMIElement);
         items.push(item);
 
-        super(items);
+        super(items, mediaElementCreationNotificationCallback);
     }
 
     private function canHandleResource(resource:MediaResourceBase):Boolean {
         var canHandle:Boolean = false;
 
-        if (resource != null) {
-            var settings:Metadata = resource.getMetadataValue(METADATA_NAMESPACE) as Metadata;
-            canHandle = settings != null;
+        if (resource is URLResource) {
+            var urlResource:URLResource = URLResource(resource);
+            var url:URL = new URL(urlResource.url);
+            canHandle = (url.path.search(/\.smi$|\.smil$/i) != -1);
         }
 
         return canHandle;
     }
 
-    private function createSAMIProxyElement():MediaElement {
-        return new SAMIProxyElement();
+    private function createSAMIElement():MediaElement {
+        samiElement = new SAMIElement();
+        updateMediaTarget();
+        return samiElement;
+    }
+
+    private function mediaElementCreationNotificationCallback(target:MediaElement):void {
+        var mainContent:Metadata = target.resource.getMetadataValue(PlayerConstants.CONTENT_ID) as Metadata;
+        if(mainContent.getValue(PlayerConstants.ID) == PlayerConstants.MAIN_CONTENT_ID) {
+            targetElement = target;
+            updateMediaTarget();
+        }
+    }
+
+    private function updateMediaTarget():void {
+        if (samiElement && targetElement && targetElement != samiElement) {
+            samiElement.target = targetElement;
+        }
     }
 }
 }
