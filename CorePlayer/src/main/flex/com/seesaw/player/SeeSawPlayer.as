@@ -39,9 +39,7 @@ import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MediaFactoryEvent;
-import org.osmf.layout.HorizontalAlign;
 import org.osmf.layout.LayoutMetadata;
-import org.osmf.layout.VerticalAlign;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaPlayer;
@@ -98,8 +96,21 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function createSubtitleElement():void {
+        factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
+
         var subtitleElement:MediaElement = factory.createMediaElement(
                 new URLResource("http://kgd-blue-test-zxtm01.dev.vodco.co.uk/s/ccp/00000025/2540.smi"));
+
+        var layout:LayoutMetadata = new LayoutMetadata();
+        subtitleElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+
+        layout.index = 5;
+        layout.x = 0;
+        layout.y = config.height * 0.75;
+
+        layout.width = config.width;
+        layout.height = 200;
+
         rootElement.addChild(subtitleElement);
     }
 
@@ -111,7 +122,6 @@ public class SeeSawPlayer extends Sprite {
         factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
         // factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
-        factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
 
         if (config.resource.getMetadataValue("contentInfo").adType == config.adModuleType)
             factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
@@ -121,7 +131,7 @@ public class SeeSawPlayer extends Sprite {
 
         logger.debug("creating video element");
         videoElement = factory.createMediaElement(config.resource);
-        //_videoElement = new BufferManager(0.5, 5, _videoElement);
+        // videoElement = new BufferManager(0.5, 5, _videoElement);
 
         var fullScreen:FullScreenTrait = videoElement.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
         if (fullScreen) {
@@ -177,7 +187,7 @@ public class SeeSawPlayer extends Sprite {
         rootElementLayout.width = width;
         rootElementLayout.height = height;
 
-        mainContainer.layout(width, height, true);
+        rootContainer.layout(width, height, true);
     }
 }
 }

@@ -21,34 +21,27 @@
  */
 
 package com.seesaw.player.captioning.sami {
-import flash.display.Sprite;
 import flash.events.Event;
 import flash.filters.BitmapFilterQuality;
 import flash.filters.GlowFilter;
 import flash.text.TextField;
-import flash.text.TextFieldAutoSize;
 import flash.text.TextFormat;
 import flash.text.TextFormatAlign;
 
-public class CaptionDisplayObject extends Sprite {
+import org.osmf.layout.LayoutMetadata;
+import org.osmf.layout.LayoutTargetSprite;
+
+public class CaptionDisplayObject extends LayoutTargetSprite {
 
     private var captionField:TextField;
 
-    public function CaptionDisplayObject() {
-        addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
-    }
+    public function CaptionDisplayObject(layoutMetadata:LayoutMetadata = null) {
+        super(layoutMetadata);
 
-    private function onAddedToStage(event:Event):void {
-        removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
-        createCaptionField();
-    }
-
-    private function createCaptionField():void {
         captionField = new TextField();
-        captionField.width = stage.stageWidth;
         captionField.htmlText = "";
         captionField.multiline = true;
-        captionField.autoSize = TextFieldAutoSize.CENTER;
+        //captionField.autoSize = TextFieldAutoSize.CENTER;
 
         var format:TextFormat = new TextFormat();
         format.align = TextFormatAlign.CENTER;
@@ -60,19 +53,22 @@ public class CaptionDisplayObject extends Sprite {
         outline.quality = BitmapFilterQuality.MEDIUM;
 
         captionField.filters = [outline];
-        captionField.addEventListener("REPOSITION", this.positionSubtitles);
-
         addChild(captionField);
     }
 
+    override public function layout(availableWidth:Number, availableHeight:Number, deep:Boolean = true):void {
+        super.layout(availableWidth, availableHeight, deep);
+        captionField.width = availableWidth;
+        captionField.height = availableHeight;
+    }
+
     private function positionSubtitles(event:Event):void {
-       event.target.y = stage.stageHeight - (event.target.height + 27);
+        event.target.y = height - (event.target.height + 27);
     }
 
     public function set text(value:String):void {
         if (captionField) {
             captionField.htmlText = value;
-            //captionField.dispatchEvent(new Event('REPOSITION'));
         }
     }
 }
