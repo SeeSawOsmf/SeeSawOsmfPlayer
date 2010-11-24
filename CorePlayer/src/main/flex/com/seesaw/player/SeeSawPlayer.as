@@ -150,10 +150,6 @@ public class SeeSawPlayer extends Sprite {
         videoElement.addEventListener(MediaElementEvent.METADATA_ADD, onVideoMetadataAdd);
         videoElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onVideoMetadataRemove);
 
-        var controlBarMetadata:Metadata = new Metadata();
-        controlBarMetadata.addValue(ControlBarMetadata.CAN_SHOW_SUBTITLES, captionUrl != null);
-        videoElement.addMetadata(ControlBarMetadata.CONTROL_BAR_METADATA, controlBarMetadata);
-
         rootElement.addChild(videoElement);
     }
 

@@ -26,7 +26,6 @@ import com.seesaw.player.ui.StyledTextField;
 
 import controls.seesaw.widget.interfaces.IWidget;
 
-import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.text.TextField;
 import flash.text.TextFormat;
@@ -34,8 +33,11 @@ import flash.text.TextFormat;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.chrome.widgets.ButtonWidget;
+import org.osmf.events.MediaElementEvent;
 import org.osmf.media.MediaElement;
+import org.osmf.metadata.CuePoint;
 import org.osmf.metadata.Metadata;
+import org.osmf.metadata.TimelineMetadata;
 import org.osmf.traits.MediaTraitType;
 
 public class SubtitlesButton extends ButtonWidget implements IWidget {
@@ -57,17 +59,37 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
         super.media = value;
 
         if (media) {
-            
+
             metadata = media.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
             if (metadata == null) {
                 metadata = new Metadata();
                 media.addMetadata(ControlBarMetadata.CONTROL_BAR_METADATA, metadata);
             }
 
-            var canShow:Boolean = metadata.getValue(ControlBarMetadata.CAN_SHOW_SUBTITLES) as Boolean;
-            visible = canShow == null ? false : canShow;
+            // Show the button if there is timeline metadata or after timeline metadata is added
+            var timelineMetadata:TimelineMetadata = media.getMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) as TimelineMetadata;
+            if (timelineMetadata == null) {
+                media.addEventListener(MediaElementEvent.METADATA_ADD, onMetadataAdd);
+            }
+            else {
+                visible = true;
+            }
+
+            media.addEventListener(MediaElementEvent.METADATA_REMOVE, onMetadataRemove);
 
             metadata.addValue(ControlBarMetadata.SUBTITLES_VISIBLE, false);
+        }
+    }
+
+    private function onMetadataAdd(event:MediaElementEvent):void {
+        if (event.namespaceURL == CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) {
+            visible = true;
+        }
+    }
+
+    private function onMetadataRemove(event:MediaElementEvent):void {
+        if (event.namespaceURL == CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) {
+            visible = false;
         }
     }
 
