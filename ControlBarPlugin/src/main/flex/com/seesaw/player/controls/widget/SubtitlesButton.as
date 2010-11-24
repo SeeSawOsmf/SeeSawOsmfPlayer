@@ -56,10 +56,15 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
     private var metadata:Metadata;
 
     override public function set media(value:MediaElement):void {
+
+        if(media) {
+            media.removeEventListener(MediaElementEvent.METADATA_ADD, onMetadataAdd);
+            media.removeEventListener(MediaElementEvent.METADATA_REMOVE, onMetadataRemove);
+        }
+
         super.media = value;
 
         if (media) {
-
             metadata = media.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
             if (metadata == null) {
                 metadata = new Metadata();
