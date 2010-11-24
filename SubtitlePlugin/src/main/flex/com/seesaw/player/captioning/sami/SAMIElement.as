@@ -29,20 +29,16 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.TimelineMetadataEvent;
-import org.osmf.layout.LayoutMetadata;
-import org.osmf.layout.LayoutTargetSprite;
 import org.osmf.media.LoadableElementBase;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.URLResource;
 import org.osmf.metadata.CuePoint;
 import org.osmf.metadata.CuePointType;
-import org.osmf.metadata.Metadata;
 import org.osmf.metadata.TimelineMetadata;
 import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.LoadTrait;
 import org.osmf.traits.LoaderBase;
-import org.osmf.traits.MediaTraitBase;
 import org.osmf.traits.MediaTraitType;
 
 public class SAMIElement extends LoadableElementBase {
@@ -116,8 +112,8 @@ public class SAMIElement extends LoadableElementBase {
     private function onCuePoint(event:TimelineMetadataEvent):void {
         var cuePoint:CuePoint = event.marker as CuePoint;
         if (cuePoint && displayTrait) {
-           var captionDisplayObject:CaptionDisplayObject = displayTrait.displayObject as CaptionDisplayObject;
-           captionDisplayObject.text = cuePoint.parameters as String;
+            var captionDisplayObject:CaptionDisplayObject = displayTrait.displayObject as CaptionDisplayObject;
+            captionDisplayObject.text = cuePoint.parameters as String;
         }
     }
 
