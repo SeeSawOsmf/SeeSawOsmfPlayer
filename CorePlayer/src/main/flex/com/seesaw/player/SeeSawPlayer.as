@@ -92,13 +92,7 @@ public class SeeSawPlayer extends Sprite {
 
         player.media = videoElement;
 
-        var layout:LayoutMetadata = new LayoutMetadata();
-        rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
-        layout.percentWidth = 100;
-        layout.percentHeight = 100;
-
-        rootContainer.layoutMetadata.width = config.width;
-        rootContainer.layoutMetadata.height = config.height;
+        setPlayerSize(config.width, config.height);
         rootContainer.addMediaElement(rootElement);
 
         logger.debug("adding media container to stage");
@@ -122,8 +116,6 @@ public class SeeSawPlayer extends Sprite {
         layout.verticalAlign = VerticalAlign.BOTTOM;
 
         rootElement.addChild(subtitleElement);
-
-        setupControlBarWatcher();
     }
 
     private function createVideoElement():void {
@@ -154,8 +146,15 @@ public class SeeSawPlayer extends Sprite {
             fullScreen.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
         }
 
-        var layout:LayoutMetadata = new LayoutMetadata();
-        videoElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+        // watch the control bar for metadata changes in visibility
+        autoHideWatcher
+                = new MetadataWatcher
+                (videoElement.metadata
+                        , ControlBarMetadata.CONTROL_BAR_METADATA
+                        , ControlBarMetadata.CONTROL_BAR_HIDDEN
+                        , controlBarHiddenChangeCallback
+                        );
+        autoHideWatcher.watch();
 
         rootElement.addChild(videoElement);
     }
@@ -218,33 +217,28 @@ public class SeeSawPlayer extends Sprite {
         logger.debug("onFullscreen: " + event.value);
         var width:int = event.value ? stage.fullScreenWidth : config.width;
         var height:int = event.value ? stage.fullScreenHeight : config.height;
-        rootContainer.layout(width, height, true);
+        setPlayerSize(width, height);
     }
 
-    private function setupControlBarWatcher():void {
-        if (autoHideWatcher) {
-            autoHideWatcher.unwatch();
-            autoHideWatcher = null;
-        }
+    private function setPlayerSize(width:int, height:int) {
+        var layout:LayoutMetadata = rootElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
+        if (layout == null) {
+            layout = new LayoutMetadata();
+            rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
 
-        if (videoElement != null) {
-            autoHideWatcher
-                    = new MetadataWatcher
-                    (videoElement.metadata
-                            , ControlBarMetadata.CONTROL_BAR_METADATA
-                            , ControlBarMetadata.CONTROL_BAR_HIDDEN
-                            , controlBarHiddenChangeCallback
-                            );
-            autoHideWatcher.watch();
         }
+        layout.width = width;
+        layout.height = height;
+        rootContainer.layout(width, height, true);
     }
 
     private function controlBarHiddenChangeCallback(value:Boolean):void {
         logger.debug("control bar hidden: " + value);
-        var layoutMetadata:LayoutMetadata = subtitleElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
-        if (layoutMetadata) {
-            // layoutMetadata.bottom = value ? 20 : 100;
-
+        if (subtitleElement) {
+            var layoutMetadata:LayoutMetadata = subtitleElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
+            if (layoutMetadata) {
+                layoutMetadata.bottom = value ? 20 : 100;
+            }
         }
     }
 }
