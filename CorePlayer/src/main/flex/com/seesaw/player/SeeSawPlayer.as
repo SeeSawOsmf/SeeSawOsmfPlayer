@@ -40,6 +40,7 @@ import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MediaFactoryEvent;
+import org.osmf.events.MetadataEvent;
 import org.osmf.layout.HorizontalAlign;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.layout.VerticalAlign;
@@ -50,7 +51,8 @@ import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
 import org.osmf.media.URLResource;
 import org.osmf.metadata.Metadata;
-import org.osmf.metadata.MetadataWatcher;
+import org.osmf.traits.DisplayObjectTrait;
+import org.osmf.traits.MediaTraitType;
 
 public class SeeSawPlayer extends Sprite {
 
@@ -64,8 +66,6 @@ public class SeeSawPlayer extends Sprite {
     private var rootContainer:MediaContainer;
     private var rootElement:ParallelElement;
     private var subtitleElement:MediaElement;
-
-    private var autoHideWatcher:MetadataWatcher;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
@@ -102,20 +102,21 @@ public class SeeSawPlayer extends Sprite {
     private function createSubtitleElement():void {
         factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
 
-        subtitleElement = factory.createMediaElement(
-                new URLResource("http://kgd-blue-test-zxtm01.dev.vodco.co.uk/s/ccp/00000025/2540.smi"));
+        if (captionUrl) {
+            subtitleElement = factory.createMediaElement(new URLResource(captionUrl));
 
-        var layout:LayoutMetadata = new LayoutMetadata();
-        subtitleElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+            var layout:LayoutMetadata = new LayoutMetadata();
+            subtitleElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
 
-        layout.index = 3;
-        layout.percentWidth = 100;
-        layout.height = 50;
-        layout.bottom = 100;
-        layout.horizontalAlign = HorizontalAlign.CENTER;
-        layout.verticalAlign = VerticalAlign.BOTTOM;
+            layout.index = 3;
+            layout.percentWidth = 100;
+            layout.height = 50;
+            layout.bottom = 100;
+            layout.horizontalAlign = HorizontalAlign.CENTER;
+            layout.verticalAlign = VerticalAlign.BOTTOM;
 
-        rootElement.addChild(subtitleElement);
+            rootElement.addChild(subtitleElement);
+        }
     }
 
     private function createVideoElement():void {
@@ -146,15 +147,12 @@ public class SeeSawPlayer extends Sprite {
             fullScreen.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
         }
 
-        // watch the control bar for metadata changes in visibility
-        autoHideWatcher
-                = new MetadataWatcher
-                (videoElement.metadata
-                        , ControlBarMetadata.CONTROL_BAR_METADATA
-                        , ControlBarMetadata.CONTROL_BAR_HIDDEN
-                        , controlBarHiddenChangeCallback
-                        );
-        autoHideWatcher.watch();
+        videoElement.addEventListener(MediaElementEvent.METADATA_ADD, onVideoMetadataAdd);
+        videoElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onVideoMetadataRemove);
+
+        var controlBarMetadata:Metadata = new Metadata();
+        controlBarMetadata.addValue(ControlBarMetadata.CAN_SHOW_SUBTITLES, captionUrl != null);
+        videoElement.addMetadata(ControlBarMetadata.CONTROL_BAR_METADATA, controlBarMetadata);
 
         rootElement.addChild(videoElement);
     }
@@ -232,14 +230,49 @@ public class SeeSawPlayer extends Sprite {
         rootContainer.layout(width, height, true);
     }
 
-    private function controlBarHiddenChangeCallback(value:Boolean):void {
-        logger.debug("control bar hidden: " + value);
-        if (subtitleElement) {
-            var layoutMetadata:LayoutMetadata = subtitleElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
-            if (layoutMetadata) {
-                layoutMetadata.bottom = value ? 20 : 100;
-            }
+    private function onVideoMetadataAdd(event:MediaElementEvent):void {
+        if (event.namespaceURL == ControlBarMetadata.CONTROL_BAR_METADATA) {
+            var metadata:Metadata = videoElement.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+            metadata.addEventListener(MetadataEvent.VALUE_CHANGE, controlBarMetadataChange);
+            metadata.addEventListener(MetadataEvent.VALUE_ADD, controlBarMetadataChange);
         }
+    }
+
+    private function onVideoMetadataRemove(event:MediaElementEvent):void {
+        if (event.namespaceURL == ControlBarMetadata.CONTROL_BAR_METADATA) {
+            var metadata:Metadata = videoElement.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+            metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, controlBarMetadataChange);
+            metadata.removeEventListener(MetadataEvent.VALUE_ADD, controlBarMetadataChange);
+        }
+    }
+
+    private function controlBarMetadataChange(event:MetadataEvent):void {
+        logger.debug("control bar metadata change: key = {0}, value = {1}", event.key, event.value);
+        switch (event.key) {
+            case ControlBarMetadata.CONTROL_BAR_HIDDEN:
+                if (subtitleElement) {
+                    var layoutMetadata:LayoutMetadata =
+                            subtitleElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
+                    if (layoutMetadata) {
+                        layoutMetadata.bottom = event.value ? 20 : 100;
+                    }
+                }
+                break;
+            case ControlBarMetadata.SUBTITLES_VISIBLE:
+                if (subtitleElement) {
+                    var displayTrait:DisplayObjectTrait =
+                            subtitleElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
+                    if (displayTrait) {
+                        displayTrait.displayObject.visible = event.value;
+                    }
+                }
+                break;
+        }
+    }
+
+    private function get captionUrl():String {
+        var metadata:Metadata = config.resource.getMetadataValue(SAMIPluginInfo.METADATA_NAMESPACE) as Metadata;
+        return metadata.getValue(SAMIPluginInfo.METADATA_KEY_URI) as String;
     }
 }
 }

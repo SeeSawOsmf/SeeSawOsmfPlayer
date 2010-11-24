@@ -96,6 +96,8 @@ public class SAMIElement extends LoadableElementBase {
                 logger.debug("adding display object trait for sami captions");
                 if (!hasTrait(MediaTraitType.DISPLAY_OBJECT)) {
                     var captionDisplayObject:CaptionDisplayObject = new CaptionDisplayObject();
+                    // Captions are invisible by default. Obtain the DisplayObjectTrait to make visible
+                    captionDisplayObject.visible = false;
                     displayTrait = new DisplayObjectTrait(captionDisplayObject);
                     addTrait(MediaTraitType.DISPLAY_OBJECT, displayTrait);
                 }

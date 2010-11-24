@@ -21,7 +21,8 @@
   ~    Incorporated. All Rights Reserved.
   -->
 
-<videoInfo xmlns="http://www.seesaw.com/api/contentinfo/v1.0" mimeType="application/smil+xml">
+<videoInfo xmlns="http://www.seesaw.com/api/contentinfo/v1.0" xmlns:smil="http://www.w3.org/ns/SMIL"
+           mimeType="application/smil+xml">
     <asset>
         <path>e5/INTERNAL/sintel-2048-stereo_1500kbs.mp4?s=1288365189&amp;e=1288365939&amp;h=2badd6fd8f7a8fd95625577584b2f23e</path>
         <bitrate>1500</bitrate>
@@ -33,37 +34,49 @@
     </asset>
     <geoblocked>false</geoblocked>
     <cdnPath>rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703</cdnPath>
-    <smil>
-        <head>
-            <meta base="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703"/>
-        </head>
-        <body>
+    <smil:smil>
+        <smil:head>
+            <smil:meta base="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703"/>
+        </smil:head>
+        <smil:body>
 
-            <seq>
+            <smil:seq>
+
                 <!--
-                <seq>
-                    <video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Idents_Diner_5s.mp4" width="512"
-                           contentType="instreamAd">
-                    </video>
-                    <video src="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703/mp4:e5/test/cms/clips/ideal_28_v2_trimmed_17"
-                           width="512" contentType="instreamAd">
-                    </video>
-                    <video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/PRA-OFLG002-030.mp4"
-                           contentType="instreamAd">
-                    </video>
-                </seq>
+                <smil:video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Idents_Diner_5s.mp4" width="512"
+                           dur="0">
+                    <smil:meta contentType="instreamAds"/>
+
+                </smil:video>
+                <smil:video
+                        src="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703/mp4:e5/test/cms/clips/ideal_28_v2_trimmed_17"
+                        width="512" dur="0">
+
+                    <smil:meta contentType="instreamAds"/>
+
+                </smil:video>
+                <smil:video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/PRA-OFLG002-030.mp4"
+                           dur="0">
+                    <smil:meta contentType="instreamAds"/>
+
+                </smil:video>
                 -->
-                <seq dur="2m" clipBegin="3m" clipEnd="5m">
-                    <switch>
-                        <video region="content" src="mp4:e5/INTERNAL/sintel-2048-stereo_500kbs.mp4"
-                               system-bitrate="500000" width="512" dur="2m" clipBegin="3m" clipEnd="5m"/>
-                        <video region="content" src="mp4:e5/INTERNAL/sintel-2048-stereo_796kbs.mp4"
-                               system-bitrate="800000" width="720" dur="2m" clipBegin="3m" clipEnd="5m"/>
-                        <video region="content" src="mp4:e5/INTERNAL/sintel-2048-stereo_1500kbs.mp4"
-                               system-bitrate="1500000" width="1080" dur="2m" clipBegin="3m" clipEnd="5m"/>
-                    </switch>
-                </seq>
-            </seq>
+
+                <smil:switch>
+                    <smil:video region="content" src="mp4:e5/INTERNAL/sintel-2048-stereo_500kbs.mp4"
+                               system-bitrate="500000" width="512" dur="2m" clipBegin="3m" clipEnd="5m">
+                    </smil:video>
+                    <smil:video region="content" src="mp4:e5/INTERNAL/sintel-2048-stereo_796kbs.mp4"
+                               system-bitrate="800000" width="720" dur="2m" clipBegin="3m" clipEnd="5m">
+                    </smil:video>
+                    <smil:video region="content" src="mp4:e5/INTERNAL/sintel-2048-stereo_1500kbs.mp4"
+                               system-bitrate="1500000" width="1080" dur="2m" clipBegin="3m" clipEnd="5m">
+
+                    </smil:video>
+                    <smil:meta contentType="mainContent"/>
+                </smil:switch>
+
+            </smil:seq>
             <!--
 
 
@@ -80,6 +93,6 @@
                        dur="3m" clipBegin="2m" clipEnd="4m"/>
             </switch>-->
 
-        </body>
-    </smil>
+        </smil:body>
+    </smil:smil>
 </videoInfo>

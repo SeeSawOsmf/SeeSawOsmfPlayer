@@ -19,41 +19,6 @@
  *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
  *    Incorporated. All Rights Reserved.
  */
-package org.osmf.smil.model {
-/**
- * Represents a meta tag in a SMIL document.
- */
-public class SMILMetaElement extends SMILElement {
-    /**
-     * Constructor.
-     */
-    public function SMILMetaElement() {
-        super(SMILElementType.META);
-    }
-
-    /**
-     * The <code>base</code> attribute value if
-     * found with the tag in the SMIL file.
-     */
-    public function get base():String {
-        return _base;
-    }
-
-    public function set base(value:String):void {
-        _base = value;
-    }
-
-    public function get contentType():String {
-        return _contentType;
-    }
-
-    public function set contentType(value:String):void {
-        _contentType = value;
-    }
-
-    private var _base:String;
-
-    private var _contentType:String;
-
-}
+package com.seesaw.player.namespaces {
+public namespace smil = "http://www.w3.org/ns/SMIL";
 }
