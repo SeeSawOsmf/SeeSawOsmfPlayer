@@ -21,27 +21,57 @@
  */
 
 package com.seesaw.player.autoresume {
+import com.seesaw.player.ioc.ObjectProvider;
+import com.seesaw.player.services.ResumeService;
+
+import flash.events.Event;
+import flash.events.TimerEvent;
+import flash.utils.Timer;
+
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ProxyElement;
-import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.PlayEvent;
 import org.osmf.events.SeekEvent;
+import org.osmf.events.TimeEvent;
 import org.osmf.media.MediaElement;
-import org.osmf.traits.LoadTrait;
 import org.osmf.traits.MediaTraitType;
+import org.osmf.traits.PlayState;
 import org.osmf.traits.PlayTrait;
 import org.osmf.traits.SeekTrait;
+import org.osmf.traits.TimeTrait;
 
 public class AutoResumeProxy extends ProxyElement {
 
+    private static const TIMER_UPDATE_INTERVAL:int = 30000;
+    private static const MIN_INTERVAL_BETWEEN_WRITE = 5;
+
     private var logger:ILogger = LoggerFactory.getClassLogger(AutoResumeProxy);
-    private var seek:SeekTrait;
 
+    private var seekTrait:SeekTrait;
+    private var playTrait:PlayTrait;
+    private var timeTrait:TimeTrait;
 
-    public function AutoResumeProxy() {
+    private var resumeService:ResumeService;
 
+    private var currentPositionTimer:Timer;
+    private var seeking:Boolean;
+    private var lastResume:Number = 0.0;
+    private var seekTime:Number = 0.0;
+
+    public function AutoResumeProxy(proxiedElement:MediaElement = null) {
+        super(proxiedElement);
+
+        var provider:ObjectProvider = ObjectProvider.getInstance();
+        resumeService = provider.getObject(ResumeService);
+
+        if (resumeService == null) {
+            throw ArgumentError("no resume service implementation provided");
+        }
+
+        currentPositionTimer = new Timer(TIMER_UPDATE_INTERVAL);
+        currentPositionTimer.addEventListener(TimerEvent.TIMER, onTimerTick);
     }
 
     public override function set proxiedElement(proxiedElement:MediaElement):void {
@@ -56,122 +86,112 @@ public class AutoResumeProxy extends ProxyElement {
         }
     }
 
-    override protected function setupTraits():void {
-        logger.debug("setupTraits");
-        addLocalTraits();
-        super.setupTraits();
-
-    }
-
-
-    private function processTrait(traitType:String, added:Boolean):void {
-        switch (traitType) {
-            case MediaTraitType.LOAD:
-                toggleLoadListeners(added);
-                break;
-            case MediaTraitType.SEEK:
-                toggleSeekListeners(added);
-                break;
-            case MediaTraitType.PLAY:
-                togglePlayListeners(added);
-                break;
+    private function onDurationChange(event:TimeEvent):void {
+        if (!currentPositionTimer.running) {
+            currentPositionTimer.start();
         }
-    }
-
-
-    private function togglePlayListeners(added:Boolean):void {
-        var playable:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
-        if (playable) {
-            if (added) {
-                playable.addEventListener(PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
-                playable.addEventListener(PlayEvent.CAN_PAUSE_CHANGE, onCanPauseChange);
-            }
-            else {
-                playable.removeEventListener(PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
-                playable.removeEventListener(PlayEvent.CAN_PAUSE_CHANGE, onCanPauseChange);
-            }
-        }
-    }
-
-    private function toggleSeekListeners(added:Boolean):void {
-
-        if (seek) {
-            // this is required because the seekTrait gets delegated in the ScrubPreventionProxy
-            // this should ensure that the new SeekTrait has listeners associated in this class
-            seek.removeEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
-        }
-
-        seek = proxiedElement.getTrait(MediaTraitType.SEEK) as SeekTrait;
-
-        if (seek) {
-            if (added) {
-
-                seek.addEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
-            } else {
-                seek.removeEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
-            }
-        }
-    }
-
-    private function toggleLoadListeners(added:Boolean):void {
-        var loadable:LoadTrait = proxiedElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
-        if (loadable) {
-            if (added) {
-                loadable.addEventListener(LoadEvent.LOAD_STATE_CHANGE, onLoadableStateChange);
-
-            }
-            else {
-                loadable.removeEventListener(LoadEvent.LOAD_STATE_CHANGE, onLoadableStateChange);
-            }
-        }
-    }
-
-    private function onLoadableStateChange(event:LoadEvent):void {
-        var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
-
-        /*  if (playTrait) {
-         var resume:Number = resource.getMetadataValue("autoResume") as Number;
-         if (resume == 0) {
-         blockedTraits = new Vector.<String>();
-         if (playTrait.playState) {
-
-         playTrait.play();
-         }
-
-         }
-
-         }*/
-    }
-
-    private function onCanPauseChange(event:PlayEvent):void {
-        //   logger.debug("Can Pause Change:{0}", event.canPause);
-    }
-
-    private function onPlayStateChange(event:PlayEvent):void {
-        //   logger.debug("Play State Change:{0}", event.playState);
     }
 
     private function onSeekingChange(event:SeekEvent):void {
-        logger.debug("On Seek Change:{0}", event.time);
+        seeking = event.seeking;
+        seekTime = event.time;
     }
 
+    private function onComplete(event:TimeEvent):void {
+        resumeService.writeResumeCookie(0.0);
+    }
+
+    private function onPlayStateChanged(event:PlayEvent):void {
+        switch (event.playState) {
+            case PlayState.PAUSED:
+                currentPositionTimer.stop();
+                if (!seeking) {
+                    // if the user has simply paused but this pause is not triggered by a seek
+                    // then write a resume cookie
+                    writeResumePosition();
+                }
+                break;
+            case PlayState.PLAYING:
+                if (seeking) {
+                    // we have reached the end of a seek and the video is playing again
+                    // so write a resume cookie at this point
+                    writeResumePosition();
+                }
+                seeking = false;
+                currentPositionTimer.start();
+                break;
+            case PlayState.STOPPED:
+                currentPositionTimer.stop();
+                // reset the resume point to the start
+                resumeService.writeResumeCookie(0.0);
+                break;
+        }
+    }
+
+    private function seekToResumePosition():void {
+        var resume:Number = resumeService.getResumeCookie();
+        if (seekTrait && seekTrait.canSeekTo(resume)) {
+            seekTrait.seek(resume);
+            lastResume = resume;
+        }
+    }
+
+    private function onTimerTick(event:Event = null):void {
+        if (playTrait && playTrait.playState == PlayState.PLAYING) {
+            // if the video is playing attempt to write at TIMER_UPDATE_INTERVAL intervals
+            writeResumePosition();
+        }
+    }
+
+    private function writeResumePosition():void {
+        if (timeTrait && seekTrait && seekTrait.canSeekTo(timeTrait.currentTime)) {
+            // there should be at least MIN_INTERVAL_BETWEEN_WRITE seconds difference between the new resume point 
+            // and the old
+            if (Math.abs(timeTrait.currentTime - lastResume) > MIN_INTERVAL_BETWEEN_WRITE) {
+                var time:Number = seeking ? seekTime : timeTrait.currentTime;
+                if (time > 0) {
+                    logger.debug("recording resume point at: " + time);
+                    resumeService.writeResumeCookie(time);
+                    lastResume = time;
+                }
+            }
+        }
+    }
 
     private function onTraitAdd(event:MediaElementEvent):void {
-        processTrait(event.traitType, true);
+        updateTraitListeners(event.traitType, true);
     }
 
     private function onTraitRemove(event:MediaElementEvent):void {
-        processTrait(event.traitType, false);
+        updateTraitListeners(event.traitType, false);
     }
 
-    private function addLocalTraits():void {
-
+    private function updateTraitListeners(traitType:String, add:Boolean):void {
+        switch (traitType) {
+            case MediaTraitType.SEEK:
+                changeListeners(add, traitType, SeekEvent.SEEKING_CHANGE, onSeekingChange);
+                seekTrait = getTrait(MediaTraitType.SEEK) as SeekTrait;
+                seekToResumePosition();
+                break;
+            case MediaTraitType.PLAY:
+                changeListeners(add, traitType, PlayEvent.PLAY_STATE_CHANGE, onPlayStateChanged);
+                playTrait = getTrait(MediaTraitType.PLAY) as PlayTrait;
+                break;
+            case MediaTraitType.TIME:
+                changeListeners(add, traitType, TimeEvent.COMPLETE, onComplete);
+                changeListeners(add, traitType, TimeEvent.DURATION_CHANGE, onDurationChange);
+                timeTrait = getTrait(MediaTraitType.TIME) as TimeTrait;
+                break;
+        }
     }
 
-    private function removeLocalTraits():void {
-
+    private function changeListeners(add:Boolean, traitType:String, event:String, listener:Function):void {
+        if (add) {
+            getTrait(traitType).addEventListener(event, listener);
+        }
+        else if (hasTrait(traitType)) {
+            getTrait(traitType).removeEventListener(event, listener);
+        }
     }
-
-
 }
 }

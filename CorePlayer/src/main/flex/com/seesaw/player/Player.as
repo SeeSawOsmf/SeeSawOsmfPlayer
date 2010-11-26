@@ -25,7 +25,6 @@ import com.seesaw.player.buttons.PlayStartButton;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.impl.services.ResumeServiceImpl;
 import com.seesaw.player.init.ServiceRequest;
-import com.seesaw.player.init.VideoInfoPluginInfo;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
@@ -34,6 +33,7 @@ import com.seesaw.player.panels.GuidanceBar;
 import com.seesaw.player.panels.GuidancePanel;
 import com.seesaw.player.panels.PosterFrame;
 import com.seesaw.player.services.ResumeService;
+import com.seesaw.player.smil.SMILPluginInfo;
 import com.seesaw.player.smil.resource.DynamicSMILResource;
 
 import flash.display.LoaderInfo;
@@ -45,10 +45,7 @@ import flash.events.Event;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.logging.Log;
-import org.osmf.media.MediaElement;
 import org.osmf.media.MediaResourceBase;
-import org.osmf.media.PluginInfoResource;
-import org.osmf.media.URLResource;
 import org.osmf.metadata.Metadata;
 
 [SWF(width=PLAYER::Width, height=PLAYER::Height, backgroundColor="#000000")]
@@ -75,8 +72,6 @@ public class Player extends Sprite {
 
     // Returned by the video info AJAX call
     private var _videoInfo:XML;
-    private var resumeService:ResumeService;
-    private var resumeValue:Number;
 
     public function Player() {
         super();
@@ -136,7 +131,8 @@ public class Player extends Sprite {
     }
 
     private function showPlayPanel():void {
-        var playButton:PlayStartButton = new PlayStartButton(PlayStartButton.PLAY);
+        var mode:String = getResumePosition() > 0 ? PlayStartButton.RESUME : PlayStartButton.PLAY;
+        var playButton:PlayStartButton = new PlayStartButton(mode);
         playButton.addEventListener(PlayStartButton.PROCEED, function(event:Event) {
             nextInitialisationStage();
         });
@@ -209,7 +205,6 @@ public class Player extends Sprite {
         xmlDoc.ignoreWhitespace = true;
 
         _videoInfo = xmlDoc;
-        _playerInit.appendChild(<resume>{resumeValue}</resume>);
 
         if (_videoInfo.geoblocked == "true") {
             // TODO: show the geoblock panel
@@ -250,8 +245,8 @@ public class Player extends Sprite {
         var metaSettings:Metadata = new Metadata();
         // Use this to check the resource is the mainContent, e.g. for the AdProxypPlugins
         metaSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
-
         resource.addMetadataValue(PlayerConstants.CONTENT_ID, metaSettings);
+
         resource.addMetadataValue(PlayerConstants.CONTENT_INFO, _playerInit);
         resource.addMetadataValue(PlayerConstants.VIDEO_INFO, _videoInfo);
 
@@ -288,8 +283,6 @@ public class Player extends Sprite {
         logger.debug("registering services");
         var provider:ObjectProvider = ObjectProvider.getInstance();
         provider.register(ResumeService, new ResumeServiceImpl());
-        resumeService = provider.getObject(ResumeService);
-        resumeValue = resumeService.getResumeCookie();
     }
 
     private function nextInitialisationStage():void {
@@ -299,6 +292,13 @@ public class Player extends Sprite {
             logger.debug("evaluating pre-initialisation stage");
             initialisationStage.call(this);
         }
+    }
+
+    private function getResumePosition():Number {
+        var provider:ObjectProvider = ObjectProvider.getInstance();
+        var resumeService:ResumeService = provider.getObject(ResumeService);
+        var resumeValue:Number = resumeService.getResumeCookie();
+        return resumeValue;
     }
 
     public function get videoPlayer():SeeSawPlayer {

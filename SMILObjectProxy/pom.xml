@@ -77,13 +77,11 @@
         <dependency>
             <groupId>com.adobe.flexunit</groupId>
             <artifactId>flexunit</artifactId>
-            <version>4.0-rc-1</version>
             <type>swc</type>
         </dependency>
         <dependency>
-            <artifactId>org.osmf.smil</artifactId>
-            <groupId>org.osmf.smil</groupId>
-            <version>1.5</version>
+            <artifactId>smil</artifactId>
+            <groupId>org.osmf</groupId>
             <type>swc</type>
         </dependency>
         <dependency>

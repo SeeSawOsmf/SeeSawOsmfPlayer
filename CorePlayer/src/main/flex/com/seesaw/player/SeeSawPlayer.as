@@ -23,6 +23,7 @@
 package com.seesaw.player {
 import com.seesaw.player.ads.AdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
+import com.seesaw.player.buffering.BufferManager;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.controls.ControlBarMetadata;
 import com.seesaw.player.controls.ControlBarPlugin;
@@ -73,6 +74,7 @@ public class SeeSawPlayer extends Sprite {
         config = playerConfig;
 
         factory = config.factory;
+
         player = new MediaPlayer();
 
         rootElement = new ParallelElement();
@@ -136,7 +138,7 @@ public class SeeSawPlayer extends Sprite {
 
         logger.debug("creating video element");
         videoElement = factory.createMediaElement(config.resource);
-        // videoElement = new BufferManager(0.5, 5, _videoElement);
+        // videoElement = new BufferManager(0.5, 5, videoElement);
 
         if (videoElement == null) {
             throw new ArgumentError("failed to create video element");
@@ -149,10 +151,6 @@ public class SeeSawPlayer extends Sprite {
 
         videoElement.addEventListener(MediaElementEvent.METADATA_ADD, onVideoMetadataAdd);
         videoElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onVideoMetadataRemove);
-
-        var controlBarMetadata:Metadata = new Metadata();
-        controlBarMetadata.addValue(ControlBarMetadata.CAN_SHOW_SUBTITLES, captionUrl != null);
-        videoElement.addMetadata(ControlBarMetadata.CONTROL_BAR_METADATA, controlBarMetadata);
 
         rootElement.addChild(videoElement);
     }

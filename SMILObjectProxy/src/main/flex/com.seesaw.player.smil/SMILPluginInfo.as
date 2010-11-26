@@ -33,6 +33,11 @@ import org.osmf.media.PluginInfo;
  * Encapsulation of the SMIL plugin.
  */
 public class SMILPluginInfo extends PluginInfo {
+
+    public static const NS_SMIL = "http://www.w3.org/ns/SMIL";
+    public static const MAIN_CONTENT_METADATA:String = "mainContent";
+    public static const MAIN_CONTENT_METADATA_KEY:String = "mainContentId";
+
     /**
      * Constructor.
      */

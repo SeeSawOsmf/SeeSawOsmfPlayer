@@ -64,13 +64,13 @@
 
                 <smil:switch>
                     <smil:video region="content" src="mp4:e5/INTERNAL/sintel-2048-stereo_500kbs.mp4"
-                               system-bitrate="500000" width="512" dur="2m" clipBegin="3m" clipEnd="5m">
+                               system-bitrate="500000" width="512" >
                     </smil:video>
                     <smil:video region="content" src="mp4:e5/INTERNAL/sintel-2048-stereo_796kbs.mp4"
-                               system-bitrate="800000" width="720" dur="2m" clipBegin="3m" clipEnd="5m">
+                               system-bitrate="800000" width="720" >
                     </smil:video>
                     <smil:video region="content" src="mp4:e5/INTERNAL/sintel-2048-stereo_1500kbs.mp4"
-                               system-bitrate="1500000" width="1080" dur="2m" clipBegin="3m" clipEnd="5m">
+                               system-bitrate="1500000" width="1080" >
 
                     </smil:video>
                     <smil:meta contentType="mainContent"/>
