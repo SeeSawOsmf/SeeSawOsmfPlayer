@@ -35,6 +35,9 @@ public class SAMIParser implements CaptionParser {
     // A new captioning is displayed every second (1000ms).
     public static const CAPTION_INTERVAL:int = 1000;
 
+    public function SAMIParser() {
+    }
+
     public function parse(strSubs:String):CaptionDocument {
         strSubs = strSubs.replace(/<span/ig, "<font");
         strSubs = strSubs.replace(/<\/span>/ig, "</font>");
@@ -50,7 +53,7 @@ public class SAMIParser implements CaptionParser {
         var displayPattern:RegExp = new RegExp("(<Sync Start=\"\\d*\">)(\.*)", "i");
         var counter:int = 0;
 
-        var captions = new Vector.<CaptionSync>();
+        var captions:Vector.<CaptionSync> = new Vector.<CaptionSync>();
         for each(var item:* in arrFromString) {
             try {
                 counter++;

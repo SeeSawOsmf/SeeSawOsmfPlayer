@@ -32,6 +32,7 @@ import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.MediaType;
 import org.osmf.media.URLResource;
+import org.osmf.metadata.Metadata;
 import org.osmf.net.DynamicStreamingItem;
 import org.osmf.net.DynamicStreamingResource;
 import org.osmf.net.StreamType;
@@ -48,6 +49,10 @@ CONFIG::LOGGING
     import org.osmf.logging.Logger;
 }
 public class SeesawSMILMediaGenerator {
+
+    private const SMIL_NS:String = "http://www.w3.org/ns/SMIL";
+    private const CONTENT_TYPE:String = "contentType";
+
     public function SeesawSMILMediaGenerator() {
     }
 
@@ -81,6 +86,12 @@ public class SeesawSMILMediaGenerator {
         switch (smilElement.type) {
             case SMILElementType.SWITCH:
                 mediaResource = createDynamicStreamingResource(smilElement, smilDocument);
+
+                var createdMetaData:Metadata = getMediaMetaData(smilElement);
+                if (createdMetaData) {
+                    mediaResource.addMetadataValue(SMIL_NS, createdMetaData);
+                }
+
                 break;
             case SMILElementType.PARALLEL:
                 var parallelElement:ParallelElement = new ParallelElement();
@@ -90,11 +101,16 @@ public class SeesawSMILMediaGenerator {
             case SMILElementType.SEQUENCE:
                 var serialElement:SerialElement = new SerialElement();
                 mediaElement = serialElement;
+
                 break;
             case SMILElementType.VIDEO:
                 var resource:StreamingURLResource = new StreamingURLResource((smilElement as SMILMediaElement).src);
                 resource.mediaType = MediaType.VIDEO;
                 var videoElement:MediaElement = factory.createMediaElement(resource);
+                var createdMetaData:Metadata = getMediaMetaData(smilElement);
+                if (createdMetaData) {
+                    resource.addMetadataValue(SMIL_NS, createdMetaData);
+                }
                 var smilVideoElement:SMILMediaElement = smilElement as SMILMediaElement;
 
                 if (!isNaN(smilVideoElement.clipBegin) && smilVideoElement.clipBegin > 0 &&
@@ -104,7 +120,9 @@ public class SeesawSMILMediaGenerator {
                 }
 
                 var duration:Number = (smilElement as SMILMediaElement).duration;
-                if (!isNaN(duration) && duration > 0) {
+                if (!isNaN(duration)) {
+
+                    // todo   videoElement is VideoElement is not true therefore default duration is not being set...
                     if (videoElement is VideoElement) {
                         (videoElement as VideoElement).defaultDuration = duration;
                     }
@@ -181,7 +199,6 @@ public class SeesawSMILMediaGenerator {
                     break;
             }
         }
-
         return dsr;
     }
 
@@ -196,9 +213,11 @@ public class SeesawSMILMediaGenerator {
             if (smilElement.type == SMILElementType.VIDEO) {
                 videoElement = smilElement as SMILMediaElement;
 
+
                 // We need to divide the bitrate by 1000 because the DynamicStreamingItem class
                 // requires the bitrate in kilobits per second.
                 var dsi:DynamicStreamingItem = new DynamicStreamingItem(videoElement.src, videoElement.bitrate / 1000);
+
                 streamItems.push(dsi);
             }
         }
@@ -218,6 +237,19 @@ public class SeesawSMILMediaGenerator {
         }
 
         return dsr;
+    }
+
+    private function getMediaMetaData(element:SMILElement):Metadata {
+        for (var i:int = 0; i < element.numChildren; i++) {
+            var smilElement:SMILElement = element.getChildAt(i);
+            if (smilElement.type == SMILElementType.META) {
+                var smilMetaElement:SMILMetaElement = smilElement as SMILMetaElement;
+                var elementMetadata:Metadata = new Metadata();
+                elementMetadata.addValue(CONTENT_TYPE, smilMetaElement.contentType);
+                return elementMetadata;
+            }
+        }
+        return null;
     }
 
 

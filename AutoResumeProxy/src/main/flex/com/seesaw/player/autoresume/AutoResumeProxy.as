@@ -65,8 +65,6 @@ public class AutoResumeProxy extends ProxyElement {
 
 
     private function processTrait(traitType:String, added:Boolean):void {
-        logger.debug(" --------- traitType -----------" + traitType);
-
         switch (traitType) {
             case MediaTraitType.LOAD:
                 toggleLoadListeners(added);

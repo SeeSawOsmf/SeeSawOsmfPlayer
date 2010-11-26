@@ -24,8 +24,8 @@ package com.seesaw.player {
 import com.seesaw.player.ads.AdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
-import com.seesaw.player.captions.CaptionManager;
-import com.seesaw.player.components.ControlBarComponent;
+import com.seesaw.player.controls.ControlBarMetadata;
+import com.seesaw.player.controls.ControlBarPlugin;
 import com.seesaw.player.events.FullScreenEvent;
 import com.seesaw.player.fullscreen.FullScreenProxyPluginInfo;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
@@ -36,118 +36,159 @@ import flash.display.Sprite;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
+import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MediaFactoryEvent;
+import org.osmf.events.MetadataEvent;
+import org.osmf.layout.HorizontalAlign;
 import org.osmf.layout.LayoutMetadata;
+import org.osmf.layout.VerticalAlign;
 import org.osmf.media.MediaElement;
+import org.osmf.media.MediaFactory;
+import org.osmf.media.MediaPlayer;
+import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
-
+import org.osmf.media.URLResource;
+import org.osmf.metadata.Metadata;
+import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.MediaTraitType;
-
-import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
 
 public class SeeSawPlayer extends Sprite {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
 
-    private var _config:PlayerConfiguration;
-    private var _rootElement:ParallelElement;
-    private var _videoElement:MediaElement;
+    private var config:PlayerConfiguration;
+    private var videoElement:MediaElement;
+
+    private var factory:MediaFactory;
+    private var player:MediaPlayer;
+    private var rootContainer:MediaContainer;
+    private var rootElement:ParallelElement;
+    private var subtitleElement:MediaElement;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
 
         config = playerConfig;
+
+        factory = config.factory;
+        player = new MediaPlayer();
+
+        rootElement = new ParallelElement();
+        rootContainer = new MediaContainer();
+
         initialisePlayer();
     }
 
     private function initialisePlayer():void {
         logger.debug("initialising media player");
 
-        config.factory.addEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onMediaElementCreate);
+        factory.addEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onMediaElementCreate);
 
-        createRootElement();
         createVideoElement();
-        createMediaElementPlugins();
+        createControlBarElement();
+        createSubtitleElement();
 
-        logger.debug("adding container to stage");
-        addChild(config.container);
+        player.media = videoElement;
 
-        var captionManager:CaptionManager = new CaptionManager(_videoElement);
-        addChild(captionManager)
+        setPlayerSize(config.width, config.height);
+        rootContainer.addMediaElement(rootElement);
+
+        logger.debug("adding media container to stage");
+        addChild(rootContainer);
     }
 
-    private function createMediaElementPlugins():void {
-        logger.debug("adding control bar media element to container");
+    private function createSubtitleElement():void {
+        factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
 
-        var controlBarComponent:ControlBarComponent = new ControlBarComponent();
-        var controlBarElement:MediaElement = controlBarComponent.createMediaElement(config.factory, _videoElement);
-        _rootElement.addChild(controlBarElement);
+        if (captionUrl) {
+            subtitleElement = factory.createMediaElement(new URLResource(captionUrl));
 
-       // controlBarElement.addEventListener(MediaElementEvent.TRAIT_ADD, onControlBarTraitsChange);
-    }
+            var layout:LayoutMetadata = new LayoutMetadata();
+            subtitleElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
 
-    private function onControlBarTraitsChange(event:MediaElementEvent):void {
-        if (event.type == MediaElementEvent.TRAIT_ADD) {
-            if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
+            layout.index = 3;
+            layout.percentWidth = 100;
+            layout.height = 50;
+            layout.bottom = 100;
+            layout.horizontalAlign = HorizontalAlign.CENTER;
+            layout.verticalAlign = VerticalAlign.BOTTOM;
 
-            }
-        } else {
-            if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
-
-            }
+            rootElement.addChild(subtitleElement);
         }
     }
 
     private function createVideoElement():void {
         logger.debug("loading the proxy plugins that wrap the video element");
-        config.factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo()));
-        config.factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
-        config.factory.loadPlugin(new PluginInfoResource(new FullScreenProxyPluginInfo()));
-        config.factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
-        config.factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
-        // config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
-        config.factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo()));
+        // factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new FullScreenProxyPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
+        // factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
 
         if (config.resource.getMetadataValue("contentInfo").adType == config.adModuleType)
-            config.factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
+            factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
 
         ///      if (config.adModuleType == "com.seesaw.player.ads.serial")
-        ///       config.factory.loadPlugin(new PluginInfoResource(new PlaylistPluginInfo()));
+        ///       factory.loadPlugin(new PluginInfoResource(new PlaylistPluginInfo()));
 
         logger.debug("creating video element");
-        _videoElement = config.factory.createMediaElement(config.resource);
-        //_videoElement = new BufferManager(0.5, 5, _videoElement);
+        videoElement = factory.createMediaElement(config.resource);
+        // videoElement = new BufferManager(0.5, 5, _videoElement);
 
-
-        if (_videoElement == null) {
-            throw ArgumentError("failed to create main media element for player");
+        if (videoElement == null) {
+            throw new ArgumentError("failed to create video element");
         }
 
-        setLocalEventHandlers();
-
-        logger.debug("adding video element to container");
-        _rootElement.addChild(_videoElement);
-    }
-
-    private function setLocalEventHandlers():void {
-        var fullScreen:FullScreenTrait = _videoElement.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
-
+        var fullScreen:FullScreenTrait = videoElement.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
         if (fullScreen) {
             fullScreen.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
         }
+
+        videoElement.addEventListener(MediaElementEvent.METADATA_ADD, onVideoMetadataAdd);
+        videoElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onVideoMetadataRemove);
+
+        var controlBarMetadata:Metadata = new Metadata();
+        controlBarMetadata.addValue(ControlBarMetadata.CAN_SHOW_SUBTITLES, captionUrl != null);
+        videoElement.addMetadata(ControlBarMetadata.CONTROL_BAR_METADATA, controlBarMetadata);
+
+        rootElement.addChild(videoElement);
     }
 
-    private function createRootElement():void {
-        logger.debug("creating root element");
+    private function createControlBarElement():void {
+        logger.debug("adding control bar media element to container");
 
-        _rootElement = new ParallelElement();
-        layout(config.width, config.height);
-        config.player.media = _rootElement;
+        var controlBarTarget:Metadata = new Metadata();
+        controlBarTarget.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
+        videoElement.addMetadata(ControlBarPlugin.NS_TARGET, controlBarTarget);
 
-        logger.debug("adding root element to container");
-        config.container.addMediaElement(_rootElement);
+        logger.debug("loading control bar plugin");
+        factory.loadPlugin(new PluginInfoResource(new ControlBarPlugin().pluginInfo));
+
+        var controlBarSettings:Metadata = new Metadata();
+        controlBarSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
+
+        var resource:MediaResourceBase = new MediaResourceBase();
+        resource.addMetadataValue(ControlBarPlugin.NS_SETTINGS, controlBarSettings);
+
+        logger.debug("creating control bar media element");
+        var controlBarElement:MediaElement = factory.createMediaElement(resource);
+
+        if (controlBarElement == null) {
+            logger.warn("failed to create control bar for player");
+            return;
+        }
+
+        var layout:LayoutMetadata = new LayoutMetadata();
+        controlBarElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+
+        layout.index = 1;
+        layout.verticalAlign = VerticalAlign.BOTTOM;
+        layout.horizontalAlign = HorizontalAlign.CENTER;
+
+        rootElement.addChild(controlBarElement);
     }
 
     private function onMediaElementCreate(event:MediaFactoryEvent):void {
@@ -157,49 +198,81 @@ public class SeeSawPlayer extends Sprite {
 
     private function onMediaTraitsChange(event:MediaElementEvent):void {
         var target = event.target as MediaElement;
-
-        var fullScreen:FullScreenTrait = target.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
-
-        if (fullScreen && event.traitType == FullScreenTrait.FULL_SCREEN) {
-            if (event.type == MediaElementEvent.TRAIT_ADD) {
-                logger.debug("adding handler for full screen trait: " + target);
-                fullScreen.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
-            }
-            else {
-                logger.debug("removing handler for full screen trait: " + target);
-                fullScreen.removeEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
+        if (event.traitType == FullScreenTrait.FULL_SCREEN) {
+            var fullScreen:FullScreenTrait = target.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
+            if (fullScreen) {
+                if (event.type == MediaElementEvent.TRAIT_ADD) {
+                    fullScreen.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
+                }
+                else {
+                    fullScreen.removeEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
+                }
             }
         }
     }
 
     private function onFullscreen(event:FullScreenEvent):void {
         logger.debug("onFullscreen: " + event.value);
-        if (event.value) {
-            layout(stage.fullScreenWidth, stage.fullScreenHeight);
+        var width:int = event.value ? stage.fullScreenWidth : config.width;
+        var height:int = event.value ? stage.fullScreenHeight : config.height;
+        setPlayerSize(width, height);
+    }
+
+    private function setPlayerSize(width:int, height:int) {
+        var layout:LayoutMetadata = rootElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
+        if (layout == null) {
+            layout = new LayoutMetadata();
+            rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+
         }
-        else {
-            layout(config.width, config.height);
+        layout.width = width;
+        layout.height = height;
+        rootContainer.layout(width, height, true);
+    }
+
+    private function onVideoMetadataAdd(event:MediaElementEvent):void {
+        if (event.namespaceURL == ControlBarMetadata.CONTROL_BAR_METADATA) {
+            var metadata:Metadata = videoElement.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+            metadata.addEventListener(MetadataEvent.VALUE_CHANGE, controlBarMetadataChange);
+            metadata.addEventListener(MetadataEvent.VALUE_ADD, controlBarMetadataChange);
         }
     }
 
-    private function layout(width:int, height:int):void {
-        logger.debug("setting new layout for root media element: " + width + "x" + height);
-
-        var rootElementLayout:LayoutMetadata = new LayoutMetadata();
-        _rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, rootElementLayout);
-
-        rootElementLayout.width = width;
-        rootElementLayout.height = height;
-
-        config.container.layout(width, height, true);
+    private function onVideoMetadataRemove(event:MediaElementEvent):void {
+        if (event.namespaceURL == ControlBarMetadata.CONTROL_BAR_METADATA) {
+            var metadata:Metadata = videoElement.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+            metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, controlBarMetadataChange);
+            metadata.removeEventListener(MetadataEvent.VALUE_ADD, controlBarMetadataChange);
+        }
     }
 
-    public function get config():PlayerConfiguration {
-        return _config;
+    private function controlBarMetadataChange(event:MetadataEvent):void {
+        logger.debug("control bar metadata change: key = {0}, value = {1}", event.key, event.value);
+        switch (event.key) {
+            case ControlBarMetadata.CONTROL_BAR_HIDDEN:
+                if (subtitleElement) {
+                    var layoutMetadata:LayoutMetadata =
+                            subtitleElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
+                    if (layoutMetadata) {
+                        layoutMetadata.bottom = event.value ? 20 : 100;
+                    }
+                }
+                break;
+            case ControlBarMetadata.SUBTITLES_VISIBLE:
+                if (subtitleElement) {
+                    var displayTrait:DisplayObjectTrait =
+                            subtitleElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
+                    if (displayTrait) {
+                        displayTrait.displayObject.visible = event.value;
+                    }
+                }
+                break;
+        }
     }
 
-    public function set config(value:PlayerConfiguration):void {
-        _config = value;
+    private function get captionUrl():String {
+        var metadata:Metadata = config.resource.getMetadataValue(SAMIPluginInfo.METADATA_NAMESPACE) as Metadata;
+        return metadata.getValue(SAMIPluginInfo.METADATA_KEY_URI) as String;
     }
 }
 }

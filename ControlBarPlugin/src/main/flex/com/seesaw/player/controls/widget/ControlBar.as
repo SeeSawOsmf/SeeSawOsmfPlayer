@@ -28,11 +28,13 @@ public class ControlBar extends Widget {
     override public function set media(value:MediaElement):void {
         super.media = value;
 
-        var metadata:Metadata = media.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
-        if (metadata == null) {
-            var metadata = new Metadata();
+        if(media){
+            var metadata:Metadata = media.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+            if (metadata == null) {
+                metadata = new Metadata();
+                media.addMetadata(ControlBarMetadata.CONTROL_BAR_METADATA, metadata);
+            }
             metadata.addValue(ControlBarMetadata.CONTROL_BAR_HIDDEN, visible);
-            media.addMetadata(ControlBarMetadata.CONTROL_BAR_METADATA, metadata);
         }
     }
 
