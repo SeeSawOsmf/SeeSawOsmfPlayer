@@ -252,6 +252,14 @@
                 <groupId>org.sonatype.flexmojos</groupId>
                 <artifactId>flexmojos-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <configuration>
+                    <useRepositoryLayout>true</useRepositoryLayout>
+                    <copyPom>true</copyPom>
+                </configuration>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
@@ -292,6 +300,7 @@
                         </dependency>
                     </dependencies>
                 </plugin>
+
             </plugins>
         </pluginManagement>
     </build>
@@ -305,5 +314,30 @@
         <flex.sdk.version>4.5.0.17855</flex.sdk.version>
         <osmf.version>1.5</osmf.version>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>3rdParty</id>
+            <name>3rd Party</name>
+            <url>http://seesawosmf.github.com/SeeSawOsmfPlayer/3rdPartyRepository</url>
+        </repository>
+        <repository>
+            <id>FlexMojos</id>
+            <name>Flex Mojos</name>
+            <url>http://svn.sonatype.org/flexmojos/repository</url>
+        </repository>
+        <repository>
+            <id>Flex Group</id>
+            <name>Flex Group</name>
+            <url>http://repository.sonatype.org/content/groups/flexgroup/</url>
+        </repository>
+    </repositories>
+
+    <profiles>
+        <profile>
+            <id>github</id>
+
+        </profile>
+    </profiles>
 
 </project>
