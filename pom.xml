@@ -333,11 +333,4 @@
         </repository>
     </repositories>
 
-    <profiles>
-        <profile>
-            <id>github</id>
-
-        </profile>
-    </profiles>
-
 </project>
