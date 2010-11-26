@@ -50,7 +50,7 @@ public class AutoResumeProxyPluginInfo extends PluginInfo {
         var items:Vector.<MediaFactoryItem> = new Vector.<MediaFactoryItem>();
         items.push(item);
 
-        super(items, mediaElementCreationNotificationCallback);
+        super(items);
     }
 
     private static function canHandleResourceFunction(resource:MediaResourceBase):Boolean {
@@ -67,16 +67,8 @@ public class AutoResumeProxyPluginInfo extends PluginInfo {
 
     private static function mediaElementCreationFunction():MediaElement {
         logger.debug("constructing proxy element");
-
         _proxy = new AutoResumeProxy();
-
         return _proxy;
-    }
-
-    private function mediaElementCreationNotificationCallback(target:MediaElement):void {
-        logger.debug("mediaElementCreationNotificationCallback: " + target);
-
-
     }
 }
 }
