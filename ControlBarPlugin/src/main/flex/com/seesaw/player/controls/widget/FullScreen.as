@@ -23,14 +23,18 @@
 package com.seesaw.player.controls.widget {
 import com.seesaw.player.events.FullScreenEvent;
 import com.seesaw.player.traits.fullscreen.FullScreenTrait;
+
+import com.seesaw.player.ui.PlayerToolTip;
 import com.seesaw.player.ui.StyledTextField;
 
 import controls.seesaw.widget.interfaces.IWidget;
 
 import flash.display.StageDisplayState;
+import flash.events.Event;
 import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.text.TextField;
+import flash.text.TextFieldAutoSize;
 import flash.text.TextFormat;
 import flash.ui.Keyboard;
 
@@ -53,15 +57,33 @@ public class FullScreen extends ButtonWidget implements IWidget {
 
     private var _fullScreenLabel:TextField;
 
+    private var toolTip:PlayerToolTip;
+
     private var _requiredTraits:Vector.<String> = new Vector.<String>;
 
     public function FullScreen() {
+
+        //var toolTip = new PlayerToolTip();
+
+        this.toolTip = new PlayerToolTip(this, "FullScreen");
+
         logger.debug("FullScreen()");
 
         _requiredTraits[0] = FullScreenTrait.FULL_SCREEN;
 
         createView();
+
+        this.addEventListener(Event.ADDED_TO_STAGE, this.onAddedToStage);
     }
+
+    private function onAddedToStage(event:Event) {
+        stage.addChild(this.toolTip);
+    }
+
+    public override function layout(availableWidth:Number, availableHeight:Number, deep:Boolean = true):void
+    {
+       super.layout(availableWidth, availableHeight, deep);
+     }
 
     override protected function get requiredTraits():Vector.<String> {
         return _requiredTraits;
@@ -86,6 +108,7 @@ public class FullScreen extends ButtonWidget implements IWidget {
         textFormat.color = 0x00A78D;
         textFormat.align = "right";
         this._fullScreenLabel.setTextFormat(textFormat);
+        this._fullScreenLabel.autoSize = TextFieldAutoSize.RIGHT;
     }
 
     override protected function processRequiredTraitsUnavailable(element:MediaElement):void {
@@ -123,9 +146,11 @@ public class FullScreen extends ButtonWidget implements IWidget {
     private function onFullScreen(event:FullScreenEvent):void {
         if (event.value) {
             _fullScreenLabel.text = EXIT_FULLSCREEN_LABEL;
+            this.toolTip.updateToolTip(EXIT_FULLSCREEN_LABEL);
         }
         else {
             _fullScreenLabel.text = FULLSCREEN_LABEL;
+            this.toolTip.updateToolTip(FULLSCREEN_LABEL);
         }
     }
 
