@@ -29,7 +29,7 @@
     <version>7.0.0-SNAPSHOT</version>
     <name>Player</name>
     <url>http://www.ioko365.com/</url>
-    <description>The SeeSaw player and related projectsHello from SAM!
+    <description>The SeeSaw player and related projects
     </description>
 
     <modules>
@@ -39,7 +39,6 @@
         <module>ControlBarPlugin</module>
         <module>DebugProxyPlugin</module>
         <module>LiverailPlugin</module>
-        <module>CanvasPoc</module>
         <module>PlayerLogging</module>
         <module>PlayerInitialisation</module>
         <module>FullScreenProxyPlugin</module>
@@ -84,10 +83,10 @@
 
     <scm>
         <connection>
-            scm:svn:http://readonly:23read0n1y@kgd-devtools03.dev.vodco.co.uk/svn/seesaw/trunk/sherbet/player/
+            scm:git:git@github.com:SeeSawOsmf/SeeSawOsmfPlayer.git
         </connection>
         <url>
-            scm:svn:http://kgd-devtools03.dev.vodco.co.uk/svn/seesaw/trunk/sherbet/player/
+            https://github.com/SeeSawOsmf/SeeSawOsmfPlayer
         </url>
     </scm>
 
@@ -205,6 +204,13 @@
                 <groupId>org.as3commons</groupId>
                 <artifactId>as3commons-logging</artifactId>
                 <version>1.1.1</version>
+                <type>swc</type>
+            </dependency>
+
+            <dependency>
+                <artifactId>smil</artifactId>
+                <groupId>org.osmf</groupId>
+                <version>1.5</version>
                 <type>swc</type>
             </dependency>
 
