@@ -22,11 +22,15 @@
 
 package com.seesaw.player.ui {
 import flash.text.TextField;
+import flash.text.TextFieldAutoSize;
 import flash.text.TextFormat;
 
 public class StyledTextField extends TextField {
 
     public function StyledTextField():void {
+        this.selectable = false;
+
+        this.autoSize = TextFieldAutoSize.LEFT;
         //Instantiate the TextFormat
         var format:TextFormat = new TextFormat();
 

@@ -21,6 +21,8 @@
  */
 
 package com.seesaw.player.buttons {
+import com.seesaw.player.ui.PlayerToolTip;
+
 import flash.display.Bitmap;
 import flash.display.Sprite;
 import flash.events.Event;
@@ -40,6 +42,8 @@ public class PlayStartButton extends Sprite {
 
     // Requested button type - play, resume or preview
     private var buttonType:String;
+
+    private var toolTip:PlayerToolTip;
 
     //Embed images
     [Embed(source="resources/preplayButton.png")]
@@ -68,8 +72,15 @@ public class PlayStartButton extends Sprite {
 
         //Build the panel and add it to the GuidancePanel MovieClip
         addChild(this.buildButton());
+        this.toolTip = new PlayerToolTip(this, "Play");
 
-        this.addEventListener(Event.ADDED_TO_STAGE, this.positionButton);
+        this.addEventListener(Event.ADDED_TO_STAGE, this.onAddedToStage);
+
+    }
+
+    private function onAddedToStage(event:Event):void {
+        stage.addChild(this.toolTip);
+        this.positionButton(event);
 
     }
 
