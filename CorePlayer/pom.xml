@@ -159,14 +159,12 @@
         <dependency>
             <artifactId>SMILObjectProxy</artifactId>
             <groupId>com.seesaw</groupId>
-            <version>${pom.version}</version>
-            <type>swc</type>
+             <type>swc</type>
         </dependency>
 
         <dependency>
             <groupId>com.adobe.flexunit</groupId>
             <artifactId>flexunit</artifactId>
-            <version>4.0-rc-1</version>
             <type>swc</type>
             <scope>test</scope>
         </dependency>

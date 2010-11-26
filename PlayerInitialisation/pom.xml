@@ -47,7 +47,6 @@
         <dependency>
             <groupId>com.adobe.flexunit</groupId>
             <artifactId>flexunit</artifactId>
-            <version>4.0-rc-1</version>
             <type>swc</type>
         </dependency>
 
