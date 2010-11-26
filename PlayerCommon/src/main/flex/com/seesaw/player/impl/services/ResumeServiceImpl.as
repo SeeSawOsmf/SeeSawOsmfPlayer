@@ -29,7 +29,13 @@ import flash.net.SharedObject;
 import flash.net.SharedObjectFlushStatus;
 import flash.utils.ByteArray;
 
+import org.as3commons.logging.ILogger;
+import org.as3commons.logging.LoggerFactory;
+
 public class ResumeServiceImpl implements ResumeService {
+    
+    private var logger:ILogger = LoggerFactory.getClassLogger(ResumeServiceImpl);
+    
     private var tripleDESKey:TripleDESKey;
     private static const ENCRYTION_KEY:String = "this%is%the%new%static%encryption%key%";
     private static const SHARED_OBJECT_LOCAL:String = "Seesaw-Player";
@@ -38,7 +44,6 @@ public class ResumeServiceImpl implements ResumeService {
     public function ResumeServiceImpl() {
         tripleDESKey = new TripleDESKey(Hex.toArray(ENCRYTION_KEY));
         localSharedObject = SharedObject.getLocal(SHARED_OBJECT_LOCAL);
-
     }
 
     public function getResumeCookie():Number {
@@ -50,38 +55,36 @@ public class ResumeServiceImpl implements ResumeService {
     }
 
     public function writeResumeCookie(currentTime:Number):void {
-
-
         localSharedObject.data.savedValue = getEncryptedValue(String(currentTime));
 
         var flushStatus:String = null;
         try {
             flushStatus = localSharedObject.flush(10000);
         } catch (error:Error) {
-            trace("Error...Could not write SharedObject to disk\n");
+            logger.error("could not write SharedObject to disk: " + error.message);
         }
+        
         if (flushStatus != null) {
             switch (flushStatus) {
                 case SharedObjectFlushStatus.PENDING:
-                    trace("Requesting permission to save object...\n");
+                    logger.debug("Requesting permission to save object..");
                     localSharedObject.addEventListener(NetStatusEvent.NET_STATUS, onFlushStatus);
                     break;
                 case SharedObjectFlushStatus.FLUSHED:
-                    trace("Value flushed to disk.\n");
+                    logger.debug("Value flushed to disk.");
                     break;
             }
         }
-
     }
 
     private function onFlushStatus(event:NetStatusEvent):void {
-        trace("User closed permission dialog...\n");
+        logger.debug("User closed permission dialog...");
         switch (event.info.code) {
             case "SharedObject.Flush.Success":
-                trace("User granted permission -- value saved.\n");
+                logger.debug("User granted permission -- value saved.");
                 break;
             case "SharedObject.Flush.Failed":
-                trace("User denied permission -- value not saved.\n");
+                logger.debug("User denied permission -- value not saved.");
                 break;
         }
         localSharedObject.removeEventListener(NetStatusEvent.NET_STATUS, onFlushStatus);

@@ -54,7 +54,6 @@ public class AutoResumeProxyPluginInfo extends PluginInfo {
     }
 
     private static function canHandleResourceFunction(resource:MediaResourceBase):Boolean {
-        logger.debug("can handle this resource: " + resource);
         var result:Boolean;
 
         if (resource != null) {
@@ -62,6 +61,7 @@ public class AutoResumeProxyPluginInfo extends PluginInfo {
             result = settings != null;
         }
 
+        logger.debug("can handle this resource: {0} {1}", resource, result);
         return result;
     }
 
