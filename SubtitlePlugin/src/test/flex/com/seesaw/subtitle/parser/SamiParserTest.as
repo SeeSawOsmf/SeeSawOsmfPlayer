@@ -30,7 +30,7 @@ import org.hamcrest.assertThat;
 import org.hamcrest.object.equalTo;
 import org.hamcrest.object.notNullValue;
 
-public class SAMIParserTest {
+public class SamiParserTest {
 
     [Test]
     public function canParseSAMI() {
