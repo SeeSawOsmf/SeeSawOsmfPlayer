@@ -31,6 +31,7 @@ public class PlayerToolTip extends Sprite {
 
         element.addEventListener(MouseEvent.MOUSE_OUT, this.hideToolTip);
         element.addEventListener(MouseEvent.MOUSE_MOVE, this.handleMouseMove);
+        element.addEventListener(MouseEvent.CLICK, this.handleMouseClick);
 
         this.toolTipTimer.addEventListener(TimerEvent.TIMER, this.triggerToolTip);
 
@@ -97,8 +98,9 @@ public class PlayerToolTip extends Sprite {
             this.toolTipBG.x = x;
         }
 
-        if ((this.toolTipBG.height + stage.mouseY) > stage.stageHeight) {
-            this.toolTipBG.y = -y;
+        if ((this.toolTipBG.height + y) > stage.stageHeight) {
+            var offset:Number = this.toolTipBG.height + 30;
+            this.toolTipBG.y = y - offset;
         } else {
             this.toolTipBG.y = y;
         }
@@ -111,6 +113,11 @@ public class PlayerToolTip extends Sprite {
     }
 
     private function handleMouseMove(event:MouseEvent):void {
+        this.toolTipBG.visible = false;
+        this.toolTipTimer.start();
+    }
+
+    private function handleMouseClick(event:MouseEvent):void {
         this.toolTipBG.visible = false;
         this.toolTipTimer.start();
     }

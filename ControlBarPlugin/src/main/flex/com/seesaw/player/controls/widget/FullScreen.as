@@ -47,9 +47,9 @@ public class FullScreen extends ButtonWidget implements IWidget {
 
     private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.FullScreen";
 
-    private static const FULLSCREEN_LABEL:String = "Fullscreen";
+    private static const FULLSCREEN_LABEL:String = "Full Screen";
 
-    private static const EXIT_FULLSCREEN_LABEL:String = "Exit Fullscreen";
+    private static const EXIT_FULLSCREEN_LABEL:String = "Exit Full Screen";
 
     private var logger:ILogger = LoggerFactory.getClassLogger(FullScreen);
 

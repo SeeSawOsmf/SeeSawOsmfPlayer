@@ -22,10 +22,12 @@
 
 package com.seesaw.player.controls.widget {
 import com.seesaw.player.controls.ControlBarMetadata;
+import com.seesaw.player.ui.PlayerToolTip;
 import com.seesaw.player.ui.StyledTextField;
 
 import controls.seesaw.widget.interfaces.IWidget;
 
+import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.text.TextField;
 import flash.text.TextFormat;
@@ -46,6 +48,8 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
 
     private var subtitlesOn:Boolean;
     private var subtitlesLabel:TextField;
+
+    private var toolTip:PlayerToolTip;
 
     /* static */
     private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.SubtitlesButton";
@@ -102,9 +106,16 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
         logger.debug("Subtitles Constructor");
         subtitlesLabel = new StyledTextField();
         subtitlesLabel.text = "Subtitles are off";
+        this.toolTip = new PlayerToolTip(this, "Subtitles are off");
         this.formatLabelFont();
 
+        this.addEventListener(Event.ADDED_TO_STAGE, this.onAddedToStage);
+
         addChild(subtitlesLabel);
+    }
+
+    private function onAddedToStage(event:Event) {
+        stage.addChild(this.toolTip);
     }
 
     private function formatLabelFont():void {
@@ -123,9 +134,11 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
     override protected function onMouseClick(event:MouseEvent):void {
         if (this.subtitlesOn == false) {
             subtitlesLabel.text = "Subtitles are on";
+            this.toolTip.updateToolTip("Subtitles are on");
             this.subtitlesOn = true;
         } else {
             subtitlesLabel.text = "Subtitles are off";
+            this.toolTip.updateToolTip("Subtitles are off");
             this.subtitlesOn = false;
         }
         metadata.addValue(ControlBarMetadata.SUBTITLES_VISIBLE, subtitlesOn);

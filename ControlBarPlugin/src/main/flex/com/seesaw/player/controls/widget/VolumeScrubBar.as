@@ -20,10 +20,13 @@
  *    Incorporated. All Rights Reserved.
  */
 package com.seesaw.player.controls.widget {
+import com.seesaw.player.ui.PlayerToolTip;
+
 import controls.seesaw.widget.interfaces.IWidget;
 
 import flash.display.DisplayObject;
 import flash.display.Sprite;
+import flash.events.Event;
 import flash.events.MouseEvent;
 
 import org.osmf.chrome.assets.AssetsManager;
@@ -76,7 +79,6 @@ public class VolumeScrubBar extends Widget implements IWidget {
             scrubBarClickArea.graphics.drawRect(0, 0, scrubBarWidth, scrubber.height);
             scrubBarClickArea.graphics.endFill();
 
-
         }
     }
 
@@ -99,10 +101,13 @@ public class VolumeScrubBar extends Widget implements IWidget {
                         , assetManager.getDisplayObject(xml.@scrubberDisabled) || new Sprite()
                         );
 
+        this.toolTip = new PlayerToolTip(scrubber, "Volume: ");
+
         scrubber.enabled = false;
         scrubber.addEventListener(ScrubberEvent.SCRUB_START, onScrubberStart);
         scrubber.addEventListener(ScrubberEvent.SCRUB_UPDATE, onScrubberUpdate);
         scrubber.addEventListener(ScrubberEvent.SCRUB_END, onScrubberEnd);
+        scrubber.addEventListener(Event.ADDED_TO_STAGE, this.scrubberAddedToStage);
         addChild(scrubber);
 
 
@@ -110,6 +115,10 @@ public class VolumeScrubBar extends Widget implements IWidget {
 
         updateState();
 
+    }
+    
+    private function scrubberAddedToStage(event:Event) {
+        stage.addChild(this.toolTip);
     }
 
     override protected function get requiredTraits():Vector.<String> {
@@ -195,6 +204,8 @@ public class VolumeScrubBar extends Widget implements IWidget {
     private var lastHeight:Number;
 
     private var seekToTime:Number;
+
+    private var toolTip:PlayerToolTip;
 
     private var scrubBarWidth:Number;
     /* static */
