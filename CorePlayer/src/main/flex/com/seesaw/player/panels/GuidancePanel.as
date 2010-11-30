@@ -21,6 +21,7 @@
  */
 
 package com.seesaw.player.panels {
+import com.seesaw.player.ui.PlayerToolTip;
 import com.seesaw.player.ui.StyledTextField;
 
 import flash.display.Bitmap;
@@ -45,6 +46,12 @@ public class GuidancePanel extends Sprite {
     private var confirmationMessage:String;
     private var parentalControlsSetupLink:String;
     private var findOutMoreLink:String;
+
+    //components which need tooltips
+    private var acceptButton:Sprite = new Sprite();
+    private var cancelButton:Sprite = new Sprite();
+    private var parentalControlsButton:Sprite = new Sprite();
+    private var findOutMoreButton:Sprite = new Sprite();
 
     //Embed images
     [Embed(source="resources/acceptButton_up.png")]
@@ -82,8 +89,24 @@ public class GuidancePanel extends Sprite {
         //Build the panel and add it to the GuidancePanel MovieClip
         addChild(this.buildPanel());
 
-        this.addEventListener(Event.ADDED_TO_STAGE, this.positionPanel);
+        this.addEventListener(Event.ADDED_TO_STAGE, this.onAddedToStage);
 
+    }
+
+    private function onAddedToStage(event:Event):void {
+        this.positionPanel(event);
+        this.setupToolTips();
+    }
+
+    private function setupToolTips():void {
+        var acceptToolTip = new PlayerToolTip(this.acceptButton, "Accept");
+        stage.addChild(acceptToolTip);
+        var cancelToolTip = new PlayerToolTip(this.cancelButton, "Decline");
+        stage.addChild(cancelToolTip);
+        var findOutMoreToolTip = new PlayerToolTip(this.findOutMoreButton, "Find out more");
+        stage.addChild(findOutMoreToolTip);
+        var parentalControlsToolTip = new PlayerToolTip(this.parentalControlsButton, "Set up Parental Controls");
+        stage.addChild(parentalControlsToolTip);
     }
 
     private function positionPanel(event:Event):void {
@@ -229,12 +252,11 @@ public class GuidancePanel extends Sprite {
     }
 
     private function buildAcceptButton(label:String):Sprite {
-        var acceptButton:Sprite = new Sprite();
 
         //setup the hand cursor
-        acceptButton.useHandCursor = true;
-        acceptButton.buttonMode = true;
-        acceptButton.mouseChildren = false;
+        this.acceptButton.useHandCursor = true;
+        this.acceptButton.buttonMode = true;
+        this.acceptButton.mouseChildren = false;
 
         //build the label
         /*var buttonLabel = new TextField();
@@ -246,18 +268,18 @@ public class GuidancePanel extends Sprite {
          //add the label to the button
          acceptButton.addChild(formattedButtonLabel);*/
 
-        acceptButton.addChild(this.acceptImageUp);
+        this.acceptButton.addChild(this.acceptImageUp);
 
-        acceptButton.addEventListener(MouseEvent.MOUSE_OVER, this.onAcceptMouseOver);
-        acceptButton.addEventListener(MouseEvent.MOUSE_OUT, this.onAcceptMouseOut);
-        acceptButton.addEventListener(MouseEvent.CLICK, this.onAcceptClick);
+        this.acceptButton.addEventListener(MouseEvent.MOUSE_OVER, this.onAcceptMouseOver);
+        this.acceptButton.addEventListener(MouseEvent.MOUSE_OUT, this.onAcceptMouseOut);
+        this.acceptButton.addEventListener(MouseEvent.CLICK, this.onAcceptClick);
 
         //position the button
-        acceptButton.y = 106;
-        acceptButton.height = 40;
-        acceptButton.width = 100;
+        this.acceptButton.y = 106;
+        this.acceptButton.height = 40;
+        this.acceptButton.width = 100;
 
-        return acceptButton;
+        return this.acceptButton;
     }
 
     private function onAcceptMouseOver(event:MouseEvent):void {
@@ -277,12 +299,11 @@ public class GuidancePanel extends Sprite {
     }
 
     private function buildDeclineButton(label:String):Sprite {
-        var declineButton:Sprite = new Sprite();
 
         //setup the hand cursor
-        declineButton.useHandCursor = true;
-        declineButton.buttonMode = true;
-        declineButton.mouseChildren = false;
+        this.cancelButton.useHandCursor = true;
+        this.cancelButton.buttonMode = true;
+        this.cancelButton.mouseChildren = false;
 
         //build the label
         var buttonLabel = new StyledTextField();
@@ -295,17 +316,17 @@ public class GuidancePanel extends Sprite {
         this.applyDefaultFormat(formattedButtonLabel);
 
         //add the label to the button
-        declineButton.addChild(formattedButtonLabel);
+        this.cancelButton.addChild(formattedButtonLabel);
 
-        declineButton.addEventListener(MouseEvent.MOUSE_OVER, this.onLinkMouseOver);
-        declineButton.addEventListener(MouseEvent.MOUSE_OUT, this.onLinkMouseOut);
-        declineButton.addEventListener(MouseEvent.CLICK, this.onDeclineClick);
+        this.cancelButton.addEventListener(MouseEvent.MOUSE_OVER, this.onLinkMouseOver);
+        this.cancelButton.addEventListener(MouseEvent.MOUSE_OUT, this.onLinkMouseOut);
+        this.cancelButton.addEventListener(MouseEvent.CLICK, this.onDeclineClick);
 
         //position the button
-        declineButton.y = 102;
-        declineButton.x = 109;
+        this.cancelButton.y = 102;
+        this.cancelButton.x = 109;
 
-        return declineButton;
+        return this.cancelButton;
     }
 
     private function onLinkMouseOver(event:MouseEvent):void {
@@ -327,12 +348,10 @@ public class GuidancePanel extends Sprite {
 
     private function buildParentalControlsLink():Sprite {
 
-        var parentalControlsButton:Sprite = new Sprite();
-
         //setup the hand cursor
-        parentalControlsButton.useHandCursor = true;
-        parentalControlsButton.buttonMode = true;
-        parentalControlsButton.mouseChildren = false;
+        this.parentalControlsButton.useHandCursor = true;
+        this.parentalControlsButton.buttonMode = true;
+        this.parentalControlsButton.mouseChildren = false;
 
         //build the label
         var parentalControlsLabel = new StyledTextField();
@@ -346,17 +365,17 @@ public class GuidancePanel extends Sprite {
         this.applySmallFormat(formattedButtonLabel);
 
         //add the label to the button
-        parentalControlsButton.addChild(formattedButtonLabel);
+        this.parentalControlsButton.addChild(formattedButtonLabel);
 
-        parentalControlsButton.addEventListener(MouseEvent.MOUSE_OVER, this.onLinkMouseOver);
-        parentalControlsButton.addEventListener(MouseEvent.MOUSE_OUT, this.onLinkMouseOut);
-        parentalControlsButton.addEventListener(MouseEvent.CLICK, this.onParentalControlClick);
+        this.parentalControlsButton.addEventListener(MouseEvent.MOUSE_OVER, this.onLinkMouseOver);
+        this.parentalControlsButton.addEventListener(MouseEvent.MOUSE_OUT, this.onLinkMouseOut);
+        this.parentalControlsButton.addEventListener(MouseEvent.CLICK, this.onParentalControlClick);
 
         //position the button
-        parentalControlsButton.y = 175;
-        parentalControlsButton.x = 0;
+        this.parentalControlsButton.y = 175;
+        this.parentalControlsButton.x = 0;
 
-        return parentalControlsButton;
+        return this.parentalControlsButton;
     }
 
     private function onParentalControlClick(event:Event):void {
@@ -371,12 +390,10 @@ public class GuidancePanel extends Sprite {
 
     private function buildFindOutMoreLink():Sprite {
 
-        var findOutMoreButton:Sprite = new Sprite();
-
         //setup the hand cursor
-        findOutMoreButton.useHandCursor = true;
-        findOutMoreButton.buttonMode = true;
-        findOutMoreButton.mouseChildren = false;
+        this.findOutMoreButton.useHandCursor = true;
+        this.findOutMoreButton.buttonMode = true;
+        this.findOutMoreButton.mouseChildren = false;
 
         //build the label
         var findOutMoreLabel = new StyledTextField();
@@ -390,17 +407,17 @@ public class GuidancePanel extends Sprite {
         this.applySmallFormat(formattedButtonLabel);
 
         //add the label to the button
-        findOutMoreButton.addChild(formattedButtonLabel);
+        this.findOutMoreButton.addChild(formattedButtonLabel);
 
-        findOutMoreButton.addEventListener(MouseEvent.MOUSE_OVER, this.onLinkMouseOver);
-        findOutMoreButton.addEventListener(MouseEvent.MOUSE_OUT, this.onLinkMouseOut);
-        findOutMoreButton.addEventListener(MouseEvent.CLICK, this.onFindOutMoreClick);
+        this.findOutMoreButton.addEventListener(MouseEvent.MOUSE_OVER, this.onLinkMouseOver);
+        this.findOutMoreButton.addEventListener(MouseEvent.MOUSE_OUT, this.onLinkMouseOut);
+        this.findOutMoreButton.addEventListener(MouseEvent.CLICK, this.onFindOutMoreClick);
 
         //position the button
-        findOutMoreButton.y = 175;
-        findOutMoreButton.x = 147;
+        this.findOutMoreButton.y = 175;
+        this.findOutMoreButton.x = 147;
 
-        return findOutMoreButton;
+        return this.findOutMoreButton;
     }
 
     private function onFindOutMoreClick(event:Event):void {

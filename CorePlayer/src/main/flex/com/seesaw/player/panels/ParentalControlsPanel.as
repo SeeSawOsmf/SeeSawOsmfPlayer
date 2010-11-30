@@ -21,6 +21,7 @@
  */
 
 package com.seesaw.player.panels {
+import com.seesaw.player.ui.PlayerToolTip;
 import com.seesaw.player.ui.StyledTextField;
 
 import flash.display.Bitmap;
@@ -39,6 +40,8 @@ public class ParentalControlsPanel extends Sprite {
 
     public static const PARENTAL_CHECK_PASSED = "PARENTAL_CHECK_PASSED";
     public static const PARENTAL_CHECK_FAILED = "PARENTAL_CHECK_FAILED";
+
+    private var toolTip:PlayerToolTip;
 
     //Guidance warning string passed into the constructor
     private var guidanceWarning:String;
@@ -92,8 +95,11 @@ public class ParentalControlsPanel extends Sprite {
         //Build the panel and add it to the GuidancePanel MovieClip
         addChild(this.buildPanel());
 
-        this.addEventListener(Event.ADDED_TO_STAGE, this.positionPanel);
+        this.addEventListener(Event.ADDED_TO_STAGE, this.onAddedToStage);
 
+    }
+
+    private function onAddedToStage(event:Event):void {
     }
 
     private function checkPassword():void {

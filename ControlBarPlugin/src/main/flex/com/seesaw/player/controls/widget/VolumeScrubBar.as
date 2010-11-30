@@ -41,8 +41,7 @@ import org.osmf.traits.MediaTraitType;
 
 public class VolumeScrubBar extends Widget implements IWidget {
     public function VolumeScrubBar() {
-
-
+        
         scrubBarClickArea = new Sprite();
         scrubBarClickArea.addEventListener(MouseEvent.MOUSE_DOWN, onTrackMouseDown);
         addChild(scrubBarClickArea);
@@ -127,6 +126,8 @@ public class VolumeScrubBar extends Widget implements IWidget {
 
     override protected function processRequiredTraitsAvailable(media:MediaElement):void {
         updateState();
+        audible = media.getTrait(MediaTraitType.AUDIO) as AudioTrait;
+        this.toolTip.updateToolTip("Volume: " + Math.round(audible.volume * 10));
     }
 
     override protected function processRequiredTraitsUnavailable(media:MediaElement):void {
@@ -185,6 +186,7 @@ public class VolumeScrubBar extends Widget implements IWidget {
 
     protected function onVolumeChange(event:AudioEvent = null):void {
         scrubber.x = audible.volume * scrubBarWidth - scrubber.width / 2;
+        this.toolTip.updateToolTip("Volume: " + Math.round(audible.volume * 10));
     }
 
 
@@ -211,7 +213,6 @@ public class VolumeScrubBar extends Widget implements IWidget {
     /* static */
 
     protected var audible:AudioTrait;
-
 
     private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.VolumeScrubBar";
     private static const CURRENT_POSITION_UPDATE_INTERVAL:int = 100;
