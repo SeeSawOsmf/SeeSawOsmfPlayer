@@ -33,6 +33,7 @@ import flash.net.navigateToURL;
 import flash.system.Security;
 import flash.text.StyleSheet;
 import flash.text.TextField;
+import flash.text.TextFieldAutoSize;
 import flash.text.TextFieldType;
 import flash.text.TextFormat;
 
@@ -50,8 +51,14 @@ public class ParentalControlsPanel extends Sprite {
     private var moreAboutParentalControlsLink:String;
     private var turnOffParentalControlsLink:String;
 
+    private var forgotPasswordButton:Sprite = new Sprite();
+    private var acceptButton:Sprite = new Sprite();
+    private var declineButton:Sprite = new Sprite();
+    private var parentalControlsButton:Sprite = new Sprite();
+    private var turnOffControlsButton:Sprite = new Sprite();
+
     //Password logic related
-    private var parentalControlPasswordInput = new StyledTextField();
+    private var parentalControlPasswordInput = new TextField();
     private var passwordError = new StyledTextField();
     private var passwordEntryBG = new Sprite();
     private var passwordEntryErrorBG = new Sprite();
@@ -100,6 +107,21 @@ public class ParentalControlsPanel extends Sprite {
     }
 
     private function onAddedToStage(event:Event):void {
+        this.positionPanel(event);
+        this.setupToolTips();
+    }
+
+    private function setupToolTips():void {
+        var acceptToolTip = new PlayerToolTip(this.acceptButton, "Enter");
+        stage.addChild(acceptToolTip);
+        var cancelToolTip = new PlayerToolTip(this.declineButton, "Cancel");
+        stage.addChild(cancelToolTip);
+        var forgotPasswordToolTip = new PlayerToolTip(this.forgotPasswordButton, "Forgot password?");
+        stage.addChild(forgotPasswordToolTip);
+        var findOutMoreToolTip = new PlayerToolTip(this.turnOffControlsButton, "Turn off Parental Controls");
+        stage.addChild(findOutMoreToolTip);
+        var parentalControlsToolTip = new PlayerToolTip(this.parentalControlsButton, "More about Parental Controls");
+        stage.addChild(parentalControlsToolTip);
     }
 
     private function checkPassword():void {
@@ -283,6 +305,8 @@ public class ParentalControlsPanel extends Sprite {
     private function buildPasswordEntry():TextField {
 
         this.parentalControlPasswordInput.name = "passwordEntry";
+        this.parentalControlPasswordInput.autoSize = TextFieldAutoSize.NONE;
+        this.parentalControlPasswordInput.selectable = true;
         this.parentalControlPasswordInput.displayAsPassword = true;
         this.parentalControlPasswordInput.maxChars = 12;
         this.parentalControlPasswordInput.height = 22;
@@ -309,7 +333,7 @@ public class ParentalControlsPanel extends Sprite {
 
     private function buildForgotPasswordLink():Sprite {
 
-        var forgotPasswordButton:Sprite = new Sprite();
+
 
         //setup the hand cursor
         forgotPasswordButton.useHandCursor = true;
@@ -346,7 +370,7 @@ public class ParentalControlsPanel extends Sprite {
         var confirmationLabel = new StyledTextField();
         confirmationLabel.width = 500;
         confirmationLabel.htmlText = this.confirmationMessage;
-        confirmationLabel.y = 106;
+        confirmationLabel.y = 67;
         var formattedWarningLabel:TextField = this.applyInfoFormat(confirmationLabel);
 
         confirmationLabel.styleSheet = this.css;
@@ -424,7 +448,6 @@ public class ParentalControlsPanel extends Sprite {
     }
 
     private function buildAcceptButton(label:String):Sprite {
-        var acceptButton:Sprite = new Sprite();
 
         //setup the hand cursor
         acceptButton.useHandCursor = true;
@@ -462,7 +485,6 @@ public class ParentalControlsPanel extends Sprite {
     }
 
     private function buildDeclineButton(label:String):Sprite {
-        var declineButton:Sprite = new Sprite();
 
         //setup the hand cursor
         declineButton.useHandCursor = true;
@@ -512,8 +534,6 @@ public class ParentalControlsPanel extends Sprite {
 
     private function buildParentalControlsLink():Sprite {
 
-        var parentalControlsButton:Sprite = new Sprite();
-
         //setup the hand cursor
         parentalControlsButton.useHandCursor = true;
         parentalControlsButton.buttonMode = true;
@@ -555,8 +575,6 @@ public class ParentalControlsPanel extends Sprite {
     }
 
     private function buildTurnOffControlsLink():Sprite {
-
-        var turnOffControlsButton:Sprite = new Sprite();
 
         //setup the hand cursor
         turnOffControlsButton.useHandCursor = true;
