@@ -72,7 +72,6 @@ public class PlayStartButton extends Sprite {
 
         //Build the panel and add it to the GuidancePanel MovieClip
         addChild(this.buildButton());
-        this.toolTip = new PlayerToolTip(this, "Play");
 
         this.addEventListener(Event.ADDED_TO_STAGE, this.onAddedToStage);
 
@@ -102,15 +101,19 @@ public class PlayStartButton extends Sprite {
 
             case "play":
                 proceedButton.addChild(this.playButtonImage);
+                this.toolTip = new PlayerToolTip(this, "Play");
                 break;
             case "playSubscribed":
                 proceedButton.addChild(this.playSubscribedButtonImage);
+                this.toolTip = new PlayerToolTip(this, "Play");
                 break;
             case "preview":
                 proceedButton.addChild(this.previewButtonImage);
+                this.toolTip = new PlayerToolTip(this, "Preview");
                 break;
             case "resume":
                 proceedButton.addChild(this.resumeButtonImage);
+                this.toolTip = new PlayerToolTip(this, "Resume");
                 break;
             default:
                 // setting an invalid button type is a coding error so throw an exception
