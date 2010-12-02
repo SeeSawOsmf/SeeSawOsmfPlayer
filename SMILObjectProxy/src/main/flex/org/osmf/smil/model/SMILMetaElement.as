@@ -43,17 +43,24 @@ public class SMILMetaElement extends SMILElement {
         _base = value;
     }
 
-    public function get contentType():String {
-        return _contentType;
+    public function get name():String {
+        return _name;
     }
 
-    public function set contentType(value:String):void {
-        _contentType = value;
+    public function set name(value:String):void {
+        _name = value;
+    }
+
+    public function get content():String {
+        return _content;
+    }
+
+    public function set content(value:String):void {
+        _content = value;
     }
 
     private var _base:String;
-
-    private var _contentType:String;
-
+    private var _name:String;
+    private var _content:String;
 }
 }

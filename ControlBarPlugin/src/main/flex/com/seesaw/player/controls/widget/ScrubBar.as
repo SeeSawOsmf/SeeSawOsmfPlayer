@@ -47,6 +47,7 @@ import org.osmf.chrome.widgets.Scrubber;
 import org.osmf.chrome.widgets.Widget;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.SeekEvent;
+import org.osmf.events.TimeEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
@@ -162,7 +163,7 @@ public class ScrubBar extends Widget implements IWidget {
 
         updateState();
     }
-
+    
     override protected function get requiredTraits():Vector.<String> {
         return _requiredTraits;
     }
@@ -188,7 +189,7 @@ public class ScrubBar extends Widget implements IWidget {
 
     private function updateState():void {
         visible = media != null;
-        // scrubber.enabled = media ? media.hasTrait(MediaTraitType.SEEK) : false;
+        scrubber.enabled = media ? media.hasTrait(MediaTraitType.SEEK) : false;
         adTrait = media ? media.getTrait(AdTraitType.AD_PLAY) as AdTrait : null;
         if (adTrait) {
             adTrait.addEventListener(AdEvent.AD_STATE_CHANGE, disableScrubber);

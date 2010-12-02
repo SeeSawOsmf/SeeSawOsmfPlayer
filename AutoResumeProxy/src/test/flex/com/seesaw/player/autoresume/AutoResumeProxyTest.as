@@ -19,23 +19,27 @@
  * Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
  * Incorporated. All Rights Reserved.
  */
-package org.osmf.smil.elements
-{
-	import org.osmf.elements.LoadFromDocumentElement;
-	import org.osmf.media.MediaResourceBase;
-	import org.osmf.smil.loader.SMILLoader;
-import org.osmf.traits.LoaderBase;
 
-public class SMILElement extends LoadFromDocumentElement
-	{
-		public function SMILElement(resource:MediaResourceBase = null, loader:LoaderBase = null)
-		{
-			if (loader == null)
-			{
-				loader = new SMILLoader();
-			}
-			super(resource, loader);		
-		}
-		
-	}
+package com.seesaw.player.autoresume {
+import com.seesaw.player.PlayerConstants;
+import com.seesaw.player.traits.fullscreen.FullScreenTrait;
+
+import org.flexunit.asserts.assertNotNull;
+import org.flexunit.asserts.assertTrue;
+import org.osmf.media.DefaultMediaFactory;
+import org.osmf.media.MediaElement;
+import org.osmf.media.MediaFactory;
+import org.osmf.media.MediaResourceBase;
+import org.osmf.metadata.Metadata;
+
+public class AutoResumeProxyTest {
+
+    public function AutoResumeProxyTest() {
+    }
+
+    [Test]
+    public function canWriteResumePosition():void {
+
+    }
+}
 }

@@ -19,23 +19,12 @@
  * Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
  * Incorporated. All Rights Reserved.
  */
-package org.osmf.smil.elements
-{
-	import org.osmf.elements.LoadFromDocumentElement;
-	import org.osmf.media.MediaResourceBase;
-	import org.osmf.smil.loader.SMILLoader;
-import org.osmf.traits.LoaderBase;
 
-public class SMILElement extends LoadFromDocumentElement
-	{
-		public function SMILElement(resource:MediaResourceBase = null, loader:LoaderBase = null)
-		{
-			if (loader == null)
-			{
-				loader = new SMILLoader();
-			}
-			super(resource, loader);		
-		}
-		
-	}
+package org.osmf.smil {
+public class SMILConstants {
+    public static const SMIL_METADATA_NS = "http://www.w3.org/ns/SMIL";
+    public static const TARGET_METADATA_KEY:String = "targetMetadataKey";
+    public static const TARGET_METADATA:String = "targetMetadata";
+    public static const SMIL_DOCUMENT:String = "smilDocument";
+}
 }
