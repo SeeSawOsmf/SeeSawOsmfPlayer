@@ -68,6 +68,7 @@ public class SeeSawPlayer extends Sprite {
     private var rootContainer:MediaContainer;
     private var rootElement:ParallelElement;
     private var subtitleElement:MediaElement;
+    private var dOGImage:MediaElement;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
@@ -92,6 +93,7 @@ public class SeeSawPlayer extends Sprite {
         createVideoElement();
         createControlBarElement();
         createSubtitleElement();
+        this.createDOG("http://www.davemoorhouse.co.uk/DOG.png");
 
         player.media = videoElement;
 
@@ -100,6 +102,29 @@ public class SeeSawPlayer extends Sprite {
 
         logger.debug("adding media container to stage");
         addChild(rootContainer);
+
+    }
+
+    private function createDOG(dOGURL:String):void {
+        this.dOGImage = factory.createMediaElement(new URLResource(dOGURL));
+        var layout:LayoutMetadata = new LayoutMetadata();
+        this.dOGImage.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+
+        layout.index = 5;
+        layout.x = 5;
+        layout.y = 5;
+        layout.verticalAlign = VerticalAlign.TOP;
+        layout.horizontalAlign = HorizontalAlign.LEFT;
+
+        this.showDOG();
+    }
+
+    private function showDOG():void {
+        rootElement.addChild(this.dOGImage);
+    }
+
+    private function hideDOG():void {
+        rootElement.removeChild(this.dOGImage);
     }
 
     private function createSubtitleElement():void {
