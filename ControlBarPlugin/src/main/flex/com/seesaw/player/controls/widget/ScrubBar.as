@@ -163,7 +163,7 @@ public class ScrubBar extends Widget implements IWidget {
 
         updateState();
     }
-    
+
     override protected function get requiredTraits():Vector.<String> {
         return _requiredTraits;
     }
@@ -184,17 +184,44 @@ public class ScrubBar extends Widget implements IWidget {
         updateState();
     }
 
+    override public function set media(value:MediaElement):void {
+        if (media) {
+            media.removeEventListener(MediaElementEvent.TRAIT_ADD, onMediaTraitsChange);
+        }
+
+        super.media = value;
+
+        if (media) {
+            media.addEventListener(MediaElementEvent.TRAIT_ADD, onMediaTraitsChange);
+        }
+    }
+
+    private function onMediaTraitsChange(event:MediaElementEvent):void {
+        var target = event.target as MediaElement;
+        if (event.traitType == MediaTraitType.TIME) {
+            var timeTrait:TimeTrait = target.getTrait(MediaTraitType.TIME) as TimeTrait;
+            timeTrait.addEventListener(TimeEvent.DURATION_CHANGE, onDurationChange);
+        }
+    }
+
+    private function onDurationChange(event:TimeEvent):void {
+        var timeTrait:TimeTrait = event.target as TimeTrait;
+        positionOffset = timeTrait.currentTime;
+    }
+
     // Internals
     //
 
     private function updateState():void {
         visible = media != null;
         scrubber.enabled = media ? media.hasTrait(MediaTraitType.SEEK) : false;
+
         adTrait = media ? media.getTrait(AdTraitType.AD_PLAY) as AdTrait : null;
         if (adTrait) {
             adTrait.addEventListener(AdEvent.AD_STATE_CHANGE, disableScrubber);
             adTrait.addEventListener(AdEvent.AD_MARKERS, adMarkerEvent);
         }
+
         updateTimerState();
     }
 
@@ -224,9 +251,9 @@ public class ScrubBar extends Widget implements IWidget {
 
     private function disableScrubber(event:AdEvent):void {
         if (adTrait.adState == AdState.STARTED) {
-            currentTime.visible = scrubber.visible = scrubBarTrail.visible = markerContainer.visible = scrubBarTrack.visible = false;
+            visible = false;
         } else if (adTrait.adState == AdState.STOPPED) {
-            currentTime.visible = scrubber.visible = scrubBarTrail.visible = markerContainer.visible = scrubBarTrack.visible = true;
+            visible = true;
         }
     }
 
@@ -243,13 +270,17 @@ public class ScrubBar extends Widget implements IWidget {
     }
 
     private function onTimerTick(event:Event = null):void {
+        // var seekTrait:SeekTrait = media ? media.getTrait(MediaTraitType.SEEK) as SeekTrait : null;
+        // scrubber.visible = scrubBarTrail.visible = scrubBarTrack.visible = seekTrait != null;
+
         var temporal:TimeTrait = media ? media.getTrait(MediaTraitType.TIME) as TimeTrait : null;
         if (temporal != null) {
-            var duration:Number = temporal.duration;
-            var position:Number = temporal.currentTime;
+            var duration:Number = temporal.duration - positionOffset;
+            var position:Number = temporal.currentTime - positionOffset;
 
             currentTime.text
                     = prettyPrintSeconds(position) + " / " + prettyPrintSeconds(duration);
+
             var scrubberX:Number
                     = scrubberStart
                     + (    (scrubberEnd - scrubberStart)
@@ -348,6 +379,8 @@ public class ScrubBar extends Widget implements IWidget {
     public function get classDefinition():String {
         return QUALIFIED_NAME;
     }
+
+    private var positionOffset:Number;
 
     private var scrubber:Scrubber;
     private var scrubBarClickArea:Sprite;
