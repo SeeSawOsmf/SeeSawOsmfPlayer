@@ -27,6 +27,7 @@ import flash.display.Bitmap;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
+import flash.external.ExternalInterface;
 import flash.system.Security;
 
 public class PlayStartButton extends Sprite {
@@ -121,6 +122,9 @@ public class PlayStartButton extends Sprite {
         }
 
         proceedButton.addEventListener(MouseEvent.CLICK, this.onProceedClick);
+        if (ExternalInterface.available) {
+            ExternalInterface.addCallback("playStart", this.onProceedClick);
+        }
 
         proceedButton.height = 170;
         proceedButton.width = 170;
@@ -128,7 +132,7 @@ public class PlayStartButton extends Sprite {
         return proceedButton;
     }
 
-    private function onProceedClick(event:MouseEvent):void {
+    private function onProceedClick(event:MouseEvent=null):void {
         this.visible = false;
         this.dispatchEvent(new Event(PROCEED));
     }

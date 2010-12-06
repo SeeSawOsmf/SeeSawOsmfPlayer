@@ -35,6 +35,8 @@ import com.seesaw.player.traits.fullscreen.FullScreenTrait;
 
 import flash.display.Sprite;
 
+import flash.external.ExternalInterface;
+
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.containers.MediaContainer;
@@ -42,6 +44,7 @@ import org.osmf.elements.ParallelElement;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.events.MetadataEvent;
+import org.osmf.events.PlayEvent;
 import org.osmf.layout.HorizontalAlign;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.layout.VerticalAlign;
@@ -55,6 +58,9 @@ import org.osmf.metadata.Metadata;
 import org.osmf.smil.SMILPluginInfo;
 import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.MediaTraitType;
+import org.osmf.traits.PlayState;
+import org.osmf.traits.PlayTrait;
+import org.osmf.traits.TimeTrait;
 
 public class SeeSawPlayer extends Sprite {
 
@@ -62,6 +68,8 @@ public class SeeSawPlayer extends Sprite {
 
     private var config:PlayerConfiguration;
     private var videoElement:MediaElement;
+
+    private var lightsDown:Boolean = false;
 
     private var factory:MediaFactory;
     private var player:MediaPlayer;
@@ -83,6 +91,7 @@ public class SeeSawPlayer extends Sprite {
         rootContainer = new MediaContainer();
 
         initialisePlayer();
+
     }
 
     private function initialisePlayer():void {
@@ -115,6 +124,11 @@ public class SeeSawPlayer extends Sprite {
         layout.y = 5;
         layout.verticalAlign = VerticalAlign.TOP;
         layout.horizontalAlign = HorizontalAlign.LEFT;
+
+        if (ExternalInterface.available) {
+            ExternalInterface.addCallback("hideDOG", this.hideDOG);
+            ExternalInterface.addCallback("showDOG", this.showDOG);
+        }
 
         this.showDOG();
     }
@@ -178,6 +192,8 @@ public class SeeSawPlayer extends Sprite {
         videoElement.addEventListener(MediaElementEvent.METADATA_ADD, onVideoMetadataAdd);
         videoElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onVideoMetadataRemove);
 
+        videoElement.addEventListener(MediaElementEvent.TRAIT_ADD, onMediaTraitsChange);
+
         rootElement.addChild(videoElement);
     }
 
@@ -222,15 +238,36 @@ public class SeeSawPlayer extends Sprite {
 
     private function onMediaTraitsChange(event:MediaElementEvent):void {
         var target = event.target as MediaElement;
-        if (event.traitType == FullScreenTrait.FULL_SCREEN) {
-            var fullScreen:FullScreenTrait = target.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
-            if (fullScreen) {
-                if (event.type == MediaElementEvent.TRAIT_ADD) {
-                    fullScreen.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
-                }
-                else {
-                    fullScreen.removeEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
-                }
+//        if (event.traitType == FullScreenTrait.FULL_SCREEN) {
+//            var fullScreen:FullScreenTrait = target.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
+//            if (fullScreen) {
+//                if (event.type == MediaElementEvent.TRAIT_ADD) {
+//                    fullScreen.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
+//                }
+//                else {
+//                    fullScreen.removeEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
+//                }
+//            }
+//        }
+
+        if(event.traitType == MediaTraitType.PLAY) {
+            var playTrait:PlayTrait = target.getTrait(MediaTraitType.PLAY) as PlayTrait;
+            playTrait.addEventListener(PlayEvent.PLAY_STATE_CHANGE, onPlayStateChanged);
+        }
+    }
+
+    private function onPlayStateChanged(event:PlayEvent):void {
+        var timeTrait:TimeTrait = videoElement.getTrait(MediaTraitType.TIME) as TimeTrait;
+        if (event.playState == PlayState.PLAYING && !this.lightsDown) {
+            if (ExternalInterface.available) {
+                ExternalInterface.call("lightsDown.lightsDown");
+                this.lightsDown = true;
+            }
+        }
+        if (event.playState == PlayState.PAUSED && (timeTrait.currentTime != timeTrait.duration)) {
+            if (ExternalInterface.available) {
+                ExternalInterface.call("lightsDown.lightsUp");
+                this.lightsDown = false;
             }
         }
     }
