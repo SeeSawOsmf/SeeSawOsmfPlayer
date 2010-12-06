@@ -30,7 +30,7 @@ import com.seesaw.player.controls.ControlBarPlugin;
 import com.seesaw.player.events.FullScreenEvent;
 import com.seesaw.player.fullscreen.FullScreenProxyPluginInfo;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
-import com.seesaw.player.smil.SMILPluginInfo;
+import com.seesaw.player.smil.SeeSawSMILLoader;
 import com.seesaw.player.traits.fullscreen.FullScreenTrait;
 
 import flash.display.Sprite;
@@ -52,6 +52,7 @@ import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
 import org.osmf.media.URLResource;
 import org.osmf.metadata.Metadata;
+import org.osmf.smil.SMILPluginInfo;
 import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.MediaTraitType;
 
@@ -123,10 +124,10 @@ public class SeeSawPlayer extends Sprite {
 
     private function createVideoElement():void {
         logger.debug("loading the proxy plugins that wrap the video element");
-        factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo(new SeeSawSMILLoader())));
         // factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new FullScreenProxyPluginInfo()));
-        factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
+        // factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
         // factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
 

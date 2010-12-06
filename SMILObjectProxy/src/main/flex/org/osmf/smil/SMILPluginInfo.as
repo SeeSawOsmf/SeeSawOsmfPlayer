@@ -27,7 +27,7 @@ import org.osmf.media.MediaFactoryItem;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfo;
 import org.osmf.smil.elements.SMILElement;
-import org.osmf.smil.loader.SMILLoader;
+import org.osmf.traits.LoaderBase;
 
 /**
 	 * Encapsulation of the SMIL plugin.
@@ -37,27 +37,29 @@ import org.osmf.smil.loader.SMILLoader;
 		/**
 		 * Constructor.
 		 */
-		public function SMILPluginInfo()
+		public function SMILPluginInfo(loader:LoaderBase)
 		{
+            this.loader = loader;
 			var items:Vector.<MediaFactoryItem> = new Vector.<MediaFactoryItem>();
-			
-			var item:MediaFactoryItem = new MediaFactoryItem("org.osmf.smil.SMILPluginInfo", new SMILLoader().canHandleResource, createSMILProxyElement);
+
+			var item:MediaFactoryItem = new MediaFactoryItem("org.osmf.smil.SMILPluginInfo", loader.canHandleResource, createSMILProxyElement);
 			items.push(item);
-			
+
 			super(items);
 		}
-		
+
 		private function createSMILProxyElement():MediaElement
 		{
-			return new SMILElement(null, new SMILLoader(mediaFactory));
+			return new SMILElement(null, loader);
 		}
-		
+
 		override public function initializePlugin(resource:MediaResourceBase):void
 		{
 			// We'll use the player-supplied MediaFactory for creating all MediaElements.
 			mediaFactory = resource.getMetadataValue(PluginInfo.PLUGIN_MEDIAFACTORY_NAMESPACE) as MediaFactory;
 		}
-		
+
+        private var loader:LoaderBase;
 		private var mediaFactory:MediaFactory;
 	}
 }

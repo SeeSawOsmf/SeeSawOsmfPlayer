@@ -23,57 +23,40 @@
 
 <videoInfo xmlns="http://www.seesaw.com/api/contentinfo/v1.0" xmlns:smil="http://www.w3.org/ns/SMIL"
            mimeType="application/smil+xml">
-    <asset>
-        <path>e5/INTERNAL/sintel-2048-stereo_1500kbs.mp4?s=1288365189&amp;e=1288365939&amp;h=2badd6fd8f7a8fd95625577584b2f23e</path>
-        <bitrate>1500</bitrate>
-        <quality>1</quality>
-        <width>512</width>
-        <height>288</height>
-        <type>mp4</type>
-        <profile>high</profile>
-    </asset>
     <geoblocked>false</geoblocked>
-    <cdnPath>rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703</cdnPath>
     <smil:smil>
         <smil:head>
             <smil:meta base="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703"/>
         </smil:head>
         <smil:body>
-
             <smil:seq>
 
-                <!--
-                <smil:video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Idents_Diner_5s.mp4" width="512"
-                           dur="0">
-                    <smil:meta contentType="instreamAds"/>
-
+                <smil:video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Idents_Diner_5s.mp4" width="512">
+                    <smil:meta name="contentType" content="instreamAds"/>
                 </smil:video>
-                <smil:video
-                        src="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703/mp4:e5/test/cms/clips/ideal_28_v2_trimmed_17"
-                        width="512" dur="0">
 
-                    <smil:meta contentType="instreamAds"/>
-
+                <smil:video src="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703/mp4:e5/test/cms/clips/ideal_28_v2_trimmed_17"
+                        width="512">
+                    <smil:meta name="contentType" content="instreamAds"/>
                 </smil:video>
-                <smil:video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/PRA-OFLG002-030.mp4"
-                           dur="0">
-                    <smil:meta contentType="instreamAds"/>
 
+                <smil:video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/PRA-OFLG002-030.mp4">
+                    <smil:meta name="contentType" content="instreamAds"/>
                 </smil:video>
-                -->
 
                 <smil:switch>
                     <smil:video region="content" src="mp4:e5/INTERNAL/sintel-2048-stereo_500kbs.mp4"
                                system-bitrate="500000" width="512" >
                     </smil:video>
+
                     <smil:video region="content" src="mp4:e5/INTERNAL/sintel-2048-stereo_796kbs.mp4"
                                system-bitrate="800000" width="720" >
                     </smil:video>
+
                     <smil:video region="content" src="mp4:e5/INTERNAL/sintel-2048-stereo_1500kbs.mp4"
                                system-bitrate="1500000" width="1080" >
-
                     </smil:video>
-                    <smil:meta contentType="mainContent"/>
+                    <smil:meta name="contentType" content="mainContent"/>
                 </smil:switch>
 
             </smil:seq>

@@ -32,11 +32,14 @@ package org.osmf.smil.media
 	import org.osmf.media.MediaResourceBase;
 	import org.osmf.media.MediaType;
 	import org.osmf.media.URLResource;
-	import org.osmf.net.DynamicStreamingItem;
+import org.osmf.metadata.Metadata;
+import org.osmf.net.DynamicStreamingItem;
 	import org.osmf.net.DynamicStreamingResource;
 	import org.osmf.net.StreamType;
 	import org.osmf.net.StreamingURLResource;
-	import org.osmf.smil.model.SMILDocument;
+import org.osmf.smil.SMILConstants;
+import org.osmf.smil.SMILPluginInfo;
+import org.osmf.smil.model.SMILDocument;
 	import org.osmf.smil.model.SMILElement;
 	import org.osmf.smil.model.SMILElementType;
 	import org.osmf.smil.model.SMILMediaElement;
@@ -47,7 +50,7 @@ package org.osmf.smil.media
 	import org.osmf.logging.Logger;
 	import org.osmf.logging.Log;
 	}
-	
+
 	/**
 	 * A utility class for creating MediaElements from a <code>SMILDocument</code>.
 	 */
@@ -55,9 +58,9 @@ package org.osmf.smil.media
 	{
 		/**
 		 * Creates the relevant MediaElement from the SMILDocument.
-		 * 
-		 * @param resource The original resource that was given to the load trait. 
-		 * This resource might be a URLto a SMIL document, for example, and may 
+		 *
+		 * @param resource The original resource that was given to the load trait.
+		 * This resource might be a URLto a SMIL document, for example, and may
 		 * contain metadata we need to retain.
 		 * @param smilDocument The SMILDocument to use for media creation.
 		 * @returns A new MediaElement based on the information found in the SMILDocument.
@@ -65,33 +68,33 @@ package org.osmf.smil.media
 		public function createMediaElement(resource:MediaResourceBase, smilDocument:SMILDocument, factory:MediaFactory):MediaElement
 		{
 			this.factory = factory;
-			
+
 			CONFIG::LOGGING
 			{
 				traceElements(smilDocument);
 			}
-			
+
 			var mediaElement:MediaElement;
-			
+
 			for (var i:int = 0; i < smilDocument.numElements; i++)
 			{
 				var smilElement:SMILElement = smilDocument.getElementAt(i);
 				mediaElement = internalCreateMediaElement(resource, null, smilDocument, smilElement);
 			}
-							
+
 			return mediaElement;
 		}
-		
+
 		/**
 		 * Recursive function to create a media element and all of it's children.
 		 */
-		private function internalCreateMediaElement(originalResource:MediaResourceBase, parentMediaElement:MediaElement, 
+		private function internalCreateMediaElement(originalResource:MediaResourceBase, parentMediaElement:MediaElement,
 													smilDocument:SMILDocument, smilElement:SMILElement):MediaElement
 		{
 			var mediaResource:MediaResourceBase = null;
-			
+
 			var mediaElement:MediaElement;
-			
+
 			switch (smilElement.type)
 			{
 				case SMILElementType.SWITCH:
@@ -108,16 +111,31 @@ package org.osmf.smil.media
 				case SMILElementType.VIDEO:
 					var resource:StreamingURLResource = new StreamingURLResource((smilElement as SMILMediaElement).src);
 					resource.mediaType = MediaType.VIDEO;
+
+                    for each (var metadataNS:String in originalResource.metadataNamespaceURLs)
+                    {
+                        var metadata:Object = originalResource.getMetadataValue(metadataNS);
+                        resource.addMetadataValue(metadataNS, metadata);
+                    }
+
+                    var targetMetadataKey:String = resource.getMetadataValue(SMILConstants.TARGET_METADATA_KEY) as String;
+                    var targetMetadataValue:Object = resource.getMetadataValue(SMILConstants.TARGET_METADATA);
+
+                    if(targetMetadataKey && targetMetadataValue)
+                    {
+                        resource.addMetadataValue(targetMetadataKey, targetMetadataValue);
+                    }
+
 					var videoElement:MediaElement = factory.createMediaElement(resource);
 					var smilVideoElement:SMILMediaElement = smilElement as SMILMediaElement;
-					
+
 					if (!isNaN(smilVideoElement.clipBegin) && smilVideoElement.clipBegin > 0 &&
 					    !isNaN(smilVideoElement.clipEnd) && smilVideoElement.clipEnd > 0)
 					{
 						resource.clipStartTime = smilVideoElement.clipBegin;
 						resource.clipEndTime = smilVideoElement.clipEnd;
 					}
-										
+
 					var duration:Number = (smilElement as SMILMediaElement).duration;
 					if (!isNaN(duration) && duration > 0)
 					{
@@ -125,21 +143,23 @@ package org.osmf.smil.media
 						{
 							(videoElement as VideoElement).defaultDuration = duration;
 						}
-						else if (videoElement is ProxyElement) 
-						{ 
+						else if (videoElement is ProxyElement)
+						{
 							// Try to find the proxied video element (fix for FM-1020)
 							var tempMediaElement:MediaElement = videoElement;
 							while (tempMediaElement is ProxyElement)
 							{
 								tempMediaElement = (tempMediaElement as ProxyElement).proxiedElement;
 							}
-							
+
 							if (tempMediaElement != null && tempMediaElement is VideoElement)
 							{
 								(tempMediaElement as VideoElement).defaultDuration = duration;
 							}
 						}
 					}
+
+                    populateMetadataFromSMIL(videoElement, smilVideoElement);
 					(parentMediaElement as CompositeElement).addChild(videoElement);
 					break;
 				case SMILElementType.IMAGE:
@@ -148,16 +168,20 @@ package org.osmf.smil.media
 					var imageElement:MediaElement = factory.createMediaElement(imageResource);
 					var dur:Number = (smilElement as SMILMediaElement).duration;
 					var durationElement:DurationElement = new DurationElement(dur, imageElement);
+
+                    populateMetadataFromSMIL(imageElement, smilVideoElement);
 					(parentMediaElement as CompositeElement).addChild(durationElement);
 					break;
 				case SMILElementType.AUDIO:
 					var audioResource:URLResource = new URLResource((smilElement as SMILMediaElement).src);
 					audioResource.mediaType = MediaType.AUDIO;
 					var audioElement:MediaElement = factory.createMediaElement(audioResource);
+
+                    populateMetadataFromSMIL(audioElement, smilVideoElement);
 					(parentMediaElement as CompositeElement).addChild(audioElement);
 					break;
 			}
-			
+
 			if (mediaElement != null)
 			{
 				for (var i:int = 0; i < smilElement.numChildren; i++)
@@ -165,7 +189,7 @@ package org.osmf.smil.media
 					var childElement:SMILElement = smilElement.getChildAt(i);
 					internalCreateMediaElement(originalResource, mediaElement, smilDocument, childElement);
 				}
-				
+
 				// Fix for FM-931, make sure we support nested elements
 				if (parentMediaElement is CompositeElement)
 				{
@@ -177,108 +201,149 @@ package org.osmf.smil.media
 				// Make sure we transfer any resource metadata from the original resource
 				for each (var metadataNS:String in originalResource.metadataNamespaceURLs)
 				{
-					var metadata:Object = originalResource.getMetadataValue(metadataNS); 
+					var metadata:Object = originalResource.getMetadataValue(metadataNS);
 					mediaResource.addMetadataValue(metadataNS, metadata);
 				}
-				
+
+                var targetMetadataKey:String = mediaResource.getMetadataValue(SMILConstants.TARGET_METADATA_KEY) as String;
+                var targetMetadataValue:Object = mediaResource.getMetadataValue(SMILConstants.TARGET_METADATA);
+
+                if(targetMetadataKey && targetMetadataValue)
+                {
+                    mediaResource.addMetadataValue(targetMetadataKey, targetMetadataValue);
+                }
+
 				mediaElement = factory.createMediaElement(mediaResource);
-				
+
+                populateMetadataFromSMIL(mediaElement, smilElement);
+
 				if (parentMediaElement is CompositeElement)
 				{
 					(parentMediaElement as CompositeElement).addChild(mediaElement);
 				}
 			}
-			
-			return mediaElement;			
+
+			return mediaElement;
 		}
-		
+
+        private function populateMetadataFromSMIL(mediaElement:MediaElement, smilElement:SMILElement):void {
+            var metadata:Metadata = mediaElement.getMetadata(SMILConstants.SMIL_METADATA_NS);
+            if (metadata == null)
+            {
+                metadata = new Metadata();
+                mediaElement.addMetadata(SMILConstants.SMIL_METADATA_NS, metadata);
+            }
+
+            for(var i:uint = 0; i < smilElement.numChildren; i++)
+            {
+                var child:SMILElement = smilElement.getChildAt(i);
+                if(child is SMILMetaElement)
+                {
+                    var smilMeta:SMILMetaElement = child as SMILMetaElement;
+                    if(smilMeta.name && smilMeta.content)
+                    {
+                        metadata.addValue(smilMeta.name, smilMeta.content);
+                    }
+                }
+            }
+        }
+
 		private function createDynamicStreamingResource(switchElement:SMILElement, smilDocument:SMILDocument):MediaResourceBase
 		{
 			var dsr:DynamicStreamingResource = null;
 			var hostURL:String;
-			
+
 			for (var i:int = 0; i < smilDocument.numElements; i++)
 			{
 				var smilElement:SMILElement = smilDocument.getElementAt(i);
 				switch (smilElement.type)
 				{
 					case SMILElementType.META:
-						hostURL = (smilElement as SMILMetaElement).base; 
+						hostURL = (smilElement as SMILMetaElement).base;
 						if (hostURL != null)
 						{
 							dsr = createDynamicStreamingItems(switchElement, hostURL);
 						}
 						break;
 				}
-			}	
-			
+			}
+
 			return dsr;
 		}
-		
+
 		private function createDynamicStreamingItems(switchElement:SMILElement, hostURL:String):DynamicStreamingResource
 		{
 			var dsr:DynamicStreamingResource = null;
 			var streamItems:Vector.<DynamicStreamingItem> = new Vector.<DynamicStreamingItem>();
-			
+
+            var videoElement:SMILMediaElement = null;
+
 			for (var i:int = 0; i < switchElement.numChildren; i++)
 			{
 				var smilElement:SMILElement = switchElement.getChildAt(i);
 				if (smilElement.type == SMILElementType.VIDEO)
 				{
-					var videoElement:SMILMediaElement = smilElement as SMILMediaElement;
-					
-					// We need to divide the bitrate by 1000 because the DynamicStreamingItem class 
+					videoElement = smilElement as SMILMediaElement;
+
+					// We need to divide the bitrate by 1000 because the DynamicStreamingItem class
 					// requires the bitrate in kilobits per second.
 					var dsi:DynamicStreamingItem = new DynamicStreamingItem(videoElement.src, videoElement.bitrate/1000);
 					streamItems.push(dsi);
 				}
 			}
-			
+
 			if (streamItems.length)
 			{
 				dsr = new DynamicStreamingResource(hostURL);
+
+                if (!isNaN(videoElement.clipBegin) && videoElement.clipBegin > 0 &&
+                    !isNaN(videoElement.clipEnd) && videoElement.clipEnd > 0) {
+                    dsr.clipStartTime = videoElement.clipBegin;
+                    dsr.clipEndTime = videoElement.clipEnd;
+                }
+
 				dsr.streamItems = streamItems;
 				dsr.streamType = StreamType.LIVE_OR_RECORDED;
 			}
-			
-			return dsr;		
+
+			return dsr;
 		}
-		
-		
+
+
 		private function traceElements(smilDocument:SMILDocument):void
 		{
 			CONFIG::LOGGING
 			{
 				debugLog(">>> SMILMediaGenerator.traceElements()  ");
-				
+
 				for (var i:int = 0; i < smilDocument.numElements; i++)
 				{
 					var smilElement:SMILElement = smilDocument.getElementAt(i);
 					traceElement(smilElement)
-				}	
-				
+				}
+
 				function traceElement(e:SMILElement, level:int=0):void
 				{
 					var levelMarker:String = "*";
-					
+
 					for (var j:int = 0; j < level; j++)
 					{
 						levelMarker += "*";
 					}
-					
+
 					debugLog(levelMarker + e.type);
 					level++;
-					
+
 					for (var k:int = 0; k < e.numChildren; k++)
 					{
 						traceElement(e.getChildAt(k), level);
 					}
-					
+
 					level--;
 				}
 			}
 		}
-		
+
 		private function debugLog(msg:String):void
 		{
 			CONFIG::LOGGING
@@ -289,12 +354,12 @@ package org.osmf.smil.media
 				}
 			}
 		}
-		
+
 		CONFIG::LOGGING
 		{
 			private static const logger:Logger = org.osmf.logging.Log.getLogger("org.osmf.smil.media.SMILMediaGenerator");
 		}
 
-		private var factory:MediaFactory;		
+		private var factory:MediaFactory;
 	}
 }

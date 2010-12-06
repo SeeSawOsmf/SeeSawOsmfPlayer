@@ -77,6 +77,11 @@
             <artifactId>flexunit</artifactId>
             <type>swc</type>
         </dependency>
+        <dependency>
+            <artifactId>SMILObjectProxy</artifactId>
+            <groupId>com.seesaw</groupId>
+            <type>swc</type>
+        </dependency>
 
     </dependencies>
 </project>

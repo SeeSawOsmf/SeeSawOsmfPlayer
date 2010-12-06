@@ -19,10 +19,7 @@
  *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
  *    Incorporated. All Rights Reserved.
  */
-package com.seesaw.player.smil.loader {
-import com.seesaw.player.smil.media.SeesawSMILMediaGenerator;
-import com.seesaw.player.smil.resource.DynamicSMILResource;
-
+package com.seesaw.player.smil {
 import org.osmf.elements.proxyClasses.LoadFromDocumentLoadTrait;
 import org.osmf.events.MediaError;
 import org.osmf.events.MediaErrorEvent;
@@ -31,7 +28,10 @@ import org.osmf.media.DefaultMediaFactory;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaResourceBase;
+import org.osmf.media.PluginInfo;
 import org.osmf.metadata.MetadataNamespaces;
+import org.osmf.smil.SMILConstants;
+import org.osmf.smil.media.SMILMediaGenerator;
 import org.osmf.smil.model.SMILDocument;
 import org.osmf.smil.parser.SMILParser;
 import org.osmf.traits.LoadState;
@@ -43,7 +43,8 @@ import org.osmf.traits.LoaderBase;
  * Multimedia Integration Language) file and generate
  * a loaded context.
  */
-public class SMILLoader extends LoaderBase {
+public class SeeSawSMILLoader extends LoaderBase {
+
     /**
      * The SMIL mime type as of SMIL 3.0.
      */
@@ -56,15 +57,8 @@ public class SMILLoader extends LoaderBase {
      * media specified in the SMIL file.  A default factory is created for the base
      * OSMF media types: Video, Audio, Image, and SWF.
      */
-    public function SMILLoader(mediaFactory:MediaFactory = null) {
+    public function SeeSawSMILLoader() {
         super();
-
-        supportedMimeTypes.push(SMIL_MIME_TYPE);
-
-        factory = mediaFactory;
-        if (factory == null) {
-            factory = new DefaultMediaFactory();
-        }
     }
 
     /**
@@ -75,9 +69,16 @@ public class SMILLoader extends LoaderBase {
 
         // We should bypass the rest of this method if a MIME type
         // is explicitly specified (whether it matches or not).
-        if (resource && resource.mimeType != null) {
-            canHandle = resource.mimeType == SMIL_MIME_TYPE;
+//        if (resource && resource.mimeType != null) {
+//            canHandle = resource.mimeType == SMIL_MIME_TYPE;
+//        }
+
+        if(resource) {
+            // This loader expects the actual smil document to be contained in the resource metadata
+            var smil:Object = resource.getMetadataValue(SMILConstants.SMIL_DOCUMENT);
+            canHandle = smil != null;
         }
+
         return canHandle;
     }
 
@@ -87,12 +88,11 @@ public class SMILLoader extends LoaderBase {
     override protected function executeLoad(loadTrait:LoadTrait):void {
         updateLoadTrait(loadTrait, LoadState.LOADING);
 
-        var internalResource:DynamicSMILResource = loadTrait.resource as DynamicSMILResource;
-
+        var smil:XMLList = loadTrait.resource.getMetadataValue(SMILConstants.SMIL_DOCUMENT) as XMLList;
 
         try {
             var parser:SMILParser = createParser();
-            var smilDocument:SMILDocument = parser.parse(String(internalResource.data));
+            var smilDocument:SMILDocument = parser.parse(smil);
             finishLoad(loadTrait, smilDocument);
         }
         catch (parseError:Error) {
@@ -113,8 +113,8 @@ public class SMILLoader extends LoaderBase {
     /**
      * Override to provide a custom media generator.
      */
-    protected function createMediaGenerator():SeesawSMILMediaGenerator {
-        return new SeesawSMILMediaGenerator();
+    protected function createMediaGenerator():SMILMediaGenerator {
+        return new SMILMediaGenerator();
     }
 
     /**
@@ -125,11 +125,15 @@ public class SMILLoader extends LoaderBase {
     }
 
     private function finishLoad(loadTrait:LoadTrait, smilDocument:SMILDocument):void {
-        var mediaGenerator:SeesawSMILMediaGenerator = createMediaGenerator();
+        var mediaGenerator:SMILMediaGenerator = createMediaGenerator();
 
         // Listen for created elements so that we can add the "derived" resource metadata
         // to them.  Use a high priority so that we can add the metadata before clients
         // get the event.
+        var factory:MediaFactory = loadTrait.resource.getMetadataValue(PluginInfo.PLUGIN_MEDIAFACTORY_NAMESPACE) as MediaFactory;
+        if (factory == null) {
+            factory = new DefaultMediaFactory();
+        }
         factory.addEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onMediaElementCreate, false, int.MAX_VALUE);
         var loadedElement:MediaElement = mediaGenerator.createMediaElement(loadTrait.resource, smilDocument, factory);
         factory.removeEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onMediaElementCreate);
@@ -153,9 +157,5 @@ public class SMILLoader extends LoaderBase {
             }
         }
     }
-
-    private var supportedMimeTypes:Vector.<String> = new Vector.<String>();
-    private var mediaTypesSupported:Vector.<String> = new Vector.<String>();
-    private var factory:MediaFactory;
 }
 }

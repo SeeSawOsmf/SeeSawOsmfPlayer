@@ -37,7 +37,7 @@ public class ScrubPreventionProxyPluginInfo extends PluginInfo {
     private static var logger:ILogger = LoggerFactory.getClassLogger(ScrubPreventionProxyPluginInfo);
 
     public static const ID:String = "com.seesaw.player.preventscrub.ScrubPreventionProxyTest";
-    private static var scrubPreventionProxy:ScrubPreventionProxy;
+    private static var scrubPreventionProxy:SimpleScrubPrevention;
 
     public function ScrubPreventionProxyPluginInfo() {
         logger.debug("com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo()");
@@ -69,7 +69,7 @@ public class ScrubPreventionProxyPluginInfo extends PluginInfo {
     private static function mediaElementCreationFunction():MediaElement {
         logger.debug("constructing proxy element");
 
-        scrubPreventionProxy = new ScrubPreventionProxy();
+        scrubPreventionProxy = new SimpleScrubPrevention();
 
         return scrubPreventionProxy;
     }

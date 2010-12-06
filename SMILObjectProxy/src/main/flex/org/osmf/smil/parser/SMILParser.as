@@ -180,6 +180,15 @@ public class SMILParser {
 
         }
 
+        var children:XMLList = node.children();
+        for (var i:uint = 0; i < children.length(); i++) {
+            var childNode:XML = children[i];
+            var meta:SMILMetaElement = parseMetaElement(childNode);
+            if(meta) {
+               element.addChild(meta); 
+            }
+        }
+
         return element;
     }
 
@@ -192,7 +201,8 @@ public class SMILParser {
                     case SMILElementType.META:
                         element = new SMILMetaElement();
                         element.base = node.@[ATTRIB_META_BASE];
-                        element.contentType = node.@[ATTRIB_CONTENT_TYPE];
+                        element.name = node.@[ATTRIB_META_NAME];
+                        element.content = node.@[ATTRIB_META_CONTENT];
                         break;
                 }
                 break;
@@ -220,7 +230,8 @@ public class SMILParser {
     private static const ATTRIB_BITRATE:String = "system-bitrate";
     private static const ATTRIB_DURATION:String = "dur";
     private static const ATTRIB_META_BASE:String = "base";
-    private static const ATTRIB_CONTENT_TYPE:String = "contentType";
+    private static const ATTRIB_META_CONTENT:String = "content";
+    private static const ATTRIB_META_NAME:String = "name";
     private static const ATTRIB_CLIP_BEGIN:String = "clipBegin";
     private static const ATTRIB_CLIP_END:String = "clipEnd";
 

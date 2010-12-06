@@ -29,12 +29,11 @@ import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 import com.seesaw.player.namespaces.contentinfo;
+import com.seesaw.player.namespaces.smil;
 import com.seesaw.player.panels.GuidanceBar;
 import com.seesaw.player.panels.GuidancePanel;
 import com.seesaw.player.panels.PosterFrame;
 import com.seesaw.player.services.ResumeService;
-import com.seesaw.player.smil.SMILPluginInfo;
-import com.seesaw.player.smil.resource.DynamicSMILResource;
 
 import flash.display.LoaderInfo;
 import flash.display.Sprite;
@@ -47,11 +46,13 @@ import org.as3commons.logging.LoggerFactory;
 import org.osmf.logging.Log;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.metadata.Metadata;
+import org.osmf.smil.SMILConstants;
 
 [SWF(width=PLAYER::Width, height=PLAYER::Height, backgroundColor="#000000")]
 public class Player extends Sprite {
 
     use namespace contentinfo;
+    use namespace smil;
 
     private static const PLAYER_WIDTH:int = PLAYER::Width;
     private static const PLAYER_HEIGHT:int = PLAYER::Height;
@@ -211,7 +212,7 @@ public class Player extends Sprite {
             return;
         }
 
-        if (_videoInfo.asset.length() > 0) {
+        if (_videoInfo.smil != null) {
             var resource:MediaResourceBase = createMediaResource(_videoInfo);
             loadVideo(resource);
         }
@@ -237,18 +238,22 @@ public class Player extends Sprite {
         addChild(videoPlayer);
     }
 
-    private function createMediaResource(videoInfo:XML):DynamicSMILResource {
+    private function createMediaResource(videoInfo:XML):MediaResourceBase {
         logger.debug("creating media resource");
         // var resource:DynamicStream = new DynamicStream(videoInfo);
-        var resource:DynamicSMILResource = new DynamicSMILResource((videoInfo));
-
-        var metaSettings:Metadata = new Metadata();
-        // Use this to check the resource is the mainContent, e.g. for the AdProxypPlugins
-        metaSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
-        resource.addMetadataValue(PlayerConstants.CONTENT_ID, metaSettings);
+        var resource:MediaResourceBase = new MediaResourceBase();
 
         resource.addMetadataValue(PlayerConstants.CONTENT_INFO, _playerInit);
         resource.addMetadataValue(PlayerConstants.VIDEO_INFO, _videoInfo);
+        resource.addMetadataValue(SMILConstants.SMIL_DOCUMENT, _videoInfo.smil);
+
+        // This allows plugins to check that the media is the main content
+        var metaSettings:Metadata = new Metadata();
+        metaSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
+
+        // We stash it in the SMIL settings so that the smil plugin can set it on the actual created resource
+        resource.addMetadataValue(SMILConstants.TARGET_METADATA_KEY, PlayerConstants.CONTENT_ID);
+        resource.addMetadataValue(SMILConstants.TARGET_METADATA, metaSettings);
 
         var subtitleMetadata:Metadata = new Metadata();
         // TODO: this is here for dev purposes - not all videos will have subtitles

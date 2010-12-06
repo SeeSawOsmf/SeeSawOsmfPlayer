@@ -23,9 +23,12 @@
 package com.seesaw.player {
 public class PlayerConstants {
     public static const ID:String = "ID";
-    public static const MAIN_CONTENT_ID:String = "mainContent";
     public static const CONTENT_INFO:String = "contentInfo";
     public static const CONTENT_ID:String = "contentId";
     public static const VIDEO_INFO:String = "videoInfo";
+    public static const CONTENT_TYPE:String = "contentType";
+
+    public static const MAIN_CONTENT_ID:String = "mainContent";
+    public static const AD_CONTENT_ID:String = "instreamAds";
 }
 }
