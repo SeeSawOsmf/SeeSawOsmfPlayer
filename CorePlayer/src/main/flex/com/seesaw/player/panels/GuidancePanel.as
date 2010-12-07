@@ -28,6 +28,7 @@ import flash.display.Bitmap;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
+import flash.external.ExternalInterface;
 import flash.net.URLRequest;
 import flash.net.navigateToURL;
 import flash.system.Security;
@@ -273,6 +274,9 @@ public class GuidancePanel extends Sprite {
         this.acceptButton.addEventListener(MouseEvent.MOUSE_OVER, this.onAcceptMouseOver);
         this.acceptButton.addEventListener(MouseEvent.MOUSE_OUT, this.onAcceptMouseOut);
         this.acceptButton.addEventListener(MouseEvent.CLICK, this.onAcceptClick);
+        if (ExternalInterface.available) {
+            ExternalInterface.addCallback("acceptGuidance", this.onAcceptClick);
+        }
 
         //position the button
         this.acceptButton.y = 106;
@@ -293,7 +297,7 @@ public class GuidancePanel extends Sprite {
         event.currentTarget.addChild(this.acceptImageUp);
     }
 
-    private function onAcceptClick(event:MouseEvent):void {
+    private function onAcceptClick(event:MouseEvent = null):void {
         this.visible = false;
         this.dispatchEvent(new Event(GUIDANCE_ACCEPTED));
     }
@@ -321,6 +325,9 @@ public class GuidancePanel extends Sprite {
         this.cancelButton.addEventListener(MouseEvent.MOUSE_OVER, this.onLinkMouseOver);
         this.cancelButton.addEventListener(MouseEvent.MOUSE_OUT, this.onLinkMouseOut);
         this.cancelButton.addEventListener(MouseEvent.CLICK, this.onDeclineClick);
+        if (ExternalInterface.available) {
+            ExternalInterface.addCallback("rejectGuidance", this.onDeclineClick);
+        }
 
         //position the button
         this.cancelButton.y = 102;
@@ -341,7 +348,7 @@ public class GuidancePanel extends Sprite {
         }
     }
 
-    private function onDeclineClick(event:MouseEvent):void {
+    private function onDeclineClick(event:MouseEvent = null):void {
         this.visible = false;
         this.dispatchEvent(new Event(GUIDANCE_DECLINED));
     }

@@ -42,6 +42,8 @@ import flash.display.StageAlign;
 import flash.display.StageScaleMode;
 import flash.events.Event;
 
+import flash.external.ExternalInterface;
+
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.logging.Log;
@@ -83,6 +85,8 @@ public class Player extends Sprite {
 
         registerServices();
 
+        this.setupExternalInterface();
+
         _loaderParams = LoaderInfo(this.root.loaderInfo).parameters;
 
         // TODO: this needs to be in a flashvar from the page
@@ -102,6 +106,20 @@ public class Player extends Sprite {
         addChild(_preloader);
 
         requestPlayerInitData(_loaderParams.playerInitUrl);
+    }
+
+    private function setupExternalInterface():void {
+        if (ExternalInterface.available) {
+            ExternalInterface.addCallback("getGuidance", this.checkGuidance);
+        }
+    }
+
+    private function checkGuidance():Boolean {
+        if (_playerInit.guidance) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private function resetInitialisationStages() {
