@@ -90,7 +90,8 @@ public class Player extends Sprite {
         _loaderParams = LoaderInfo(this.root.loaderInfo).parameters;
 
         // TODO: this needs to be in a flashvar from the page
-        _loaderParams.playerInitUrl = "http://localhost:8080/player.playerinitialisation:playerinit?t:ac=TV:DRAMA/p/33535/Sintel";
+        _loaderParams.playerInitUrl = "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/" +
+                "player.playerinitialisation:playerinit?t:ac=TV:DRAMA/p/33535/Sintel";
 
         stage.scaleMode = StageScaleMode.NO_SCALE;
         stage.align = StageAlign.TOP_LEFT;
