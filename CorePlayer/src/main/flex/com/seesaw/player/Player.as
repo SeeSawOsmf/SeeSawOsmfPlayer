@@ -146,7 +146,7 @@ public class Player extends Sprite {
     }
 
     private function showGuidancePanel():void {
-        if (_playerInit.guidance) {
+        if (_playerInit.tvAgeRating && _playerInit.tvAgeRating >= 16 && _playerInit.guidance) {
             if (_guidanceBar) {
                 _guidanceBar.visible = false;
             }
