@@ -86,8 +86,7 @@ public class Player extends Sprite {
         _loaderParams = LoaderInfo(this.root.loaderInfo).parameters;
 
         // TODO: this needs to be in a flashvar from the page
-        _loaderParams.playerInitUrl = "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/" +
-                "player.playerinitialisation:playerinit?t:ac=TV:DRAMA/b/13599/Waterloo-Road";
+        _loaderParams.playerInitUrl = "http://localhost:8080/player.playerinitialisation:playerinit?t:ac=TV:DRAMA/p/33535/Sintel";
 
         stage.scaleMode = StageScaleMode.NO_SCALE;
         stage.align = StageAlign.TOP_LEFT;
@@ -189,8 +188,7 @@ public class Player extends Sprite {
     private function onSuccessFromPlayerInit(response:Object):void {
         logger.debug("received player init data");
 
-        removeChild(_preloader);
-        _preloader = null;
+        removePreloader();
 
         var xmlDoc:XML = new XML(response);
         xmlDoc.ignoreWhitespace = true;
@@ -275,8 +273,7 @@ public class Player extends Sprite {
     private function onFailFromPlayerInit():void {
         logger.debug("failed to retrieve init data");
 
-        removeChild(_preloader);
-        _preloader = null;
+        removePreloader();
 
         // TODO: set the error ('programme not playing') panel as the main content
 
@@ -317,6 +314,13 @@ public class Player extends Sprite {
         var resumeService:ResumeService = provider.getObject(ResumeService);
         var resumeValue:Number = resumeService.getResumeCookie();
         return resumeValue;
+    }
+
+    private function removePreloader():void {
+        if (_preloader) {
+            removeChild(_preloader);
+            _preloader = null;
+        }
     }
 
     public function get videoPlayer():SeeSawPlayer {

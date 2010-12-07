@@ -101,7 +101,7 @@ public class SMILParser {
     private function parseElement(doc:SMILDocument, children:XMLList, parent:SMILElement = null):void {
         for (var i:uint = 0; i < children.length(); i++) {
             var childNode:XML = children[i];
-            var element:SMILElement;
+            var element:SMILElement = null;
 
             switch (childNode.nodeKind()) {
                 case "element":
@@ -127,7 +127,7 @@ public class SMILParser {
                     break;
             }
 
-            parseElement(doc, childNode.children(), element);
+            parseElement(doc, childNode.children(), element != null ? element : parent);
 
             if (element != null) {
                 if (parent != null) {

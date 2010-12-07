@@ -114,8 +114,11 @@ import org.osmf.smil.model.SMILDocument;
 
                     for each (var metadataNS:String in originalResource.metadataNamespaceURLs)
                     {
-                        var metadata:Object = originalResource.getMetadataValue(metadataNS);
-                        resource.addMetadataValue(metadataNS, metadata);
+                        if(metadataNS != SMILConstants.SMIL_DOCUMENT) 
+                        {
+                            var metadata:Object = originalResource.getMetadataValue(metadataNS);
+                            resource.addMetadataValue(metadataNS, metadata);
+                        }
                     }
 
                     var targetMetadataKey:String = resource.getMetadataValue(SMILConstants.TARGET_METADATA_KEY) as String;
@@ -201,8 +204,11 @@ import org.osmf.smil.model.SMILDocument;
 				// Make sure we transfer any resource metadata from the original resource
 				for each (var metadataNS:String in originalResource.metadataNamespaceURLs)
 				{
-					var metadata:Object = originalResource.getMetadataValue(metadataNS);
-					mediaResource.addMetadataValue(metadataNS, metadata);
+                    if(metadataNS != SMILConstants.SMIL_DOCUMENT)
+                    {
+					    var metadata:Object = originalResource.getMetadataValue(metadataNS);
+					    mediaResource.addMetadataValue(metadataNS, metadata);
+                    }
 				}
 
                 var targetMetadataKey:String = mediaResource.getMetadataValue(SMILConstants.TARGET_METADATA_KEY) as String;
