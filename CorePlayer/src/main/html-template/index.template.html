@@ -63,13 +63,13 @@
     <li class="inactive"><a href="#" id="currentItemPosition">Get Current Item Position (in seconds)</a></li>
     <li class="inactive"><a href="#" id="currentItemDuration">Get Current Item Duration (in seconds)</a></li>
     <li class="inactive"><a href="#" id="currentItemTitle">Get Current Item Title</a></li>
-    <li class="inactive"><a href="#" id="setVolume">Set Volume</a></li>
-    <li class="inactive"><a href="#" id="getVolume">Get Volume</a></li>
+    <li><a href="#" id="setVolume">Set Volume</a></li>
+    <li><a href="#" id="getVolume">Get Volume</a></li>
     <li class="inactive"><a href="#" id="seek">Seek (offset in seconds)</a></li>
     <li class="inactive"><a href="#" id="clickToSee">Click To See (proceed)</a></li>
-    <li class="inactive"><a href="#" id="getGuidance">Get Guidance</a></li>
-    <li class="inactive"><a href="#" id="acceptGuidance">Accept Guidance</a></li>
-    <li class="inactive"><a href="#" id="rejectGuidance">Reject Guidance</a></li>
+    <li><a href="#" id="getGuidance">Get Guidance</a></li>
+    <li><a href="#" id="acceptGuidance">Accept Guidance</a></li>
+    <li><a href="#" id="rejectGuidance">Reject Guidance</a></li>
 </ul>
 <script type="text/javascript">
 	LightsDown = Class.create({
@@ -131,6 +131,38 @@
 		event.stop();
 		if ($("corePlayer").hideDOG) {
 			$("corePlayer").hideDOG();
+		}
+	});
+    $("getVolume").observe('click', function(event) {
+		event.stop();
+		if ($("corePlayer").getVolume) {
+			var volume = $("corePlayer").getVolume();
+            alert(volume);
+		}
+	});
+    $("setVolume").observe('click', function(event) {
+		event.stop();
+		if ($("corePlayer").setVolume) {
+			$("corePlayer").setVolume(4);
+		}
+	});
+    $("getGuidance").observe('click', function(event) {
+		event.stop();
+		if ($("corePlayer").getGuidance) {
+			var guidance = $("corePlayer").getGuidance();
+            alert(guidance);
+		}
+	});
+    $("acceptGuidance").observe('click', function(event) {
+		event.stop();
+		if ($("corePlayer").acceptGuidance) {
+			$("corePlayer").acceptGuidance();
+		}
+	});
+    $("rejectGuidance").observe('click', function(event) {
+		event.stop();
+		if ($("corePlayer").rejectGuidance) {
+			$("corePlayer").rejectGuidance();
 		}
 	});
 </script>

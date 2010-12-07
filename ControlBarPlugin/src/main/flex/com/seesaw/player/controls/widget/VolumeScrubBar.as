@@ -29,6 +29,8 @@ import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
 
+import flash.external.ExternalInterface;
+
 import org.osmf.chrome.assets.AssetsManager;
 import org.osmf.chrome.assets.FontAsset;
 import org.osmf.chrome.events.ScrubberEvent;
@@ -38,14 +40,19 @@ import org.osmf.events.MediaElementEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.traits.AudioTrait;
 import org.osmf.traits.MediaTraitType;
+import org.as3commons.logging.ILogger;
+import org.as3commons.logging.LoggerFactory;
 
 public class VolumeScrubBar extends Widget implements IWidget {
+
+    private var logger:ILogger = LoggerFactory.getClassLogger(VolumeScrubBar);
+
+    private var volumeDisplay:Number;
+
     public function VolumeScrubBar() {
-        
         scrubBarClickArea = new Sprite();
         scrubBarClickArea.addEventListener(MouseEvent.MOUSE_DOWN, onTrackMouseDown);
         addChild(scrubBarClickArea);
-
         super();
     }
 
@@ -118,6 +125,10 @@ public class VolumeScrubBar extends Widget implements IWidget {
     
     private function scrubberAddedToStage(event:Event) {
         stage.addChild(this.toolTip);
+        if (ExternalInterface.available) {
+            ExternalInterface.addCallback("getVolume", this.getVolume);
+            ExternalInterface.addCallback("setVolume", this.setVolume);
+        }
     }
 
     override protected function get requiredTraits():Vector.<String> {
@@ -127,7 +138,23 @@ public class VolumeScrubBar extends Widget implements IWidget {
     override protected function processRequiredTraitsAvailable(media:MediaElement):void {
         updateState();
         audible = media.getTrait(MediaTraitType.AUDIO) as AudioTrait;
-        this.toolTip.updateToolTip("Volume: " + Math.round(audible.volume * 10));
+        if (audible) {
+            audible.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
+        }
+        if (audible.volume) {
+            this.volumeDisplay = Math.round(audible.volume * 10);
+            this.toolTip.updateToolTip("Volume: " + Math.round(audible.volume * 10));
+        }
+    }
+
+    private function getVolume():Number {
+        return this.volumeDisplay;
+    }
+
+    private function setVolume(newVolumeDisplay:Number):void {
+        audible.volume = newVolumeDisplay / 10;
+        logger.debug('New audible.volume: ' + audible.volume);
+        //this.volumeDisplay = newVolumeDisplay;
     }
 
     override protected function processRequiredTraitsUnavailable(media:MediaElement):void {
@@ -157,14 +184,13 @@ public class VolumeScrubBar extends Widget implements IWidget {
 
     private function onScrubberUpdate(event:ScrubberEvent = null):void {
 
-
         audible = media.getTrait(MediaTraitType.AUDIO) as AudioTrait;
-        if (audible) {
-            audible.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
-        }
+
         var percentage:Number = ((scrubber.x - scrubberStart) / scrubBarWidth);
 
         audible.volume = Math.min(percentage, percentage);
+
+        this.volumeDisplay = Math.round(audible.volume * 10);
 
     }
 
@@ -186,7 +212,8 @@ public class VolumeScrubBar extends Widget implements IWidget {
 
     protected function onVolumeChange(event:AudioEvent = null):void {
         scrubber.x = audible.volume * scrubBarWidth - scrubber.width / 2;
-        this.toolTip.updateToolTip("Volume: " + Math.round(audible.volume * 10));
+        this.volumeDisplay = Math.round(audible.volume * 10);
+        this.toolTip.updateToolTip("Volume: " + this.volumeDisplay);
     }
 
 
