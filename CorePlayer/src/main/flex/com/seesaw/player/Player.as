@@ -41,7 +41,6 @@ import flash.display.Sprite;
 import flash.display.StageAlign;
 import flash.display.StageScaleMode;
 import flash.events.Event;
-
 import flash.external.ExternalInterface;
 
 import org.as3commons.logging.ILogger;
@@ -89,7 +88,7 @@ public class Player extends Sprite {
         loaderParams = LoaderInfo(this.root.loaderInfo).parameters;
 
         // TODO: this needs to be in a flashvar from the page
-        loaderParams.playerInitUrl = "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/" +
+        loaderParams.playerInitUrl = "http://localhost:8080/" +
                 "player.playerinitialisation:playerinit?t:ac=TV:DRAMA/p/33535/Sintel";
 
         stage.scaleMode = StageScaleMode.NO_SCALE;
@@ -297,10 +296,11 @@ public class Player extends Sprite {
         resource.addMetadataValue(SMILConstants.TARGET_METADATA_KEY, PlayerConstants.CONTENT_ID);
         resource.addMetadataValue(SMILConstants.TARGET_METADATA, metaSettings);
 
-        var subtitleMetadata:Metadata = new Metadata();
-        // TODO: this is here for dev purposes - not all videos will have subtitles
-        subtitleMetadata.addValue(SAMIPluginInfo.METADATA_KEY_URI, "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/s/ccp/00000025/2540.smi");
-        resource.addMetadataValue(SAMIPluginInfo.METADATA_NAMESPACE, subtitleMetadata);
+        if (videoInfo && videoInfo.subtitleLocation) {
+            var subtitleMetadata:Metadata = new Metadata();
+            subtitleMetadata.addValue(SAMIPluginInfo.METADATA_KEY_URI, String(videoInfo.subtitleLocation));
+            resource.addMetadataValue(SAMIPluginInfo.METADATA_NAMESPACE, subtitleMetadata);
+        }
 
         return resource;
     }
