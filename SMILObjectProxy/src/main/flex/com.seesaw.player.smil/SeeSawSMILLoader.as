@@ -31,6 +31,7 @@ import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfo;
 import org.osmf.metadata.MetadataNamespaces;
 import org.osmf.smil.SMILConstants;
+import org.osmf.smil.loader.SMILLoaderBase;
 import org.osmf.smil.media.SMILMediaGenerator;
 import org.osmf.smil.model.SMILDocument;
 import org.osmf.smil.parser.SMILParser;
@@ -43,12 +44,7 @@ import org.osmf.traits.LoaderBase;
  * Multimedia Integration Language) file and generate
  * a loaded context.
  */
-public class SeeSawSMILLoader extends LoaderBase {
-
-    /**
-     * The SMIL mime type as of SMIL 3.0.
-     */
-    public static const SMIL_MIME_TYPE:String = "application/smil+xml";
+public class SeeSawSMILLoader extends SMILLoaderBase {
 
     /**
      * Constructor.
@@ -57,8 +53,8 @@ public class SeeSawSMILLoader extends LoaderBase {
      * media specified in the SMIL file.  A default factory is created for the base
      * OSMF media types: Video, Audio, Image, and SWF.
      */
-    public function SeeSawSMILLoader() {
-        super();
+    public function SeeSawSMILLoader(mediaFactory:MediaFactory = null) {
+        super(mediaFactory);
     }
 
     /**
@@ -97,7 +93,8 @@ public class SeeSawSMILLoader extends LoaderBase {
         }
         catch (parseError:Error) {
             updateLoadTrait(loadTrait, LoadState.LOAD_ERROR);
-            loadTrait.dispatchEvent(new MediaErrorEvent(MediaErrorEvent.MEDIA_ERROR, false, false, new MediaError(parseError.errorID, parseError.message)));
+            loadTrait.dispatchEvent(new MediaErrorEvent(MediaErrorEvent.MEDIA_ERROR, false, false,
+                    new MediaError(parseError.errorID, parseError.message)));
 
         }
     }
@@ -130,10 +127,6 @@ public class SeeSawSMILLoader extends LoaderBase {
         // Listen for created elements so that we can add the "derived" resource metadata
         // to them.  Use a high priority so that we can add the metadata before clients
         // get the event.
-        var factory:MediaFactory = loadTrait.resource.getMetadataValue(PluginInfo.PLUGIN_MEDIAFACTORY_NAMESPACE) as MediaFactory;
-        if (factory == null) {
-            factory = new DefaultMediaFactory();
-        }
         factory.addEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onMediaElementCreate, false, int.MAX_VALUE);
         var loadedElement:MediaElement = mediaGenerator.createMediaElement(loadTrait.resource, smilDocument, factory);
         factory.removeEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onMediaElementCreate);

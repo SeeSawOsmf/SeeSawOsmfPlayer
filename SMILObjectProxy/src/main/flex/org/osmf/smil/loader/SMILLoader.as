@@ -51,7 +51,7 @@ import org.osmf.utils.URL;
 	 * Multimedia Integration Language) file and generate
 	 * a loaded context.
 	 */
-	public class SMILLoader extends LoaderBase
+	public class SMILLoader extends SMILLoaderBase
 	{
 		/**
 		 * The SMIL mime type as of SMIL 3.0.
@@ -67,15 +67,9 @@ import org.osmf.utils.URL;
 		 */		
 		public function SMILLoader(mediaFactory:MediaFactory = null)
 		{
-			super();
+			super(mediaFactory);
 			
 			supportedMimeTypes.push(SMIL_MIME_TYPE);
-			
-			factory = mediaFactory;
-			if (factory == null)
-			{
-				factory = new DefaultMediaFactory();
-			}
 		}
 
 		/**
@@ -215,6 +209,5 @@ import org.osmf.utils.URL;
 				
 		private var supportedMimeTypes:Vector.<String> = new Vector.<String>();
 		private var mediaTypesSupported:Vector.<String> = new Vector.<String>();
-		private var factory:MediaFactory;
 	}
 }

@@ -27,6 +27,7 @@ import org.osmf.media.MediaFactoryItem;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfo;
 import org.osmf.smil.elements.SMILElement;
+import org.osmf.smil.loader.SMILLoaderBase;
 import org.osmf.traits.LoaderBase;
 
 /**
@@ -42,7 +43,8 @@ import org.osmf.traits.LoaderBase;
             this.loader = loader;
 			var items:Vector.<MediaFactoryItem> = new Vector.<MediaFactoryItem>();
 
-			var item:MediaFactoryItem = new MediaFactoryItem("org.osmf.smil.SMILPluginInfo", loader.canHandleResource, createSMILProxyElement);
+			var item:MediaFactoryItem = new MediaFactoryItem("org.osmf.smil.SMILPluginInfo",
+                    loader.canHandleResource, createSMILProxyElement);
 			items.push(item);
 
 			super(items);
@@ -50,6 +52,9 @@ import org.osmf.traits.LoaderBase;
 
 		private function createSMILProxyElement():MediaElement
 		{
+            if(loader instanceof SMILLoaderBase) {
+                SMILLoaderBase(loader).factory = mediaFactory;
+            }
 			return new SMILElement(null, loader);
 		}
 
