@@ -83,8 +83,6 @@ public class Player extends Sprite {
 
         registerServices();
 
-        this.setupExternalInterface();
-
         _loaderParams = LoaderInfo(this.root.loaderInfo).parameters;
 
         // TODO: this needs to be in a flashvar from the page
@@ -106,6 +104,8 @@ public class Player extends Sprite {
     private function setupExternalInterface():void {
         if (ExternalInterface.available) {
             ExternalInterface.addCallback("getGuidance", this.checkGuidance);
+            ExternalInterface.addCallback("getCurrentItemTitle", this.getCurrentItemTitle);
+            ExternalInterface.addCallback("getCurrentItemDuration", this.getCurrentItemDuration);
         }
     }
 
@@ -117,7 +117,23 @@ public class Player extends Sprite {
         }
     }
 
+    private function getCurrentItemTitle():String {
+        if (_playerInit.programmeTitle) {
+            return _playerInit.programmeTitle;
+        } else {
+            return "Title unavailable";
+        }
+    }
+
+    private function getCurrentItemDuration():Number {
+        if (_playerInit.duration) {
+            return _playerInit.duration;
+        }
+        return 0;
+    }
+
     private function resetInitialisationStages() {
+        logger.debug("TITLE HERE: " + _playerInit.programmeTitle);
         logger.debug("reseting pre-initialisation stages");
         // sets the order of stuff to evaluate during initialisation
         _preInitStages = new Vector.<Function>();
@@ -200,12 +216,11 @@ public class Player extends Sprite {
 
     private function onSuccessFromPlayerInit(response:Object):void {
         logger.debug("received player init data");
-
         var xmlDoc:XML = new XML(response);
         xmlDoc.ignoreWhitespace = true;
 
         _playerInit = xmlDoc;
-
+        this.setupExternalInterface();
         resetInitialisationStages();
         nextInitialisationStage();
     }

@@ -56,17 +56,16 @@
     </object>
 </div>
 <ul>
-	<li><a href="#" id="proceed" title="Proceed">Proceed</a></li>
 	<li><a href="#" id="showDOG" title="Show">Show DOG</a></li>
 	<li><a href="#" id="hideDOG" title="Hide">Hide DOG</a></li>
     <li class="inactive"><a href="#" id="playPause">Play / Pause</a></li>
     <li class="inactive"><a href="#" id="currentItemPosition">Get Current Item Position (in seconds)</a></li>
-    <li class="inactive"><a href="#" id="currentItemDuration">Get Current Item Duration (in seconds)</a></li>
-    <li class="inactive"><a href="#" id="currentItemTitle">Get Current Item Title</a></li>
+    <li><a href="#" id="currentItemDuration">Get Current Item Duration (in seconds)</a></li>
+    <li><a href="#" id="currentItemTitle">Get Current Item Title</a></li>
     <li><a href="#" id="setVolume">Set Volume</a></li>
     <li><a href="#" id="getVolume">Get Volume</a></li>
     <li class="inactive"><a href="#" id="seek">Seek (offset in seconds)</a></li>
-    <li class="inactive"><a href="#" id="clickToSee">Click To See (proceed)</a></li>
+    <li><a href="#" id="proceed" title="Proceed">Click To See (proceed)</a></li>
     <li><a href="#" id="getGuidance">Get Guidance</a></li>
     <li><a href="#" id="acceptGuidance">Accept Guidance</a></li>
     <li><a href="#" id="rejectGuidance">Reject Guidance</a></li>
@@ -144,6 +143,20 @@
 		event.stop();
 		if ($("corePlayer").setVolume) {
 			$("corePlayer").setVolume(4);
+		}
+	});
+    $("currentItemTitle").observe('click', function(event) {
+		event.stop();
+		if ($("corePlayer").getCurrentItemTitle) {
+			var currentItemTitle = $("corePlayer").getCurrentItemTitle();
+            alert(currentItemTitle);
+		}
+	});
+    $("currentItemDuration").observe('click', function(event) {
+		event.stop();
+		if ($("corePlayer").getCurrentItemDuration) {
+			var currentItemDuration = $("corePlayer").getCurrentItemDuration();
+            alert(currentItemDuration);
 		}
 	});
     $("getGuidance").observe('click', function(event) {
