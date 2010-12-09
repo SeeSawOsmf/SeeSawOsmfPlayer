@@ -35,11 +35,14 @@ import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.events.TimerEvent;
+import flash.external.ExternalInterface;
 import flash.text.TextField;
 import flash.text.TextFormat;
 import flash.text.TextFormatAlign;
 import flash.utils.Timer;
 
+import org.as3commons.logging.ILogger;
+import org.as3commons.logging.LoggerFactory;
 import org.osmf.chrome.assets.AssetsManager;
 import org.osmf.chrome.assets.FontAsset;
 import org.osmf.chrome.events.ScrubberEvent;
@@ -59,7 +62,9 @@ public class ScrubBar extends Widget implements IWidget {
     private var _adState:AdTrait;
     private var adMarkers:Array;
     private var markerContainer:Sprite;
-
+    private var currentTimeInSeconds:Number = 0;
+    private var logger:ILogger = LoggerFactory.getClassLogger(PlayPauseButtonBase);
+    
     public function ScrubBar() {
         currentTime = new StyledTextField();
         addChild(currentTime);
@@ -70,6 +75,9 @@ public class ScrubBar extends Widget implements IWidget {
 
         markerContainer = new Sprite();
         addChild(markerContainer);
+
+        this.setupExternalInterface();
+        
         super();
     }
 
@@ -278,6 +286,8 @@ public class ScrubBar extends Widget implements IWidget {
             var duration:Number = temporal.duration - positionOffset;
             var position:Number = temporal.currentTime - positionOffset;
 
+            this.currentTimeInSeconds = position;
+
             currentTime.text
                     = prettyPrintSeconds(position) + " / " + prettyPrintSeconds(duration);
 
@@ -336,6 +346,12 @@ public class ScrubBar extends Widget implements IWidget {
         }
     }
 
+    private function seekTo(targetTime:Number):void {
+        var seekable:SeekTrait = media ? media.getTrait(MediaTraitType.SEEK) as SeekTrait : null;
+        seekToTime = targetTime;
+        seekable.seek(targetTime);
+    }
+
     private function onSeekingChange(event:SeekEvent):void {
         var seekable:SeekTrait = event.target as SeekTrait;
         if (event.seeking == false) {
@@ -374,6 +390,17 @@ public class ScrubBar extends Widget implements IWidget {
         currentTime.text = "0:00:00";
         scrubber.x = scrubberStart;
         scrubBarTrail.width = scrubber.x - scrubBarTrail.x + 4;
+    }
+
+    private function setupExternalInterface():void {
+        if (ExternalInterface.available) {
+            ExternalInterface.addCallback("getCurrentItemPosition", this.getCurrentItemPosition);
+            ExternalInterface.addCallback("seekTo", this.seekTo);
+        }
+    }
+
+    private function getCurrentItemPosition():Number {
+        return this.currentTimeInSeconds;
     }
 
     public function get classDefinition():String {

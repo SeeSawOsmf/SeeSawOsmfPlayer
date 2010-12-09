@@ -27,6 +27,8 @@ import com.seesaw.player.traits.ads.AdTraitType;
 
 import flash.events.Event;
 
+import flash.external.ExternalInterface;
+
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.events.PlayEvent;
@@ -47,6 +49,35 @@ public class PlayPauseButtonBase extends ButtonWidget {
     public function PlayPauseButtonBase() {
         logger.debug("PlayPauseButtonBase()");
         _requiredTraits[0] = MediaTraitType.PLAY;
+        this.setupExternalInterface();
+    }
+
+    private function setupExternalInterface():void {
+        if (ExternalInterface.available) {
+            ExternalInterface.addCallback("playPause", this.playPause);
+        }
+    }
+
+    private function playPause():void {
+        if ((adMode && adPlaying) || playing) {
+            if (adMode && adPlaying) {
+                logger.debug("pausing ad");
+                adTrait.pause();
+            }
+            else if (playing) {
+                logger.debug("pausing main content");
+                playTrait.pause();
+            }
+        } else if ((adMode && adPaused) || paused) {
+            if (adMode && adPaused) {
+                logger.debug("ad paused");
+                adTrait.play();
+            }
+            else if (paused) {
+                logger.debug("main content paused");
+                playTrait.play();
+            }
+        }
     }
 
     override protected function get requiredTraits():Vector.<String> {
