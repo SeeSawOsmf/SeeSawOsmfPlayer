@@ -23,8 +23,7 @@
 package org.osmf.smil {
 public class SMILConstants {
     public static const SMIL_METADATA_NS = "http://www.w3.org/ns/SMIL";
-    public static const TARGET_METADATA_KEY:String = "targetMetadataKey";
-    public static const TARGET_METADATA:String = "targetMetadata";
+    public static const PROXY_TRIGGER:String = "proxyTrigger";
     public static const SMIL_DOCUMENT:String = "smilDocument";
 }
 }

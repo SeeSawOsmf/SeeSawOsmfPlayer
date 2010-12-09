@@ -82,14 +82,11 @@ public class SeeSawPlayer extends Sprite {
         config = playerConfig;
 
         factory = config.factory;
-
         player = new MediaPlayer();
-
         rootElement = new ParallelElement();
         rootContainer = new MediaContainer();
 
         initialisePlayer();
-
     }
 
     private function initialisePlayer():void {
@@ -107,7 +104,6 @@ public class SeeSawPlayer extends Sprite {
 
         logger.debug("adding media container to stage");
         addChild(rootContainer);
-
     }
 
     private function createDOG(dOGURL:String):void {
@@ -160,11 +156,11 @@ public class SeeSawPlayer extends Sprite {
     private function createVideoElement():void {
         logger.debug("loading the proxy plugins that wrap the video element");
         factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo(new SeeSawSMILLoader())));
-        factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
-        factory.loadPlugin(new PluginInfoResource(new FullScreenProxyPluginInfo()));
+        // factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
-        // factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new FullScreenProxyPluginInfo()));
 
         if (config.resource.getMetadataValue("contentInfo").adType == config.adModuleType)
             factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
@@ -172,15 +168,6 @@ public class SeeSawPlayer extends Sprite {
         logger.debug("creating video element");
         videoElement = factory.createMediaElement(config.resource);
         // videoElement = new BufferManager(0.5, 5, videoElement);
-
-        if (videoElement == null) {
-            throw new ArgumentError("failed to create video element");
-        }
-
-        var fullScreen:FullScreenTrait = videoElement.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
-        if (fullScreen) {
-            fullScreen.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
-        }
 
         videoElement.addEventListener(MediaElementEvent.METADATA_ADD, onVideoMetadataAdd);
         videoElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onVideoMetadataRemove);

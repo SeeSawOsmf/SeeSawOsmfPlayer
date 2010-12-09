@@ -77,8 +77,6 @@ public class AdProxy extends ProxyElement {
         super(proxiedElement);
 
         Security.allowDomain("vox-static.liverail.com");
-
-
     }
 
     public override function set proxiedElement(proxiedElement:MediaElement):void {
@@ -93,7 +91,6 @@ public class AdProxy extends ProxyElement {
 
             outerViewableSprite = new Sprite();
             outerViewable = new AdProxyDisplayObjectTrait(outerViewableSprite);
-
 
             createLiverail();
         }
@@ -119,7 +116,6 @@ public class AdProxy extends ProxyElement {
     }
 
     private function processTrait(traitType:String, added:Boolean):void {
-        logger.debug(" --------- traitType -----------" + traitType);
         switch (traitType) {
             case MediaTraitType.LOAD:
                 toggleLoadListeners(added);
@@ -369,8 +365,6 @@ public class AdProxy extends ProxyElement {
             _innerViewable.addEventListener(DisplayObjectEvent.MEDIA_SIZE_CHANGE, onInnerMediaSizeChange);
 
             updateView();
-
-
         }
     }
 
@@ -379,16 +373,11 @@ public class AdProxy extends ProxyElement {
     }
 
     private function onInnerMediaSizeChange(event:DisplayObjectEvent):void {
-
         _innerViewable.displayObject.height = 378;
         _innerViewable.displayObject.width = 672;
-
-
     }
 
     private function updateView():void {
-
-
         outerViewableSprite.addChildAt(_innerViewable.displayObject, 0);
         _innerViewable.displayObject.height = 378;
         _innerViewable.displayObject.width = 672;

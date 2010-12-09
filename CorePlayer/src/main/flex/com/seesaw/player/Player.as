@@ -291,10 +291,11 @@ public class Player extends Sprite {
         // This allows plugins to check that the media is the main content
         var metaSettings:Metadata = new Metadata();
         metaSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
+        resource.addMetadataValue(PlayerConstants.CONTENT_ID, metaSettings);
 
-        // We stash it in the SMIL settings so that the smil plugin can set it on the actual created resource
-        resource.addMetadataValue(SMILConstants.TARGET_METADATA_KEY, PlayerConstants.CONTENT_ID);
-        resource.addMetadataValue(SMILConstants.TARGET_METADATA, metaSettings);
+        // The SMIL plugin needs to remove the main content id from all the elements it creates otherwise
+        // they will be wrapped in proxies - leading to double wrapping of proxies (since the smil element is proxied).
+        resource.addMetadataValue(SMILConstants.PROXY_TRIGGER, PlayerConstants.CONTENT_ID);
 
         if (videoInfo && videoInfo.subtitleLocation) {
             var subtitleMetadata:Metadata = new Metadata();
@@ -356,6 +357,11 @@ public class Player extends Sprite {
             removeChild(preloader);
             preloader = null;
         }
+    }
+
+    private function get useLivreailAds():Boolean {
+        // TODO: this needs work
+        return Boolean(videoInfo.avod) || Boolean(videoInfo.exceededDrmRule);
     }
 
     public function get videoPlayer():SeeSawPlayer {

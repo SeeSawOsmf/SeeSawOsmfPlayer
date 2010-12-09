@@ -35,6 +35,10 @@ public class FullScreenProxyElement extends ProxyElement {
         super(proxiedElement);
     }
 
+    override public function set proxiedElement(value:MediaElement):void {
+        super.proxiedElement = value;
+    }
+
     override protected function setupTraits():void {
         logger.debug("setupTraits");
         addTrait(FullScreenTrait.FULL_SCREEN, new FullScreenTrait());

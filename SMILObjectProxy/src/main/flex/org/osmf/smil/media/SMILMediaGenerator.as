@@ -112,22 +112,7 @@ import org.osmf.smil.model.SMILDocument;
 					var resource:StreamingURLResource = new StreamingURLResource((smilElement as SMILMediaElement).src);
 					resource.mediaType = MediaType.VIDEO;
 
-                    for each (var metadataNS:String in originalResource.metadataNamespaceURLs)
-                    {
-                        if(metadataNS != SMILConstants.SMIL_DOCUMENT) 
-                        {
-                            var metadata:Object = originalResource.getMetadataValue(metadataNS);
-                            resource.addMetadataValue(metadataNS, metadata);
-                        }
-                    }
-
-                    var targetMetadataKey:String = resource.getMetadataValue(SMILConstants.TARGET_METADATA_KEY) as String;
-                    var targetMetadataValue:Object = resource.getMetadataValue(SMILConstants.TARGET_METADATA);
-
-                    if(targetMetadataKey && targetMetadataValue)
-                    {
-                        resource.addMetadataValue(targetMetadataKey, targetMetadataValue);
-                    }
+                    populateMetdataFromResource(originalResource, resource);
 
 					var videoElement:MediaElement = factory.createMediaElement(resource);
 					var smilVideoElement:SMILMediaElement = smilElement as SMILMediaElement;
@@ -201,23 +186,7 @@ import org.osmf.smil.model.SMILDocument;
 			}
 			else if (mediaResource != null)
 			{
-				// Make sure we transfer any resource metadata from the original resource
-				for each (var metadataNS:String in originalResource.metadataNamespaceURLs)
-				{
-                    if(metadataNS != SMILConstants.SMIL_DOCUMENT)
-                    {
-					    var metadata:Object = originalResource.getMetadataValue(metadataNS);
-					    mediaResource.addMetadataValue(metadataNS, metadata);
-                    }
-				}
-
-                var targetMetadataKey:String = mediaResource.getMetadataValue(SMILConstants.TARGET_METADATA_KEY) as String;
-                var targetMetadataValue:Object = mediaResource.getMetadataValue(SMILConstants.TARGET_METADATA);
-
-                if(targetMetadataKey && targetMetadataValue)
-                {
-                    mediaResource.addMetadataValue(targetMetadataKey, targetMetadataValue);
-                }
+                populateMetdataFromResource(originalResource, mediaResource);
 
 				mediaElement = factory.createMediaElement(mediaResource);
 
@@ -231,6 +200,22 @@ import org.osmf.smil.model.SMILDocument;
 
 			return mediaElement;
 		}
+
+        private function populateMetdataFromResource(originalResource:MediaResourceBase, mediaResource:MediaResourceBase):void {
+            var proxyTriggerKey:String = originalResource.getMetadataValue(SMILConstants.PROXY_TRIGGER) as String;
+
+            // Make sure we transfer any resource metadata from the original resource
+            for each (var metadataNS:String in originalResource.metadataNamespaceURLs)
+            {
+                // Ignore metadata that is contained in TARGET_METADATA_KEY so that proxies are not generated.
+                // This avoids proxy wrapping around both the SMILElement and the subsequently created mediaElement below
+                if(proxyTriggerKey == null || metadataNS != proxyTriggerKey)
+                {
+                    var metadata:Object = originalResource.getMetadataValue(metadataNS);
+                    mediaResource.addMetadataValue(metadataNS, metadata);
+                }
+            }
+        }
 
         private function populateMetadataFromSMIL(mediaElement:MediaElement, smilElement:SMILElement):void {
             var metadata:Metadata = mediaElement.getMetadata(SMILConstants.SMIL_METADATA_NS);

@@ -36,6 +36,6 @@ public class SMILElement extends LoadFromDocumentElement
 			}
 			super(resource, loader);		
 		}
-		
+
 	}
 }
