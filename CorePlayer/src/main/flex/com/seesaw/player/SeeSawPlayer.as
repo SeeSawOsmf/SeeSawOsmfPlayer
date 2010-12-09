@@ -40,6 +40,7 @@ import org.as3commons.logging.LoggerFactory;
 import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
 import org.osmf.events.MediaElementEvent;
+import org.osmf.events.MediaFactoryEvent;
 import org.osmf.events.MetadataEvent;
 import org.osmf.events.PlayEvent;
 import org.osmf.layout.HorizontalAlign;
@@ -54,6 +55,7 @@ import org.osmf.media.URLResource;
 import org.osmf.metadata.Metadata;
 import org.osmf.smil.SMILPluginInfo;
 import org.osmf.traits.DisplayObjectTrait;
+import org.osmf.traits.MediaTraitBase;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.TimeTrait;
@@ -159,7 +161,7 @@ public class SeeSawPlayer extends Sprite {
         // factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
-        factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
+        // factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new FullScreenProxyPluginInfo()));
 
         if (config.resource.getMetadataValue("contentInfo").adType == config.adModuleType)
@@ -167,13 +169,18 @@ public class SeeSawPlayer extends Sprite {
 
         logger.debug("creating video element");
         videoElement = factory.createMediaElement(config.resource);
-        // videoElement = new BufferManager(0.5, 5, videoElement);
 
         videoElement.addEventListener(MediaElementEvent.METADATA_ADD, onVideoMetadataAdd);
         videoElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onVideoMetadataRemove);
-
         videoElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
         videoElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
+
+        var trait:MediaTraitBase = videoElement.getTrait(FullScreenTrait.FULL_SCREEN);
+        if(trait) {
+            trait.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
+        }
+
+        // videoElement = new BufferManager(0.5, 5, videoElement);
 
         rootElement.addChild(videoElement);
     }
