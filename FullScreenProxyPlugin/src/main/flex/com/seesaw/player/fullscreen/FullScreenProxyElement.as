@@ -40,6 +40,5 @@ public class FullScreenProxyElement extends ProxyElement {
         addTrait(FullScreenTrait.FULL_SCREEN, new FullScreenTrait());
         super.setupTraits();
     }
-
 }
 }

@@ -23,7 +23,6 @@
 package com.seesaw.player {
 import com.seesaw.player.ads.AdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
-import com.seesaw.player.buffering.BufferManager;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.controls.ControlBarMetadata;
 import com.seesaw.player.controls.ControlBarPlugin;
@@ -34,7 +33,6 @@ import com.seesaw.player.smil.SeeSawSMILLoader;
 import com.seesaw.player.traits.fullscreen.FullScreenTrait;
 
 import flash.display.Sprite;
-
 import flash.external.ExternalInterface;
 
 import org.as3commons.logging.ILogger;
@@ -57,10 +55,12 @@ import org.osmf.media.URLResource;
 import org.osmf.metadata.Metadata;
 import org.osmf.smil.SMILPluginInfo;
 import org.osmf.traits.DisplayObjectTrait;
+import org.osmf.traits.MediaTraitBase;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
-import org.osmf.traits.PlayTrait;
 import org.osmf.traits.TimeTrait;
+
+import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
 
 public class SeeSawPlayer extends Sprite {
 
@@ -84,25 +84,20 @@ public class SeeSawPlayer extends Sprite {
         config = playerConfig;
 
         factory = config.factory;
-
         player = new MediaPlayer();
-
         rootElement = new ParallelElement();
         rootContainer = new MediaContainer();
 
         initialisePlayer();
-
     }
 
     private function initialisePlayer():void {
         logger.debug("initialising media player");
 
-        factory.addEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onMediaElementCreate);
-
         createVideoElement();
         createControlBarElement();
         createSubtitleElement();
-        this.createDOG("http://www.davemoorhouse.co.uk/DOG.png");
+        createDOG("http://www.davemoorhouse.co.uk/DOG.png");
 
         player.media = videoElement;
 
@@ -111,7 +106,6 @@ public class SeeSawPlayer extends Sprite {
 
         logger.debug("adding media container to stage");
         addChild(rootContainer);
-
     }
 
     private function createDOG(dOGURL:String):void {
@@ -165,34 +159,28 @@ public class SeeSawPlayer extends Sprite {
         logger.debug("loading the proxy plugins that wrap the video element");
         factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo(new SeeSawSMILLoader())));
         // factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
-        factory.loadPlugin(new PluginInfoResource(new FullScreenProxyPluginInfo()));
-        // factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
         // factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new FullScreenProxyPluginInfo()));
 
         if (config.resource.getMetadataValue("contentInfo").adType == config.adModuleType)
             factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
 
-        ///      if (config.adModuleType == "com.seesaw.player.ads.serial")
-        ///       factory.loadPlugin(new PluginInfoResource(new PlaylistPluginInfo()));
-
         logger.debug("creating video element");
         videoElement = factory.createMediaElement(config.resource);
-        // videoElement = new BufferManager(0.5, 5, videoElement);
-
-        if (videoElement == null) {
-            throw new ArgumentError("failed to create video element");
-        }
-
-        var fullScreen:FullScreenTrait = videoElement.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
-        if (fullScreen) {
-            fullScreen.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
-        }
 
         videoElement.addEventListener(MediaElementEvent.METADATA_ADD, onVideoMetadataAdd);
         videoElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onVideoMetadataRemove);
+        videoElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
+        videoElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
 
-        videoElement.addEventListener(MediaElementEvent.TRAIT_ADD, onMediaTraitsChange);
+        var trait:MediaTraitBase = videoElement.getTrait(FullScreenTrait.FULL_SCREEN);
+        if(trait) {
+            trait.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
+        }
+
+        // videoElement = new BufferManager(0.5, 5, videoElement);
 
         rootElement.addChild(videoElement);
     }
@@ -231,28 +219,33 @@ public class SeeSawPlayer extends Sprite {
         rootElement.addChild(controlBarElement);
     }
 
-    private function onMediaElementCreate(event:MediaFactoryEvent):void {
-        event.mediaElement.addEventListener(MediaElementEvent.TRAIT_ADD, onMediaTraitsChange);
-        event.mediaElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onMediaTraitsChange);
+    private function updateTraitListeners(element:MediaElement, traitType:String, add:Boolean):void {
+        switch (traitType) {
+            case FullScreenTrait.FULL_SCREEN:
+                changeListeners(element, add, traitType, FullScreenEvent.FULL_SCREEN, onFullscreen);
+                break;
+            case MediaTraitType.PLAY:
+                changeListeners(element, add, traitType, PlayEvent.PLAY_STATE_CHANGE, onPlayStateChanged);
+                break;
+        }
     }
 
-    private function onMediaTraitsChange(event:MediaElementEvent):void {
+    private function onTraitAdd(event:MediaElementEvent):void {
         var target = event.target as MediaElement;
-//        if (event.traitType == FullScreenTrait.FULL_SCREEN) {
-//            var fullScreen:FullScreenTrait = target.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
-//            if (fullScreen) {
-//                if (event.type == MediaElementEvent.TRAIT_ADD) {
-//                    fullScreen.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
-//                }
-//                else {
-//                    fullScreen.removeEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
-//                }
-//            }
-//        }
+        updateTraitListeners(target, event.traitType, true);
+    }
 
-        if(event.traitType == MediaTraitType.PLAY) {
-            var playTrait:PlayTrait = target.getTrait(MediaTraitType.PLAY) as PlayTrait;
-            playTrait.addEventListener(PlayEvent.PLAY_STATE_CHANGE, onPlayStateChanged);
+    private function onTraitRemove(event:MediaElementEvent):void {
+        var target = event.target as MediaElement;
+        updateTraitListeners(target, event.traitType, false);
+    }
+
+    private function changeListeners(element:MediaElement, add:Boolean, traitType:String, event:String, listener:Function):void {
+        if (add) {
+            element.getTrait(traitType).addEventListener(event, listener);
+        }
+        else if (element.hasTrait(traitType)) {
+            element.getTrait(traitType).removeEventListener(event, listener);
         }
     }
 
@@ -333,7 +326,10 @@ public class SeeSawPlayer extends Sprite {
 
     private function get captionUrl():String {
         var metadata:Metadata = config.resource.getMetadataValue(SAMIPluginInfo.METADATA_NAMESPACE) as Metadata;
-        return metadata.getValue(SAMIPluginInfo.METADATA_KEY_URI) as String;
+        if (metadata) {
+            return metadata.getValue(SAMIPluginInfo.METADATA_KEY_URI) as String;
+        }
+        return null;
     }
 }
 }

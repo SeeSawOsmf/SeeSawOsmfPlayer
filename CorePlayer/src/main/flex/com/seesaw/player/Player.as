@@ -41,7 +41,6 @@ import flash.display.Sprite;
 import flash.display.StageAlign;
 import flash.display.StageScaleMode;
 import flash.events.Event;
-
 import flash.external.ExternalInterface;
 
 import org.as3commons.logging.ILogger;
@@ -66,17 +65,18 @@ public class Player extends Sprite {
     private var logger:ILogger = LoggerFactory.getClassLogger(Player);
 
     private var _videoPlayer:SeeSawPlayer;
-    private var _loaderParams:Object;
-    private var _preInitStages:Vector.<Function>;
-    private var _posterFrame:PosterFrame;
-    private var _guidanceBar:Sprite;
-    private var _preloader:Preloader;
+
+    private var loaderParams:Object;
+    private var preInitStages:Vector.<Function>;
+    private var posterFrame:PosterFrame;
+    private var guidanceBar:Sprite;
+    private var preloader:Preloader;
 
     // Returned by the player initialiser AJAX call
-    private var _playerInit:XML;
+    private var playerInit:XML;
 
     // Returned by the video info AJAX call
-    private var _videoInfo:XML;
+    private var videoInfo:XML;
 
     public function Player() {
         super();
@@ -85,10 +85,10 @@ public class Player extends Sprite {
 
         registerServices();
 
-        _loaderParams = LoaderInfo(this.root.loaderInfo).parameters;
+        loaderParams = LoaderInfo(this.root.loaderInfo).parameters;
 
         // TODO: this needs to be in a flashvar from the page
-        _loaderParams.playerInitUrl = "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/" +
+        loaderParams.playerInitUrl = "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/" +
                 "player.playerinitialisation:playerinit?t:ac=TV:DRAMA/p/33535/Sintel";
 
         stage.scaleMode = StageScaleMode.NO_SCALE;
@@ -101,10 +101,10 @@ public class Player extends Sprite {
         logger.debug("added to stage");
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 
-        _preloader = new Preloader();
-        addChild(_preloader);
+        preloader = new Preloader();
+        addChild(preloader);
 
-        requestPlayerInitData(_loaderParams.playerInitUrl);
+        requestPlayerInitData(loaderParams.playerInitUrl);
     }
 
     private function setupExternalInterface():void {
@@ -116,7 +116,7 @@ public class Player extends Sprite {
     }
 
     private function checkGuidance():Boolean {
-        if (_playerInit.guidance) {
+        if (playerInit.guidance) {
             return true;
         } else {
             return false;
@@ -124,50 +124,49 @@ public class Player extends Sprite {
     }
 
     private function getCurrentItemTitle():String {
-        if (_playerInit.programmeTitle) {
-            return _playerInit.programmeTitle;
+        if (playerInit.programmeTitle) {
+            return playerInit.programmeTitle;
         } else {
             return "Title unavailable";
         }
     }
 
     private function getCurrentItemDuration():Number {
-        if (_playerInit.duration) {
-            return _playerInit.duration;
+        if (playerInit.duration) {
+            return playerInit.duration;
         }
         return 0;
     }
 
     private function resetInitialisationStages() {
-        logger.debug("TITLE HERE: " + _playerInit.programmeTitle);
         logger.debug("reseting pre-initialisation stages");
         // sets the order of stuff to evaluate during initialisation
-        _preInitStages = new Vector.<Function>();
-        _preInitStages[0] = showPosterFrame;
-        _preInitStages[1] = showPlayPanel;
-        _preInitStages[2] = showGuidancePanel;
-        _preInitStages[3] = removePosterFrame;
-        _preInitStages[4] = attemptPlaybackStart;
+        preInitStages = new Vector.<Function>();
+        preInitStages[0] = showPosterFrame;
+        preInitStages[1] = showPlayPanel;
+        preInitStages[2] = showGuidancePanel;
+        preInitStages[3] = removePosterFrame;
+        preInitStages[4] = attemptPlaybackStart;
     }
 
     private function showPosterFrame():void {
         //Play / resume / preview button
-        _posterFrame = new PosterFrame(_playerInit.largeImageUrl);
-        _posterFrame.addEventListener(PosterFrame.LOADED, function(event:Event) {
+        posterFrame = new PosterFrame(playerInit.largeImageUrl);
+        posterFrame.addEventListener(PosterFrame.LOADED, function(event:Event) {
             nextInitialisationStage();
         });
 
         //if there is guidance, show the guidance bar
-        if (_playerInit.guidance) {
-            _guidanceBar = new GuidanceBar(_playerInit.guidance.warning);
-            _posterFrame.addChild(_guidanceBar);
+        if (playerInit.guidance) {
+            guidanceBar = new GuidanceBar(playerInit.guidance.warning);
+            posterFrame.addChild(guidanceBar);
         }
-        addChild(_posterFrame);
+        addChild(posterFrame);
     }
 
     private function removePosterFrame():void {
-        removeChild(_posterFrame);
-        _posterFrame = null;
+        removeChild(posterFrame);
+        posterFrame = null;
         nextInitialisationStage();
     }
 
@@ -181,16 +180,16 @@ public class Player extends Sprite {
     }
 
     private function showGuidancePanel():void {
-        if (_playerInit.tvAgeRating && _playerInit.tvAgeRating >= 16 && _playerInit.guidance) {
-            if (_guidanceBar) {
-                _guidanceBar.visible = false;
+        if (playerInit.tvAgeRating && playerInit.tvAgeRating >= 16 && playerInit.guidance) {
+            if (guidanceBar) {
+                guidanceBar.visible = false;
             }
             var guidancePanel = new GuidancePanel(
-                    _playerInit.guidance.warning,
-                    _playerInit.guidance.explanation,
-                    _playerInit.guidance.guidance,
-                    _playerInit.parentalControls.parentalControlsPageURL,
-                    _playerInit.parentalControls.whatsThisLinkURL
+                    playerInit.guidance.warning,
+                    playerInit.guidance.explanation,
+                    playerInit.guidance.guidance,
+                    playerInit.parentalControls.parentalControlsPageURL,
+                    playerInit.parentalControls.whatsThisLinkURL
                     );
 
             guidancePanel.addEventListener(GuidancePanel.GUIDANCE_ACCEPTED, function(event:Event) {
@@ -210,7 +209,7 @@ public class Player extends Sprite {
     }
 
     private function attemptPlaybackStart():void {
-        requestProgrammeData(_playerInit.videoInfoUrl);
+        requestProgrammeData(playerInit.videoInfoUrl);
     }
 
     private function requestPlayerInitData(playerInitUrl:String):void {
@@ -228,7 +227,7 @@ public class Player extends Sprite {
         var xmlDoc:XML = new XML(response);
         xmlDoc.ignoreWhitespace = true;
 
-        _playerInit = xmlDoc;
+        playerInit = xmlDoc;
         this.setupExternalInterface();
         resetInitialisationStages();
         nextInitialisationStage();
@@ -247,15 +246,15 @@ public class Player extends Sprite {
         var xmlDoc:XML = new XML(response);
         xmlDoc.ignoreWhitespace = true;
 
-        _videoInfo = xmlDoc;
+        videoInfo = xmlDoc;
 
-        if (_videoInfo.geoblocked == "true") {
+        if (videoInfo.geoblocked == "true") {
             // TODO: show the geoblock panel
             return;
         }
 
-        if (_videoInfo.smil != null) {
-            var resource:MediaResourceBase = createMediaResource(_videoInfo);
+        if (videoInfo.smil != null) {
+            var resource:MediaResourceBase = createMediaResource(videoInfo);
             loadVideo(resource);
         }
         else {
@@ -285,22 +284,24 @@ public class Player extends Sprite {
         // var resource:DynamicStream = new DynamicStream(videoInfo);
         var resource:MediaResourceBase = new MediaResourceBase();
 
-        resource.addMetadataValue(PlayerConstants.CONTENT_INFO, _playerInit);
-        resource.addMetadataValue(PlayerConstants.VIDEO_INFO, _videoInfo);
-        resource.addMetadataValue(SMILConstants.SMIL_DOCUMENT, _videoInfo.smil);
+        resource.addMetadataValue(PlayerConstants.CONTENT_INFO, playerInit);
+        resource.addMetadataValue(PlayerConstants.VIDEO_INFO, videoInfo);
+        resource.addMetadataValue(SMILConstants.SMIL_DOCUMENT, videoInfo.smil);
 
         // This allows plugins to check that the media is the main content
         var metaSettings:Metadata = new Metadata();
         metaSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
+        resource.addMetadataValue(PlayerConstants.CONTENT_ID, metaSettings);
 
-        // We stash it in the SMIL settings so that the smil plugin can set it on the actual created resource
-        resource.addMetadataValue(SMILConstants.TARGET_METADATA_KEY, PlayerConstants.CONTENT_ID);
-        resource.addMetadataValue(SMILConstants.TARGET_METADATA, metaSettings);
+        // The SMIL plugin needs to remove the main content id from all the elements it creates otherwise
+        // they will be wrapped in proxies - leading to double wrapping of proxies (since the smil element is proxied).
+        resource.addMetadataValue(SMILConstants.PROXY_TRIGGER, PlayerConstants.CONTENT_ID);
 
-        var subtitleMetadata:Metadata = new Metadata();
-        // TODO: this is here for dev purposes - not all videos will have subtitles
-        subtitleMetadata.addValue(SAMIPluginInfo.METADATA_KEY_URI, "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/s/ccp/00000025/2540.smi");
-        resource.addMetadataValue(SAMIPluginInfo.METADATA_NAMESPACE, subtitleMetadata);
+        if (videoInfo && videoInfo.subtitleLocation) {
+            var subtitleMetadata:Metadata = new Metadata();
+            subtitleMetadata.addValue(SAMIPluginInfo.METADATA_KEY_URI, String(videoInfo.subtitleLocation));
+            resource.addMetadataValue(SAMIPluginInfo.METADATA_NAMESPACE, subtitleMetadata);
+        }
 
         return resource;
     }
@@ -337,7 +338,7 @@ public class Player extends Sprite {
 
     private function nextInitialisationStage():void {
         // remove the next initialisation step and evaluate it
-        var initialisationStage:Function = _preInitStages.shift();
+        var initialisationStage:Function = preInitStages.shift();
         if (initialisationStage) {
             logger.debug("evaluating pre-initialisation stage");
             initialisationStage.call(this);
@@ -352,10 +353,15 @@ public class Player extends Sprite {
     }
 
     private function removePreloader():void {
-        if (_preloader) {
-            removeChild(_preloader);
-            _preloader = null;
+        if (preloader) {
+            removeChild(preloader);
+            preloader = null;
         }
+    }
+
+    private function get useLivreailAds():Boolean {
+        // TODO: this needs work
+        return Boolean(videoInfo.avod) || Boolean(videoInfo.exceededDrmRule);
     }
 
     public function get videoPlayer():SeeSawPlayer {
