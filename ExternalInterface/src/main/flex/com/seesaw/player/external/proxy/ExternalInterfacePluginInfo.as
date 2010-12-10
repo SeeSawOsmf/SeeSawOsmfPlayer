@@ -21,7 +21,6 @@
  */
 
 package com.seesaw.player.external.proxy {
-import com.seesaw.player.external.*;
 import com.seesaw.player.PlayerConstants;
 
 import org.osmf.media.MediaElement;
@@ -29,7 +28,6 @@ import org.osmf.media.MediaFactoryItem;
 import org.osmf.media.MediaFactoryItemType;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfo;
-import org.osmf.media.PluginInfoResource;
 import org.osmf.metadata.Metadata;
 
 public class ExternalInterfacePluginInfo extends PluginInfo {

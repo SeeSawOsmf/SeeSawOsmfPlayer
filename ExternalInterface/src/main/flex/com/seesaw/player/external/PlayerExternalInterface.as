@@ -23,7 +23,9 @@
 package com.seesaw.player.external {
 public interface PlayerExternalInterface {
     function get available():Boolean;
+
     function lightsDown():void;
-    function lightsUp():void; 
+
+    function lightsUp():void;
 }
 }

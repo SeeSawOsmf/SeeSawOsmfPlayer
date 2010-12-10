@@ -25,7 +25,6 @@ import com.seesaw.player.external.*;
 
 import flash.external.ExternalInterface;
 
-import org.osmf.elements.ProxyElement;
 import org.osmf.events.PlayEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.traits.MediaTraitType;
