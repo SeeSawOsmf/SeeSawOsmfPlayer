@@ -21,9 +21,6 @@
  */
 
 package com.seesaw.player.controls.widget {
-import com.seesaw.player.events.FullScreenEvent;
-import com.seesaw.player.traits.fullscreen.FullScreenTrait;
-
 import com.seesaw.player.ui.PlayerToolTip;
 import com.seesaw.player.ui.StyledTextField;
 
@@ -31,6 +28,7 @@ import controls.seesaw.widget.interfaces.IWidget;
 
 import flash.display.StageDisplayState;
 import flash.events.Event;
+import flash.events.FullScreenEvent;
 import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.text.TextField;
@@ -42,64 +40,87 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.chrome.widgets.ButtonWidget;
 import org.osmf.media.MediaElement;
+import org.osmf.traits.MediaTraitType;
 
 public class FullScreen extends ButtonWidget implements IWidget {
 
     private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.FullScreen";
-
     private static const FULLSCREEN_LABEL:String = "Full Screen";
-
     private static const EXIT_FULLSCREEN_LABEL:String = "Exit Full Screen";
 
     private var logger:ILogger = LoggerFactory.getClassLogger(FullScreen);
-
-    private var _fullScreenTrait:FullScreenTrait;
-
-    private var _fullScreenLabel:TextField;
-
+    private var fullScreenLabel:TextField;
     private var toolTip:PlayerToolTip;
-
     private var _requiredTraits:Vector.<String> = new Vector.<String>;
 
     public function FullScreen() {
-
-        //var toolTip = new PlayerToolTip();
-
-        this.toolTip = new PlayerToolTip(this, "FullScreen");
-
         logger.debug("FullScreen()");
+        _requiredTraits[0] = MediaTraitType.DISPLAY_OBJECT;
 
-        _requiredTraits[0] = FullScreenTrait.FULL_SCREEN;
+        fullScreenLabel = new StyledTextField();
+        fullScreenLabel.text = FULLSCREEN_LABEL;
+        formatLabelFont();
+        toolTip = new PlayerToolTip(this, "FullScreen");
+        addChild(fullScreenLabel);
 
-        createView();
-
-        this.addEventListener(Event.ADDED_TO_STAGE, this.onAddedToStage);
+        addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
     }
 
     private function onAddedToStage(event:Event) {
-        stage.addChild(this.toolTip);
+        removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+        stage.addChild(toolTip);
+        stage.addEventListener(FullScreenEvent.FULL_SCREEN, onFullScreen);
     }
-
-    public override function layout(availableWidth:Number, availableHeight:Number, deep:Boolean = true):void
-    {
-       super.layout(availableWidth, availableHeight, deep);
-     }
 
     override protected function get requiredTraits():Vector.<String> {
         return _requiredTraits;
     }
 
     override protected function processRequiredTraitsAvailable(element:MediaElement):void {
-        _fullScreenTrait = element.getTrait(FullScreenTrait.FULL_SCREEN) as FullScreenTrait;
+        addEventListener(KeyboardEvent.KEY_DOWN, KeyPressed);
+        visible = true;
+    }
 
-        if (_fullScreenTrait) {
-            _fullScreenTrait.addEventListener(FullScreenEvent.FULL_SCREEN, onFullScreen);
-            addEventListener(KeyboardEvent.KEY_DOWN, KeyPressed);
-            this.formatLabelFont();
-            addChild(_fullScreenLabel);
+    override protected function processRequiredTraitsUnavailable(element:MediaElement):void {
+        removeEventListener(KeyboardEvent.KEY_DOWN, KeyPressed);
+       // visible = false;
+    }
+
+    override protected function onMouseClick(event:MouseEvent):void {
+        if (stage) {
+            setFullScreen(stage.displayState == StageDisplayState.NORMAL);
         }
+    }
 
-        visible = media.hasTrait(FullScreenTrait.FULL_SCREEN);
+    private function KeyPressed(event:KeyboardEvent):void {
+        if (event.keyCode == Keyboard.ESCAPE) {
+            stage.displayState = StageDisplayState.NORMAL;
+        }
+    }
+
+    private function setFullScreen(fullScreen:Boolean):void {
+        if (stage) {
+            if (fullScreen && stage.displayState == StageDisplayState.NORMAL) {
+                stage.displayState = StageDisplayState.FULL_SCREEN;
+            } else if (!fullScreen && stage.displayState == StageDisplayState.FULL_SCREEN) {
+                stage.displayState = StageDisplayState.NORMAL;
+            }
+        }
+    }
+
+    private function onFullScreen(event:FullScreenEvent):void {
+        if (event.fullScreen) {
+            fullScreenLabel.text = EXIT_FULLSCREEN_LABEL;
+            toolTip.updateToolTip(EXIT_FULLSCREEN_LABEL);
+        }
+        else {
+            fullScreenLabel.text = FULLSCREEN_LABEL;
+            toolTip.updateToolTip(FULLSCREEN_LABEL);
+        }
+    }
+
+    public function get classDefinition():String {
+        return QUALIFIED_NAME;
     }
 
     private function formatLabelFont():void {
@@ -107,60 +128,8 @@ public class FullScreen extends ButtonWidget implements IWidget {
         textFormat.size = 12;
         textFormat.color = 0x00A78D;
         textFormat.align = "right";
-        this._fullScreenLabel.setTextFormat(textFormat);
-        this._fullScreenLabel.autoSize = TextFieldAutoSize.RIGHT;
-    }
-
-    override protected function processRequiredTraitsUnavailable(element:MediaElement):void {
-        if (_fullScreenTrait) {
-            _fullScreenTrait.removeEventListener(FullScreenEvent.FULL_SCREEN, onFullScreen);
-            removeEventListener(KeyboardEvent.KEY_DOWN, KeyPressed);
-            removeChild(_fullScreenLabel);
-            _fullScreenTrait = null;
-        }
-
-        visible = media.hasTrait(FullScreenTrait.FULL_SCREEN);
-    }
-
-    override protected function onMouseClick(event:MouseEvent):void {
-        setFullScreen(!_fullScreenTrait.fullscreen);
-    }
-
-    private function KeyPressed(event:KeyboardEvent):void {
-        if (_fullScreenTrait && _fullScreenTrait.fullscreen == true && event.keyCode == Keyboard.ESCAPE) {
-            _fullScreenTrait.fullscreen = false;
-        }
-    }
-
-    private function setFullScreen(fullScreen:Boolean):void {
-        if (_fullScreenTrait) {
-            if (fullScreen && stage.displayState == StageDisplayState.NORMAL) {
-                stage.displayState = StageDisplayState.FULL_SCREEN;
-            } else if (!fullScreen && stage.displayState == StageDisplayState.FULL_SCREEN) {
-                stage.displayState = StageDisplayState.NORMAL;
-            }
-            _fullScreenTrait.fullscreen = fullScreen;
-        }
-    }
-
-    private function onFullScreen(event:FullScreenEvent):void {
-        if (event.value) {
-            _fullScreenLabel.text = EXIT_FULLSCREEN_LABEL;
-            this.toolTip.updateToolTip(EXIT_FULLSCREEN_LABEL);
-        }
-        else {
-            _fullScreenLabel.text = FULLSCREEN_LABEL;
-            this.toolTip.updateToolTip(FULLSCREEN_LABEL);
-        }
-    }
-
-    private function createView():void {
-        _fullScreenLabel = new StyledTextField();
-        _fullScreenLabel.text = FULLSCREEN_LABEL;
-    }
-
-    public function get classDefinition():String {
-        return QUALIFIED_NAME;
+        fullScreenLabel.setTextFormat(textFormat);
+        fullScreenLabel.autoSize = TextFieldAutoSize.RIGHT;
     }
 }
 }

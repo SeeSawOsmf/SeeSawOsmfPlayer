@@ -26,13 +26,12 @@ import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.controls.ControlBarMetadata;
 import com.seesaw.player.controls.ControlBarPlugin;
-import com.seesaw.player.events.FullScreenEvent;
-import com.seesaw.player.fullscreen.FullScreenProxyPluginInfo;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
 import com.seesaw.player.smil.SeeSawSMILLoader;
-import com.seesaw.player.traits.fullscreen.FullScreenTrait;
 
 import flash.display.Sprite;
+import flash.events.Event;
+import flash.events.FullScreenEvent;
 import flash.external.ExternalInterface;
 
 import org.as3commons.logging.ILogger;
@@ -40,7 +39,6 @@ import org.as3commons.logging.LoggerFactory;
 import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
 import org.osmf.events.MediaElementEvent;
-import org.osmf.events.MediaFactoryEvent;
 import org.osmf.events.MetadataEvent;
 import org.osmf.events.PlayEvent;
 import org.osmf.layout.HorizontalAlign;
@@ -55,12 +53,9 @@ import org.osmf.media.URLResource;
 import org.osmf.metadata.Metadata;
 import org.osmf.smil.SMILPluginInfo;
 import org.osmf.traits.DisplayObjectTrait;
-import org.osmf.traits.MediaTraitBase;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.TimeTrait;
-
-import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
 
 public class SeeSawPlayer extends Sprite {
 
@@ -81,6 +76,8 @@ public class SeeSawPlayer extends Sprite {
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
 
+        addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+
         config = playerConfig;
 
         factory = config.factory;
@@ -89,6 +86,11 @@ public class SeeSawPlayer extends Sprite {
         rootContainer = new MediaContainer();
 
         initialisePlayer();
+    }
+
+    private function onAddedToStage(event:Event) {
+        removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+        stage.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
     }
 
     private function initialisePlayer():void {
@@ -161,8 +163,6 @@ public class SeeSawPlayer extends Sprite {
         // factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
-        // factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
-        factory.loadPlugin(new PluginInfoResource(new FullScreenProxyPluginInfo()));
 
         if (config.resource.getMetadataValue("contentInfo").adType == config.adModuleType)
             factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
@@ -174,11 +174,6 @@ public class SeeSawPlayer extends Sprite {
         videoElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onVideoMetadataRemove);
         videoElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
         videoElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
-
-        var trait:MediaTraitBase = videoElement.getTrait(FullScreenTrait.FULL_SCREEN);
-        if(trait) {
-            trait.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
-        }
 
         // videoElement = new BufferManager(0.5, 5, videoElement);
 
@@ -221,9 +216,6 @@ public class SeeSawPlayer extends Sprite {
 
     private function updateTraitListeners(element:MediaElement, traitType:String, add:Boolean):void {
         switch (traitType) {
-            case FullScreenTrait.FULL_SCREEN:
-                changeListeners(element, add, traitType, FullScreenEvent.FULL_SCREEN, onFullscreen);
-                break;
             case MediaTraitType.PLAY:
                 changeListeners(element, add, traitType, PlayEvent.PLAY_STATE_CHANGE, onPlayStateChanged);
                 break;
@@ -266,9 +258,9 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onFullscreen(event:FullScreenEvent):void {
-        logger.debug("onFullscreen: " + event.value);
-        var width:int = event.value ? stage.fullScreenWidth : config.width;
-        var height:int = event.value ? stage.fullScreenHeight : config.height;
+        logger.debug("onFullscreen: " + event.fullScreen);
+        var width:int = event.fullScreen ? stage.fullScreenWidth : config.width;
+        var height:int = event.fullScreen ? stage.fullScreenHeight : config.height;
         setPlayerSize(width, height);
     }
 
