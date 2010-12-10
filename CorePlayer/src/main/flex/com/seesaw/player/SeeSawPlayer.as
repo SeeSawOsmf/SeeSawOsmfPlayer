@@ -26,6 +26,9 @@ import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.controls.ControlBarMetadata;
 import com.seesaw.player.controls.ControlBarPlugin;
+import com.seesaw.player.external.ExternalInterfaceConstants;
+import com.seesaw.player.external.PlayerExternalInterface;
+import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
 import com.seesaw.player.smil.SeeSawSMILLoader;
 
@@ -73,8 +76,13 @@ public class SeeSawPlayer extends Sprite {
     private var subtitleElement:MediaElement;
     private var dOGImage:MediaElement;
 
+    private var externalInterface:PlayerExternalInterface;
+
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
+
+        var provider:ObjectProvider = ObjectProvider.getInstance();
+        externalInterface = provider.getObject(PlayerExternalInterface);
 
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 
@@ -244,14 +252,14 @@ public class SeeSawPlayer extends Sprite {
     private function onPlayStateChanged(event:PlayEvent):void {
         var timeTrait:TimeTrait = videoElement.getTrait(MediaTraitType.TIME) as TimeTrait;
         if (event.playState == PlayState.PLAYING && !this.lightsDown) {
-            if (ExternalInterface.available) {
-                ExternalInterface.call("lightsDown.lightsDown");
+            if (externalInterface.available) {
+                externalInterface.lightsDown();
                 this.lightsDown = true;
             }
         }
         if (event.playState == PlayState.PAUSED && (timeTrait.currentTime != timeTrait.duration)) {
             if (ExternalInterface.available) {
-                ExternalInterface.call("lightsDown.lightsUp");
+                externalInterface.lightsUp();
                 this.lightsDown = false;
             }
         }

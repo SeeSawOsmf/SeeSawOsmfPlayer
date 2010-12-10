@@ -48,6 +48,7 @@
         <module>PlaylistPlugin</module>
         <module>SMILObjectProxy</module>
         <module>SubtitlePlugin</module>
+        <module>ExternalInterface</module>
     </modules>
 
     <developers>
@@ -172,6 +173,12 @@
             </dependency>
             <dependency>
                 <artifactId>SMILObjectProxy</artifactId>
+                <groupId>com.seesaw</groupId>
+                <version>${pom.version}</version>
+                <type>swc</type>
+            </dependency>
+            <dependency>
+                <artifactId>ExternalInterface</artifactId>
                 <groupId>com.seesaw</groupId>
                 <version>${pom.version}</version>
                 <type>swc</type>
