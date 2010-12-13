@@ -22,10 +22,17 @@
 
 package com.seesaw.player.external {
 public interface PlayerExternalInterface {
+
     function get available():Boolean;
+    
+    function callLightsDown():void;
+    function callLightsUp():void;
 
-    function lightsDown():void;
+    function addGetGuidanceCallback(callback:Function):void;
+    function addGetCurrentItemTitleCallback(callback:Function):void;
+    function addGetCurrentItemDurationCallback(callback:Function):void;
 
-    function lightsUp():void;
+    function addHideDogCallback(callback:Function):void;
+    function addShowDogCallback(callback:Function):void;
 }
 }

@@ -73,11 +73,9 @@ public class Player extends Sprite {
     private var posterFrame:PosterFrame;
     private var guidanceBar:Sprite;
     private var preloader:Preloader;
+    private var xi:PlayerExternalInterface;
 
-    // Returned by the player initialiser AJAX call
     private var playerInit:XML;
-
-    // Returned by the video info AJAX call
     private var videoInfo:XML;
 
     public function Player() {
@@ -87,10 +85,12 @@ public class Player extends Sprite {
 
         registerServices();
 
+        xi = ObjectProvider.getInstance().getObject(PlayerExternalInterface);
+
         loaderParams = LoaderInfo(this.root.loaderInfo).parameters;
 
         // TODO: this needs to be in a flashvar from the page
-        loaderParams.playerInitUrl = "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/" +
+        loaderParams.playerInitUrl = "http://localhost:8080/" +
                 "player.playerinitialisation:playerinit?t:ac=TV:DRAMA/p/33535/Sintel";
 
         stage.scaleMode = StageScaleMode.NO_SCALE;
@@ -110,10 +110,10 @@ public class Player extends Sprite {
     }
 
     private function setupExternalInterface():void {
-        if (ExternalInterface.available) {
-            ExternalInterface.addCallback("getGuidance", this.checkGuidance);
-            ExternalInterface.addCallback("getCurrentItemTitle", this.getCurrentItemTitle);
-            ExternalInterface.addCallback("getCurrentItemDuration", this.getCurrentItemDuration);
+        if (xi.available) {
+            xi.addGetGuidanceCallback(checkGuidance);
+            xi.addGetCurrentItemTitleCallback(getCurrentItemTitle);
+            xi.addGetCurrentItemDurationCallback(getCurrentItemDuration);
         }
     }
 
@@ -349,8 +349,7 @@ public class Player extends Sprite {
     }
 
     private function getResumePosition():Number {
-        var provider:ObjectProvider = ObjectProvider.getInstance();
-        var resumeService:ResumeService = provider.getObject(ResumeService);
+        var resumeService:ResumeService = ObjectProvider.getInstance().getObject(ResumeService);
         var resumeValue:Number = resumeService.getResumeCookie();
         return resumeValue;
     }
@@ -360,11 +359,6 @@ public class Player extends Sprite {
             removeChild(preloader);
             preloader = null;
         }
-    }
-
-    private function get useLivreailAds():Boolean {
-        // TODO: this needs work
-        return Boolean(videoInfo.avod) || Boolean(videoInfo.exceededDrmRule);
     }
 
     public function get videoPlayer():SeeSawPlayer {
