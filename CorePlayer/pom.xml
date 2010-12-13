@@ -112,11 +112,6 @@
         </dependency>
         <dependency>
             <groupId>com.seesaw</groupId>
-            <artifactId>FullScreenProxyPlugin</artifactId>
-            <type>swc</type>
-        </dependency>
-        <dependency>
-            <groupId>com.seesaw</groupId>
             <artifactId>PlayerInitialisation</artifactId>
             <type>swc</type>
         </dependency>
@@ -159,7 +154,12 @@
         <dependency>
             <artifactId>SMILObjectProxy</artifactId>
             <groupId>com.seesaw</groupId>
-             <type>swc</type>
+            <type>swc</type>
+        </dependency>
+        <dependency>
+            <artifactId>ExternalInterface</artifactId>
+            <groupId>com.seesaw</groupId>
+            <type>swc</type>
         </dependency>
 
         <dependency>

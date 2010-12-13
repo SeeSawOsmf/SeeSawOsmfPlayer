@@ -23,6 +23,8 @@
 package com.seesaw.player {
 import com.seesaw.player.buttons.PlayStartButton;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
+import com.seesaw.player.external.PlayerExternalInterface;
+import com.seesaw.player.external.PlayerExternalInterfaceImpl;
 import com.seesaw.player.impl.services.ResumeServiceImpl;
 import com.seesaw.player.init.ServiceRequest;
 import com.seesaw.player.ioc.ObjectProvider;
@@ -334,6 +336,7 @@ public class Player extends Sprite {
         logger.debug("registering services");
         var provider:ObjectProvider = ObjectProvider.getInstance();
         provider.register(ResumeService, new ResumeServiceImpl());
+        provider.register(PlayerExternalInterface, new PlayerExternalInterfaceImpl());
     }
 
     private function nextInitialisationStage():void {

@@ -27,7 +27,9 @@ package org.osmf.smil.media
 	import org.osmf.elements.ProxyElement;
 	import org.osmf.elements.SerialElement;
 	import org.osmf.elements.VideoElement;
-	import org.osmf.media.MediaElement;
+import org.osmf.events.LoadEvent;
+import org.osmf.events.MediaElementEvent;
+import org.osmf.media.MediaElement;
 	import org.osmf.media.MediaFactory;
 	import org.osmf.media.MediaResourceBase;
 	import org.osmf.media.MediaType;
@@ -44,8 +46,11 @@ import org.osmf.smil.model.SMILDocument;
 	import org.osmf.smil.model.SMILElementType;
 	import org.osmf.smil.model.SMILMediaElement;
 	import org.osmf.smil.model.SMILMetaElement;
+import org.osmf.traits.LoadState;
+import org.osmf.traits.LoadTrait;
+import org.osmf.traits.MediaTraitType;
 
-	CONFIG::LOGGING
+CONFIG::LOGGING
 	{
 	import org.osmf.logging.Logger;
 	import org.osmf.logging.Log;
@@ -106,7 +111,7 @@ import org.osmf.smil.model.SMILDocument;
 					break;
 				case SMILElementType.SEQUENCE:
 					var serialElement:SerialElement = new SerialElement();
-					mediaElement = serialElement;
+                    mediaElement = serialElement;
 					break;
 				case SMILElementType.VIDEO:
 					var resource:StreamingURLResource = new StreamingURLResource((smilElement as SMILMediaElement).src);
