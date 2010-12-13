@@ -1,0 +1,16 @@
+#playerWrapper {
+    position:relative;
+    z-index:200;
+}
+.wISSLatchLights {
+    background-color:#000000;
+    height:100%;
+    left:0;
+    position:fixed;
+    top:0;
+    width:100%;
+    z-index:155;
+}
+li.inactive {
+    text-decoration: line-through;
+}
