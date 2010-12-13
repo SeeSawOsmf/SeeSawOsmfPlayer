@@ -30,5 +30,6 @@ public class PlayerConstants {
 
     public static const MAIN_CONTENT_ID:String = "mainContent";
     public static const AD_CONTENT_ID:String = "instreamAds";
+    public static const STING_CONTENT_ID:String = "sting";
 }
 }

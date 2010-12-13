@@ -51,7 +51,8 @@ public class SimpleScrubPrevention extends ProxyElement {
     }
 
     private function onMetadataChange(event:MetadataEvent):void {
-        if (event.key == PlayerConstants.CONTENT_TYPE && event.value == PlayerConstants.AD_CONTENT_ID) {
+        if (event.key == PlayerConstants.CONTENT_TYPE && (event.value == PlayerConstants.AD_CONTENT_ID
+                || event.value == PlayerConstants.STING_CONTENT_ID)) {
             var traitsToBlock:Vector.<String> = new Vector.<String>();
             traitsToBlock[0] = MediaTraitType.SEEK;
             blockedTraits = traitsToBlock;
