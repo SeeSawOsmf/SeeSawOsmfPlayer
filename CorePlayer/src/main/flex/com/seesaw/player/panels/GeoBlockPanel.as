@@ -34,6 +34,7 @@ public class GeoBlockPanel extends Sprite {
 
     //Geo block message string passed into the constructor
     private var guidanceWarning:String;
+    private var findOutMore:String;
 
     //css
     private var css:StyleSheet;
@@ -42,11 +43,11 @@ public class GeoBlockPanel extends Sprite {
      * Takes: warning:String - the guidance warning that appears at the top of the panel
      *
      */
-    public function GeoBlockPanel(warning:String) {
+    public function GeoBlockPanel() {
 
         //set the private variables
-        this.guidanceWarning = "<p>We're sorry...</p><br /><p>You need to be located in the UK to watch programmes on SeeSaw. This is because we haven't been given permission by the programme makers and rights holders to show the content outside of the UK.</p><br /><p>If you're located in the UK and think that you've received this message in error, there may be a problem with your Internet Service Provider (ISP). <font color='#00A88E'><a href='/help'>Find out more</a></font>.</p>";
-
+        this.guidanceWarning = "<p><font color='#FFFFFF'>We're sorry...</font></p><br /><p><font color='#FFFFFF'>You need to be located in the UK to watch programmes on SeeSaw. This is because we haven't been given permission by the programme makers and rights holders to show the content outside of the UK.</p><br /><p>If you're located in the UK and think that you've received this message in error, there may be a problem with your Internet Service Provider (ISP).</font></p>";
+        this.findOutMore = "<font color='#00A88E'><a href='/help'>Find out more</a></font>.";
         Security.allowDomain("*");
         super();
 
@@ -70,9 +71,11 @@ public class GeoBlockPanel extends Sprite {
 
         var htmlLink:Object = new Object();
         htmlLink.color = "#00A88E";
+        htmlLink.fontSize = 12;
 
         var paragraph:Object = new Object();
         paragraph.color = "#FFFFFF";
+        paragraph.fontSize = 12;
 
         this.css.setStyle('p', paragraph);
         this.css.setStyle('a', htmlLink);
@@ -85,6 +88,7 @@ public class GeoBlockPanel extends Sprite {
 
         var contentContainer:Sprite = this.buildContentContainer();
         contentContainer.addChild(this.buildWarning());
+        contentContainer.addChild(this.buildFindOutMoreLink());
 
         panel.addChild(contentContainer);
 
@@ -109,11 +113,12 @@ public class GeoBlockPanel extends Sprite {
         //the x and y of this container are the equivalent to padding in CSS
         contentContainer.x = 20;
         contentContainer.y = 20;
+        
         return contentContainer;
     }
 
     private function buildWarning():TextField {
-        var warningLabel = new StyledTextField();
+        var warningLabel = new TextField();
         warningLabel.width = 260;
         warningLabel.height = 230;
         warningLabel.multiline = true;
@@ -128,10 +133,41 @@ public class GeoBlockPanel extends Sprite {
         return warningLabel;
     }
 
+    private function buildFindOutMoreLink():TextField {
+        var findOutMoreLink = new TextField();
+        findOutMoreLink.width = 90;
+        findOutMoreLink.height = 20;
+        findOutMoreLink.wordWrap = true;
+        findOutMoreLink.htmlText = this.findOutMore;
+        //warningLabel.styleSheet = this.css;
+        findOutMoreLink.x = 34;
+        findOutMoreLink.y = 187;
+
+        this.applyLinkFormat(findOutMoreLink);
+        //var formattedWarningLabel:TextField = this.applyWarningFormat(warningLabel);
+
+        return findOutMoreLink;
+    }
+
     private function applyWarningFormat(textToFormat:TextField):TextField {
         var textFormat:TextFormat = new TextFormat();
         textFormat.size = 12;
+        textFormat.font = "Arial";
         textFormat.color = 0xFFFFFF;
+        textFormat.align = "left";
+        textFormat.leading = 3;
+
+        textToFormat.setTextFormat(textFormat);
+
+        return textToFormat;
+
+    }
+
+    private function applyLinkFormat(textToFormat:TextField):TextField {
+        var textFormat:TextFormat = new TextFormat();
+        textFormat.size = 12;
+        textFormat.font = "Arial";
+        textFormat.color = 0x00A88E;
         textFormat.align = "left";
         textFormat.leading = 3;
 
