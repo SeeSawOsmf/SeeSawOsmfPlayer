@@ -158,16 +158,22 @@ CONFIG::LOGGING
 				case SMILElementType.IMAGE:
 					var imageResource:URLResource = new URLResource((smilElement as SMILMediaElement).src);
 					imageResource.mediaType = MediaType.IMAGE;
+
+                    populateMetdataFromResource(originalResource, imageResource);
+
 					var imageElement:MediaElement = factory.createMediaElement(imageResource);
 					var dur:Number = (smilElement as SMILMediaElement).duration;
 					var durationElement:DurationElement = new DurationElement(dur, imageElement);
 
-                    populateMetadataFromSMIL(imageElement, smilVideoElement);
+                    populateMetadataFromSMIL(imageElement, smilElement);
 					(parentMediaElement as CompositeElement).addChild(durationElement);
 					break;
 				case SMILElementType.AUDIO:
 					var audioResource:URLResource = new URLResource((smilElement as SMILMediaElement).src);
 					audioResource.mediaType = MediaType.AUDIO;
+
+                    populateMetdataFromResource(originalResource, audioResource);
+
 					var audioElement:MediaElement = factory.createMediaElement(audioResource);
 
                     populateMetadataFromSMIL(audioElement, smilVideoElement);
@@ -207,18 +213,20 @@ CONFIG::LOGGING
 		}
 
         private function populateMetdataFromResource(originalResource:MediaResourceBase, mediaResource:MediaResourceBase):void {
-            var proxyTriggerKey:String = originalResource.getMetadataValue(SMILConstants.PROXY_TRIGGER) as String;
-
             // Make sure we transfer any resource metadata from the original resource
             for each (var metadataNS:String in originalResource.metadataNamespaceURLs)
             {
-                // Ignore metadata that is contained in TARGET_METADATA_KEY so that proxies are not generated.
-                // This avoids proxy wrapping around both the SMILElement and the subsequently created mediaElement below
-                if(proxyTriggerKey == null || metadataNS != proxyTriggerKey)
-                {
-                    var metadata:Object = originalResource.getMetadataValue(metadataNS);
-                    mediaResource.addMetadataValue(metadataNS, metadata);
-                }
+                var metadata:Object = originalResource.getMetadataValue(metadataNS);
+                mediaResource.addMetadataValue(metadataNS, metadata);
+            }
+
+            // Shuffle some metadata so that it triggers proxies on the created elements
+            var proxyTriggerKey:String = originalResource.getMetadataValue(SMILConstants.PROXY_TRIGGER_METADATA_KEY) as String;
+            var proxyTriggerValue:Object = originalResource.getMetadataValue(SMILConstants.PROXY_TRIGGER_METADATA_VALUE) as Object;
+
+            if(proxyTriggerKey && proxyTriggerValue)
+            {
+                mediaResource.addMetadataValue(proxyTriggerKey, proxyTriggerValue);
             }
         }
 

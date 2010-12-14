@@ -53,6 +53,7 @@ import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
 import org.osmf.media.URLResource;
 import org.osmf.metadata.Metadata;
+import org.osmf.smil.SMILConstants;
 import org.osmf.smil.SMILPluginInfo;
 import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.MediaTraitType;
@@ -73,7 +74,7 @@ public class SeeSawPlayer extends Sprite {
     private var rootContainer:MediaContainer;
     private var rootElement:ParallelElement;
     private var subtitleElement:MediaElement;
-    private var dOGImage:MediaElement;
+    private var dogImage:MediaElement;
 
     private var xi:PlayerExternalInterface;
 
@@ -92,6 +93,7 @@ public class SeeSawPlayer extends Sprite {
         videoInfo = playerConfig.resource.getMetadataValue(PlayerConstants.VIDEO_INFO) as XML;
 
         factory = config.factory;
+
         player = new MediaPlayer();
         rootElement = new ParallelElement();
         rootContainer = new MediaContainer();
@@ -113,10 +115,6 @@ public class SeeSawPlayer extends Sprite {
         createControlBarElement();
         createSubtitleElement();
 
-        if (playerInit.dogImage) {
-            createDOG(String(playerInit.dogImage));
-        }
-
         player.media = videoElement;
 
         setPlayerSize(config.width, config.height);
@@ -124,37 +122,6 @@ public class SeeSawPlayer extends Sprite {
 
         logger.debug("adding media container to stage");
         addChild(rootContainer);
-    }
-
-    private function createDOG(dOGURL:String):void {
-        dOGImage = factory.createMediaElement(new URLResource(dOGURL));
-
-        if (dOGImage) {
-            logger.debug("creating digital onscreen graphic image: " + dOGURL);
-            var layout:LayoutMetadata = new LayoutMetadata();
-            dOGImage.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
-
-            layout.index = 5;
-            layout.x = 5;
-            layout.y = 5;
-            layout.verticalAlign = VerticalAlign.TOP;
-            layout.horizontalAlign = HorizontalAlign.LEFT;
-
-            if (xi.available) {
-                xi.addHideDogCallback(hideDOG);
-                xi.addShowDogCallback(showDOG);
-            }
-
-            showDOG();
-        }
-    }
-
-    private function showDOG():void {
-        rootElement.addChild(this.dOGImage);
-    }
-
-    private function hideDOG():void {
-        rootElement.removeChild(this.dOGImage);
     }
 
     private function createSubtitleElement():void {
@@ -193,6 +160,7 @@ public class SeeSawPlayer extends Sprite {
 
         videoElement.addEventListener(MediaElementEvent.METADATA_ADD, onVideoMetadataAdd);
         videoElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onVideoMetadataRemove);
+
         videoElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
         videoElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
 
@@ -288,7 +256,6 @@ public class SeeSawPlayer extends Sprite {
         if (layout == null) {
             layout = new LayoutMetadata();
             rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
-
         }
         layout.width = width;
         layout.height = height;
@@ -298,20 +265,25 @@ public class SeeSawPlayer extends Sprite {
     private function onVideoMetadataAdd(event:MediaElementEvent):void {
         if (event.namespaceURL == ControlBarMetadata.CONTROL_BAR_METADATA) {
             var metadata:Metadata = videoElement.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
-            metadata.addEventListener(MetadataEvent.VALUE_CHANGE, controlBarMetadataChange);
-            metadata.addEventListener(MetadataEvent.VALUE_ADD, controlBarMetadataChange);
+            metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
+            metadata.addEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
+        }
+        else if (event.namespaceURL == SMILConstants.SMIL_METADATA_NS) {
+            var metadata:Metadata = videoElement.getMetadata(SMILConstants.SMIL_METADATA_NS);
+            var contentType:String = metadata.getValue(PlayerConstants.CONTENT_TYPE) as String;
+            logger.debug("switching to content: " + contentType);
         }
     }
 
     private function onVideoMetadataRemove(event:MediaElementEvent):void {
         if (event.namespaceURL == ControlBarMetadata.CONTROL_BAR_METADATA) {
             var metadata:Metadata = videoElement.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
-            metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, controlBarMetadataChange);
-            metadata.removeEventListener(MetadataEvent.VALUE_ADD, controlBarMetadataChange);
+            metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
+            metadata.removeEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
         }
     }
 
-    private function controlBarMetadataChange(event:MetadataEvent):void {
+    private function onControlBarMetadataChange(event:MetadataEvent):void {
         logger.debug("control bar metadata change: key = {0}, value = {1}", event.key, event.value);
         switch (event.key) {
             case ControlBarMetadata.CONTROL_BAR_HIDDEN:
@@ -341,6 +313,44 @@ public class SeeSawPlayer extends Sprite {
             return metadata.getValue(SAMIPluginInfo.METADATA_KEY_URI) as String;
         }
         return null;
+    }
+
+    private function createDogImage():void {
+        if (playerInit.dogImage == null) {
+            return;
+        }
+
+        var resource:URLResource = new URLResource(String(playerInit.dogImage));
+
+        dogImage = factory.createMediaElement(resource);
+
+        if (dogImage) {
+            logger.debug("creating digital onscreen graphic image: " + resource.url);
+
+            var layout:LayoutMetadata = new LayoutMetadata();
+            dogImage.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+
+            layout.index = 5;
+            layout.x = 5;
+            layout.y = 5;
+            layout.verticalAlign = VerticalAlign.TOP;
+            layout.horizontalAlign = HorizontalAlign.LEFT;
+
+            if (xi.available) {
+                xi.addHideDogCallback(hideDOG);
+                xi.addShowDogCallback(showDOG);
+            }
+
+            showDOG();
+        }
+    }
+
+    private function showDOG():void {
+        rootElement.addChild(this.dogImage);
+    }
+
+    private function hideDOG():void {
+        rootElement.removeChild(this.dogImage);
     }
 }
 }
