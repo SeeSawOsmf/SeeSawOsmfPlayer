@@ -23,21 +23,56 @@
 package com.seesaw.player.external {
 import flash.external.ExternalInterface;
 
+import org.as3commons.logging.ILogger;
+import org.as3commons.logging.LoggerFactory;
+
 public class PlayerExternalInterfaceImpl implements PlayerExternalInterface {
+
+    private var logger:ILogger = LoggerFactory.getClassLogger(PlayerExternalInterfaceImpl);
 
     public function get available():Boolean {
         return ExternalInterface.available;
     }
 
-    public function lightsDown():void {
+    public function callLightsDown():void {
+        call(ExternalInterfaceConstants.LIGHTS_DOWN);
+    }
+
+    public function callLightsUp():void {
+        call(ExternalInterfaceConstants.LIGHTS_DOWN);
+    }
+
+    public function addGetGuidanceCallback(callback:Function):void {
+        addCallback(ExternalInterfaceConstants.GET_GUIDANCE, callback);
+    }
+
+    public function addGetCurrentItemTitleCallback(callback:Function):void {
+        addCallback(ExternalInterfaceConstants.GET_CURRENT_ITEM_TITLE, callback);
+    }
+
+    public function addGetCurrentItemDurationCallback(callback:Function):void {
+        addCallback(ExternalInterfaceConstants.GET_CURRENT_ITEM_DURATION, callback);
+    }
+
+    public function addHideDogCallback(callback:Function):void {
+        addCallback(ExternalInterfaceConstants.SHOW_DOG, callback);
+    }
+
+    public function addShowDogCallback(callback:Function):void {
+        addCallback(ExternalInterfaceConstants.HIDE_DOG, callback);
+    }
+
+    private function addCallback(name:String, callback:Function):void {
         if (available) {
-            ExternalInterface.call(ExternalInterfaceConstants.LIGHTS_DOWN);
+            logger.debug("adding callback {0}", name);
+            ExternalInterface.addCallback(name, callback);
         }
     }
 
-    public function lightsUp():void {
+    private function call(name:String) {
         if (available) {
-            ExternalInterface.call(ExternalInterfaceConstants.LIGHTS_DOWN);
+            logger.debug("calling {0}", name);
+            ExternalInterface.call(name);
         }
     }
 }

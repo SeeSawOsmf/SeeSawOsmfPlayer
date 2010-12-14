@@ -26,16 +26,15 @@ import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.controls.ControlBarMetadata;
 import com.seesaw.player.controls.ControlBarPlugin;
-import com.seesaw.player.external.ExternalInterfaceConstants;
 import com.seesaw.player.external.PlayerExternalInterface;
 import com.seesaw.player.ioc.ObjectProvider;
+import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
 import com.seesaw.player.smil.SeeSawSMILLoader;
 
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.FullScreenEvent;
-import flash.external.ExternalInterface;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -62,12 +61,12 @@ import org.osmf.traits.TimeTrait;
 
 public class SeeSawPlayer extends Sprite {
 
+    use namespace contentinfo;
+
     private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
 
     private var config:PlayerConfiguration;
     private var videoElement:MediaElement;
-
-    private var lightsDown:Boolean = false;
 
     private var factory:MediaFactory;
     private var player:MediaPlayer;
@@ -76,17 +75,21 @@ public class SeeSawPlayer extends Sprite {
     private var subtitleElement:MediaElement;
     private var dOGImage:MediaElement;
 
-    private var externalInterface:PlayerExternalInterface;
+    private var xi:PlayerExternalInterface;
+
+    private var playerInit:XML;
+    private var videoInfo:XML;
+
+    private var lightsDown:Boolean = false;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
 
-        var provider:ObjectProvider = ObjectProvider.getInstance();
-        externalInterface = provider.getObject(PlayerExternalInterface);
-
-        addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+        xi = ObjectProvider.getInstance().getObject(PlayerExternalInterface);
 
         config = playerConfig;
+        playerInit = playerConfig.resource.getMetadataValue(PlayerConstants.CONTENT_INFO) as XML;
+        videoInfo = playerConfig.resource.getMetadataValue(PlayerConstants.VIDEO_INFO) as XML;
 
         factory = config.factory;
         player = new MediaPlayer();
@@ -94,6 +97,8 @@ public class SeeSawPlayer extends Sprite {
         rootContainer = new MediaContainer();
 
         initialisePlayer();
+
+        addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
     }
 
     private function onAddedToStage(event:Event) {
@@ -107,7 +112,10 @@ public class SeeSawPlayer extends Sprite {
         createVideoElement();
         createControlBarElement();
         createSubtitleElement();
-        createDOG("http://www.davemoorhouse.co.uk/DOG.png");
+
+        if (playerInit.dogImage) {
+            createDOG(String(playerInit.dogImage));
+        }
 
         player.media = videoElement;
 
@@ -119,17 +127,26 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function createDOG(dOGURL:String):void {
-        this.dOGImage = factory.createMediaElement(new URLResource(dOGURL));
-        var layout:LayoutMetadata = new LayoutMetadata();
-        this.dOGImage.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+        dOGImage = factory.createMediaElement(new URLResource(dOGURL));
 
-        layout.index = 5;
-        layout.x = 5;
-        layout.y = 5;
-        layout.verticalAlign = VerticalAlign.TOP;
-        layout.horizontalAlign = HorizontalAlign.LEFT;
+        if (dOGImage) {
+            logger.debug("creating digital onscreen graphic image: " + dOGURL);
+            var layout:LayoutMetadata = new LayoutMetadata();
+            dOGImage.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
 
-        this.showDOG();
+            layout.index = 5;
+            layout.x = 5;
+            layout.y = 5;
+            layout.verticalAlign = VerticalAlign.TOP;
+            layout.horizontalAlign = HorizontalAlign.LEFT;
+
+            if (xi.available) {
+                xi.addHideDogCallback(hideDOG);
+                xi.addShowDogCallback(showDOG);
+            }
+
+            showDOG();
+        }
     }
 
     private function showDOG():void {
@@ -144,6 +161,7 @@ public class SeeSawPlayer extends Sprite {
         factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
 
         if (captionUrl) {
+            logger.debug("creating captions: " + captionUrl);
             subtitleElement = factory.createMediaElement(new URLResource(captionUrl));
 
             var layout:LayoutMetadata = new LayoutMetadata();
@@ -177,8 +195,6 @@ public class SeeSawPlayer extends Sprite {
         videoElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onVideoMetadataRemove);
         videoElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
         videoElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
-
-        // videoElement = new BufferManager(0.5, 5, videoElement);
 
         rootElement.addChild(videoElement);
     }
@@ -247,14 +263,14 @@ public class SeeSawPlayer extends Sprite {
     private function onPlayStateChanged(event:PlayEvent):void {
         var timeTrait:TimeTrait = videoElement.getTrait(MediaTraitType.TIME) as TimeTrait;
         if (event.playState == PlayState.PLAYING && !this.lightsDown) {
-            if (externalInterface.available) {
-                externalInterface.lightsDown();
+            if (xi.available) {
+                xi.callLightsDown();
                 this.lightsDown = true;
             }
         }
         if (event.playState == PlayState.PAUSED && (timeTrait.currentTime != timeTrait.duration)) {
-            if (ExternalInterface.available) {
-                externalInterface.lightsUp();
+            if (xi.available) {
+                xi.callLightsUp();
                 this.lightsDown = false;
             }
         }

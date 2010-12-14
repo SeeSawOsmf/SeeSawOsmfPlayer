@@ -23,6 +23,8 @@
 package com.seesaw.player.external.proxy {
 import com.seesaw.player.external.*;
 
+import com.seesaw.player.ioc.ObjectProvider;
+
 import flash.external.ExternalInterface;
 
 import org.osmf.events.PlayEvent;
@@ -34,9 +36,11 @@ import org.osmf.traits.TimeTrait;
 public class LightsDownProxy extends ExternalInterfaceProxyBase {
 
     private var lightsDown:Boolean = false;
+    private var xi:PlayerExternalInterface;
 
     public function LightsDownProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
+        xi = ObjectProvider.getInstance().getObject(PlayerExternalInterface);
     }
 
     protected override function updateTraitListeners(element:MediaElement, traitType:String, add:Boolean):void {
@@ -50,14 +54,14 @@ public class LightsDownProxy extends ExternalInterfaceProxyBase {
     private function onPlayStateChanged(event:PlayEvent):void {
         var timeTrait:TimeTrait = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
         if (event.playState == PlayState.PLAYING && !this.lightsDown) {
-            if (ExternalInterface.available) {
-                ExternalInterface.call(ExternalInterfaceConstants.LIGHTS_DOWN);
+            if (xi.available) {
+                xi.callLightsDown();
                 this.lightsDown = true;
             }
         }
         if (event.playState == PlayState.PAUSED && (timeTrait.currentTime != timeTrait.duration)) {
             if (ExternalInterface.available) {
-                ExternalInterface.call(ExternalInterfaceConstants.LIGHTS_UP);
+                xi.callLightsUp();
                 this.lightsDown = false;
             }
         }

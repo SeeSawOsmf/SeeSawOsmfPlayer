@@ -28,7 +28,7 @@ import org.osmf.media.MediaResourceBase;
 public class PlayerConfiguration {
 
     private var _factory:MediaFactory;
-    private var _adModuleType:String = "liverail"
+    private var _adModuleType:String = "liverail";
 
     private var _width:int;
     private var _height:int;
