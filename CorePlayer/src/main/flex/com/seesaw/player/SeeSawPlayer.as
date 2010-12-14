@@ -129,11 +129,6 @@ public class SeeSawPlayer extends Sprite {
         layout.verticalAlign = VerticalAlign.TOP;
         layout.horizontalAlign = HorizontalAlign.LEFT;
 
-        if (ExternalInterface.available) {
-            ExternalInterface.addCallback("hideDOG", this.hideDOG);
-            ExternalInterface.addCallback("showDOG", this.showDOG);
-        }
-
         this.showDOG();
     }
 
