@@ -28,6 +28,7 @@ import com.seesaw.player.controls.ControlBarMetadata;
 import com.seesaw.player.controls.ControlBarPlugin;
 import com.seesaw.player.external.PlayerExternalInterface;
 import com.seesaw.player.ioc.ObjectProvider;
+import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
 import com.seesaw.player.smil.SeeSawSMILLoader;
 
@@ -59,6 +60,8 @@ import org.osmf.traits.PlayState;
 import org.osmf.traits.TimeTrait;
 
 public class SeeSawPlayer extends Sprite {
+
+    use namespace contentinfo;
 
     private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
 
