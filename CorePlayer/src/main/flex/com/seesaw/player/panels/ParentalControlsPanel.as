@@ -21,6 +21,7 @@
  */
 
 package com.seesaw.player.panels {
+import com.adobe.crypto.MD5;
 import com.seesaw.player.ui.PlayerToolTip;
 import com.seesaw.player.ui.StyledTextField;
 
@@ -28,6 +29,7 @@ import flash.display.Bitmap;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
+import flash.external.ExternalInterface;
 import flash.net.URLRequest;
 import flash.net.navigateToURL;
 import flash.system.Security;
@@ -41,6 +43,10 @@ public class ParentalControlsPanel extends Sprite {
 
     public static const PARENTAL_CHECK_PASSED = "PARENTAL_CHECK_PASSED";
     public static const PARENTAL_CHECK_FAILED = "PARENTAL_CHECK_FAILED";
+
+    public static const EXTERNAL_GET_COOKIE_FUNCTION_NAME:String = "SEESAW.Utils.getCookie";
+	public static const EXTERNAL_SET_COOKIE_FUNCTION_NAME:String = "SEESAW.Utils.setCookie";
+    public static const PARENTAL_CONTROL_PASSWORD_COOKIE_NAME:String = "seesaw.player.monitor";
 
     private var toolTip:PlayerToolTip;
 
@@ -64,7 +70,8 @@ public class ParentalControlsPanel extends Sprite {
     private var passwordEntryErrorBG = new Sprite();
     private var hashedPassword:String;
     private var enteredPassword:String;
-
+    private var attempts:int = 0;
+    
     //Embed images
     [Embed(source="resources/acceptButton_up.png")]
     private var acceptImageUpEmbed:Class;
@@ -84,9 +91,12 @@ public class ParentalControlsPanel extends Sprite {
      *
      */
     public function ParentalControlsPanel(password:String, warning:String, explanation:String, confirmationMessage:String, moreAboutParentalControlsLink:String, turnOffParentalControlsLink:String) {
-
-        //set the private variables
+        
         this.hashedPassword = password;
+        //set the private variables
+        if (ExternalInterface.available) {
+            this.hashedPassword = ParentalControlsPanel.getHashedPassword();
+        }
         this.guidanceWarning = warning;
         this.guidanceExplanation = explanation;
         this.confirmationMessage = confirmationMessage;
@@ -106,6 +116,10 @@ public class ParentalControlsPanel extends Sprite {
 
     }
 
+    public static function getHashedPassword():String {
+	    return ExternalInterface.call(EXTERNAL_GET_COOKIE_FUNCTION_NAME, PARENTAL_CONTROL_PASSWORD_COOKIE_NAME);
+	}
+
     private function onAddedToStage(event:Event):void {
         this.positionPanel(event);
         this.setupToolTips();
@@ -124,12 +138,24 @@ public class ParentalControlsPanel extends Sprite {
         stage.addChild(parentalControlsToolTip);
     }
 
-    private function checkPassword():void {
+    /*private function checkPassword():void {
         if (this.hashedPassword == this.enteredPassword) {
             this.visible = false;
             this.dispatchEvent(new Event(PARENTAL_CHECK_PASSED));
         } else {
             this.showErrorState();
+        }
+    }*/
+
+    private function checkPassword():void {
+        var userEnteredPassword:String = MD5.hash(this.enteredPassword);
+        if (hashedPassword == userEnteredPassword){
+            this.visible = false;
+            this.dispatchEvent(new Event(PARENTAL_CHECK_PASSED));
+        } else {
+            this.showErrorState();
+            this.attempts++;
+            if(this.attempts>=3) this.onDeclineClick();
         }
     }
 
@@ -527,7 +553,7 @@ public class ParentalControlsPanel extends Sprite {
         }
     }
 
-    private function onDeclineClick(event:MouseEvent):void {
+    private function onDeclineClick(event:MouseEvent = null):void {
         this.visible = false;
         this.dispatchEvent(new Event(PARENTAL_CHECK_FAILED));
     }

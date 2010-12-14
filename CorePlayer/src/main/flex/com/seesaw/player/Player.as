@@ -34,6 +34,7 @@ import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.namespaces.smil;
 import com.seesaw.player.panels.GuidanceBar;
 import com.seesaw.player.panels.GuidancePanel;
+import com.seesaw.player.panels.ParentalControlsPanel;
 import com.seesaw.player.panels.PosterFrame;
 import com.seesaw.player.preloader.Preloader;
 import com.seesaw.player.services.ResumeService;
@@ -186,7 +187,15 @@ public class Player extends Sprite {
             if (guidanceBar) {
                 guidanceBar.visible = false;
             }
-            var guidancePanel = new GuidancePanel(
+
+            if (ExternalInterface.available) {
+                var hashedPassword:String = ParentalControlsPanel.getHashedPassword();
+                logger.debug("COOKIE PASSWORD: " + hashedPassword);
+            }
+
+            if (hashedPassword) {
+                var parentalControlsPanel = new ParentalControlsPanel(
+                    hashedPassword,
                     playerInit.guidance.warning,
                     playerInit.guidance.explanation,
                     playerInit.guidance.guidance,
@@ -194,16 +203,37 @@ public class Player extends Sprite {
                     playerInit.parentalControls.whatsThisLinkURL
                     );
 
-            guidancePanel.addEventListener(GuidancePanel.GUIDANCE_ACCEPTED, function(event:Event) {
-                nextInitialisationStage();
-            });
+                parentalControlsPanel.addEventListener(ParentalControlsPanel.PARENTAL_CHECK_PASSED, function(event:Event) {
+                    nextInitialisationStage();
+                });
 
-            guidancePanel.addEventListener(GuidancePanel.GUIDANCE_DECLINED, function(event:Event) {
-                resetInitialisationStages(); // sends the user back to stage 0
-                nextInitialisationStage();
-            });
+                parentalControlsPanel.addEventListener(ParentalControlsPanel.PARENTAL_CHECK_FAILED, function(event:Event) {
+                    resetInitialisationStages(); // sends the user back to stage 0
+                    nextInitialisationStage();
+                });
 
-            addChild(guidancePanel);
+                addChild(parentalControlsPanel);     
+            } else {
+                var guidancePanel = new GuidancePanel(
+                    playerInit.guidance.warning,
+                    playerInit.guidance.explanation,
+                    playerInit.guidance.guidance,
+                    playerInit.parentalControls.parentalControlsPageURL,
+                    playerInit.parentalControls.whatsThisLinkURL
+                    );
+
+                guidancePanel.addEventListener(GuidancePanel.GUIDANCE_ACCEPTED, function(event:Event) {
+                    nextInitialisationStage();
+                });
+
+                guidancePanel.addEventListener(GuidancePanel.GUIDANCE_DECLINED, function(event:Event) {
+                    resetInitialisationStages(); // sends the user back to stage 0
+                    nextInitialisationStage();
+                });
+
+                addChild(guidancePanel);
+            }
+
         }
         else {
             nextInitialisationStage();
