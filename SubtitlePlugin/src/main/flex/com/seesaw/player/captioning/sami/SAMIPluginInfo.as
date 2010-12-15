@@ -21,7 +21,6 @@
  */
 
 package com.seesaw.player.captioning.sami {
-import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 
@@ -40,6 +39,7 @@ public class SAMIPluginInfo extends PluginInfo {
 
     public static const METADATA_NAMESPACE:String = "http://www.seesaw.com/sami/1.0";
     public static const METADATA_KEY_URI:String = "uri";
+    public static const NS_TARGET_ELEMENT:String = "http://www.seesaw.com/sami/1.0/target";
 
     private static var loggerSetup:* = (LoggerFactory.loggerFactory = new TraceAndArthropodLoggerFactory());
     private static var osmfLoggerSetup:* = (Log.loggerFactory = new CommonsOsmfLoggerFactory());
@@ -78,8 +78,8 @@ public class SAMIPluginInfo extends PluginInfo {
     }
 
     private function mediaElementCreationNotificationCallback(target:MediaElement):void {
-        var mainContent:Metadata = target.resource.getMetadataValue(PlayerConstants.CONTENT_ID) as Metadata;
-        if(mainContent.getValue(PlayerConstants.ID) == PlayerConstants.MAIN_CONTENT_ID) {
+        var targetMetadata:Metadata = target.getMetadata(NS_TARGET_ELEMENT);
+        if (targetMetadata) {
             targetElement = target;
             updateMediaTarget();
         }

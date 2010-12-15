@@ -20,7 +20,7 @@
                             <ns2:meta content="mainContent" name="contentType"/>
                         </ns2:metadata>
                     </ns2:switch>
-                    <ns2:img dur="852" src="http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png" clipEnd="852" clipBegin="0">
+                    <ns2:img src="http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png">
                         <ns2:metadata>
                             <ns2:meta content="dogImage" name="contentType"/>
                         </ns2:metadata>

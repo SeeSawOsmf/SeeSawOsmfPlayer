@@ -163,10 +163,13 @@ CONFIG::LOGGING
                     populateMetadataFromSMIL(imageResource, smilElement);
 
 					var imageElement:MediaElement = factory.createMediaElement(imageResource);
-					var dur:Number = (smilElement as SMILMediaElement).duration;
-					var durationElement:DurationElement = new DurationElement(dur, imageElement);
+                    var dur:Number = (smilElement as SMILMediaElement).duration;
+                    if (!isNaN(dur) && dur > 0)
+					{
+                       imageElement = new DurationElement(dur, imageElement);
+                    }
 
-					(parentMediaElement as CompositeElement).addChild(durationElement);
+					(parentMediaElement as CompositeElement).addChild(imageElement);
 					break;
 				case SMILElementType.AUDIO:
 					var audioResource:URLResource = new URLResource((smilElement as SMILMediaElement).src);

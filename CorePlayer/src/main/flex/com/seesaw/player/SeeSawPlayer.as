@@ -76,7 +76,6 @@ public class SeeSawPlayer extends Sprite {
     private var rootContainer:MediaContainer;
     private var rootElement:ParallelElement;
     private var subtitleElement:MediaElement;
-    private var dogImage:MediaElement;
 
     private var xi:PlayerExternalInterface;
 
@@ -129,16 +128,19 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function createSubtitleElement():void {
-        factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
-
         if (captionUrl) {
             logger.debug("creating captions: " + captionUrl);
+
+            var targetMetadata:Metadata = new Metadata();
+            targetMetadata.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
+            videoElement.addMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT, targetMetadata);
+
+            factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
             subtitleElement = factory.createMediaElement(new URLResource(captionUrl));
 
             var layout:LayoutMetadata = new LayoutMetadata();
             subtitleElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
 
-            layout.index = 3;
             layout.percentWidth = 100;
             layout.height = 50;
             layout.bottom = 100;
@@ -271,9 +273,11 @@ public class SeeSawPlayer extends Sprite {
             metadata.addEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
         }
         else if (event.namespaceURL == SMILConstants.SMIL_METADATA_NS) {
-            var metadata:Metadata = videoElement.getMetadata(SMILConstants.SMIL_METADATA_NS);
-            var contentType:String = metadata.getValue(PlayerConstants.CONTENT_TYPE) as String;
-            logger.debug("switching to content: " + contentType);
+            var metadata:Metadata = videoElement.resource.getMetadataValue(SMILConstants.SMIL_METADATA_NS) as Metadata;
+            if (metadata) {
+                var contentType:String = metadata.getValue(PlayerConstants.CONTENT_TYPE) as String;
+                logger.debug("switching to content: " + contentType);
+            }
         }
     }
 
