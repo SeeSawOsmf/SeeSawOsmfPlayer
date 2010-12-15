@@ -33,6 +33,7 @@ import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
 import com.seesaw.player.smil.SeeSawSMILLoader;
 
 import flash.display.Sprite;
+import flash.display.StageDisplayState;
 import flash.events.Event;
 import flash.events.FullScreenEvent;
 
@@ -41,6 +42,7 @@ import org.as3commons.logging.LoggerFactory;
 import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
 import org.osmf.events.MediaElementEvent;
+import org.osmf.events.MediaFactoryEvent;
 import org.osmf.events.MetadataEvent;
 import org.osmf.events.PlayEvent;
 import org.osmf.layout.HorizontalAlign;
@@ -94,6 +96,8 @@ public class SeeSawPlayer extends Sprite {
 
         factory = config.factory;
 
+        factory.addEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onMediaElementCreate);
+
         player = new MediaPlayer();
         rootElement = new ParallelElement();
         rootContainer = new MediaContainer();
@@ -117,7 +121,7 @@ public class SeeSawPlayer extends Sprite {
 
         player.media = videoElement;
 
-        setPlayerSize(config.width, config.height);
+        setPlayerSize(contentWidth, contentHeight);
         rootContainer.addMediaElement(rootElement);
 
         logger.debug("adding media container to stage");
@@ -246,9 +250,7 @@ public class SeeSawPlayer extends Sprite {
 
     private function onFullscreen(event:FullScreenEvent):void {
         logger.debug("onFullscreen: " + event.fullScreen);
-        var width:int = event.fullScreen ? stage.fullScreenWidth : config.width;
-        var height:int = event.fullScreen ? stage.fullScreenHeight : config.height;
-        setPlayerSize(width, height);
+        setPlayerSize(contentWidth, contentHeight);
     }
 
     private function setPlayerSize(width:int, height:int) {
@@ -315,42 +317,50 @@ public class SeeSawPlayer extends Sprite {
         return null;
     }
 
-    private function createDogImage():void {
-        if (playerInit.dogImage == null) {
-            return;
-        }
+    private function onMediaElementCreate(event:MediaFactoryEvent):void {
+        var resource:MediaResourceBase = event.mediaElement.resource;
 
-        var resource:URLResource = new URLResource(String(playerInit.dogImage));
+        if (resource) {
+            var smilMetadata:Metadata = resource.getMetadataValue(SMILConstants.SMIL_METADATA_NS) as Metadata;
 
-        dogImage = factory.createMediaElement(resource);
+            if (smilMetadata) {
+                var contentType:String = smilMetadata.getValue(PlayerConstants.CONTENT_TYPE) as String;
+                var mediaElement:MediaElement = event.mediaElement;
 
-        if (dogImage) {
-            logger.debug("creating digital onscreen graphic image: " + resource.url);
-
-            var layout:LayoutMetadata = new LayoutMetadata();
-            dogImage.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
-
-            layout.index = 5;
-            layout.x = 5;
-            layout.y = 5;
-            layout.verticalAlign = VerticalAlign.TOP;
-            layout.horizontalAlign = HorizontalAlign.LEFT;
-
-            if (xi.available) {
-                xi.addHideDogCallback(hideDOG);
-                xi.addShowDogCallback(showDOG);
+                switch (contentType) {
+                    case PlayerConstants.DOG_CONTENT_ID:
+                        var layout:LayoutMetadata = new LayoutMetadata();
+                        layout.x = 5;
+                        layout.y = 5;
+                        layout.verticalAlign = VerticalAlign.TOP;
+                        layout.horizontalAlign = HorizontalAlign.LEFT;
+                        mediaElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+                        break;
+                    case PlayerConstants.MAIN_CONTENT_ID:
+                    case PlayerConstants.STING_CONTENT_ID:
+                    case PlayerConstants.AD_CONTENT_ID:
+                        var layout:LayoutMetadata = new LayoutMetadata();
+                        layout.width = contentWidth;
+                        layout.height = contentHeight;
+                        mediaElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+                        break;
+                }
             }
-
-            showDOG();
         }
     }
 
-    private function showDOG():void {
-        rootElement.addChild(this.dogImage);
+    public function get contentWidth():int {
+        if (stage == null) {
+            return config.width;
+        }
+        return stage.displayState == StageDisplayState.FULL_SCREEN ? stage.fullScreenWidth : config.width;
     }
 
-    private function hideDOG():void {
-        rootElement.removeChild(this.dogImage);
+    public function get contentHeight():int {
+        if (stage == null) {
+            return config.height;
+        }
+        return stage.displayState == StageDisplayState.FULL_SCREEN ? stage.fullScreenHeight : config.height;
     }
 }
 }
