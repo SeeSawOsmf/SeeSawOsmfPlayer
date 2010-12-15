@@ -161,11 +161,6 @@
             <groupId>com.seesaw</groupId>
             <type>swc</type>
         </dependency>
-        <dependency>
-            <artifactId>DigitalOnScreenGraphic</artifactId>
-            <groupId>com.seesaw</groupId>
-            <type>swc</type>
-        </dependency>
 
         <dependency>
             <groupId>com.adobe.flexunit</groupId>
