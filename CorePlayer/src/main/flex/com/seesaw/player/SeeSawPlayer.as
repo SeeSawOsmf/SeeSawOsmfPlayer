@@ -47,6 +47,7 @@ import org.osmf.events.MetadataEvent;
 import org.osmf.events.PlayEvent;
 import org.osmf.layout.HorizontalAlign;
 import org.osmf.layout.LayoutMetadata;
+import org.osmf.layout.ScaleMode;
 import org.osmf.layout.VerticalAlign;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
@@ -73,7 +74,7 @@ public class SeeSawPlayer extends Sprite {
 
     private var factory:MediaFactory;
     private var player:MediaPlayer;
-    private var rootContainer:MediaContainer;
+    private var container:MediaContainer;
     private var rootElement:ParallelElement;
     private var subtitleElement:MediaElement;
 
@@ -94,12 +95,11 @@ public class SeeSawPlayer extends Sprite {
         videoInfo = playerConfig.resource.getMetadataValue(PlayerConstants.VIDEO_INFO) as XML;
 
         factory = config.factory;
-
         factory.addEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onMediaElementCreate);
 
         player = new MediaPlayer();
         rootElement = new ParallelElement();
-        rootContainer = new MediaContainer();
+        container = new MediaContainer();
 
         initialisePlayer();
 
@@ -120,11 +120,20 @@ public class SeeSawPlayer extends Sprite {
 
         player.media = videoElement;
 
-        setPlayerSize(contentWidth, contentHeight);
-        rootContainer.addMediaElement(rootElement);
+        var layout:LayoutMetadata = rootElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
+        if (layout == null) {
+            layout = new LayoutMetadata();
+            rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+        }
+        layout.percentWidth = 100;
+        layout.percentHeight = 100;
+
+        setContainerSize(contentWidth, contentHeight);
+
+        container.addMediaElement(rootElement);
 
         logger.debug("adding media container to stage");
-        addChild(rootContainer);
+        addChild(container);
     }
 
     private function createSubtitleElement():void {
@@ -252,18 +261,12 @@ public class SeeSawPlayer extends Sprite {
 
     private function onFullscreen(event:FullScreenEvent):void {
         logger.debug("onFullscreen: " + event.fullScreen);
-        setPlayerSize(contentWidth, contentHeight);
+        setContainerSize(contentWidth, contentHeight);
     }
 
-    private function setPlayerSize(width:int, height:int) {
-        var layout:LayoutMetadata = rootElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
-        if (layout == null) {
-            layout = new LayoutMetadata();
-            rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
-        }
-        layout.width = width;
-        layout.height = height;
-        rootContainer.layout(width, height, true);
+    private function setContainerSize(width:int, height:int) {
+        container.width = width;
+        container.height = height;
     }
 
     private function onVideoMetadataAdd(event:MediaElementEvent):void {
@@ -271,13 +274,6 @@ public class SeeSawPlayer extends Sprite {
             var metadata:Metadata = videoElement.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
             metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
             metadata.addEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
-        }
-        else if (event.namespaceURL == SMILConstants.SMIL_METADATA_NS) {
-            var metadata:Metadata = videoElement.resource.getMetadataValue(SMILConstants.SMIL_METADATA_NS) as Metadata;
-            if (metadata) {
-                var contentType:String = metadata.getValue(PlayerConstants.CONTENT_TYPE) as String;
-                logger.debug("switching to content: " + contentType);
-            }
         }
     }
 
@@ -331,24 +327,31 @@ public class SeeSawPlayer extends Sprite {
                 var contentType:String = smilMetadata.getValue(PlayerConstants.CONTENT_TYPE) as String;
                 var mediaElement:MediaElement = event.mediaElement;
 
+                var layout:LayoutMetadata = mediaElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
+                if (layout == null) {
+                    layout = new LayoutMetadata();
+                    mediaElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+                }
+
                 switch (contentType) {
                     case PlayerConstants.DOG_CONTENT_ID:
-                        var layout:LayoutMetadata = new LayoutMetadata();
                         layout.x = 5;
                         layout.y = 5;
                         layout.verticalAlign = VerticalAlign.TOP;
                         layout.horizontalAlign = HorizontalAlign.LEFT;
-                        mediaElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
                         break;
                     case PlayerConstants.MAIN_CONTENT_ID:
                     case PlayerConstants.STING_CONTENT_ID:
                     case PlayerConstants.AD_CONTENT_ID:
-                        var layout:LayoutMetadata = new LayoutMetadata();
-                        layout.width = contentWidth;
-                        layout.height = contentHeight;
-                        mediaElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+                        layout.percentWidth = 100;
+                        layout.percentHeight = 100;
+                        layout.verticalAlign = VerticalAlign.MIDDLE;
+                        layout.horizontalAlign = HorizontalAlign.CENTER;
+                        layout.scaleMode = ScaleMode.STRETCH;
                         break;
                 }
+
+                mediaElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
             }
         }
     }

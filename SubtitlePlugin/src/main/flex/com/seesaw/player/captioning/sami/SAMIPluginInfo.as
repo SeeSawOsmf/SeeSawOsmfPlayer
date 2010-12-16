@@ -68,10 +68,12 @@ public class SAMIPluginInfo extends PluginInfo {
             canHandle = (url.path.search(/\.smi$|\.smil$/i) != -1);
         }
 
+        logger.debug("canHandleResource: {0} {1}", resource, canHandle);
         return canHandle;
     }
 
     private function createSAMIElement():MediaElement {
+        logger.debug("creating SAMIElement");
         samiElement = new SAMIElement();
         updateMediaTarget();
         return samiElement;
@@ -87,6 +89,7 @@ public class SAMIPluginInfo extends PluginInfo {
 
     private function updateMediaTarget():void {
         if (samiElement && targetElement && targetElement != samiElement) {
+            logger.debug("setting media target: {0}", targetElement);
             samiElement.target = targetElement;
         }
     }
