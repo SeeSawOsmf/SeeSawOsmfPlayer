@@ -32,12 +32,14 @@ import org.osmf.metadata.Metadata;
 
 public class ExternalInterfacePluginInfo extends PluginInfo {
 
+    private static const ID:String = "com.seesaw.player.external.proxy.ExternalInterfacePluginInfo";
+
     public function ExternalInterfacePluginInfo() {
         var items:Vector.<MediaFactoryItem> = new Vector.<MediaFactoryItem>();
 
         var item:MediaFactoryItem = new MediaFactoryItem(
-                "com.seesaw.player.external.proxy.ExternalInterfacePluginInfo",
-                canHandleResourceFunction,
+                ID,
+                canHandleLightsDownResourceFunction,
                 lightsDownProxyCreationFunction,
                 MediaFactoryItemType.PROXY);
         items.push(item);
@@ -45,7 +47,7 @@ public class ExternalInterfacePluginInfo extends PluginInfo {
         super(items);
     }
 
-    private static function canHandleResourceFunction(resource:MediaResourceBase):Boolean {
+    private static function canHandleLightsDownResourceFunction(resource:MediaResourceBase):Boolean {
         var result:Boolean;
 
         if (resource != null) {

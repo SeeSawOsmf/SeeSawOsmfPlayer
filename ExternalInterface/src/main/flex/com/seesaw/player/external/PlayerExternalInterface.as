@@ -31,8 +31,5 @@ public interface PlayerExternalInterface {
     function addGetGuidanceCallback(callback:Function):void;
     function addGetCurrentItemTitleCallback(callback:Function):void;
     function addGetCurrentItemDurationCallback(callback:Function):void;
-
-    function addHideDogCallback(callback:Function):void;
-    function addShowDogCallback(callback:Function):void;
 }
 }

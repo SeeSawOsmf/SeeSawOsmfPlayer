@@ -21,7 +21,6 @@
  */
 
 package com.seesaw.player.captioning.sami {
-import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 
@@ -40,6 +39,7 @@ public class SAMIPluginInfo extends PluginInfo {
 
     public static const METADATA_NAMESPACE:String = "http://www.seesaw.com/sami/1.0";
     public static const METADATA_KEY_URI:String = "uri";
+    public static const NS_TARGET_ELEMENT:String = "http://www.seesaw.com/sami/1.0/target";
 
     private static var loggerSetup:* = (LoggerFactory.loggerFactory = new TraceAndArthropodLoggerFactory());
     private static var osmfLoggerSetup:* = (Log.loggerFactory = new CommonsOsmfLoggerFactory());
@@ -68,18 +68,20 @@ public class SAMIPluginInfo extends PluginInfo {
             canHandle = (url.path.search(/\.smi$|\.smil$/i) != -1);
         }
 
+        logger.debug("canHandleResource: {0} {1}", resource, canHandle);
         return canHandle;
     }
 
     private function createSAMIElement():MediaElement {
+        logger.debug("creating SAMIElement");
         samiElement = new SAMIElement();
         updateMediaTarget();
         return samiElement;
     }
 
     private function mediaElementCreationNotificationCallback(target:MediaElement):void {
-        var mainContent:Metadata = target.resource.getMetadataValue(PlayerConstants.CONTENT_ID) as Metadata;
-        if(mainContent.getValue(PlayerConstants.ID) == PlayerConstants.MAIN_CONTENT_ID) {
+        var targetMetadata:Metadata = target.getMetadata(NS_TARGET_ELEMENT);
+        if (targetMetadata) {
             targetElement = target;
             updateMediaTarget();
         }
@@ -87,6 +89,7 @@ public class SAMIPluginInfo extends PluginInfo {
 
     private function updateMediaTarget():void {
         if (samiElement && targetElement && targetElement != samiElement) {
+            logger.debug("setting media target: {0}", targetElement);
             samiElement.target = targetElement;
         }
     }
