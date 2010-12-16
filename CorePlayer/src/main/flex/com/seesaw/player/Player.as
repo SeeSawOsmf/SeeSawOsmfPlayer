@@ -38,16 +38,22 @@ import com.seesaw.player.panels.PosterFrame;
 import com.seesaw.player.preloader.Preloader;
 import com.seesaw.player.services.ResumeService;
 
+import flash.display.DisplayObject;
+import flash.display.DisplayObjectContainer;
 import flash.display.LoaderInfo;
 import flash.display.Sprite;
 import flash.display.StageAlign;
 import flash.display.StageScaleMode;
 import flash.events.Event;
+import flash.events.MouseEvent;
 import flash.external.ExternalInterface;
+
+import flash.utils.getAliasName;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.logging.Log;
+import org.osmf.media.MediaPlayer;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.metadata.Metadata;
 import org.osmf.smil.SMILConstants;
@@ -78,6 +84,8 @@ public class Player extends Sprite {
     private var playerInit:XML;
     private var videoInfo:XML;
 
+    var testApi:TestApi;
+
     public function Player() {
         super();
 
@@ -92,11 +100,13 @@ public class Player extends Sprite {
         // TODO: this needs to be in a flashvar from the page
         loaderParams.playerInitUrl = "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/" +
                 "player.playerinitialisation:playerinit?t:ac=TV:DRAMA/p/33535/Sintel";
-
         stage.scaleMode = StageScaleMode.NO_SCALE;
-        stage.align = StageAlign.TOP_LEFT;
 
+        stage.align = StageAlign.TOP_LEFT;
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+
+        // created purely to allow testing
+        testApi = new TestApi(this);
     }
 
     private function onAddedToStage(event:Event):void {
@@ -174,7 +184,7 @@ public class Player extends Sprite {
 
     private function showPlayPanel():void {
         var mode:String = getResumePosition() > 0 ? PlayStartButton.RESUME : PlayStartButton.PLAY;
-        var playButton:PlayStartButton = new PlayStartButton(mode);
+        var playButton = new PlayStartButton(mode);
         playButton.addEventListener(PlayStartButton.PROCEED, function(event:Event) {
             nextInitialisationStage();
         });
@@ -202,15 +212,15 @@ public class Player extends Sprite {
                 resetInitialisationStages(); // sends the user back to stage 0
                 nextInitialisationStage();
             });
-
             addChild(guidancePanel);
+            guidancePanel.name = "guidancePanel";
         }
         else {
             nextInitialisationStage();
         }
     }
 
-    private function attemptPlaybackStart():void {
+    public function attemptPlaybackStart():void {
         requestProgrammeData(playerInit.videoInfoUrl);
     }
 

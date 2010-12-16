@@ -39,6 +39,7 @@ public class Preloader extends Sprite {
         loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onSwfLoaded);
         loader.visible = false;
         addChild(loader);
+
     }
 
     private function onSwfLoaded(e:Event):void {

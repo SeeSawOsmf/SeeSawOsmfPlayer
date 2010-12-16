@@ -342,5 +342,9 @@ public class SeeSawPlayer extends Sprite {
         }
         return null;
     }
+
+    public function mediaPlayer():MediaPlayer {
+        return player;
+    }
 }
 }
