@@ -70,7 +70,7 @@ public class SeeSawPlayer extends Sprite {
     private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
 
     private var config:PlayerConfiguration;
-    private var videoElement:MediaElement;
+    private var contentElement:MediaElement;
 
     private var factory:MediaFactory;
     private var player:MediaPlayer;
@@ -118,7 +118,7 @@ public class SeeSawPlayer extends Sprite {
         createControlBarElement();
         createSubtitleElement();
 
-        player.media = videoElement;
+        player.media = contentElement;
 
         var layout:LayoutMetadata = rootElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
         if (layout == null) {
@@ -142,7 +142,7 @@ public class SeeSawPlayer extends Sprite {
 
             var targetMetadata:Metadata = new Metadata();
             targetMetadata.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
-            videoElement.addMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT, targetMetadata);
+            contentElement.addMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT, targetMetadata);
 
             factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
             subtitleElement = factory.createMediaElement(new URLResource(captionUrl));
@@ -171,15 +171,15 @@ public class SeeSawPlayer extends Sprite {
             factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
 
         logger.debug("creating video element");
-        videoElement = factory.createMediaElement(config.resource);
+        contentElement = factory.createMediaElement(config.resource);
 
-        videoElement.addEventListener(MediaElementEvent.METADATA_ADD, onVideoMetadataAdd);
-        videoElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onVideoMetadataRemove);
+        contentElement.addEventListener(MediaElementEvent.METADATA_ADD, onVideoMetadataAdd);
+        contentElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onVideoMetadataRemove);
 
-        videoElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
-        videoElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
+        contentElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
+        contentElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
 
-        rootElement.addChild(videoElement);
+        rootElement.addChild(contentElement);
     }
 
     private function createControlBarElement():void {
@@ -187,7 +187,7 @@ public class SeeSawPlayer extends Sprite {
 
         var controlBarTarget:Metadata = new Metadata();
         controlBarTarget.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
-        videoElement.addMetadata(ControlBarPlugin.NS_TARGET, controlBarTarget);
+        contentElement.addMetadata(ControlBarPlugin.NS_TARGET, controlBarTarget);
 
         logger.debug("loading control bar plugin");
         factory.loadPlugin(new PluginInfoResource(new ControlBarPlugin().pluginInfo));
@@ -244,7 +244,7 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onPlayStateChanged(event:PlayEvent):void {
-        var timeTrait:TimeTrait = videoElement.getTrait(MediaTraitType.TIME) as TimeTrait;
+        var timeTrait:TimeTrait = contentElement.getTrait(MediaTraitType.TIME) as TimeTrait;
         if (event.playState == PlayState.PLAYING && !this.lightsDown) {
             if (xi.available) {
                 xi.callLightsDown();
@@ -271,7 +271,7 @@ public class SeeSawPlayer extends Sprite {
 
     private function onVideoMetadataAdd(event:MediaElementEvent):void {
         if (event.namespaceURL == ControlBarMetadata.CONTROL_BAR_METADATA) {
-            var metadata:Metadata = videoElement.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+            var metadata:Metadata = contentElement.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
             metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
             metadata.addEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
         }
@@ -279,7 +279,7 @@ public class SeeSawPlayer extends Sprite {
 
     private function onVideoMetadataRemove(event:MediaElementEvent):void {
         if (event.namespaceURL == ControlBarMetadata.CONTROL_BAR_METADATA) {
-            var metadata:Metadata = videoElement.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+            var metadata:Metadata = contentElement.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
             metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
             metadata.removeEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
         }
