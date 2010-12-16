@@ -34,26 +34,21 @@ import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.namespaces.smil;
 import com.seesaw.player.panels.GuidanceBar;
 import com.seesaw.player.panels.GuidancePanel;
+import com.seesaw.player.panels.ParentalControlsPanel;
 import com.seesaw.player.panels.PosterFrame;
 import com.seesaw.player.preloader.Preloader;
 import com.seesaw.player.services.ResumeService;
 
-import flash.display.DisplayObject;
-import flash.display.DisplayObjectContainer;
 import flash.display.LoaderInfo;
 import flash.display.Sprite;
 import flash.display.StageAlign;
 import flash.display.StageScaleMode;
 import flash.events.Event;
-import flash.events.MouseEvent;
 import flash.external.ExternalInterface;
-
-import flash.utils.getAliasName;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.logging.Log;
-import org.osmf.media.MediaPlayer;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.metadata.Metadata;
 import org.osmf.smil.SMILConstants;
@@ -100,9 +95,10 @@ public class Player extends Sprite {
         // TODO: this needs to be in a flashvar from the page
         loaderParams.playerInitUrl = "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/" +
                 "player.playerinitialisation:playerinit?t:ac=TV:DRAMA/p/33535/Sintel";
-        stage.scaleMode = StageScaleMode.NO_SCALE;
 
+        stage.scaleMode = StageScaleMode.NO_SCALE;
         stage.align = StageAlign.TOP_LEFT;
+
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 
         // created purely to allow testing
@@ -184,7 +180,7 @@ public class Player extends Sprite {
 
     private function showPlayPanel():void {
         var mode:String = getResumePosition() > 0 ? PlayStartButton.RESUME : PlayStartButton.PLAY;
-        var playButton = new PlayStartButton(mode);
+        var playButton:PlayStartButton = new PlayStartButton(mode);
         playButton.addEventListener(PlayStartButton.PROCEED, function(event:Event) {
             nextInitialisationStage();
         });
@@ -196,7 +192,15 @@ public class Player extends Sprite {
             if (guidanceBar) {
                 guidanceBar.visible = false;
             }
-            var guidancePanel = new GuidancePanel(
+
+            if (ExternalInterface.available) {
+                var hashedPassword:String = ParentalControlsPanel.getHashedPassword();
+                logger.debug("COOKIE PASSWORD: " + hashedPassword);
+            }
+
+            if (hashedPassword) {
+                var parentalControlsPanel = new ParentalControlsPanel(
+                    hashedPassword,
                     playerInit.guidance.warning,
                     playerInit.guidance.explanation,
                     playerInit.guidance.guidance,
@@ -204,23 +208,44 @@ public class Player extends Sprite {
                     playerInit.parentalControls.whatsThisLinkURL
                     );
 
-            guidancePanel.addEventListener(GuidancePanel.GUIDANCE_ACCEPTED, function(event:Event) {
-                nextInitialisationStage();
-            });
+                parentalControlsPanel.addEventListener(ParentalControlsPanel.PARENTAL_CHECK_PASSED, function(event:Event) {
+                    nextInitialisationStage();
+                });
 
-            guidancePanel.addEventListener(GuidancePanel.GUIDANCE_DECLINED, function(event:Event) {
-                resetInitialisationStages(); // sends the user back to stage 0
-                nextInitialisationStage();
-            });
-            addChild(guidancePanel);
-            guidancePanel.name = "guidancePanel";
+                parentalControlsPanel.addEventListener(ParentalControlsPanel.PARENTAL_CHECK_FAILED, function(event:Event) {
+                    resetInitialisationStages(); // sends the user back to stage 0
+                    nextInitialisationStage();
+                });
+
+                addChild(parentalControlsPanel);     
+            } else {
+                var guidancePanel = new GuidancePanel(
+                    playerInit.guidance.warning,
+                    playerInit.guidance.explanation,
+                    playerInit.guidance.guidance,
+                    playerInit.parentalControls.parentalControlsPageURL,
+                    playerInit.parentalControls.whatsThisLinkURL
+                    );
+
+                guidancePanel.addEventListener(GuidancePanel.GUIDANCE_ACCEPTED, function(event:Event) {
+                    nextInitialisationStage();
+                });
+
+                guidancePanel.addEventListener(GuidancePanel.GUIDANCE_DECLINED, function(event:Event) {
+                    resetInitialisationStages(); // sends the user back to stage 0
+                    nextInitialisationStage();
+                });
+
+                addChild(guidancePanel);
+            }
+
         }
         else {
             nextInitialisationStage();
         }
     }
 
-    public function attemptPlaybackStart():void {
+    private function attemptPlaybackStart():void {
         requestProgrammeData(playerInit.videoInfoUrl);
     }
 
@@ -303,11 +328,10 @@ public class Player extends Sprite {
         // This allows plugins to check that the media is the main content
         var metaSettings:Metadata = new Metadata();
         metaSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
-        resource.addMetadataValue(PlayerConstants.CONTENT_ID, metaSettings);
 
-        // The SMIL plugin needs to remove the main content id from all the elements it creates otherwise
-        // they will be wrapped in proxies - leading to double wrapping of proxies (since the smil element is proxied).
-        resource.addMetadataValue(SMILConstants.PROXY_TRIGGER, PlayerConstants.CONTENT_ID);
+        // The SMIL plugin needs to not get proxied
+        resource.addMetadataValue(SMILConstants.PROXY_TRIGGER_METADATA_KEY, PlayerConstants.CONTENT_ID);
+        resource.addMetadataValue(SMILConstants.PROXY_TRIGGER_METADATA_VALUE, metaSettings);
 
         if (videoInfo && videoInfo.subtitleLocation) {
             var subtitleMetadata:Metadata = new Metadata();

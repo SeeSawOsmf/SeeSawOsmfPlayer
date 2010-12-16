@@ -20,7 +20,8 @@
   ~    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
   ~    Incorporated. All Rights Reserved.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.seesaw</groupId>
     <artifactId>player</artifactId>
@@ -49,7 +50,7 @@
         <module>SubtitlePlugin</module>
         <module>IntegrationTests</module>
         <module>ExternalInterface</module>
-  </modules>
+    </modules>
 
     <developers>
         <developer>
