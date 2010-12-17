@@ -28,6 +28,7 @@ import flash.events.Event;
 import flash.net.URLRequest;
 import flash.system.LoaderContext;
 import flash.system.Security;
+import flash.utils.getQualifiedClassName;
 
 public class PosterFrame extends Sprite {
 
@@ -55,7 +56,7 @@ public class PosterFrame extends Sprite {
         addChild(this.loadedImage);
 
         this.loadedImage.contentLoaderInfo.addEventListener(Event.COMPLETE, this.sizePosterFrame);
-
+        this.name = getQualifiedClassName(this);
     }
 
     private function buildPosterFrame():Loader {

@@ -53,16 +53,16 @@ public class LightsDownProxy extends ExternalInterfaceProxyBase {
 
     private function onPlayStateChanged(event:PlayEvent):void {
         var timeTrait:TimeTrait = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
-        if (event.playState == PlayState.PLAYING && !this.lightsDown) {
+        if (event.playState == PlayState.PLAYING && !lightsDown) {
             if (xi.available) {
                 xi.callLightsDown();
-                this.lightsDown = true;
+                lightsDown = true;
             }
         }
         if (event.playState == PlayState.PAUSED && (timeTrait.currentTime != timeTrait.duration)) {
             if (ExternalInterface.available) {
                 xi.callLightsUp();
-                this.lightsDown = false;
+                lightsDown = false;
             }
         }
     }

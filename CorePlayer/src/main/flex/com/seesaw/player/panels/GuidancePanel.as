@@ -21,6 +21,7 @@
  */
 
 package com.seesaw.player.panels {
+import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.ui.PlayerToolTip;
 import com.seesaw.player.ui.StyledTextField;
 
@@ -30,6 +31,7 @@ import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.external.ExternalInterface;
 import flash.net.URLRequest;
+import flash.net.getClassByAlias;
 import flash.net.navigateToURL;
 import flash.system.Security;
 import flash.text.StyleSheet;
@@ -73,6 +75,9 @@ public class GuidancePanel extends Sprite {
      *
      */
     public function GuidancePanel(warning:String, explanation:String, confirmationMessage:String, parentalControlsSetup:String, findOutMore:String) {
+
+        this.acceptButton.name = PlayerConstants.GUIDANCE_PANEL_ACCEPT_BUTTON_NAME;
+        this.cancelButton.name = PlayerConstants.GUIDANCE_PANEL_CANCEL_BUTTON_NAME;
 
         //set the private variables
         this.guidanceWarning = warning;
@@ -435,6 +440,13 @@ public class GuidancePanel extends Sprite {
             trace("Error occurred!");
         }
 
+    }
+
+    public function getAcceptButton():Sprite {
+        return acceptButton;
+    }
+    public function getCancelButton():Sprite {
+        return cancelButton;
     }
 
 }

@@ -79,6 +79,8 @@ public class Player extends Sprite {
     private var playerInit:XML;
     private var videoInfo:XML;
 
+    var testApi:TestApi;
+
     public function Player() {
         super();
 
@@ -98,6 +100,9 @@ public class Player extends Sprite {
         stage.align = StageAlign.TOP_LEFT;
 
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+
+        // created purely to allow testing
+        testApi = new TestApi(this);
     }
 
     private function onAddedToStage(event:Event):void {
@@ -323,11 +328,10 @@ public class Player extends Sprite {
         // This allows plugins to check that the media is the main content
         var metaSettings:Metadata = new Metadata();
         metaSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
-        resource.addMetadataValue(PlayerConstants.CONTENT_ID, metaSettings);
 
-        // The SMIL plugin needs to remove the main content id from all the elements it creates otherwise
-        // they will be wrapped in proxies - leading to double wrapping of proxies (since the smil element is proxied).
-        resource.addMetadataValue(SMILConstants.PROXY_TRIGGER, PlayerConstants.CONTENT_ID);
+        // The SMIL plugin needs to not get proxied
+        resource.addMetadataValue(SMILConstants.PROXY_TRIGGER_METADATA_KEY, PlayerConstants.CONTENT_ID);
+        resource.addMetadataValue(SMILConstants.PROXY_TRIGGER_METADATA_VALUE, metaSettings);
 
         if (videoInfo && videoInfo.subtitleLocation) {
             var subtitleMetadata:Metadata = new Metadata();

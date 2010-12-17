@@ -21,6 +21,7 @@
  */
 
 package com.seesaw.player.buttons {
+import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.ui.PlayerToolTip;
 
 import flash.display.Bitmap;
@@ -72,10 +73,10 @@ public class PlayStartButton extends Sprite {
         super();
 
         //Build the panel and add it to the GuidancePanel MovieClip
-        addChild(this.buildButton());
-
+        var proceedButton:Sprite = this.buildButton();
+        addChild(proceedButton);
+        proceedButton.name = PlayerConstants.PROCEED_BUTTON_NAME;
         this.addEventListener(Event.ADDED_TO_STAGE, this.onAddedToStage);
-
     }
 
     private function onAddedToStage(event:Event):void {

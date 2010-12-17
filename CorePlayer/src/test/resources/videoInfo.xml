@@ -1,81 +1,38 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<!--
-  ~ Copyright 2010 ioko365 Ltd.  All Rights Reserved.
-  ~
-  ~    The contents of this file are subject to the Mozilla Public License
-  ~    Version 1.1 (the "License"); you may not use this file except in
-  ~    compliance with the License. You may obtain a copy of the
-  ~    License athttp://www.mozilla.org/MPL/
-  ~
-  ~    Software distributed under the License is distributed on an "AS IS"
-  ~    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
-  ~    License for the specific language governing rights and limitations
-  ~    under the License.
-  ~
-  ~    The Initial Developer of the Original Code is ioko365 Ltd.
-  ~    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
-  ~    Incorporated. All Rights Reserved.
-  ~
-  ~    The Initial Developer of the Original Code is ioko365 Ltd.
-  ~    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
-  ~    Incorporated. All Rights Reserved.
-  -->
-
-<videoInfo xmlns="http://www.seesaw.com/api/contentinfo/v1.0" xmlns:smil="http://www.w3.org/ns/SMIL"
-           mimeType="application/smil+xml">
+<videoInfo xmlns:ns2="http://www.w3.org/ns/SMIL" xmlns="http://www.seesaw.com/api/contentinfo/v1.0">
+    <ns2:smil>
+        <ns2:head>
+            <ns2:meta base="rtmpe://cdn-flash-blue-dev.vodco.co.uk/a2703"/>
+        </ns2:head>
+        <ns2:body>
+            <ns2:seq>
+                <ns2:video src="rtmpe://cdn-flash-blue-dev.vodco.co.uk/a2703/mp4:e4/test/cms/clips/Gravity_small.mp4">
+                    <ns2:metadata>
+                        <ns2:meta content="sting" name="contentType"/>
+                    </ns2:metadata>
+                </ns2:video>
+                <ns2:par>
+                    <ns2:switch>
+                        <ns2:video system-bitrate="1581000" dur="852" src="mp4:e4/test/ccp/p/HIGH_RES/00000418/41803.mp4?s=1292344952&amp;e=1292345702&amp;h=a0832fd166d3dd8b83cb6efb1ac2a096" clipEnd="852" clipBegin="0"/>
+                        <ns2:video system-bitrate="500000" dur="852" src="mp4:e4/test/ccp/p/LOW_RES/00000418/41804.mp4?s=1292344952&amp;e=1292345702&amp;h=25f880bd01a2dc244a346e0d9836a707" clipEnd="852" clipBegin="0"/>
+                        <ns2:video system-bitrate="844000" dur="852" src="mp4:e4/test/ccp/p/STD_RES/00000418/41805.mp4?s=1292344952&amp;e=1292345702&amp;h=211fc21bb0d08355019fd1b70b474199" clipEnd="852" clipBegin="0"/>
+                        <ns2:metadata>
+                            <ns2:meta content="mainContent" name="contentType"/>
+                        </ns2:metadata>
+                    </ns2:switch>
+                    <ns2:img src="http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png">
+                        <ns2:metadata>
+                            <ns2:meta content="dogImage" name="contentType"/>
+                        </ns2:metadata>
+                    </ns2:img>
+                </ns2:par>
+            </ns2:seq>
+        </ns2:body>
+    </ns2:smil>
     <geoblocked>false</geoblocked>
-    <smil:smil>
-        <smil:head>
-            <smil:meta base="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703"/>
-        </smil:head>
-        <smil:body>
-            <smil:seq>
-
-                <smil:video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Idents_Diner_5s.mp4" width="512">
-                    <smil:meta name="contentType" content="instreamAds"/>
-                </smil:video>
-
-                <smil:video src="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703/mp4:e5/test/cms/clips/ideal_28_v2_trimmed_17"
-                        width="512">
-                    <smil:meta name="contentType" content="instreamAds"/>
-                </smil:video>
-
-                <smil:video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/PRA-OFLG002-030.mp4">
-                    <smil:meta name="contentType" content="instreamAds"/>
-                </smil:video>
-
-                <smil:switch>
-                    <smil:video region="content" src="mp4:e5/INTERNAL/sintel-2048-stereo_500kbs.mp4"
-                               system-bitrate="500000" width="512" >
-                    </smil:video>
-
-                    <smil:video region="content" src="mp4:e5/INTERNAL/sintel-2048-stereo_796kbs.mp4"
-                               system-bitrate="800000" width="720" >
-                    </smil:video>
-
-                    <smil:video region="content" src="mp4:e5/INTERNAL/sintel-2048-stereo_1500kbs.mp4"
-                               system-bitrate="1500000" width="1080" >
-                    </smil:video>
-                    <smil:meta name="contentType" content="mainContent"/>
-                </smil:switch>
-
-            </smil:seq>
-            <!--
-
-
-            <video src="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703/mp4:e5/test/cms/clips/ideal_28_v2_trimmed_17"
-                   width="512" contentType="instreamAd">
-            </video>
-         
-            <switch>
-                <video src="mp4:e5/INTERNAL/sintel-2048-stereo_500kbs.mp4" system-bitrate="500000" width="512" dur="3m"
-                       clipBegin="2m" clipEnd="4m"/>
-                <video src="mp4:e5/INTERNAL/sintel-2048-stereo_796kbs.mp4" system-bitrate="800000" width="720" dur="3m"
-                       clipBegin="2m" clipEnd="4m"/>
-                <video src="mp4:e5/INTERNAL/sintel-2048-stereo_1500kbs.mp4" system-bitrate="1500000" width="1080"
-                       dur="3m" clipBegin="2m" clipEnd="4m"/>
-            </switch>-->
-
-        </smil:body>
-    </smil:smil>
-</videoInfo>
+    <subtitleLocation>http://kgd-blue-test-zxtm01.dev.vodco.co.uk/s/ccp/00000047/4722.smi</subtitleLocation>
+    <exceededDrmRule>false</exceededDrmRule>
+    <avod>true</avod>
+    <tvodPlayable>false</tvodPlayable>
+    <svodPlayable>false</svodPlayable>
+</videoInfo> 

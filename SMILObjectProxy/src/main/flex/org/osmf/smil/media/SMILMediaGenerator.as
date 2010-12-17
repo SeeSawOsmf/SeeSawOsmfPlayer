@@ -118,6 +118,7 @@ CONFIG::LOGGING
 					resource.mediaType = MediaType.VIDEO;
 
                     populateMetdataFromResource(originalResource, resource);
+                    populateMetadataFromSMIL(resource, smilElement);
 
 					var videoElement:MediaElement = factory.createMediaElement(resource);
 					var smilVideoElement:SMILMediaElement = smilElement as SMILMediaElement;
@@ -152,25 +153,33 @@ CONFIG::LOGGING
 						}
 					}
 
-                    populateMetadataFromSMIL(videoElement, smilVideoElement);
 					(parentMediaElement as CompositeElement).addChild(videoElement);
 					break;
 				case SMILElementType.IMAGE:
 					var imageResource:URLResource = new URLResource((smilElement as SMILMediaElement).src);
 					imageResource.mediaType = MediaType.IMAGE;
-					var imageElement:MediaElement = factory.createMediaElement(imageResource);
-					var dur:Number = (smilElement as SMILMediaElement).duration;
-					var durationElement:DurationElement = new DurationElement(dur, imageElement);
 
-                    populateMetadataFromSMIL(imageElement, smilVideoElement);
-					(parentMediaElement as CompositeElement).addChild(durationElement);
+                    populateMetdataFromResource(originalResource, imageResource);
+                    populateMetadataFromSMIL(imageResource, smilElement);
+
+					var imageElement:MediaElement = factory.createMediaElement(imageResource);
+                    var dur:Number = (smilElement as SMILMediaElement).duration;
+                    if (!isNaN(dur) && dur > 0)
+					{
+                       imageElement = new DurationElement(dur, imageElement);
+                    }
+
+					(parentMediaElement as CompositeElement).addChild(imageElement);
 					break;
 				case SMILElementType.AUDIO:
 					var audioResource:URLResource = new URLResource((smilElement as SMILMediaElement).src);
 					audioResource.mediaType = MediaType.AUDIO;
+
+                    populateMetdataFromResource(originalResource, audioResource);
+                    populateMetadataFromSMIL(audioResource, smilElement);
+
 					var audioElement:MediaElement = factory.createMediaElement(audioResource);
 
-                    populateMetadataFromSMIL(audioElement, smilVideoElement);
 					(parentMediaElement as CompositeElement).addChild(audioElement);
 					break;
 			}
@@ -192,10 +201,9 @@ CONFIG::LOGGING
 			else if (mediaResource != null)
 			{
                 populateMetdataFromResource(originalResource, mediaResource);
+                populateMetadataFromSMIL(mediaResource, smilElement);
 
 				mediaElement = factory.createMediaElement(mediaResource);
-
-                populateMetadataFromSMIL(mediaElement, smilElement);
 
 				if (parentMediaElement is CompositeElement)
 				{
@@ -207,27 +215,29 @@ CONFIG::LOGGING
 		}
 
         private function populateMetdataFromResource(originalResource:MediaResourceBase, mediaResource:MediaResourceBase):void {
-            var proxyTriggerKey:String = originalResource.getMetadataValue(SMILConstants.PROXY_TRIGGER) as String;
-
             // Make sure we transfer any resource metadata from the original resource
             for each (var metadataNS:String in originalResource.metadataNamespaceURLs)
             {
-                // Ignore metadata that is contained in TARGET_METADATA_KEY so that proxies are not generated.
-                // This avoids proxy wrapping around both the SMILElement and the subsequently created mediaElement below
-                if(proxyTriggerKey == null || metadataNS != proxyTriggerKey)
-                {
-                    var metadata:Object = originalResource.getMetadataValue(metadataNS);
-                    mediaResource.addMetadataValue(metadataNS, metadata);
-                }
+                var metadata:Object = originalResource.getMetadataValue(metadataNS);
+                mediaResource.addMetadataValue(metadataNS, metadata);
+            }
+
+            // Shuffle some metadata so that it triggers proxies on the created elements
+            var proxyTriggerKey:String = originalResource.getMetadataValue(SMILConstants.PROXY_TRIGGER_METADATA_KEY) as String;
+            var proxyTriggerValue:Object = originalResource.getMetadataValue(SMILConstants.PROXY_TRIGGER_METADATA_VALUE) as Object;
+
+            if(proxyTriggerKey && proxyTriggerValue)
+            {
+                mediaResource.addMetadataValue(proxyTriggerKey, proxyTriggerValue);
             }
         }
 
-        private function populateMetadataFromSMIL(mediaElement:MediaElement, smilElement:SMILElement):void {
-            var metadata:Metadata = mediaElement.getMetadata(SMILConstants.SMIL_METADATA_NS);
+        private function populateMetadataFromSMIL(resource:MediaResourceBase, smilElement:SMILElement):void {
+            var metadata:Metadata = resource.getMetadataValue(SMILConstants.SMIL_METADATA_NS) as Metadata;
             if (metadata == null)
             {
                 metadata = new Metadata();
-                mediaElement.addMetadata(SMILConstants.SMIL_METADATA_NS, metadata);
+                resource.addMetadataValue(SMILConstants.SMIL_METADATA_NS, metadata);
             }
 
             for(var i:uint = 0; i < smilElement.numChildren; i++)

@@ -115,7 +115,9 @@ public class SAMIElement extends LoadableElementBase {
         var cuePoint:CuePoint = event.marker as CuePoint;
         if (cuePoint && displayTrait) {
             var captionDisplayObject:CaptionDisplayObject = displayTrait.displayObject as CaptionDisplayObject;
-            captionDisplayObject.text = cuePoint.parameters as String;
+            var caption:String = cuePoint.parameters as String;
+            captionDisplayObject.text = caption;
+            logger.debug("displaying caption: " + caption);
         }
     }
 

@@ -167,22 +167,22 @@ public class DebugProxyElement extends ProxyElement {
 
     private function toggleDisplayListeners(added:Boolean):void {
         var display:DisplayObjectTrait = proxiedElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
-        /*
-         if (display) {
-         display.addEventListener(DisplayObjectEvent.DISPLAY_OBJECT_CHANGE, onDisplayObjectChange);
-         display.addEventListener(DisplayObjectEvent.MEDIA_SIZE_CHANGE, onMediaSizeChange);
-         } else {
-         display.removeEventListener(DisplayObjectEvent.DISPLAY_OBJECT_CHANGE, onDisplayObjectChange);
-         display.removeEventListener(DisplayObjectEvent.MEDIA_SIZE_CHANGE, onMediaSizeChange);
-         }  */
+
+        if (display) {
+            display.addEventListener(DisplayObjectEvent.DISPLAY_OBJECT_CHANGE, onDisplayObjectChange);
+            display.addEventListener(DisplayObjectEvent.MEDIA_SIZE_CHANGE, onMediaSizeChange);
+        } else {
+            display.removeEventListener(DisplayObjectEvent.DISPLAY_OBJECT_CHANGE, onDisplayObjectChange);
+            display.removeEventListener(DisplayObjectEvent.MEDIA_SIZE_CHANGE, onMediaSizeChange);
+        }
     }
 
     private function onMediaSizeChange(event:DisplayObjectEvent):void {
-        /// logger.debug("On Media Size Change old:{0}x{1} new:{2}x{3}", event.oldHeight, event.oldWidth, event.newHeight, event.newWidth);
+        logger.debug("On Media Size Change old:{0}x{1} new:{2}x{3}", event.oldHeight, event.oldWidth, event.newHeight, event.newWidth);
     }
 
     private function onDisplayObjectChange(event:DisplayObjectEvent):void {
-        /// logger.debug("On Display Object Change old:{0} new:{1}", event.oldDisplayObject, event.newDisplayObject)
+        logger.debug("On Display Object Change old:{0} new:{1}", event.oldDisplayObject, event.newDisplayObject)
     }
 
     private function toggleAudioListeners(added:Boolean):void {
