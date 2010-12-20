@@ -191,7 +191,6 @@ public class AdProxy extends ProxyElement {
     }
 
     private function onVolumeChange(event:AudioEvent):void {
-
         _adManager.setVolume(event.volume, false);
     }
 
