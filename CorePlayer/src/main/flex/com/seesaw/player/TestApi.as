@@ -22,18 +22,13 @@
 
 package com.seesaw.player {
 import com.adobe.errors.IllegalStateError;
-import com.seesaw.player.buttons.PlayStartButton;
-
 import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.namespaces.smil;
 
 import flash.display.DisplayObject;
 import flash.display.DisplayObjectContainer;
-import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.external.ExternalInterface;
-
-
 
 public class TestApi {
 
@@ -44,6 +39,7 @@ public class TestApi {
 
         public function TestApi ( player:Player  ) {
             this.player = player;
+            if(ExternalInterface.available){
             ExternalInterface.addCallback( "proceed" , proceed);
             ExternalInterface.addCallback( "guidancePanelAccept" , guidancePanelAccept);
             ExternalInterface.addCallback( "guidancePanelDecline" , guidancePanelDecline);
@@ -52,7 +48,8 @@ public class TestApi {
             ExternalInterface.addCallback( "getElementsByName" , getElementsByName);
             ExternalInterface.addCallback( "getAllStageElements" , getAllStageElements);
             ExternalInterface.addCallback( "getStageElements" , getStageElements);
-        }
+            }
+            }
 
         public function playState():String {
             if ( player.videoPlayer == null ) return "NOT_STARTED";
