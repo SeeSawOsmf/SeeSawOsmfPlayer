@@ -20,9 +20,12 @@
  * Incorporated. All Rights Reserved.
  */
 
-package org.osmf.smil {
-public class SMILConstants {
-    public static const SMIL_METADATA_NS = "http://www.w3.org/ns/SMIL";
-    public static const SMIL_DOCUMENT:String = "smilDocument";
+package com.seesaw.player.ads {
+public class LiverailConstants {
+    public static const NS_SETTINGS:String = "http://www.seesaw.com/player/plugins/liverail/1.0";
+    public static const AD_MODE_ID:String = "liverail";
+    public static const PUBLISHER_ID:String = "publisher";
+    public static const VERSION:String = "version";
+    public static const CONFIG_OBJECT:String = "config";
 }
 }

@@ -21,6 +21,7 @@
  */
 
 package com.seesaw.player {
+import com.seesaw.player.ads.LiverailConstants;
 import com.seesaw.player.buttons.PlayStartButton;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.external.PlayerExternalInterface;
@@ -28,6 +29,7 @@ import com.seesaw.player.external.PlayerExternalInterfaceImpl;
 import com.seesaw.player.impl.services.ResumeServiceImpl;
 import com.seesaw.player.init.ServiceRequest;
 import com.seesaw.player.ioc.ObjectProvider;
+import com.seesaw.player.liverail.LiverailConfig;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 import com.seesaw.player.namespaces.contentinfo;
@@ -92,7 +94,7 @@ public class Player extends Sprite {
 
         // TODO: this needs to be in a flashvar from the page
         loaderParams.playerInitUrl = "http://localhost:8080/" +
-                "player.playerinitialisation:playerinit?t:ac=TV:DRAMA/p/33535/Sintel";
+                "player.playerinitialisation:playerinit?t:ac=TV:FACTUAL/s/7675/Around-the-World-in-80-Days";
 
         stage.scaleMode = StageScaleMode.NO_SCALE;
         stage.align = StageAlign.TOP_LEFT;
@@ -195,13 +197,13 @@ public class Player extends Sprite {
 
             if (hashedPassword) {
                 var parentalControlsPanel = new ParentalControlsPanel(
-                    hashedPassword,
-                    playerInit.guidance.warning,
-                    playerInit.guidance.explanation,
-                    playerInit.guidance.guidance,
-                    playerInit.parentalControls.parentalControlsPageURL,
-                    playerInit.parentalControls.whatsThisLinkURL
-                    );
+                        hashedPassword,
+                        playerInit.guidance.warning,
+                        playerInit.guidance.explanation,
+                        playerInit.guidance.guidance,
+                        playerInit.parentalControls.parentalControlsPageURL,
+                        playerInit.parentalControls.whatsThisLinkURL
+                        );
 
                 parentalControlsPanel.addEventListener(ParentalControlsPanel.PARENTAL_CHECK_PASSED, function(event:Event) {
                     nextInitialisationStage();
@@ -212,15 +214,15 @@ public class Player extends Sprite {
                     nextInitialisationStage();
                 });
 
-                addChild(parentalControlsPanel);     
+                addChild(parentalControlsPanel);
             } else {
                 var guidancePanel = new GuidancePanel(
-                    playerInit.guidance.warning,
-                    playerInit.guidance.explanation,
-                    playerInit.guidance.guidance,
-                    playerInit.parentalControls.parentalControlsPageURL,
-                    playerInit.parentalControls.whatsThisLinkURL
-                    );
+                        playerInit.guidance.warning,
+                        playerInit.guidance.explanation,
+                        playerInit.guidance.guidance,
+                        playerInit.parentalControls.parentalControlsPageURL,
+                        playerInit.parentalControls.whatsThisLinkURL
+                        );
 
                 guidancePanel.addEventListener(GuidancePanel.GUIDANCE_ACCEPTED, function(event:Event) {
                     nextInitialisationStage();
@@ -260,7 +262,7 @@ public class Player extends Sprite {
         xmlDoc.ignoreWhitespace = true;
 
         playerInit = xmlDoc;
-        this.setupExternalInterface();
+        setupExternalInterface();
         resetInitialisationStages();
         nextInitialisationStage();
     }
@@ -281,16 +283,12 @@ public class Player extends Sprite {
         videoInfo = xmlDoc;
 
         if (videoInfo.geoblocked == "true") {
-            // TODO: show the geoblock panel
             return;
         }
 
         if (videoInfo.smil != null) {
             var resource:MediaResourceBase = createMediaResource(videoInfo);
             loadVideo(resource);
-        }
-        else {
-            // TODO: show the error panel
         }
     }
 
@@ -313,25 +311,29 @@ public class Player extends Sprite {
 
     private function createMediaResource(videoInfo:XML):MediaResourceBase {
         logger.debug("creating media resource");
-        // var resource:DynamicStream = new DynamicStream(videoInfo);
         var resource:MediaResourceBase = new MediaResourceBase();
 
-        resource.addMetadataValue(PlayerConstants.CONTENT_INFO, playerInit);
-        resource.addMetadataValue(PlayerConstants.VIDEO_INFO, videoInfo);
-        resource.addMetadataValue(SMILConstants.SMIL_DOCUMENT, videoInfo.smil);
+        var metadata:Metadata = new Metadata();
+        metadata.addValue(PlayerConstants.CONTENT_INFO, playerInit);
+        metadata.addValue(PlayerConstants.VIDEO_INFO, videoInfo);
+        resource.addMetadataValue(PlayerConstants.METADATA_NS, metadata);
 
-        // This allows plugins to check that the media is the main content
-        var metaSettings:Metadata = new Metadata();
-        metaSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
-
-        // The SMIL plugin needs to not get proxied
-        resource.addMetadataValue(SMILConstants.PROXY_TRIGGER_METADATA_KEY, PlayerConstants.CONTENT_ID);
-        resource.addMetadataValue(SMILConstants.PROXY_TRIGGER_METADATA_VALUE, metaSettings);
+        metadata = new Metadata();
+        metadata.addValue(SMILConstants.SMIL_DOCUMENT, videoInfo.smil);
+        resource.addMetadataValue(SMILConstants.SMIL_METADATA_NS, metadata);
 
         if (videoInfo && videoInfo.subtitleLocation) {
-            var subtitleMetadata:Metadata = new Metadata();
-            subtitleMetadata.addValue(SAMIPluginInfo.METADATA_KEY_URI, String(videoInfo.subtitleLocation));
-            resource.addMetadataValue(SAMIPluginInfo.METADATA_NAMESPACE, subtitleMetadata);
+            metadata = new Metadata();
+            metadata.addValue(SAMIPluginInfo.METADATA_KEY_URI, String(videoInfo.subtitleLocation));
+            resource.addMetadataValue(SAMIPluginInfo.METADATA_NAMESPACE, metadata);
+        }
+
+        if (playerInit && playerInit.adMode == LiverailConstants.AD_MODE_ID) {
+            metadata = new Metadata();
+            metadata.addValue(LiverailConstants.VERSION, playerInit.liverail.version);
+            metadata.addValue(LiverailConstants.PUBLISHER_ID, playerInit.liverail.publisherId);
+            metadata.addValue(LiverailConstants.CONFIG_OBJECT, new LiverailConfig(playerInit));
+            resource.addMetadataValue(LiverailConstants.NS_SETTINGS, metadata);
         }
 
         return resource;
@@ -342,8 +344,6 @@ public class Player extends Sprite {
 
         removePreloader();
 
-        // TODO: set the error ('programme not playing') panel as the main content
-
         // TODO: request a test file but this should be removed eventually
         var request:ServiceRequest = new ServiceRequest("../src/test/resources/contentInfo.xml", onSuccessFromPlayerInit, null);
         request.submit();
@@ -351,7 +351,6 @@ public class Player extends Sprite {
 
     private function onFailFromVideoInfo():void {
         logger.debug("failed to retrieve programme data");
-        // TODO: set the error ('programme not playing') panel as the main content
 
         // TODO: request a test file but this should be removed eventually
         var request:ServiceRequest = new ServiceRequest("../src/test/resources/videoInfo.xml", onSuccessFromVideoInfo, null);

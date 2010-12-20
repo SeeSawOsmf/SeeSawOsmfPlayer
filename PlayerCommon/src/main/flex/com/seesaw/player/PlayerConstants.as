@@ -23,6 +23,7 @@
 package com.seesaw.player {
 public class PlayerConstants {
     public static const ID:String = "ID";
+    public static const METADATA_NS:String = "http://www.seesaw.com/player/1.0";
     public static const CONTENT_INFO:String = "contentInfo";
     public static const CONTENT_ID:String = "contentId";
     public static const VIDEO_INFO:String = "videoInfo";

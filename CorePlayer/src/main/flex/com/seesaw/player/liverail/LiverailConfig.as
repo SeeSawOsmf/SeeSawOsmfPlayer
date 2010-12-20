@@ -20,47 +20,38 @@
  *    Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.player.ads {
+package com.seesaw.player.liverail {
+import com.seesaw.player.ads.LiverailConfiguration;
 import com.seesaw.player.namespaces.contentinfo;
 
-public class LiverailConfig {
-    private var _config:Object;
+public class LiverailConfig extends LiverailConfiguration {
+
     private var contentInfo:XML;
     private var liveRailAdMap:String = "";
     private var liveRailTags:String = "";
     private var genres:Array;
     private var ageRating:int;
-    private var _adPositions:Array = [];
-    private var _totalAdPositions:Array = [];
     private var adSlots:int = 0;
 
     use namespace contentinfo;
 
     public function LiverailConfig(contentInfoXml:XML) {
-
-
         contentInfo = contentInfoXml as XML;
-        if (contentInfo) {
-            generateMap();
-        }
+        createConfig();
+        generateMap();
     }
 
-    public function generateMap():void {
-
-
+    public override function generateMap():void {
         var autoResumePoint:Number = 0;
-
 
         liveRailAdMap = "";
         liveRailTags = "";
+
         if (contentInfo != null) {
-
-
             liveRailTags += "sourceId_" + stripSpecialChars(contentInfo.sourceId);
             liveRailTags += ",firstPresentationBrand_" + stripSpecialChars(contentInfo.firstPresentationBrand);
             liveRailTags += ",minimumAge_" + ageRating.toString();
             liveRailTags += ",catchup_" + stripSpecialChars(contentInfo.catchup);
-
 
             for each(var genre:String in genres) {
                 liveRailTags += "," + stripSpecialChars(genre);
@@ -75,7 +66,6 @@ public class LiverailConfig {
                 liveRailTags += ",duration_greater_than_1_hour";
             }
 
-
             for each(var item:XML in contentInfo.loggingSheet.children()) {
                 var name:String = item.name().localName;
                 switch (name) {
@@ -87,12 +77,10 @@ public class LiverailConfig {
                                 liveRailAdMap += "in::" + pos.toString();
 
                                 if (Math.abs(pos) > 0) {
-                                    _adPositions.push(convertPercenage(pos));
+                                    adPositions.push(convertPercenage(pos));
                                 }
-
-
                             }
-                            _totalAdPositions.push(pos);
+                            totalAdPositions.push(pos);
                         }
                         liveRailAdMap += ";";
                         adSlots++;
@@ -103,14 +91,12 @@ public class LiverailConfig {
             //hardcode the preroll if not exist in string already
             if (!liveRailAdMap.match("in::0")) {
                 liveRailAdMap = "in::0;" + liveRailAdMap + "in::100%;";
-                _totalAdPositions.push(0);
+                totalAdPositions.push(0);
             }
 
             //remove the last semi-colon in the string, apparently there is a reason for this as LR asked us to do it
             liveRailAdMap = liveRailAdMap.substring(0, liveRailAdMap.lastIndexOf(";"));
         }
-
-
     }
 
     private static function convertDuration(str:String):Number {
@@ -124,10 +110,8 @@ public class LiverailConfig {
 
     private function convertPercenage(num:Number):Number {
         var duration:Number = contentInfo.duration;
-
         return (num / duration);
     }
-
 
     private function stripSpecialChars(original:String):String {
         original = original.replace(/_|:/ig, "");
@@ -135,7 +119,6 @@ public class LiverailConfig {
     }
 
     private function extractMidLevelGenresAndAddToGenresArray(genre:*, index:int, original:Array):void {
-
         var startPositionToFindSecondColon:int;
 
         if (genre.indexOf("TV:") == 0) {
@@ -153,11 +136,9 @@ public class LiverailConfig {
         }
     }
 
-    public function get config():Object {
-
-        _config = {
+    private function createConfig():void {
+        config = {
             "LR_ADMAP" : liveRailAdMap,
-
             "LR_TAGS" : liveRailTags,
             "LR_BITRATE" :    "low",
             "LR_BUMPER_MIDROLL_ADONLY"    :"default",
@@ -189,11 +170,6 @@ public class LiverailConfig {
             "LR_VERSION" :    contentInfo.liverail.version,
             "LR_VIDEO_ID"    : contentInfo.liverail.programme
         }
-        return _config;
-    }
-
-    public function get adPositions():Array {
-        return _adPositions;
     }
 }
 }

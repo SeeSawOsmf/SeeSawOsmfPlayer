@@ -69,7 +69,7 @@ public class ControlBarPlugin extends Sprite {
     // Internals
     //
 
-    public static const ID:String = "org.osmf.samples.controlbar";
+    public static const ID:String = "com.seesaw.player.controls.ControlBarPlugin";
     public static const NS_SETTINGS:String = "http://www.osmf.org/samples/controlbar/settings";
     public static const NS_TARGET:String = "http://www.osmf.org/samples/controlbar/target";
 

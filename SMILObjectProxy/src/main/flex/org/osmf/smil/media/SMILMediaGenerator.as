@@ -118,9 +118,11 @@ CONFIG::LOGGING
 					resource.mediaType = MediaType.VIDEO;
 
                     populateMetdataFromResource(originalResource, resource);
-                    populateMetadataFromSMIL(resource, smilElement);
 
 					var videoElement:MediaElement = factory.createMediaElement(resource);
+
+                    populateMetadataFromSMIL(videoElement, smilElement);
+
 					var smilVideoElement:SMILMediaElement = smilElement as SMILMediaElement;
 
 					if (!isNaN(smilVideoElement.clipBegin) && smilVideoElement.clipBegin > 0 &&
@@ -160,9 +162,11 @@ CONFIG::LOGGING
 					imageResource.mediaType = MediaType.IMAGE;
 
                     populateMetdataFromResource(originalResource, imageResource);
-                    populateMetadataFromSMIL(imageResource, smilElement);
 
 					var imageElement:MediaElement = factory.createMediaElement(imageResource);
+
+                    populateMetadataFromSMIL(imageElement, smilElement);
+
                     var dur:Number = (smilElement as SMILMediaElement).duration;
                     if (!isNaN(dur) && dur > 0)
 					{
@@ -176,9 +180,10 @@ CONFIG::LOGGING
 					audioResource.mediaType = MediaType.AUDIO;
 
                     populateMetdataFromResource(originalResource, audioResource);
-                    populateMetadataFromSMIL(audioResource, smilElement);
 
 					var audioElement:MediaElement = factory.createMediaElement(audioResource);
+
+                    populateMetadataFromSMIL(audioElement, smilElement);
 
 					(parentMediaElement as CompositeElement).addChild(audioElement);
 					break;
@@ -201,9 +206,10 @@ CONFIG::LOGGING
 			else if (mediaResource != null)
 			{
                 populateMetdataFromResource(originalResource, mediaResource);
-                populateMetadataFromSMIL(mediaResource, smilElement);
 
 				mediaElement = factory.createMediaElement(mediaResource);
+
+                populateMetadataFromSMIL(mediaElement, smilElement);
 
 				if (parentMediaElement is CompositeElement)
 				{
@@ -221,23 +227,14 @@ CONFIG::LOGGING
                 var metadata:Object = originalResource.getMetadataValue(metadataNS);
                 mediaResource.addMetadataValue(metadataNS, metadata);
             }
-
-            // Shuffle some metadata so that it triggers proxies on the created elements
-            var proxyTriggerKey:String = originalResource.getMetadataValue(SMILConstants.PROXY_TRIGGER_METADATA_KEY) as String;
-            var proxyTriggerValue:Object = originalResource.getMetadataValue(SMILConstants.PROXY_TRIGGER_METADATA_VALUE) as Object;
-
-            if(proxyTriggerKey && proxyTriggerValue)
-            {
-                mediaResource.addMetadataValue(proxyTriggerKey, proxyTriggerValue);
-            }
         }
 
-        private function populateMetadataFromSMIL(resource:MediaResourceBase, smilElement:SMILElement):void {
-            var metadata:Metadata = resource.getMetadataValue(SMILConstants.SMIL_METADATA_NS) as Metadata;
+        private function populateMetadataFromSMIL(media:MediaElement, smilElement:SMILElement):void {
+            var metadata:Metadata = media.getMetadata(SMILConstants.SMIL_METADATA_NS) as Metadata;
             if (metadata == null)
             {
                 metadata = new Metadata();
-                resource.addMetadataValue(SMILConstants.SMIL_METADATA_NS, metadata);
+                media.addMetadata(SMILConstants.SMIL_METADATA_NS, metadata);
             }
 
             for(var i:uint = 0; i < smilElement.numChildren; i++)

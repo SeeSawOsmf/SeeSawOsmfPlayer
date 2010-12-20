@@ -23,7 +23,6 @@
 package com.seesaw.player.ads {
 import com.seesaw.player.ads.events.LiveRailEvent;
 import com.seesaw.player.events.AdEvent;
-import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.traits.ads.AdState;
 import com.seesaw.player.traits.ads.AdTrait;
 import com.seesaw.player.traits.ads.AdTraitType;
@@ -47,6 +46,7 @@ import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.PlayEvent;
 import org.osmf.media.MediaElement;
+import org.osmf.metadata.Metadata;
 import org.osmf.traits.AudioTrait;
 import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.LoadTrait;
@@ -56,8 +56,6 @@ import org.osmf.traits.PlayTrait;
 import org.osmf.traits.TimeTrait;
 
 public class AdProxy extends ProxyElement {
-
-    use namespace contentinfo;
 
     private var logger:ILogger = LoggerFactory.getClassLogger(AdProxy);
 
@@ -70,7 +68,7 @@ public class AdProxy extends ProxyElement {
 
     private var _adManager:*;
     private var liverailLoader:Loader;
-    private var liverailConfig:LiverailConfig;
+    private var liverailConfig:LiverailConfiguration;
     private var _contentInfoResource:XML;
 
     public function AdProxy(proxiedElement:MediaElement = null) {
@@ -212,12 +210,10 @@ public class AdProxy extends ProxyElement {
         liverailLoader.load(urlResource);
     }
 
-
     private function onLoadComplete(event:Event):void {
         logger.debug("Liverail Loaded ---- onLoadComplete")
         _adManager = liverailLoader.content;
         outerViewableSprite.addChild(_adManager);
-
         setupAdManager();
     }
 
@@ -231,26 +227,21 @@ public class AdProxy extends ProxyElement {
         _adManager.addEventListener(LiveRailEvent.AD_BREAK_COMPLETE, adbreakComplete);
         _adManager.addEventListener(LiveRailEvent.PREROLL_COMPLETE, onLiveRailPrerollComplete);
         _adManager.addEventListener(LiveRailEvent.AD_START, onLiveRailAdStart);
+
         /*adManager.addEventListener(LiveRailEvent.INIT_ERROR, onLiveRailInitError);
-
-
          adManager.addEventListener(LiveRailEvent.POSTROLL_COMPLETE, onLiveRailPostrollComplete);
-
-
          adManager.addEventListener(LiveRailEvent.AD_END, onLiveRailAdEnd);
-
          adManager.addEventListener(LiveRailEvent.CLICK_THRU, onLiveRailClickThru);
          adManager.addEventListener(LiveRailEvent.VOLUME_CHANGE, onLiveRailVolumeChange);
-
          adManager.addEventListener(LiveRailEvent.AD_PROGRESS,onAdProgress);
          */
 
-
-        _contentInfoResource = resource.getMetadataValue("contentInfo") as XML;
-        liverailConfig = new LiverailConfig(_contentInfoResource);
-        _adManager.initAds(liverailConfig.config);
-        _adTrait.createMarkers(liverailConfig.adPositions);
-
+        var metadata:Metadata = resource.getMetadataValue(LiverailConstants.NS_SETTINGS) as Metadata;
+        if (metadata) {
+            liverailConfig = metadata.getValue(LiverailConstants.CONFIG_OBJECT) as LiverailConfiguration;
+            _adManager.initAds(liverailConfig.config);
+            _adTrait.createMarkers(liverailConfig.adPositions);
+        }
     }
 
     private function onLiveRailAdStart(e:Event):void {

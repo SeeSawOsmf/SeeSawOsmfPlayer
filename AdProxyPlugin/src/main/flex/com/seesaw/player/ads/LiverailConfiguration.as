@@ -20,9 +20,40 @@
  * Incorporated. All Rights Reserved.
  */
 
-package org.osmf.smil {
-public class SMILConstants {
-    public static const SMIL_METADATA_NS = "http://www.w3.org/ns/SMIL";
-    public static const SMIL_DOCUMENT:String = "smilDocument";
+package com.seesaw.player.ads {
+public class LiverailConfiguration {
+
+    private var _adPositions:Array = [];
+    private var _totalAdPositions:Array = [];
+    private var _config:Object;
+
+    public function get adPositions():Array {
+        return _adPositions;
+    }
+
+    public function set adPositions(value:Array):void {
+        _adPositions = value;
+    }
+
+    public function get totalAdPositions():Array {
+        return _totalAdPositions;
+    }
+
+    public function set totalAdPositions(value:Array):void {
+        _totalAdPositions = value;
+    }
+
+    public function get config():Object {
+        return _config;
+    }
+
+    public function set config(value:Object):void {
+        _config = value;
+    }
+
+    public function generateMap():void {
+
+    }
+
 }
 }

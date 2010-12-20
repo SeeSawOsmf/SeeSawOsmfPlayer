@@ -35,4 +35,5 @@
     <avod>true</avod>
     <tvodPlayable>false</tvodPlayable>
     <svodPlayable>false</svodPlayable>
+    <userId>1234</userId>
 </videoInfo> 
