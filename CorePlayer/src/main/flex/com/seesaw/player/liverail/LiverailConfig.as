@@ -37,8 +37,8 @@ public class LiverailConfig extends LiverailConfiguration {
 
     public function LiverailConfig(contentInfoXml:XML) {
         contentInfo = contentInfoXml as XML;
-        createConfig();
         generateMap();
+        createConfig();
     }
 
     public override function generateMap():void {
@@ -165,10 +165,10 @@ public class LiverailConfig extends LiverailConfiguration {
             "LR_LAYOUT_LINEAR_PAUSEONCLICKTHRU" :    false  ,
             "LR_LAYOUT_SKIN_ID" :    1 ,
             "LR_PARTNERS" :    "SHERBET" ,
-            "LR_PUBLISHER_ID" :    contentInfo.liverail.publisherId ,
+            "LR_PUBLISHER_ID" :    String(contentInfo.liverail.publisherId),
             "LR_USE_JUNCTION" :    false,
-            "LR_VERSION" :    contentInfo.liverail.version,
-            "LR_VIDEO_ID"    : contentInfo.liverail.programme
+            "LR_VERSION" :    String(contentInfo.liverail.version),
+            "LR_VIDEO_ID"    : String(contentInfo.programme)
         }
     }
 }

@@ -333,6 +333,7 @@ public class Player extends Sprite {
             metadata.addValue(LiverailConstants.VERSION, playerInit.liverail.version);
             metadata.addValue(LiverailConstants.PUBLISHER_ID, playerInit.liverail.publisherId);
             metadata.addValue(LiverailConstants.CONFIG_OBJECT, new LiverailConfig(playerInit));
+            metadata.addValue(LiverailConstants.RESUME_POSITION, getResumePosition());
             resource.addMetadataValue(LiverailConstants.NS_SETTINGS, metadata);
         }
 

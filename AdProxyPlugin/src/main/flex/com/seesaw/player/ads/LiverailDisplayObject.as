@@ -21,12 +21,34 @@
  */
 
 package com.seesaw.player.ads {
-public class LiverailConstants {
-    public static const NS_SETTINGS:String = "http://www.seesaw.com/player/plugins/liverail/1.0";
-    public static const AD_MODE_ID:String = "liverail";
-    public static const PUBLISHER_ID:String = "publisher";
-    public static const VERSION:String = "version";
-    public static const CONFIG_OBJECT:String = "config";
-    public static const RESUME_POSITION:String = "resume";
+import flash.geom.Rectangle;
+
+import org.osmf.layout.LayoutTargetSprite;
+
+public class LiverailDisplayObject extends LayoutTargetSprite {
+
+    private var _adManager:*;
+
+    public function LiverailDisplayObject(adManager:* = null) {
+        _adManager = adManager;
+    }
+
+    override public function layout(availableWidth:Number, availableHeight:Number, deep:Boolean = true):void {
+        super.layout(availableWidth, availableHeight, deep);
+        if (_adManager) {
+            _adManager.setSize(new Rectangle(0, 0, availableWidth, availableHeight));
+        }
+    }
+
+    public function get adManager():* {
+        return _adManager;
+    }
+
+    public function set adManager(value:*):void {
+        _adManager = value;
+        if (_adManager) {
+            addChild(_adManager);
+        }
+    }
 }
 }

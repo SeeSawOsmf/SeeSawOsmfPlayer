@@ -49,6 +49,7 @@ import org.osmf.media.MediaElement;
 import org.osmf.metadata.Metadata;
 import org.osmf.traits.AudioTrait;
 import org.osmf.traits.DisplayObjectTrait;
+import org.osmf.traits.LoadState;
 import org.osmf.traits.LoadTrait;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
@@ -63,13 +64,13 @@ public class AdProxy extends ProxyElement {
 
     private var _adTrait:AdTrait;
     private var _innerViewable:DisplayObjectTrait;
-    private var outerViewable:AdProxyDisplayObjectTrait;
+    private var outerViewable:DisplayObjectTrait;
     private var outerViewableSprite:Sprite;
 
     private var _adManager:*;
     private var liverailLoader:Loader;
     private var liverailConfig:LiverailConfiguration;
-    private var _contentInfoResource:XML;
+    private var resumePosition:int
 
     public function AdProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -88,9 +89,7 @@ public class AdProxy extends ProxyElement {
             proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onProxiedTraitsChange);
 
             outerViewableSprite = new Sprite();
-            outerViewable = new AdProxyDisplayObjectTrait(outerViewableSprite);
-
-            createLiverail();
+            outerViewable = new DisplayObjectTrait(outerViewableSprite);
         }
     }
 
@@ -160,26 +159,23 @@ public class AdProxy extends ProxyElement {
         if (loadable) {
             if (added) {
                 loadable.addEventListener(LoadEvent.LOAD_STATE_CHANGE, onLoadableStateChange);
-                loadable.addEventListener(LoadEvent.BYTES_TOTAL_CHANGE, onBytesTotalChange);
-
             }
             else {
                 loadable.removeEventListener(LoadEvent.LOAD_STATE_CHANGE, onLoadableStateChange);
-                loadable.removeEventListener(LoadEvent.BYTES_TOTAL_CHANGE, onBytesTotalChange);
             }
         }
     }
 
     private function onLoadableStateChange(event:LoadEvent):void {
-        var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
+        if (event.loadState == LoadState.READY) {
+            createLiverail();
 
-        if (playTrait) {
-            playTrait.pause();
+            var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
+
+            if (playTrait) {
+                playTrait.pause();
+            }
         }
-    }
-
-    private function onBytesTotalChange(event:LoadEvent):void {
-        /// logger.debug("Load onBytesTotal change:{0}", event.bytes);
     }
 
     private function onCanPauseChange(event:PlayEvent):void {
@@ -239,6 +235,7 @@ public class AdProxy extends ProxyElement {
         var metadata:Metadata = resource.getMetadataValue(LiverailConstants.NS_SETTINGS) as Metadata;
         if (metadata) {
             liverailConfig = metadata.getValue(LiverailConstants.CONFIG_OBJECT) as LiverailConfiguration;
+            resumePosition = resource.getMetadataValue(LiverailConstants.RESUME_POSITION) as int;
             _adManager.initAds(liverailConfig.config);
             _adTrait.createMarkers(liverailConfig.adPositions);
         }
@@ -253,12 +250,9 @@ public class AdProxy extends ProxyElement {
     }
 
     private function onLiveRailInitComplete(event:Event):void {
-        logger.debug("Liverail ---- onLiveRailInitComplete")
-        // _adManager.setSize(new Rectangle(0, 0, outerViewable.mediaWidth, outerViewable.mediaHeight));
+        _adManager.setSize(new Rectangle(0, 0, 672, 378));
 
-        _adManager.setSize(new Rectangle(0, 0, 672, 378));   ///todo use the actual stageWidth to set the adModule.
-
-        if (_contentInfoResource.resume == 0) {
+        if (resumePosition == 0) {
             _adManager.onContentStart();
         } else {
             adbreakComplete();
@@ -301,12 +295,9 @@ public class AdProxy extends ProxyElement {
             var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
 
             if (playTrait) {
-
                 playTrait.play();
             }
         }
-        // var ob:Object = proxiedElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE);
-
     }
 
     public function volume(vol:Number):void {
@@ -335,7 +326,6 @@ public class AdProxy extends ProxyElement {
                 innerViewable = DisplayObjectTrait(proxiedElement.getTrait(MediaTraitType.DISPLAY_OBJECT));
 
                 if (_innerViewable) {
-
                     addTrait(MediaTraitType.DISPLAY_OBJECT, outerViewable);
                 }
             }
