@@ -23,6 +23,7 @@
 package com.seesaw.player {
 import com.seesaw.player.ads.AdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
+import com.seesaw.player.batchEventService.BatchEventServicePlugin;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.controls.ControlBarMetadata;
 import com.seesaw.player.controls.ControlBarPlugin;
@@ -163,6 +164,7 @@ public class SeeSawPlayer extends Sprite {
         logger.debug("loading the proxy plugins that wrap the video element");
         factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo(new SeeSawSMILLoader())));
         // factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
         factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
 
