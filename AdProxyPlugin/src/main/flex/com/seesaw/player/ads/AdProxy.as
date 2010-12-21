@@ -23,7 +23,7 @@
 package com.seesaw.player.ads {
 import com.seesaw.player.ads.events.LiveRailEvent;
 import com.seesaw.player.events.AdEvent;
-import com.seesaw.player.traits.ads.AdState;
+import com.seesaw.player.ads.AdState;
 import com.seesaw.player.traits.ads.AdTrait;
 import com.seesaw.player.traits.ads.AdTraitType;
 
@@ -44,6 +44,7 @@ import org.osmf.events.AudioEvent;
 import org.osmf.events.DisplayObjectEvent;
 import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
+import org.osmf.events.MetadataEvent;
 import org.osmf.events.PlayEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.metadata.Metadata;
@@ -70,7 +71,9 @@ public class AdProxy extends ProxyElement {
     private var _adManager:*;
     private var liverailLoader:Loader;
     private var liverailConfig:LiverailConfiguration;
-    private var resumePosition:int
+    private var resumePosition:int;
+
+    private var adStatusMetadata:Metadata;
 
     public function AdProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -82,15 +85,25 @@ public class AdProxy extends ProxyElement {
         if (proxiedElement) {
             super.proxiedElement = proxiedElement;
 
-            proxiedElement.removeEventListener(MediaElementEvent.TRAIT_ADD, onProxiedTraitsChange);
-            proxiedElement.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onProxiedTraitsChange);
-
             proxiedElement.addEventListener(MediaElementEvent.TRAIT_ADD, onProxiedTraitsChange);
             proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onProxiedTraitsChange);
+
+            adStatusMetadata = proxiedElement.getMetadata(LiverailConstants.NS_STATUS) as Metadata;
+            if(adStatusMetadata == null) {
+                adStatusMetadata = new Metadata();
+                adStatusMetadata.addValue(LiverailConstants.AD_STATE, AdState.STOPPED);
+                adStatusMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdStateMetadataChanged);
+                adStatusMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdStateMetadataChanged);
+                proxiedElement.addMetadata(LiverailConstants.NS_STATUS, adStatusMetadata);
+            }
 
             outerViewableSprite = new Sprite();
             outerViewable = new DisplayObjectTrait(outerViewableSprite);
         }
+    }
+
+    private function onAdStateMetadataChanged(event:MetadataEvent):void {
+        logger.debug("ad state changed: " + event.value);
     }
 
     override protected function setupTraits():void {
@@ -241,7 +254,7 @@ public class AdProxy extends ProxyElement {
     }
 
     private function onLiveRailAdStart(e:Event):void {
-
+        adStatusMetadata.addValue(LiverailConstants.AD_STATE, AdState.PLAYING);
     }
 
     private function onLiveRailPrerollComplete(event:Event):void {
@@ -260,7 +273,6 @@ public class AdProxy extends ProxyElement {
         var timer:Timer = new Timer(CONTENT_UPDATE_INTERVAL);
         timer.addEventListener(TimerEvent.TIMER, onTimerTick);
         timer.start();
-
     }
 
     private function adbreakStart(event:Event):void {

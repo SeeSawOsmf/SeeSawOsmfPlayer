@@ -25,6 +25,7 @@ import com.seesaw.player.ads.AdProxyPluginInfo;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.controls.ControlBarMetadata;
 import com.seesaw.player.controls.ControlBarPlugin;
+import com.seesaw.player.external.ExternalInterfaceMetadata;
 import com.seesaw.player.external.PlayerExternalInterface;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.namespaces.contentinfo;
@@ -81,8 +82,6 @@ public class SeeSawPlayer extends Sprite {
 
     private var playerInit:XML;
     private var videoInfo:XML;
-
-    private var lightsDown:Boolean = false;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
@@ -245,19 +244,32 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onPlayStateChanged(event:PlayEvent):void {
+        var lightsDown:Boolean = false;
+
+        var metadata:Metadata = contentElement.getMetadata(ExternalInterfaceMetadata.EXTERNAL_INTERFACE_METADATA);
+
+        if(metadata == null) {
+            metadata = new Metadata();
+            contentElement.addMetadata(ExternalInterfaceMetadata.EXTERNAL_INTERFACE_METADATA, metadata);
+        }
+
+        lightsDown = metadata.getValue(ExternalInterfaceMetadata.LIGHTS_DOWN);
+
         var timeTrait:TimeTrait = contentElement.getTrait(MediaTraitType.TIME) as TimeTrait;
-        if (event.playState == PlayState.PLAYING && !this.lightsDown) {
+        if (event.playState == PlayState.PLAYING && !lightsDown) {
             if (xi.available) {
                 xi.callLightsDown();
-                this.lightsDown = true;
+                metadata.addValue(ExternalInterfaceMetadata.LIGHTS_DOWN, true);
             }
         }
         if (event.playState == PlayState.PAUSED && (timeTrait.currentTime != timeTrait.duration)) {
             if (xi.available) {
                 xi.callLightsUp();
-                this.lightsDown = false;
+                metadata.addValue(ExternalInterfaceMetadata.LIGHTS_DOWN, false);
             }
         }
+
+
     }
 
     private function onFullscreen(event:FullScreenEvent):void {
@@ -308,14 +320,6 @@ public class SeeSawPlayer extends Sprite {
                 }
                 break;
         }
-    }
-
-    private function get captionUrl():String {
-        var metadata:Metadata = config.resource.getMetadataValue(SAMIPluginInfo.METADATA_NAMESPACE) as Metadata;
-        if (metadata) {
-            return metadata.getValue(SAMIPluginInfo.METADATA_KEY_URI) as String;
-        }
-        return null;
     }
 
     private function onMediaElementCreate(event:MediaFactoryEvent):void {
@@ -381,6 +385,18 @@ public class SeeSawPlayer extends Sprite {
             return config.height;
         }
         return stage.displayState == StageDisplayState.FULL_SCREEN ? stage.fullScreenHeight : config.height;
+    }
+
+    private function get captionUrl():String {
+        var metadata:Metadata = config.resource.getMetadataValue(SAMIPluginInfo.METADATA_NAMESPACE) as Metadata;
+        if (metadata) {
+            return metadata.getValue(SAMIPluginInfo.METADATA_KEY_URI) as String;
+        }
+        return null;
+    }
+
+    public function mediaPlayer():MediaPlayer {
+        return player;
     }
 }
 }

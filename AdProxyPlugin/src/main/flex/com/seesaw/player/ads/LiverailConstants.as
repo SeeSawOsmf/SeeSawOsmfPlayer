@@ -22,11 +22,14 @@
 
 package com.seesaw.player.ads {
 public class LiverailConstants {
-    public static const NS_SETTINGS:String = "http://www.seesaw.com/player/plugins/liverail/1.0";
+    public static const NS_SETTINGS:String = "http://www.seesaw.com/player/plugins/liverail/settings";
     public static const AD_MODE_ID:String = "liverail";
     public static const PUBLISHER_ID:String = "publisher";
     public static const VERSION:String = "version";
     public static const CONFIG_OBJECT:String = "config";
     public static const RESUME_POSITION:String = "resume";
+
+    public static const NS_STATUS:String = "http://www.seesaw.com/player/plugins/liverail/status";
+    public static const AD_STATE = "adstate";
 }
 }

@@ -81,6 +81,8 @@ public class Player extends Sprite {
     private var playerInit:XML;
     private var videoInfo:XML;
 
+    var testApi:TestApi;
+
     public function Player() {
         super();
 
@@ -100,6 +102,9 @@ public class Player extends Sprite {
         stage.align = StageAlign.TOP_LEFT;
 
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+
+        // created purely to allow testing
+        testApi = new TestApi(this);
     }
 
     private function onAddedToStage(event:Event):void {

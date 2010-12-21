@@ -20,7 +20,7 @@
  *    Incorporated. All Rights Reserved.
  */
 
-package  com.seesaw.player.traits.ads {
+package  com.seesaw.player.ads {
 
 public final class AdState {
 

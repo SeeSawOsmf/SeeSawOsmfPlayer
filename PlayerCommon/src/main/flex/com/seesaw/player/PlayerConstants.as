@@ -33,5 +33,10 @@ public class PlayerConstants {
     public static const AD_CONTENT_ID:String = "instreamAds";
     public static const STING_CONTENT_ID:String = "sting";
     public static const DOG_CONTENT_ID:String = "dogImage";
+    
+    public static const PROCEED_BUTTON_NAME = "PlayerStartButton.proceedButton";
+    public static const GUIDANCE_PANEL_ACCEPT_BUTTON_NAME:String = "GuidancePanel.acceptButton" ;
+    public static const GUIDANCE_PANEL_CANCEL_BUTTON_NAME:String = "GuidancePanel.cancelButton" ;
 }
+
 }

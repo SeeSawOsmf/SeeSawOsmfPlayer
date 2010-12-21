@@ -102,6 +102,12 @@
                     top="30"
                     />
             <widget
+                    id="com.seesaw.player.controls.widget.LightsDownButton"
+                    type="com.seesaw.player.controls.widget.LightsDownButton"
+                    right="240"
+                    top="70"
+                    />
+            <widget
                     id="com.seesaw.player.controls.widget.SubtitlesButton"
                     type="com.seesaw.player.controls.widget.SubtitlesButton"
                     right="120"

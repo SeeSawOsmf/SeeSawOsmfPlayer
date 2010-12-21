@@ -39,7 +39,7 @@ public class PlayerExternalInterfaceImpl implements PlayerExternalInterface {
     }
 
     public function callLightsUp():void {
-        call(ExternalInterfaceConstants.LIGHTS_DOWN);
+        call(ExternalInterfaceConstants.LIGHTS_UP);
     }
 
     public function addGetGuidanceCallback(callback:Function):void {

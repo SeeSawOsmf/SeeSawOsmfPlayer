@@ -21,6 +21,7 @@
  */
 
 package com.seesaw.player.traits.ads {
+import com.seesaw.player.ads.AdState;
 import com.seesaw.player.events.AdEvent;
 
 import org.osmf.traits.MediaTraitBase;
