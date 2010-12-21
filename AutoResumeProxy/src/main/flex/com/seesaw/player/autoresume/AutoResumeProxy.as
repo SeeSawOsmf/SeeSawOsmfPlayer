@@ -45,7 +45,7 @@ import org.osmf.traits.TimeTrait;
 public class AutoResumeProxy extends ProxyElement {
 
     private static const TIMER_UPDATE_INTERVAL:int = 30000;
-    private static const MIN_INTERVAL_BETWEEN_WRITE = 5;
+    private static const MIN_INTERVAL_BETWEEN_WRITE:int = 5;
 
     private var logger:ILogger = LoggerFactory.getClassLogger(AutoResumeProxy);
 
