@@ -72,6 +72,7 @@ public class PlayPauseButtonBase extends ButtonWidget {
     override protected function onMediaElementTraitAdd(event:MediaElementEvent):void {
         if (event.traitType == MediaTraitType.PLAY) {
             var trait:PlayTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
+            logger.debug("adding play trait: " + trait);
             trait.addEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
             trait.addEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
         }
@@ -81,6 +82,7 @@ public class PlayPauseButtonBase extends ButtonWidget {
     override protected function onMediaElementTraitRemove(event:MediaElementEvent):void {
         if (event.traitType == MediaTraitType.PLAY) {
             var trait:PlayTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
+            logger.debug("removing play trait: " + trait)
             trait.removeEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
             trait.removeEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
         }

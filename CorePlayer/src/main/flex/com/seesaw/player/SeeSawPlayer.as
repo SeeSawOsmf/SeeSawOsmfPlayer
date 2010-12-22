@@ -169,7 +169,7 @@ public class SeeSawPlayer extends Sprite {
         // factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         // factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
-        // factory.loadPlugin(new PluginInfoResource(new LiverailAdProxyPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new LiverailAdProxyPluginInfo()));
 
         logger.debug("creating video element");
         contentElement = factory.createMediaElement(config.resource);

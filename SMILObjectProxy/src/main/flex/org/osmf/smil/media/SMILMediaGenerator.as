@@ -117,8 +117,6 @@ CONFIG::LOGGING
 					var resource:StreamingURLResource = new StreamingURLResource((smilElement as SMILMediaElement).src);
 					resource.mediaType = MediaType.VIDEO;
 
-                   // populateMetdataFromResource(originalResource, resource);
-
 					var videoElement:MediaElement = factory.createMediaElement(resource);
 
                     populateMetadataFromSMIL(videoElement, smilElement);
@@ -161,8 +159,6 @@ CONFIG::LOGGING
 					var imageResource:URLResource = new URLResource((smilElement as SMILMediaElement).src);
 					imageResource.mediaType = MediaType.IMAGE;
 
-                    populateMetdataFromResource(originalResource, imageResource);
-
 					var imageElement:MediaElement = factory.createMediaElement(imageResource);
 
                     populateMetadataFromSMIL(imageElement, smilElement);
@@ -178,8 +174,6 @@ CONFIG::LOGGING
 				case SMILElementType.AUDIO:
 					var audioResource:URLResource = new URLResource((smilElement as SMILMediaElement).src);
 					audioResource.mediaType = MediaType.AUDIO;
-
-                    populateMetdataFromResource(originalResource, audioResource);
 
 					var audioElement:MediaElement = factory.createMediaElement(audioResource);
 
@@ -205,7 +199,6 @@ CONFIG::LOGGING
 			}
 			else if (mediaResource != null)
 			{
-                // populateMetdataFromResource(originalResource, mediaResource);
                 mediaResource.mediaType = MediaType.VIDEO;
 
 				mediaElement = factory.createMediaElement(mediaResource);

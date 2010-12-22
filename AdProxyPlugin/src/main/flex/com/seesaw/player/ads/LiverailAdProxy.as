@@ -26,7 +26,6 @@ import com.seesaw.player.traits.ads.AdPlayTrait;
 import com.seesaw.player.traits.ads.AdTimeTrait;
 
 import flash.display.Loader;
-import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
 import flash.events.TimerEvent;
@@ -38,7 +37,6 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ProxyElement;
 import org.osmf.events.AudioEvent;
-import org.osmf.events.DisplayObjectEvent;
 import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.PlayEvent;
@@ -59,10 +57,6 @@ public class LiverailAdProxy extends ProxyElement {
 
     private static const CONTENT_UPDATE_INTERVAL:int = 500;
 
-    private var _innerViewable:DisplayObjectTrait;
-    private var outerViewable:DisplayObjectTrait;
-    private var outerViewableSprite:Sprite;
-
     private var adManager:*;
     private var liverailLoader:Loader;
     private var liverailConfig:LiverailConfiguration;
@@ -70,6 +64,8 @@ public class LiverailAdProxy extends ProxyElement {
 
     private var adMetadata:AdMetadata;
     private var timer:Timer;
+
+    private var adTimeTrait:AdTimeTrait;
 
     public function LiverailAdProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -80,17 +76,14 @@ public class LiverailAdProxy extends ProxyElement {
         if (proxiedElement) {
             super.proxiedElement = proxiedElement;
 
-            proxiedElement.addEventListener(MediaElementEvent.TRAIT_ADD, onProxiedTraitsChange);
-            proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onProxiedTraitsChange);
+            proxiedElement.addEventListener(MediaElementEvent.TRAIT_ADD, onProxiedTraitAdd);
+            proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onProxiedTraitRemove);
 
             adMetadata = getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
             if (adMetadata == null) {
                 adMetadata = new AdMetadata();
                 addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
             }
-
-            outerViewableSprite = new Sprite();
-            outerViewable = new DisplayObjectTrait(outerViewableSprite);
         }
     }
 
@@ -106,7 +99,7 @@ public class LiverailAdProxy extends ProxyElement {
     }
 
     private function toggleAudioListeners(added:Boolean):void {
-        var audible:AudioTrait = proxiedElement.getTrait(MediaTraitType.AUDIO) as AudioTrait;
+        var audible:AudioTrait = getTrait(MediaTraitType.AUDIO) as AudioTrait;
         if (audible) {
             if (added) {
                 audible.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
@@ -120,7 +113,7 @@ public class LiverailAdProxy extends ProxyElement {
     }
 
     private function toggleLoadListeners(added:Boolean):void {
-        var loadable:LoadTrait = proxiedElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
+        var loadable:LoadTrait = getTrait(MediaTraitType.LOAD) as LoadTrait;
         if (loadable) {
             if (added) {
                 loadable.addEventListener(LoadEvent.LOAD_STATE_CHANGE, onLoadableStateChange);
@@ -135,7 +128,7 @@ public class LiverailAdProxy extends ProxyElement {
         if (event.loadState == LoadState.READY) {
             createLiverail();
 
-            var playTrait:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
+            var playTrait:PlayTrait = getTrait(MediaTraitType.PLAY) as PlayTrait;
             if (playTrait) {
                 playTrait.pause();
             }
@@ -164,7 +157,7 @@ public class LiverailAdProxy extends ProxyElement {
 
     private function onLoadComplete(event:Event):void {
         adManager = liverailLoader.content;
-        outerViewableSprite.addChild(adManager);
+        // outerViewableSprite.addChild(adManager);
         setupAdManager();
     }
 
@@ -177,6 +170,8 @@ public class LiverailAdProxy extends ProxyElement {
         adManager.addEventListener(LiveRailEvent.AD_BREAK_COMPLETE, adbreakComplete);
         adManager.addEventListener(LiveRailEvent.PREROLL_COMPLETE, onLiveRailPrerollComplete);
         adManager.addEventListener(LiveRailEvent.AD_START, onLiveRailAdStart);
+        adManager.addEventListener(LiveRailEvent.AD_END, onLiveRailAdEnd);
+        adManager.addEventListener(LiveRailEvent.AD_PROGRESS, onLiverailAdProgress);
 
         /*adManager.addEventListener(LiveRailEvent.INIT_ERROR, onLiveRailInitError);
          adManager.addEventListener(LiveRailEvent.POSTROLL_COMPLETE, onLiveRailPostrollComplete);
@@ -192,14 +187,26 @@ public class LiverailAdProxy extends ProxyElement {
         adMarkers = liverailConfig.adPositions;
     }
 
-    private function set adMarkers(adMarkers:Array):void {
-        if (adMetadata) {
-            adMetadata.adMarkers = adMarkers;
+    private function onLiverailAdProgress(event:Object):void {
+        if (adTimeTrait == null) {
+            adTimeTrait = new AdTimeTrait(event.data.duration);
+            addTrait(MediaTraitType.TIME, adTimeTrait);
+            //adTimeTrait.adDuration = event.data.duration;
         }
+        adTimeTrait.adTime = event.data.time;
     }
 
     private function onLiveRailAdStart(event:Event):void {
         logger.debug("onLiveRailAdStart");
+        if (adTimeTrait) {
+            removeTrait(MediaTraitType.TIME);
+            adTimeTrait = null;
+        }
+    }
+
+    private function onLiveRailAdEnd(event:Event):void {
+        logger.debug("onLiveRailAdStart");
+
     }
 
     private function onLiveRailPrerollComplete(event:Event):void {
@@ -265,16 +272,13 @@ public class LiverailAdProxy extends ProxyElement {
         adManager.onContentStart();
     }
 
-    private function adbreakStart(event:Event):void {
+    private function adbreakStart(event:Object):void {
         logger.debug("adbreakStart");
 
         var playTrait:PlayTrait = getTrait(MediaTraitType.PLAY) as PlayTrait;
 
         if (playTrait) {
-            var traitsToBlock:Vector.<String> = new Vector.<String>();
-            traitsToBlock[0] = MediaTraitType.SEEK;
-
-            blockedTraits = traitsToBlock;
+            setTraitsToBlock(MediaTraitType.SEEK);
             playTrait.pause();
         }
 
@@ -288,18 +292,17 @@ public class LiverailAdProxy extends ProxyElement {
         adPlayTrait.addEventListener(PlayEvent.PLAY_STATE_CHANGE, onAdPlayStateChange);
         addTrait(MediaTraitType.PLAY, adPlayTrait);
 
-        var adTimeTrait:AdTimeTrait = new AdTimeTrait(80);
-        addTrait(MediaTraitType.TIME, adTimeTrait);
+        // add a display trait that will display the ads
+        addTrait(MediaTraitType.DISPLAY_OBJECT, new DisplayObjectTrait(adManager));
     }
 
     private function adbreakComplete(event:Event = null):void {
         removeTrait(MediaTraitType.PLAY);
-        removeTrait(MediaTraitType.TIME);
+        removeTrait(MediaTraitType.DISPLAY_OBJECT);
 
         var playTrait:PlayTrait = getTrait(MediaTraitType.PLAY) as PlayTrait;
         if (playTrait) {
-            var traitsToBlock:Vector.<String> = new Vector.<String>();
-            blockedTraits = traitsToBlock;
+            setTraitsToBlock();
             playTrait.play();
         }
 
@@ -324,60 +327,21 @@ public class LiverailAdProxy extends ProxyElement {
     }
 
     public function onContentUpdate(time:Number, duration:Number):void {
+        logger.debug("content update: time = {0}, duration = {1}", time, duration);
         adManager.onContentUpdate(time, duration);
     }
 
-    private function onProxiedTraitsChange(event:MediaElementEvent):void {
-        if (event.type == MediaElementEvent.TRAIT_ADD) {
-            if (event.traitType == MediaTraitType.DISPLAY_OBJECT && !_innerViewable) {
-
-                // proxiedElement.addEventListener(DisplayObjectEvent.DISPLAY_OBJECT_CHANGE, onInnerDisplayObjectChange);
-                // proxiedElement.addEventListener(DisplayObjectEvent.MEDIA_SIZE_CHANGE, onInnerMediaSizeChange);
-
-                innerViewable = DisplayObjectTrait(proxiedElement.getTrait(MediaTraitType.DISPLAY_OBJECT));
-
-                if (_innerViewable) {
-                    addTrait(MediaTraitType.DISPLAY_OBJECT, outerViewable);
-                }
-            }
-        }
+    private function onProxiedTraitAdd(event:MediaElementEvent):void {
         processTrait(event.traitType, true);
     }
 
-    private function set innerViewable(value:DisplayObjectTrait):void {
-        if (value != null) {
-            if (_innerViewable) {
-                _innerViewable.removeEventListener(DisplayObjectEvent.DISPLAY_OBJECT_CHANGE, onInnerDisplayObjectChange);
-                _innerViewable.removeEventListener(DisplayObjectEvent.MEDIA_SIZE_CHANGE, onInnerMediaSizeChange);
-            }
-
-            _innerViewable = value;
-            _innerViewable.addEventListener(DisplayObjectEvent.DISPLAY_OBJECT_CHANGE, onInnerDisplayObjectChange);
-            _innerViewable.addEventListener(DisplayObjectEvent.MEDIA_SIZE_CHANGE, onInnerMediaSizeChange);
-
-            updateView();
-        }
-    }
-
-    private function onInnerDisplayObjectChange(event:DisplayObjectEvent):void {
-        updateView();
-    }
-
-    private function onInnerMediaSizeChange(event:DisplayObjectEvent):void {
-        _innerViewable.displayObject.height = 378;
-        _innerViewable.displayObject.width = 672;
-    }
-
-    private function updateView():void {
-        outerViewableSprite.addChildAt(_innerViewable.displayObject, 0);
-        _innerViewable.displayObject.height = 378;
-        _innerViewable.displayObject.width = 672;
-
+    private function onProxiedTraitRemove(event:MediaElementEvent):void {
+        processTrait(event.traitType, false);
     }
 
     private function onTimerTick(event:TimerEvent):void {
-        var timeTrait:TimeTrait = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
-        if (timeTrait) {
+        var timeTrait:TimeTrait = getTrait(MediaTraitType.TIME) as TimeTrait;
+        if (timeTrait && !isNaN(timeTrait.duration) && !isNaN(timeTrait.currentTime)) {
             onContentUpdate(timeTrait.currentTime, timeTrait.duration);
         }
     }
@@ -386,5 +350,20 @@ public class LiverailAdProxy extends ProxyElement {
         var metadata:Metadata = resource.getMetadataValue(LiverailConstants.SETTINGS_NAMESPACE) as Metadata;
         return metadata ? metadata.getValue(key) : null;
     }
+
+    private function set adMarkers(adMarkers:Array):void {
+        if (adMetadata) {
+            adMetadata.adMarkers = adMarkers;
+        }
+    }
+
+    private function setTraitsToBlock(...traitTypes):void {
+        var traitsToBlock:Vector.<String> = new Vector.<String>();
+        for (var i:int = 0; i < traitTypes.length; i++) {
+            traitsToBlock[i] = traitTypes[i];
+        }
+        blockedTraits = traitsToBlock;
+    }
+
 }
 }
