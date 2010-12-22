@@ -25,9 +25,7 @@ import com.seesaw.player.ads.events.LiveRailEvent;
 import com.seesaw.player.traits.ads.AdPlayTrait;
 import com.seesaw.player.traits.ads.AdTimeTrait;
 
-import flash.display.Loader;
 import flash.events.Event;
-import flash.events.IOErrorEvent;
 import flash.events.TimerEvent;
 import flash.system.Security;
 import flash.utils.Timer;
@@ -59,7 +57,6 @@ public class LiverailAdProxy extends ProxyElement {
     private static const CONTENT_UPDATE_INTERVAL:int = 500;
 
     private var adManager:*;
-    private var liverailLoader:Loader;
     private var liverailConfig:LiverailConfiguration;
     private var resumePosition:int;
 
@@ -91,9 +88,9 @@ public class LiverailAdProxy extends ProxyElement {
     private function onLiverailLoadStateChange(event:LoadEvent):void {
         var loadTrait:LiverailLoadTrait = getTrait(MediaTraitType.LOAD) as LiverailLoadTrait;
         if (event.loadState == LoadState.READY) {
-            removeTrait(MediaTraitType.LOAD);
             adManager = loadTrait.adManager;
             setupAdManager();
+            removeTrait(MediaTraitType.LOAD);
         }
         else if (event.loadState == LoadState.LOAD_ERROR) {
             removeTrait(MediaTraitType.LOAD);
@@ -154,7 +151,7 @@ public class LiverailAdProxy extends ProxyElement {
 
     private function onLoadableStateChange(event:LoadEvent):void {
         if (event.loadState == LoadState.READY) {
-            if(adManager) {
+            if (adManager) {
                 pause();
                 adManager.initAds(liverailConfig.config);
             }
@@ -205,16 +202,17 @@ public class LiverailAdProxy extends ProxyElement {
         adTimeTrait.adTime = event.data.time;
     }
 
-    private function onLiveRailAdStart(event:Event):void {
+    private function onLiveRailAdStart(event:Object):void {
         logger.debug("onLiveRailAdStart");
+        play();
+    }
+
+    private function onLiveRailAdEnd(event:Event):void {
+        logger.debug("onLiveRailAdEnd");
         if (adTimeTrait) {
             removeTrait(MediaTraitType.TIME);
             adTimeTrait = null;
         }
-    }
-
-    private function onLiveRailAdEnd(event:Event):void {
-        logger.debug("onLiveRailAdStart");
     }
 
     private function onLiveRailPrerollComplete(event:Event):void {
@@ -268,6 +266,9 @@ public class LiverailAdProxy extends ProxyElement {
             case PlayState.PLAYING:
                 adManager.resumeAd();
                 break;
+            case PlayState.STOPPED:
+                adManager.pauseAd();
+                break;
         }
     }
 
@@ -313,8 +314,6 @@ public class LiverailAdProxy extends ProxyElement {
         }
 
         adMetadata.adBreaks = metadataAdBreaks;
-
-        // adManager.setSize(new Rectangle(0, 0, 672, 378));
 
         timer = new Timer(CONTENT_UPDATE_INTERVAL);
         timer.addEventListener(TimerEvent.TIMER, onTimerTick);

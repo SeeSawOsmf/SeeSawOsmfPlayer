@@ -51,6 +51,7 @@ public class PauseButton extends PlayPauseButtonBase implements IWidget {
 
     override protected function updateVisibility():void {
         visible = playing;
+        logger.debug("updateVisibility: " + visible);
     }
 
     override protected function onMouseClick(event:MouseEvent):void {
