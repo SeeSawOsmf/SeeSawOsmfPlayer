@@ -65,6 +65,8 @@ import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.TimeTrait;
 
+import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
+
 public class SeeSawPlayer extends Sprite {
 
     use namespace contentinfo;
@@ -163,7 +165,7 @@ public class SeeSawPlayer extends Sprite {
     private function createVideoElement():void {
         logger.debug("loading the proxy plugins that wrap the video element");
         factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo(new SeeSawSMILLoader())));
-        // factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
         factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
