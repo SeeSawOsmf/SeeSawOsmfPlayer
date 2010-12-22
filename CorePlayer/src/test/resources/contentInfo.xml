@@ -34,6 +34,7 @@
     </parentalControls>
     <unavailablePageUrl>http://localhost:8080/unavailable</unavailablePageUrl>
     <videoInfoUrl>http://localhost:8080/player.playerinitialisation:videoinfo?t:ac=TV:DRAMA/p/33535/Sintel</videoInfoUrl>
+    <batchEventService>http://localhost:8080/player.videoplayer:registerbatcheven?t:ac=TV:DRAMA/p/33535/Sintel</batchEventService>
     <largeImageUrl>http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/E4_LARGE.png</largeImageUrl>
     <liverail>
         <version>4.1</version>
