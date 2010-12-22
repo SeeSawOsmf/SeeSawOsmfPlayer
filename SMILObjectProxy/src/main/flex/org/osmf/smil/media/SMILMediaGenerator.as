@@ -117,7 +117,7 @@ CONFIG::LOGGING
 					var resource:StreamingURLResource = new StreamingURLResource((smilElement as SMILMediaElement).src);
 					resource.mediaType = MediaType.VIDEO;
 
-                    populateMetdataFromResource(originalResource, resource);
+                   // populateMetdataFromResource(originalResource, resource);
 
 					var videoElement:MediaElement = factory.createMediaElement(resource);
 
@@ -205,7 +205,8 @@ CONFIG::LOGGING
 			}
 			else if (mediaResource != null)
 			{
-                populateMetdataFromResource(originalResource, mediaResource);
+                // populateMetdataFromResource(originalResource, mediaResource);
+                mediaResource.mediaType = MediaType.VIDEO;
 
 				mediaElement = factory.createMediaElement(mediaResource);
 

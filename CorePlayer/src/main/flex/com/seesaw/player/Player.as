@@ -39,6 +39,8 @@ import com.seesaw.player.panels.GuidancePanel;
 import com.seesaw.player.panels.ParentalControlsPanel;
 import com.seesaw.player.panels.PosterFrame;
 import com.seesaw.player.preloader.Preloader;
+import com.seesaw.player.preventscrub.ScrubPreventionConstants;
+import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
 import com.seesaw.player.services.ResumeService;
 
 import flash.display.LoaderInfo;
@@ -321,11 +323,14 @@ public class Player extends Sprite {
         var metadata:Metadata = new Metadata();
         metadata.addValue(PlayerConstants.CONTENT_INFO, playerInit);
         metadata.addValue(PlayerConstants.VIDEO_INFO, videoInfo);
-        resource.addMetadataValue(PlayerConstants.METADATA_NS, metadata);
+        resource.addMetadataValue(PlayerConstants.METADATA_NAMESPACE, metadata);
 
         metadata = new Metadata();
         metadata.addValue(SMILConstants.SMIL_DOCUMENT, videoInfo.smil);
         resource.addMetadataValue(SMILConstants.SMIL_METADATA_NS, metadata);
+
+        metadata = new Metadata();
+        resource.addMetadataValue(ScrubPreventionConstants.SETTINGS_NAMESPACE, metadata);
 
         if (videoInfo && videoInfo.subtitleLocation) {
             metadata = new Metadata();
@@ -339,7 +344,8 @@ public class Player extends Sprite {
             metadata.addValue(LiverailConstants.PUBLISHER_ID, playerInit.liverail.publisherId);
             metadata.addValue(LiverailConstants.CONFIG_OBJECT, new LiverailConfig(playerInit));
             metadata.addValue(LiverailConstants.RESUME_POSITION, getResumePosition());
-            resource.addMetadataValue(LiverailConstants.NS_SETTINGS, metadata);
+            metadata.addValue(LiverailConstants.ADMANAGER_URL,  "http://vox-static.liverail.com/swf/v4/admanager.swf");
+            resource.addMetadataValue(LiverailConstants.SETTINGS_NAMESPACE, metadata);
         }
 
         return resource;

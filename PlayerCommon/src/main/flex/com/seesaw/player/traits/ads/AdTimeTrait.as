@@ -20,14 +20,27 @@
  * Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.player.ads {
-public class LiverailConstants {
-    public static const SETTINGS_NAMESPACE:String = "http://www.seesaw.com/player/plugins/liverail/settings";
-    public static const AD_MODE_ID:String = "liverail";
-    public static const PUBLISHER_ID:String = "publisher";
-    public static const VERSION:String = "version";
-    public static const CONFIG_OBJECT:String = "config";
-    public static const RESUME_POSITION:String = "resume";
-    public static const ADMANAGER_URL = "swfLocation";
+package com.seesaw.player.traits.ads {
+import flash.events.TimerEvent;
+import flash.utils.Timer;
+
+import org.osmf.traits.TimeTrait;
+
+public class AdTimeTrait extends TimeTrait {
+
+    private var counter:uint;
+
+    public function AdTimeTrait(duration:Number = NaN) {
+        super(duration);
+        if (duration) {
+            var timer:Timer = new Timer(1000, duration);
+            timer.addEventListener(TimerEvent.TIMER, onTimerTick);
+            timer.start();
+        }
+    }
+
+    private function onTimerTick(event:TimerEvent):void {
+        setCurrentTime(counter++);
+    }
 }
 }

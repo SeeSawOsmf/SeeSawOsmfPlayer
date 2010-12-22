@@ -27,18 +27,16 @@ import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactoryItem;
 import org.osmf.media.MediaFactoryItemType;
 import org.osmf.media.MediaResourceBase;
-import org.osmf.media.MediaType;
 import org.osmf.media.PluginInfo;
-import org.osmf.metadata.Metadata;
 
-public class AdProxyPluginInfo extends PluginInfo {
+public class LiverailAdProxyPluginInfo extends PluginInfo {
 
-    private static var logger:ILogger = LoggerFactory.getClassLogger(AdProxyPluginInfo);
+    private static var logger:ILogger = LoggerFactory.getClassLogger(LiverailAdProxyPluginInfo);
 
-    public static const ID:String = "com.seesaw.player.ads.AdProxy";
+    public static const ID:String = "com.seesaw.player.ads.Liverail";
 
-    public function AdProxyPluginInfo() {
-        logger.debug("AdProxyPluginInfo()");
+    public function LiverailAdProxyPluginInfo() {
+        logger.debug("LiverailAdProxyPluginInfo()");
 
         var item:MediaFactoryItem = new MediaFactoryItem(
                 ID,
@@ -54,18 +52,11 @@ public class AdProxyPluginInfo extends PluginInfo {
 
     private static function canHandleResourceFunction(resource:MediaResourceBase):Boolean {
         logger.debug("can handle this resource: " + resource);
-//        var result:Boolean;
-//
-//        if (resource != null) {
-//            var settings:Metadata = resource.getMetadataValue(LiverailConstants.NS_SETTINGS) as Metadata;
-//            result = settings != null && settings.getValue(LiverailConstants.CONFIG_OBJECT) != null;
-//        }
-
-        return resource.mediaType == MediaType.VIDEO;
+        return resource && resource.getMetadataValue(LiverailConstants.SETTINGS_NAMESPACE) != null;
     }
 
     private static function mediaElementCreationFunction():MediaElement {
-        return new AdProxy();
+        return new LiverailAdProxy();
     }
 }
 }

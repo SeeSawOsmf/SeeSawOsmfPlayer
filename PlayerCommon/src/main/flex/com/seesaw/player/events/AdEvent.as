@@ -29,9 +29,7 @@ import flash.events.Event;
 public class AdEvent extends Event {
 
     public static const PLAY_PAUSE_CHANGE:String = "playPauseChange";
-
     public static const AD_STATE_CHANGE:String = "adStateChange";
-
     public static const AD_MARKERS:String = "adMarkers";
 
     public function AdEvent

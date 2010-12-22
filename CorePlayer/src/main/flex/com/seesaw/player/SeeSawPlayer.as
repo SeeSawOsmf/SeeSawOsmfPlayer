@@ -21,7 +21,7 @@
  */
 
 package com.seesaw.player {
-import com.seesaw.player.ads.AdProxyPluginInfo;
+import com.seesaw.player.ads.LiverailAdProxyPluginInfo;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.controls.ControlBarMetadata;
 import com.seesaw.player.controls.ControlBarPlugin;
@@ -90,7 +90,7 @@ public class SeeSawPlayer extends Sprite {
 
         config = playerConfig;
 
-        var metadata:Metadata = config.resource.getMetadataValue(PlayerConstants.METADATA_NS) as Metadata;
+        var metadata:Metadata = config.resource.getMetadataValue(PlayerConstants.METADATA_NAMESPACE) as Metadata;
 
         playerInit = metadata.getValue(PlayerConstants.CONTENT_INFO) as XML;
         if (playerInit == null) {
@@ -167,8 +167,8 @@ public class SeeSawPlayer extends Sprite {
         factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo(new SeeSawSMILLoader())));
         // factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         //factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo(canHandleMainContent)));
-        factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
-        factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
+        // factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new LiverailAdProxyPluginInfo()));
 
         logger.debug("creating video element");
         contentElement = factory.createMediaElement(config.resource);
@@ -262,7 +262,7 @@ public class SeeSawPlayer extends Sprite {
                 metadata.addValue(ExternalInterfaceMetadata.LIGHTS_DOWN, true);
             }
         }
-        if (event.playState == PlayState.PAUSED && (timeTrait.currentTime != timeTrait.duration)) {
+        if (event.playState == PlayState.PAUSED && timeTrait && (timeTrait.currentTime != timeTrait.duration)) {
             if (xi.available) {
                 xi.callLightsUp();
                 metadata.addValue(ExternalInterfaceMetadata.LIGHTS_DOWN, false);

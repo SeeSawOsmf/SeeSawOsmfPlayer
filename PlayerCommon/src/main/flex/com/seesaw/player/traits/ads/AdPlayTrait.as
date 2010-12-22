@@ -20,35 +20,23 @@
  * Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.player.ads {
-import flash.geom.Rectangle;
+package com.seesaw.player.traits.ads {
+import org.osmf.traits.PlayTrait;
 
-import org.osmf.layout.LayoutTargetSprite;
+public class AdPlayTrait extends PlayTrait {
 
-public class LiverailDisplayObject extends LayoutTargetSprite {
+    private var _markers:Array;
 
-    private var _adManager:*;
-
-    public function LiverailDisplayObject(adManager:* = null) {
-        _adManager = adManager;
+    public function AdPlayTrait() {
+        super();
     }
 
-    override public function layout(availableWidth:Number, availableHeight:Number, deep:Boolean = true):void {
-        super.layout(availableWidth, availableHeight, deep);
-        if (_adManager) {
-            _adManager.setSize(new Rectangle(0, 0, availableWidth, availableHeight));
-        }
+    public function get markers():Array {
+        return _markers;
     }
 
-    public function get adManager():* {
-        return _adManager;
-    }
-
-    public function set adManager(value:*):void {
-        _adManager = value;
-        if (_adManager) {
-            addChild(_adManager);
-        }
+    public function set markers(value:Array):void {
+        _markers = value;
     }
 }
 }

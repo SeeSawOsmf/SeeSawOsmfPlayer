@@ -50,18 +50,11 @@ public class PauseButton extends PlayPauseButtonBase implements IWidget {
     }
 
     override protected function updateVisibility():void {
-        visible = adMode ? adPlaying : playing;
+        visible = playing;
     }
 
     override protected function onMouseClick(event:MouseEvent):void {
-        if (adMode && adPlaying) {
-            logger.debug("pausing ad");
-            adTrait.pause();
-        }
-        else if (playing) {
-            logger.debug("pausing main content");
-            playTrait.pause();
-        }
+        playTrait.pause();
     }
 
     public function get classDefinition():String {

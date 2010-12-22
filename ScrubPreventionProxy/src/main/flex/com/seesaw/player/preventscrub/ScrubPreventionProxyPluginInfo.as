@@ -27,6 +27,7 @@ import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactoryItem;
 import org.osmf.media.MediaFactoryItemType;
 import org.osmf.media.MediaResourceBase;
+import org.osmf.media.MediaType;
 import org.osmf.media.PluginInfo;
 
 public class ScrubPreventionProxyPluginInfo extends PluginInfo {
@@ -52,7 +53,7 @@ public class ScrubPreventionProxyPluginInfo extends PluginInfo {
 
     private static function canHandleResourceFunction(resource:MediaResourceBase):Boolean {
         logger.debug("can handle this resource: " + resource);
-        return resource != null;
+        return resource && resource.mediaType == MediaType.VIDEO;
     }
 
     private static function mediaElementCreationFunction():MediaElement {
