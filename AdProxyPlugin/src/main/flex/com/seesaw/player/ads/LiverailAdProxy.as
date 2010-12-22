@@ -29,7 +29,6 @@ import flash.display.Loader;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
 import flash.events.TimerEvent;
-import flash.net.URLRequest;
 import flash.system.Security;
 import flash.utils.Timer;
 
@@ -41,6 +40,8 @@ import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.PlayEvent;
 import org.osmf.media.MediaElement;
+import org.osmf.media.MediaResourceBase;
+import org.osmf.media.URLResource;
 import org.osmf.metadata.Metadata;
 import org.osmf.traits.AudioTrait;
 import org.osmf.traits.DisplayObjectTrait;
@@ -70,6 +71,33 @@ public class LiverailAdProxy extends ProxyElement {
     public function LiverailAdProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
         Security.allowDomain("vox-static.liverail.com");
+    }
+
+    override public function set resource(value:MediaResourceBase):void {
+        super.resource = value;
+        updateLoadTrait();
+    }
+
+    private function updateLoadTrait():void {
+        var loadTrait:LoadTrait = getTrait(MediaTraitType.LOAD) as LoadTrait;
+        var liverailPath:String = getSetting(LiverailConstants.ADMANAGER_URL) as String;
+        if (loadTrait && liverailPath) {
+            var liverailLoadTrait:LiverailLoadTrait = new LiverailLoadTrait(new LiverailLoader(), new URLResource(liverailPath));
+            liverailLoadTrait.addEventListener(LoadEvent.LOAD_STATE_CHANGE, onLiverailLoadStateChange);
+            addTrait(MediaTraitType.LOAD, liverailLoadTrait);
+        }
+    }
+
+    private function onLiverailLoadStateChange(event:LoadEvent):void {
+        var loadTrait:LiverailLoadTrait = getTrait(MediaTraitType.LOAD) as LiverailLoadTrait;
+        if (event.loadState == LoadState.READY) {
+            removeTrait(MediaTraitType.LOAD);
+            adManager = loadTrait.adManager;
+            setupAdManager();
+        }
+        else if (event.loadState == LoadState.LOAD_ERROR) {
+            removeTrait(MediaTraitType.LOAD);
+        }
     }
 
     public override function set proxiedElement(proxiedElement:MediaElement):void {
@@ -103,11 +131,11 @@ public class LiverailAdProxy extends ProxyElement {
         if (audible) {
             if (added) {
                 audible.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
-                audible.addEventListener(AudioEvent.MUTED_CHANGE, onMutedChange);
+                audible.addEventListener(AudioEvent.MUTED_CHANGE, onVolumeChange);
             }
             else {
                 audible.removeEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
-                audible.removeEventListener(AudioEvent.MUTED_CHANGE, onMutedChange);
+                audible.removeEventListener(AudioEvent.MUTED_CHANGE, onVolumeChange);
             }
         }
     }
@@ -126,42 +154,20 @@ public class LiverailAdProxy extends ProxyElement {
 
     private function onLoadableStateChange(event:LoadEvent):void {
         if (event.loadState == LoadState.READY) {
-            createLiverail();
-
-            var playTrait:PlayTrait = getTrait(MediaTraitType.PLAY) as PlayTrait;
-            if (playTrait) {
-                playTrait.pause();
+            if(adManager) {
+                pause();
+                adManager.initAds(liverailConfig.config);
             }
         }
     }
 
-    private function onMutedChange(event:AudioEvent):void {
-        logger.debug("Mute change: {0}", event.muted);
-    }
-
     private function onVolumeChange(event:AudioEvent):void {
-        adManager.setVolume(event.volume, false);
-    }
-
-    private function createLiverail():void {
-        var liverailPath:String = getSetting(LiverailConstants.ADMANAGER_URL) as String;
-
-        if (liverailPath && adManager == null) {
-            var urlResource:URLRequest = new URLRequest(liverailPath);
-            liverailLoader = new Loader();
-            liverailLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadComplete);
-            liverailLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onLoadError);
-            liverailLoader.load(urlResource);
+        if (event.muted) {
+            adManager.setVolume(0);
         }
-    }
-
-    private function onLoadComplete(event:Event):void {
-        adManager = liverailLoader.content;
-        // outerViewableSprite.addChild(adManager);
-        setupAdManager();
-    }
-
-    private function onLoadError(e:IOErrorEvent):void {
+        else {
+            adManager.setVolume(event.volume);
+        }
     }
 
     private function setupAdManager():void {
@@ -172,26 +178,29 @@ public class LiverailAdProxy extends ProxyElement {
         adManager.addEventListener(LiveRailEvent.AD_START, onLiveRailAdStart);
         adManager.addEventListener(LiveRailEvent.AD_END, onLiveRailAdEnd);
         adManager.addEventListener(LiveRailEvent.AD_PROGRESS, onLiverailAdProgress);
+        adManager.addEventListener(LiveRailEvent.CLICK_THRU, onLiveRailClickThru);
 
         /*adManager.addEventListener(LiveRailEvent.INIT_ERROR, onLiveRailInitError);
          adManager.addEventListener(LiveRailEvent.POSTROLL_COMPLETE, onLiveRailPostrollComplete);
          adManager.addEventListener(LiveRailEvent.AD_END, onLiveRailAdEnd);
-         adManager.addEventListener(LiveRailEvent.CLICK_THRU, onLiveRailClickThru);
-         adManager.addEventListener(LiveRailEvent.VOLUME_CHANGE, onLiveRailVolumeChange);
 
+         adManager.addEventListener(LiveRailEvent.VOLUME_CHANGE, onLiveRailVolumeChange);
          */
 
         liverailConfig = getSetting(LiverailConstants.CONFIG_OBJECT) as LiverailConfiguration;
         resumePosition = getSetting(LiverailConstants.RESUME_POSITION) as int;
-        adManager.initAds(liverailConfig.config);
+
         adMarkers = liverailConfig.adPositions;
+    }
+
+    private function onLiveRailClickThru(event:Object):void {
+        pause();
     }
 
     private function onLiverailAdProgress(event:Object):void {
         if (adTimeTrait == null) {
             adTimeTrait = new AdTimeTrait(event.data.duration);
             addTrait(MediaTraitType.TIME, adTimeTrait);
-            //adTimeTrait.adDuration = event.data.duration;
         }
         adTimeTrait.adTime = event.data.time;
     }
@@ -206,77 +215,16 @@ public class LiverailAdProxy extends ProxyElement {
 
     private function onLiveRailAdEnd(event:Event):void {
         logger.debug("onLiveRailAdStart");
-
     }
 
     private function onLiveRailPrerollComplete(event:Event):void {
         logger.debug("onLiveRailPrerollComplete");
-
-    }
-
-    private function onLiveRailInitComplete(ev:Object):void {
-        logger.debug("onLiveRailInitComplete");
-
-        var adMap:Object = ev.data.adMap;
-        var adBreaks:Array = adMap.adBreaks;
-
-        var metadataAdBreaks:Vector.<AdBreak> = new Vector.<AdBreak>(adBreaks.length, true);
-
-        for (var i:uint = 0; i < adBreaks.length; i++) {
-            var adBreak:Object = adBreaks[i];
-
-            //total number of ads in this ad-break
-            var queueAdsTotal:uint = adBreak.queueAdsTotal;
-
-            //total duration of ad-break in seconds
-            //sometimes duration is not available for 3rd party ads such as VPAID
-            //when duration cannot be computed, this value remains zero
-            var queueDuration:Number = adBreak.queueDuration;
-
-            // (queueAdsTotal > 0)
-            var hasAds:Boolean = adBreak.hasAds;
-
-            //start time passed in the LR_ADMAP param: "0", "768.52" and "100%", all values are String
-            var startTimeString:String = adBreak.startTimeString;
-
-            //start time value converted to Number: 0, 768.52, 100
-            var startTimeValue:Number = adBreak.startTimeValue;
-
-            //specifies whether the startTimeValue is Percent (true) or  seconds (false)
-            var startTimeIsPercent:Boolean = adBreak.startTimeIsPercent;
-
-            // sets the ad breaks as metadata on the element
-            var metadataAdBreak:AdBreak = new AdBreak();
-            metadataAdBreak.queueAdsTotal = queueAdsTotal;
-            metadataAdBreak.queueDuration = queueDuration;
-            metadataAdBreak.startTime = startTimeValue;
-            metadataAdBreak.startTimeIsPercent = startTimeIsPercent;
-
-            metadataAdBreaks[i] = metadataAdBreak;
-        }
-
-        adMetadata.adBreaks = metadataAdBreaks;
-
-        //        if (resumePosition == 0) {
-        //            adManager.onContentStart();
-        //        } else {
-        //            adbreakComplete();
-        //        }
-
-        // adManager.setSize(new Rectangle(0, 0, 672, 378));
-
-        timer = new Timer(CONTENT_UPDATE_INTERVAL);
-        timer.addEventListener(TimerEvent.TIMER, onTimerTick);
-        timer.start();
-
-        adManager.onContentStart();
     }
 
     private function adbreakStart(event:Object):void {
         logger.debug("adbreakStart");
 
         var playTrait:PlayTrait = getTrait(MediaTraitType.PLAY) as PlayTrait;
-
         if (playTrait) {
             setTraitsToBlock(MediaTraitType.SEEK);
             playTrait.pause();
@@ -323,7 +271,60 @@ public class LiverailAdProxy extends ProxyElement {
         }
     }
 
+    private function onLiveRailInitComplete(ev:Object):void {
+        logger.debug("onLiveRailInitComplete");
+
+        var adMap:Object = ev.data.adMap;
+        var adBreaks:Array = adMap.adBreaks;
+
+        var metadataAdBreaks:Vector.<AdBreak> = new Vector.<AdBreak>(adBreaks.length, true);
+
+        for (var i:uint = 0; i < adBreaks.length; i++) {
+            var adBreak:Object = adBreaks[i];
+
+            //total number of ads in this ad-break
+            var queueAdsTotal:uint = adBreak.queueAdsTotal;
+
+            //total duration of ad-break in seconds
+            //sometimes duration is not available for 3rd party ads such as VPAID
+            //when duration cannot be computed, this value remains zero
+            var queueDuration:Number = adBreak.queueDuration;
+
+            // (queueAdsTotal > 0)
+            var hasAds:Boolean = adBreak.hasAds;
+
+            //start time passed in the LR_ADMAP param: "0", "768.52" and "100%", all values are String
+            var startTimeString:String = adBreak.startTimeString;
+
+            //start time value converted to Number: 0, 768.52, 100
+            var startTimeValue:Number = adBreak.startTimeValue;
+
+            //specifies whether the startTimeValue is Percent (true) or  seconds (false)
+            var startTimeIsPercent:Boolean = adBreak.startTimeIsPercent;
+
+            // sets the ad breaks as metadata on the element
+            var metadataAdBreak:AdBreak = new AdBreak();
+            metadataAdBreak.queueAdsTotal = queueAdsTotal;
+            metadataAdBreak.queueDuration = queueDuration;
+            metadataAdBreak.startTime = startTimeValue;
+            metadataAdBreak.startTimeIsPercent = startTimeIsPercent;
+
+            metadataAdBreaks[i] = metadataAdBreak;
+        }
+
+        adMetadata.adBreaks = metadataAdBreaks;
+
+        // adManager.setSize(new Rectangle(0, 0, 672, 378));
+
+        timer = new Timer(CONTENT_UPDATE_INTERVAL);
+        timer.addEventListener(TimerEvent.TIMER, onTimerTick);
+        timer.start();
+
+        adManager.onContentStart();
+    }
+
     public function volume(vol:Number):void {
+        adManager.setVolume(vol);
     }
 
     public function onContentUpdate(time:Number, duration:Number):void {
@@ -363,6 +364,21 @@ public class LiverailAdProxy extends ProxyElement {
             traitsToBlock[i] = traitTypes[i];
         }
         blockedTraits = traitsToBlock;
+    }
+
+
+    private function pause() {
+        var playTrait:PlayTrait = getTrait(MediaTraitType.PLAY) as PlayTrait;
+        if (hasTrait(MediaTraitType.PLAY)) {
+            playTrait.pause();
+        }
+    }
+
+    private function play() {
+        var playTrait:PlayTrait = getTrait(MediaTraitType.PLAY) as PlayTrait;
+        if (hasTrait(MediaTraitType.PLAY)) {
+            playTrait.play();
+        }
     }
 
 }
