@@ -22,8 +22,10 @@
 
 package
 com.seesaw.player.controls.widget {
+import com.seesaw.player.ads.AdBreak;
 import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.ads.AdState;
+import com.seesaw.player.traits.ads.AdTimeTrait;
 import com.seesaw.player.traits.ads.AdTraitType;
 import com.seesaw.player.ui.StyledTextField;
 
@@ -60,7 +62,7 @@ import org.osmf.traits.TimeTrait;
 
 public class ScrubBar extends Widget implements IWidget {
 
-    private var logger:ILogger = LoggerFactory.getClassLogger(PlayPauseButtonBase);
+    private var logger:ILogger = LoggerFactory.getClassLogger(ScrubBar);
 
     private var markerContainer:Sprite;
     private var currentTimeInSeconds:Number = 0;
@@ -185,27 +187,30 @@ public class ScrubBar extends Widget implements IWidget {
     }
 
     override protected function onMediaElementTraitAdd(event:MediaElementEvent):void {
+        if (event.traitType == MediaTraitType.TIME) {
+            var timeTrait:TimeTrait = media.getTrait(MediaTraitType.TIME) as TimeTrait;
+            logger.debug("adding time trait: " + timeTrait);
+            timeTrait.addEventListener(TimeEvent.DURATION_CHANGE, onDurationChange);
+        }
         updateState();
     }
 
     override protected function onMediaElementTraitRemove(event:MediaElementEvent):void {
+        if (event.traitType == MediaTraitType.TIME) {
+            var timeTrait:TimeTrait = media.getTrait(MediaTraitType.TIME) as TimeTrait;
+            logger.debug("removing time trait: " + timeTrait);
+            timeTrait.removeEventListener(TimeEvent.DURATION_CHANGE, onDurationChange);
+        }
         updateState();
     }
 
-    override public function set media(value:MediaElement):void {
-        if (media) {
-            media.removeEventListener(MediaElementEvent.TRAIT_ADD, onMediaTraitsChange);
-            media.removeEventListener(MediaElementEvent.METADATA_ADD, onMediaMetadataRemove);
-            media.removeEventListener(MediaElementEvent.METADATA_REMOVE, onMediaMetadataRemove);
+    override protected function processMediaElementChange(oldMediaElement:MediaElement):void {
+        if (oldMediaElement) {
+            oldMediaElement.removeEventListener(MediaElementEvent.METADATA_ADD, onMediaMetadataRemove);
+            oldMediaElement.removeEventListener(MediaElementEvent.METADATA_REMOVE, onMediaMetadataRemove);
         }
-
-        super.media = value;
-
-        if (media) {
-            media.addEventListener(MediaElementEvent.TRAIT_ADD, onMediaTraitsChange);
-            media.addEventListener(MediaElementEvent.METADATA_ADD, onMediaMetadataAdd);
-            media.addEventListener(MediaElementEvent.METADATA_REMOVE, onMediaMetadataRemove);
-        }
+        media.addEventListener(MediaElementEvent.METADATA_ADD, onMediaMetadataAdd);
+        media.addEventListener(MediaElementEvent.METADATA_REMOVE, onMediaMetadataRemove);
     }
 
     private function onMediaMetadataAdd(event:MediaElementEvent):void {
@@ -222,17 +227,9 @@ public class ScrubBar extends Widget implements IWidget {
         }
     }
 
-    private function onMediaTraitsChange(event:MediaElementEvent):void {
-        var target = event.target as MediaElement;
-        if (event.traitType == MediaTraitType.TIME) {
-            var timeTrait:TimeTrait = target.getTrait(MediaTraitType.TIME) as TimeTrait;
-            timeTrait.addEventListener(TimeEvent.DURATION_CHANGE, onDurationChange);
-        }
-    }
-
     private function onDurationChange(event:TimeEvent):void {
         var timeTrait:TimeTrait = event.target as TimeTrait;
-        positionOffset = timeTrait.currentTime;
+        // positionOffset = timeTrait.currentTime;
     }
 
     // Internals
@@ -250,25 +247,26 @@ public class ScrubBar extends Widget implements IWidget {
     }
 
     private function onAdStateMetadataChanged(event:MetadataEvent):void {
-        if (event.key == AdMetadata.AD_STATE) {
-            logger.debug("ad state changed: " + event.value);
-            visible = event.value != AdState.STOPPED;
-        }
-        else if (event.key == AdMetadata.AD_MARKERS) {
+        if (event.key == AdMetadata.AD_STATE && event.value == AdState.STOPPED) {
             logger.debug("ad markers changed");
-            createAdMarkers(event.value as Array);
+            createAdMarkers();
         }
     }
 
-    private function createAdMarkers(markers:Array):void {
-        removeAllChildren(markerContainer);
+    private function createAdMarkers():void {
+        var adBreaks:Vector.<AdBreak> = adMetadata.adBreaks;
 
-        for each (var value:Number in markers) {
-            var sprite:Sprite = new Sprite();
-            sprite.graphics.beginFill(0xffffff);
-            sprite.graphics.drawRect(scrubBarTrack.width * value + (scrubBarTrack.x) - 2, scrubBarTrack.y - 0.5, 6, 4);
-            sprite.graphics.endFill();
-            markerContainer.addChild(sprite);
+        if (adBreaks && adBreaks.length > 0) {
+            removeAllChildren(markerContainer);
+
+            for each (var value:AdBreak in adBreaks) {
+                var sprite:Sprite = new Sprite();
+                sprite.graphics.beginFill(0xffffff);
+                sprite.graphics.drawRect(scrubBarTrack.width * value.startTime +
+                        (scrubBarTrack.x) - 2, scrubBarTrack.y - 0.5, 6, 4);
+                sprite.graphics.endFill();
+                markerContainer.addChild(sprite);
+            }
         }
     }
 
@@ -294,7 +292,7 @@ public class ScrubBar extends Widget implements IWidget {
         // scrubber.visible = scrubBarTrail.visible = scrubBarTrack.visible = seekTrait != null;
 
         var temporal:TimeTrait = media ? media.getTrait(MediaTraitType.TIME) as TimeTrait : null;
-        if (temporal != null) {
+        if (temporal != null && !isNaN(temporal.duration) && !isNaN(temporal.currentTime)) {
             var duration:Number = temporal.duration - positionOffset;
             var position:Number = temporal.currentTime - positionOffset;
 
@@ -419,7 +417,7 @@ public class ScrubBar extends Widget implements IWidget {
         return QUALIFIED_NAME;
     }
 
-    private var positionOffset:Number;
+    private var positionOffset:Number = 0.0;
 
     private var scrubber:Scrubber;
     private var scrubBarClickArea:Sprite;

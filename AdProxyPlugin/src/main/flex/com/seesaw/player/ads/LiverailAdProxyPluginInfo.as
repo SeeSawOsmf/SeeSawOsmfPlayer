@@ -51,8 +51,9 @@ public class LiverailAdProxyPluginInfo extends PluginInfo {
     }
 
     private static function canHandleResourceFunction(resource:MediaResourceBase):Boolean {
-        logger.debug("can handle this resource: " + resource);
-        return resource && resource.getMetadataValue(LiverailConstants.SETTINGS_NAMESPACE) != null;
+        var canHandle:Boolean = resource && resource.getMetadataValue(LiverailConstants.SETTINGS_NAMESPACE) != null;
+        logger.debug("can handle this resource: {0} = {1}", resource, canHandle);
+        return canHandle;
     }
 
     private static function mediaElementCreationFunction():MediaElement {

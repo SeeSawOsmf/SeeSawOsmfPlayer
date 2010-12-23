@@ -82,10 +82,11 @@ public class PlayPauseButtonBase extends ButtonWidget {
     }
 
     override protected function processRequiredTraitsAvailable(element:MediaElement):void {
-        visibilityDeterminingEventHandler();
+        updateVisibility();
     }
 
     override protected function processRequiredTraitsUnavailable(element:MediaElement):void {
+        updateVisibility();
     }
 
     protected function visibilityDeterminingEventHandler(event:Event = null):void {

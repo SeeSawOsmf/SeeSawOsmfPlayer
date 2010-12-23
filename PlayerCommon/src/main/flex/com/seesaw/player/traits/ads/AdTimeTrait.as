@@ -21,26 +21,20 @@
  */
 
 package com.seesaw.player.traits.ads {
-import flash.events.TimerEvent;
-import flash.utils.Timer;
-
 import org.osmf.traits.TimeTrait;
 
 public class AdTimeTrait extends TimeTrait {
 
-    private var counter:uint;
-
     public function AdTimeTrait(duration:Number = NaN) {
         super(duration);
-        if (duration) {
-            var timer:Timer = new Timer(1000, duration);
-            timer.addEventListener(TimerEvent.TIMER, onTimerTick);
-            timer.start();
-        }
     }
 
-    private function onTimerTick(event:TimerEvent):void {
-        setCurrentTime(counter++);
+    public function set adDuration(duration:Number):void {
+        setDuration(duration);    
+    }
+
+    public function set adTime(time:Number):void {
+        setCurrentTime(time);
     }
 }
 }

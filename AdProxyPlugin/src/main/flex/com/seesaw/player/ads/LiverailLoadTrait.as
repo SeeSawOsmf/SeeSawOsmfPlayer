@@ -21,32 +21,24 @@
  */
 
 package com.seesaw.player.ads {
-import org.osmf.metadata.Metadata;
+import org.osmf.media.MediaResourceBase;
+import org.osmf.traits.LoadTrait;
+import org.osmf.traits.LoaderBase;
 
-public class AdMetadata extends Metadata {
+public class LiverailLoadTrait extends LoadTrait {
 
-    public static const AD_NAMESPACE:String = "http://www.seesaw.com/player/ads/1.0";
-    public static const AD_STATE:String = "adState";
-    public static const AD_BREAKS:String = "adBreaks";
+    private var _adManager:*;
 
-    public function get adState():String {
-        return getValue(AdMetadata.AD_STATE);
+    public function LiverailLoadTrait(loader:LoaderBase, resource:MediaResourceBase) {
+        super(loader, resource);
     }
 
-    public function set adState(adState:String):void {
-        addValue(AdMetadata.AD_STATE, adState);
+    public function get adManager():* {
+        return _adManager;
     }
 
-    public function get adBreaks():Vector.<AdBreak> {
-        return getValue(AdMetadata.AD_BREAKS) as Vector.<AdBreak>;
-    }
-
-    public function set adBreaks(adBreaks:Vector.<AdBreak>):void {
-        addValue(AdMetadata.AD_BREAKS, adBreaks);
-    }
-
-    public function get adMode():Boolean {
-        return adState != AdState.STOPPED;
+    public function set adManager(value:*):void {
+        _adManager = value;
     }
 }
 }

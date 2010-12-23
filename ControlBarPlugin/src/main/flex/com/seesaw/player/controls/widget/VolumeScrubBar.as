@@ -142,8 +142,7 @@ public class VolumeScrubBar extends Widget implements IWidget {
             audible.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
         }
         if (audible.volume) {
-            this.volumeDisplay = Math.round(audible.volume * 10);
-            this.toolTip.updateToolTip("Volume: " + Math.round(audible.volume * 10));
+            onVolumeChange();
         }
     }
 
