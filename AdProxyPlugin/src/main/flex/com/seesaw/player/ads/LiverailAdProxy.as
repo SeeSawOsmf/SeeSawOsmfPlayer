@@ -222,8 +222,6 @@ public class LiverailAdProxy extends ProxyElement {
         }
 
         adMetadata.adBreaks = metadataAdBreaks;
-
-        play();
     }
 
     private function onLiveRailInitError(ev:Object):void {
@@ -363,6 +361,7 @@ public class LiverailAdProxy extends ProxyElement {
     }
 
     private function updateTraitListeners(element:MediaElement, traitType:String, add:Boolean):void {
+        logger.debug("updateTraitListeners: element = {0}, type = {1}, add = {2}", element, traitType, add);
         switch (traitType) {
             case MediaTraitType.PLAY:
                 changeListeners(element, add, traitType, PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
