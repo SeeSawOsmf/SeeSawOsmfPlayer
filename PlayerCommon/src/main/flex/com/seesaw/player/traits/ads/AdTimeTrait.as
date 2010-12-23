@@ -20,9 +20,27 @@
  * Incorporated. All Rights Reserved.
  */
 
-package org.osmf.smil {
-public class SMILConstants {
-    public static const SMIL_METADATA_NS = "http://www.w3.org/ns/SMIL";
-    public static const SMIL_DOCUMENT:String = "smilDocument";
+package com.seesaw.player.traits.ads {
+import flash.events.TimerEvent;
+import flash.utils.Timer;
+
+import org.osmf.traits.TimeTrait;
+
+public class AdTimeTrait extends TimeTrait {
+
+    private var counter:uint;
+
+    public function AdTimeTrait(duration:Number = NaN) {
+        super(duration);
+        if (duration) {
+            var timer:Timer = new Timer(1000, duration);
+            timer.addEventListener(TimerEvent.TIMER, onTimerTick);
+            timer.start();
+        }
+    }
+
+    private function onTimerTick(event:TimerEvent):void {
+        setCurrentTime(counter++);
+    }
 }
 }

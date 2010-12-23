@@ -20,9 +20,23 @@
  * Incorporated. All Rights Reserved.
  */
 
-package org.osmf.smil {
-public class SMILConstants {
-    public static const SMIL_METADATA_NS = "http://www.w3.org/ns/SMIL";
-    public static const SMIL_DOCUMENT:String = "smilDocument";
+package com.seesaw.player.traits.ads {
+import org.osmf.traits.PlayTrait;
+
+public class AdPlayTrait extends PlayTrait {
+
+    private var _markers:Array;
+
+    public function AdPlayTrait() {
+        super();
+    }
+
+    public function get markers():Array {
+        return _markers;
+    }
+
+    public function set markers(value:Array):void {
+        _markers = value;
+    }
 }
 }

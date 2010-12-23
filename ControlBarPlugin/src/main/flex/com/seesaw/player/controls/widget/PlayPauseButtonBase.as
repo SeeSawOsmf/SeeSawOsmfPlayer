@@ -20,17 +20,12 @@
  *    Incorporated. All Rights Reserved.
  */
 package com.seesaw.player.controls.widget {
-import com.seesaw.player.events.AdEvent;
-import com.seesaw.player.traits.ads.AdState;
-import com.seesaw.player.traits.ads.AdTrait;
-import com.seesaw.player.traits.ads.AdTraitType;
-
 import flash.events.Event;
-
 import flash.external.ExternalInterface;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
+import org.osmf.events.MediaElementEvent;
 import org.osmf.events.PlayEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.traits.MediaTraitType;
@@ -40,9 +35,6 @@ import org.osmf.traits.PlayTrait;
 public class PlayPauseButtonBase extends ButtonWidget {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(PlayPauseButtonBase);
-
-    private var _playTrait:PlayTrait;
-    private var _adTrait:AdTrait;
 
     private var _requiredTraits:Vector.<String> = new Vector.<String>;
 
@@ -59,24 +51,11 @@ public class PlayPauseButtonBase extends ButtonWidget {
     }
 
     private function playPause():void {
-        if ((adMode && adPlaying) || playing) {
-            if (adMode && adPlaying) {
-                logger.debug("pausing ad");
-                adTrait.pause();
-            }
-            else if (playing) {
-                logger.debug("pausing main content");
-                playTrait.pause();
-            }
-        } else if ((adMode && adPaused) || paused) {
-            if (adMode && adPaused) {
-                logger.debug("ad paused");
-                adTrait.play();
-            }
-            else if (paused) {
-                logger.debug("main content paused");
-                playTrait.play();
-            }
+        if(playTrait.playState == PlayState.PLAYING) {
+            playTrait.pause();
+        }
+        else {
+            playTrait.play();
         }
     }
 
@@ -84,32 +63,29 @@ public class PlayPauseButtonBase extends ButtonWidget {
         return _requiredTraits;
     }
 
-    override protected function processRequiredTraitsAvailable(element:MediaElement):void {
-        _playTrait = element.getTrait(MediaTraitType.PLAY) as PlayTrait;
-        _playTrait.addEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
-        _playTrait.addEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
-
-        _adTrait = element.getTrait(AdTraitType.AD_PLAY) as AdTrait;
-        if (_adTrait) {
-            _adTrait.addEventListener(AdEvent.AD_STATE_CHANGE, visibilityDeterminingEventHandler);
-            _adTrait.addEventListener(AdEvent.PLAY_PAUSE_CHANGE, visibilityDeterminingEventHandler);
+    override protected function onMediaElementTraitAdd(event:MediaElementEvent):void {
+        if (event.traitType == MediaTraitType.PLAY) {
+            var trait:PlayTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
+            trait.addEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
+            trait.addEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
         }
+        updateVisibility();
+    }
 
+    override protected function onMediaElementTraitRemove(event:MediaElementEvent):void {
+        if (event.traitType == MediaTraitType.PLAY) {
+            var trait:PlayTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
+            trait.removeEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
+            trait.removeEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
+        }
+        updateVisibility();
+    }
+
+    override protected function processRequiredTraitsAvailable(element:MediaElement):void {
         visibilityDeterminingEventHandler();
     }
 
     override protected function processRequiredTraitsUnavailable(element:MediaElement):void {
-        if (_playTrait) {
-            _playTrait.removeEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
-            _playTrait.removeEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
-            _playTrait = null;
-        }
-
-        if (_adTrait) {
-            _adTrait.removeEventListener(AdEvent.AD_STATE_CHANGE, visibilityDeterminingEventHandler);
-            _adTrait.removeEventListener(AdEvent.PLAY_PAUSE_CHANGE, visibilityDeterminingEventHandler);
-            _adTrait = null;
-        }
     }
 
     protected function visibilityDeterminingEventHandler(event:Event = null):void {
@@ -131,32 +107,8 @@ public class PlayPauseButtonBase extends ButtonWidget {
         return playTrait && playTrait.playState == PlayState.PLAYING;
     }
 
-    protected function get adMode():Boolean {
-        return adTrait && adTrait.adState == AdState.STARTED;
-    }
-
-    protected function get adPaused():Boolean {
-        return adTrait && adTrait.playState == AdState.PAUSED;
-    }
-
-    protected function get adPlaying():Boolean {
-        return adTrait && adTrait.playState == AdState.PLAYING;
-    }
-
     public function get playTrait():PlayTrait {
-        return _playTrait;
-    }
-
-    public function set playTrait(value:PlayTrait):void {
-        _playTrait = value;
-    }
-
-    public function get adTrait():AdTrait {
-        return _adTrait;
-    }
-
-    public function set adTrait(value:AdTrait):void {
-        _adTrait = value;
+        return media.getTrait(MediaTraitType.PLAY) as PlayTrait;
     }
 }
 }

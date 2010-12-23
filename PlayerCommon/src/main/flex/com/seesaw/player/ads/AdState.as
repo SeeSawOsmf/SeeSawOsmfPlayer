@@ -20,15 +20,12 @@
  *    Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.player.ads {
-import flash.display.DisplayObject;
+package  com.seesaw.player.ads {
 
-import org.osmf.traits.DisplayObjectTrait;
-
-public class AdProxyDisplayObjectTrait extends DisplayObjectTrait {
-    public function AdProxyDisplayObjectTrait(displayObject:DisplayObject, mediaWidth:Number = 0, mediaHeight:Number = 0) {
-        super(displayObject, mediaWidth, mediaHeight);
-    }
-
+public final class AdState {
+    public static const PLAYING:String = "playing";
+    public static const PAUSED:String = "paused";
+    public static const STOPPED:String = "stopped";
+    public static const STARTED:String = "started";
 }
 }

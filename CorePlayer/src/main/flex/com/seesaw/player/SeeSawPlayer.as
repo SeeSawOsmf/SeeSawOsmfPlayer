@@ -21,7 +21,6 @@
  */
 
 package com.seesaw.player {
-import com.seesaw.player.ads.AdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.batchEventService.BatchEventServicePlugin;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
@@ -93,8 +92,18 @@ public class SeeSawPlayer extends Sprite {
         xi = ObjectProvider.getInstance().getObject(PlayerExternalInterface);
 
         config = playerConfig;
-        playerInit = playerConfig.resource.getMetadataValue(PlayerConstants.CONTENT_INFO) as XML;
-        videoInfo = playerConfig.resource.getMetadataValue(PlayerConstants.VIDEO_INFO) as XML;
+
+        var metadata:Metadata = config.resource.getMetadataValue(PlayerConstants.METADATA_NAMESPACE) as Metadata;
+
+        playerInit = metadata.getValue(PlayerConstants.CONTENT_INFO) as XML;
+        if (playerInit == null) {
+            throw new ArgumentError("player initialisation metadata not specified");
+        }
+
+        videoInfo = metadata.getValue(PlayerConstants.VIDEO_INFO) as XML;
+        if (videoInfo == null) {
+            throw new ArgumentError("video initialisation metadata not specified");
+        }
 
         factory = config.factory;
         factory.addEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onMediaElementCreate);
@@ -122,13 +131,7 @@ public class SeeSawPlayer extends Sprite {
 
         player.media = contentElement;
 
-        var layout:LayoutMetadata = rootElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
-        if (layout == null) {
-            layout = new LayoutMetadata();
-            rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
-        }
-        layout.percentWidth = 100;
-        layout.percentHeight = 100;
+        setRootElementLayout();
 
         setContainerSize(contentWidth, contentHeight);
 
@@ -143,7 +146,7 @@ public class SeeSawPlayer extends Sprite {
             logger.debug("creating captions: " + captionUrl);
 
             var targetMetadata:Metadata = new Metadata();
-            targetMetadata.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
+            targetMetadata.addValue(PlayerConstants.CONTENT_ID, PlayerConstants.MAIN_CONTENT_ID);
             contentElement.addMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT, targetMetadata);
 
             factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
@@ -169,15 +172,13 @@ public class SeeSawPlayer extends Sprite {
         factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
         factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
-
-        if (config.resource.getMetadataValue("contentInfo").adType == config.adModuleType)
-            factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
+        // factory.loadPlugin(new PluginInfoResource(new LiverailAdProxyPluginInfo()));
 
         logger.debug("creating video element");
         contentElement = factory.createMediaElement(config.resource);
 
-        contentElement.addEventListener(MediaElementEvent.METADATA_ADD, onVideoMetadataAdd);
-        contentElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onVideoMetadataRemove);
+        contentElement.addEventListener(MediaElementEvent.METADATA_ADD, onContentMetadataAdd);
+        contentElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onContentMetadataRemove);
 
         contentElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
         contentElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
@@ -265,7 +266,7 @@ public class SeeSawPlayer extends Sprite {
                 metadata.addValue(ExternalInterfaceMetadata.LIGHTS_DOWN, true);
             }
         }
-        if (event.playState == PlayState.PAUSED && (timeTrait.currentTime != timeTrait.duration)) {
+        if (event.playState == PlayState.PAUSED && timeTrait && (timeTrait.currentTime != timeTrait.duration)) {
             if (xi.available) {
                 xi.callLightsUp();
                 metadata.addValue(ExternalInterfaceMetadata.LIGHTS_DOWN, false);
@@ -285,7 +286,7 @@ public class SeeSawPlayer extends Sprite {
         container.height = height;
     }
 
-    private function onVideoMetadataAdd(event:MediaElementEvent):void {
+    private function onContentMetadataAdd(event:MediaElementEvent):void {
         if (event.namespaceURL == ControlBarMetadata.CONTROL_BAR_METADATA) {
             var metadata:Metadata = contentElement.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
             metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
@@ -293,7 +294,7 @@ public class SeeSawPlayer extends Sprite {
         }
     }
 
-    private function onVideoMetadataRemove(event:MediaElementEvent):void {
+    private function onContentMetadataRemove(event:MediaElementEvent):void {
         if (event.namespaceURL == ControlBarMetadata.CONTROL_BAR_METADATA) {
             var metadata:Metadata = contentElement.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
             metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
@@ -326,42 +327,54 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onMediaElementCreate(event:MediaFactoryEvent):void {
-        var resource:MediaResourceBase = event.mediaElement.resource;
-
-        if (resource) {
-            var smilMetadata:Metadata = resource.getMetadataValue(SMILConstants.SMIL_METADATA_NS) as Metadata;
-
-            if (smilMetadata) {
-                var contentType:String = smilMetadata.getValue(PlayerConstants.CONTENT_TYPE) as String;
-                var mediaElement:MediaElement = event.mediaElement;
-
-                var layout:LayoutMetadata = mediaElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
-                if (layout == null) {
-                    layout = new LayoutMetadata();
-                    mediaElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
-                }
-
-                switch (contentType) {
-                    case PlayerConstants.DOG_CONTENT_ID:
-                        layout.x = 5;
-                        layout.y = 5;
-                        layout.verticalAlign = VerticalAlign.TOP;
-                        layout.horizontalAlign = HorizontalAlign.LEFT;
-                        break;
-                    case PlayerConstants.MAIN_CONTENT_ID:
-                    case PlayerConstants.STING_CONTENT_ID:
-                    case PlayerConstants.AD_CONTENT_ID:
-                        layout.percentWidth = 100;
-                        layout.percentHeight = 100;
-                        layout.verticalAlign = VerticalAlign.MIDDLE;
-                        layout.horizontalAlign = HorizontalAlign.CENTER;
-                        layout.scaleMode = ScaleMode.STRETCH;
-                        break;
-                }
-
-                mediaElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+        var mediaElement:MediaElement = event.mediaElement;
+        event.mediaElement.addEventListener(MediaElementEvent.METADATA_ADD, function(mediaElementEvent:MediaElementEvent) {
+            if (mediaElementEvent.namespaceURL == SMILConstants.SMIL_METADATA_NS) {
+                mediaElementEvent.metadata.addEventListener(MetadataEvent.VALUE_CHANGE, function(metadataEvent:MetadataEvent) {
+                    if (metadataEvent.key == PlayerConstants.CONTENT_TYPE) {
+                        setContentLayout(metadataEvent.value, mediaElement);
+                    }
+                });
             }
+        });
+    }
+
+    private function setRootElementLayout():void {
+        var layout:LayoutMetadata = rootElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
+        if (layout == null) {
+            layout = new LayoutMetadata();
+            rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
         }
+        layout.percentWidth = 100;
+        layout.percentHeight = 100;
+    }
+
+    private function setContentLayout(contentType:String, element:MediaElement):void {
+        var layout:LayoutMetadata = element.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
+        if (layout == null) {
+            layout = new LayoutMetadata();
+            element.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+        }
+
+        switch (contentType) {
+            case PlayerConstants.DOG_CONTENT_ID:
+                layout.x = 5;
+                layout.y = 5;
+                layout.verticalAlign = VerticalAlign.TOP;
+                layout.horizontalAlign = HorizontalAlign.LEFT;
+                break;
+            case PlayerConstants.MAIN_CONTENT_ID:
+            case PlayerConstants.STING_CONTENT_ID:
+            case PlayerConstants.AD_CONTENT_ID:
+                layout.width = contentWidth;
+                layout.height = contentHeight;
+                layout.verticalAlign = VerticalAlign.MIDDLE;
+                layout.horizontalAlign = HorizontalAlign.CENTER;
+                layout.scaleMode = ScaleMode.STRETCH
+                break;
+        }
+
+        element.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
     }
 
     public function get contentWidth():int {

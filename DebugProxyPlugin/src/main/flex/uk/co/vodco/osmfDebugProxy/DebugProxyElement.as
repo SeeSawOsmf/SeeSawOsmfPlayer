@@ -286,7 +286,7 @@ public class DebugProxyElement extends ProxyElement {
     }
 
     private function onSeekingChange(event:SeekEvent):void {
-        //   logger.debug("On Seek Change:{0}", event.seeking);
+          logger.debug("On Seek Change:{0}", event.seeking);
     }
 
     private function toggleTimeListeners(added:Boolean):void {

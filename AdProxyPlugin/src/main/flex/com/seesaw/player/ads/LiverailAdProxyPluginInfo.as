@@ -21,8 +21,6 @@
  */
 
 package com.seesaw.player.ads {
-import com.seesaw.player.PlayerConstants;
-
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.media.MediaElement;
@@ -30,17 +28,15 @@ import org.osmf.media.MediaFactoryItem;
 import org.osmf.media.MediaFactoryItemType;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfo;
-import org.osmf.metadata.Metadata;
 
-public class AdProxyPluginInfo extends PluginInfo {
+public class LiverailAdProxyPluginInfo extends PluginInfo {
 
-    private static var logger:ILogger = LoggerFactory.getClassLogger(AdProxyPluginInfo);
+    private static var logger:ILogger = LoggerFactory.getClassLogger(LiverailAdProxyPluginInfo);
 
-    public static const ID:String = "com.seesaw.player.ads.AdProxy";
-    private static var adProxy:AdProxy;
+    public static const ID:String = "com.seesaw.player.ads.Liverail";
 
-    public function AdProxyPluginInfo() {
-        logger.debug("AdProxyPluginInfo()");
+    public function LiverailAdProxyPluginInfo() {
+        logger.debug("LiverailAdProxyPluginInfo()");
 
         var item:MediaFactoryItem = new MediaFactoryItem(
                 ID,
@@ -51,31 +47,16 @@ public class AdProxyPluginInfo extends PluginInfo {
         var items:Vector.<MediaFactoryItem> = new Vector.<MediaFactoryItem>();
         items.push(item);
 
-        super(items, mediaElementCreationNotificationCallback);
+        super(items);
     }
 
     private static function canHandleResourceFunction(resource:MediaResourceBase):Boolean {
         logger.debug("can handle this resource: " + resource);
-        var result:Boolean;
-
-        if (resource != null) {
-            var settings:Metadata = resource.getMetadataValue(PlayerConstants.CONTENT_ID) as Metadata;
-            result = settings != null;
-        }
-
-        return result;
+        return resource && resource.getMetadataValue(LiverailConstants.SETTINGS_NAMESPACE) != null;
     }
 
     private static function mediaElementCreationFunction():MediaElement {
-        logger.debug("constructing proxy element");
-
-        adProxy = new AdProxy();
-
-        return adProxy;
-    }
-
-    private function mediaElementCreationNotificationCallback(target:MediaElement):void {
-        logger.debug("mediaElementCreationNotificationCallback: " + target);
+        return new LiverailAdProxy();
     }
 }
 }

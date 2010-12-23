@@ -20,9 +20,8 @@
  * Incorporated. All Rights Reserved.
  */
 
-package org.osmf.smil {
-public class SMILConstants {
-    public static const SMIL_METADATA_NS = "http://www.w3.org/ns/SMIL";
-    public static const SMIL_DOCUMENT:String = "smilDocument";
+package com.seesaw.player.preventscrub {
+public class ScrubPreventionConstants {
+    public static const SETTINGS_NAMESPACE:String = "http://www.seesaw.com/player/scrubprevention/settings";
 }
 }

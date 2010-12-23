@@ -21,8 +21,6 @@
  */
 
 package com.seesaw.player.autoresume {
-import com.seesaw.player.PlayerConstants;
-
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.media.MediaElement;
@@ -30,17 +28,14 @@ import org.osmf.media.MediaFactoryItem;
 import org.osmf.media.MediaFactoryItemType;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfo;
-import org.osmf.metadata.Metadata;
 
 public class AutoResumeProxyPluginInfo extends PluginInfo {
 
     private static var logger:ILogger = LoggerFactory.getClassLogger(AutoResumeProxyPluginInfo);
 
     public static const ID:String = "com.seesaw.player.autoresume.AutoResumeProxy";
-    private static var _proxy:AutoResumeProxy;
 
     public function AutoResumeProxyPluginInfo() {
-
         var item:MediaFactoryItem = new MediaFactoryItem(
                 ID,
                 canHandleResourceFunction,
@@ -54,21 +49,13 @@ public class AutoResumeProxyPluginInfo extends PluginInfo {
     }
 
     private static function canHandleResourceFunction(resource:MediaResourceBase):Boolean {
-        var result:Boolean;
-
-        if (resource != null) {
-            var settings:Metadata = resource.getMetadataValue(PlayerConstants.CONTENT_ID) as Metadata;
-            result = settings != null;
-        }
-
-        logger.debug("can handle this resource: {0} {1}", resource, result);
-        return result;
+        logger.debug("can handle this resource: " + resource);
+        return resource && resource.getMetadataValue(AutoResumeConstants.SETTINGS_NAMESPACE) != null;
     }
 
     private static function mediaElementCreationFunction():MediaElement {
         logger.debug("constructing proxy element");
-        _proxy = new AutoResumeProxy();
-        return _proxy;
+        return new AutoResumeProxy();
     }
 }
 }

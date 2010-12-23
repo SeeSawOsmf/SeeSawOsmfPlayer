@@ -21,40 +21,34 @@
  */
 package org.osmf.smil.media
 {
-	import org.osmf.elements.CompositeElement;
-	import org.osmf.elements.DurationElement;
-	import org.osmf.elements.ParallelElement;
-	import org.osmf.elements.ProxyElement;
-	import org.osmf.elements.SerialElement;
-	import org.osmf.elements.VideoElement;
-import org.osmf.events.LoadEvent;
-import org.osmf.events.MediaElementEvent;
+import org.osmf.elements.CompositeElement;
+import org.osmf.elements.DurationElement;
+import org.osmf.elements.ParallelElement;
+import org.osmf.elements.ProxyElement;
+import org.osmf.elements.SerialElement;
+import org.osmf.elements.VideoElement;
 import org.osmf.media.MediaElement;
-	import org.osmf.media.MediaFactory;
-	import org.osmf.media.MediaResourceBase;
-	import org.osmf.media.MediaType;
-	import org.osmf.media.URLResource;
+import org.osmf.media.MediaFactory;
+import org.osmf.media.MediaResourceBase;
+import org.osmf.media.MediaType;
+import org.osmf.media.URLResource;
 import org.osmf.metadata.Metadata;
 import org.osmf.net.DynamicStreamingItem;
-	import org.osmf.net.DynamicStreamingResource;
-	import org.osmf.net.StreamType;
-	import org.osmf.net.StreamingURLResource;
+import org.osmf.net.DynamicStreamingResource;
+import org.osmf.net.StreamType;
+import org.osmf.net.StreamingURLResource;
 import org.osmf.smil.SMILConstants;
-import org.osmf.smil.SMILPluginInfo;
 import org.osmf.smil.model.SMILDocument;
-	import org.osmf.smil.model.SMILElement;
-	import org.osmf.smil.model.SMILElementType;
-	import org.osmf.smil.model.SMILMediaElement;
-	import org.osmf.smil.model.SMILMetaElement;
-import org.osmf.traits.LoadState;
-import org.osmf.traits.LoadTrait;
-import org.osmf.traits.MediaTraitType;
+import org.osmf.smil.model.SMILElement;
+import org.osmf.smil.model.SMILElementType;
+import org.osmf.smil.model.SMILMediaElement;
+import org.osmf.smil.model.SMILMetaElement;
 
 CONFIG::LOGGING
 	{
-	import org.osmf.logging.Logger;
-	import org.osmf.logging.Log;
-	}
+    import org.osmf.logging.Log;
+    import org.osmf.logging.Logger;
+}
 
 	/**
 	 * A utility class for creating MediaElements from a <code>SMILDocument</code>.
@@ -117,10 +111,12 @@ CONFIG::LOGGING
 					var resource:StreamingURLResource = new StreamingURLResource((smilElement as SMILMediaElement).src);
 					resource.mediaType = MediaType.VIDEO;
 
-                    populateMetdataFromResource(originalResource, resource);
-                    populateMetadataFromSMIL(resource, smilElement);
+                   // populateMetdataFromResource(originalResource, resource);
 
 					var videoElement:MediaElement = factory.createMediaElement(resource);
+
+                    populateMetadataFromSMIL(videoElement, smilElement);
+
 					var smilVideoElement:SMILMediaElement = smilElement as SMILMediaElement;
 
 					if (!isNaN(smilVideoElement.clipBegin) && smilVideoElement.clipBegin > 0 &&
@@ -160,9 +156,11 @@ CONFIG::LOGGING
 					imageResource.mediaType = MediaType.IMAGE;
 
                     populateMetdataFromResource(originalResource, imageResource);
-                    populateMetadataFromSMIL(imageResource, smilElement);
 
 					var imageElement:MediaElement = factory.createMediaElement(imageResource);
+
+                    populateMetadataFromSMIL(imageElement, smilElement);
+
                     var dur:Number = (smilElement as SMILMediaElement).duration;
                     if (!isNaN(dur) && dur > 0)
 					{
@@ -176,9 +174,10 @@ CONFIG::LOGGING
 					audioResource.mediaType = MediaType.AUDIO;
 
                     populateMetdataFromResource(originalResource, audioResource);
-                    populateMetadataFromSMIL(audioResource, smilElement);
 
 					var audioElement:MediaElement = factory.createMediaElement(audioResource);
+
+                    populateMetadataFromSMIL(audioElement, smilElement);
 
 					(parentMediaElement as CompositeElement).addChild(audioElement);
 					break;
@@ -200,10 +199,12 @@ CONFIG::LOGGING
 			}
 			else if (mediaResource != null)
 			{
-                populateMetdataFromResource(originalResource, mediaResource);
-                populateMetadataFromSMIL(mediaResource, smilElement);
+                // populateMetdataFromResource(originalResource, mediaResource);
+                mediaResource.mediaType = MediaType.VIDEO;
 
 				mediaElement = factory.createMediaElement(mediaResource);
+
+                populateMetadataFromSMIL(mediaElement, smilElement);
 
 				if (parentMediaElement is CompositeElement)
 				{
@@ -221,23 +222,14 @@ CONFIG::LOGGING
                 var metadata:Object = originalResource.getMetadataValue(metadataNS);
                 mediaResource.addMetadataValue(metadataNS, metadata);
             }
-
-            // Shuffle some metadata so that it triggers proxies on the created elements
-            var proxyTriggerKey:String = originalResource.getMetadataValue(SMILConstants.PROXY_TRIGGER_METADATA_KEY) as String;
-            var proxyTriggerValue:Object = originalResource.getMetadataValue(SMILConstants.PROXY_TRIGGER_METADATA_VALUE) as Object;
-
-            if(proxyTriggerKey && proxyTriggerValue)
-            {
-                mediaResource.addMetadataValue(proxyTriggerKey, proxyTriggerValue);
-            }
         }
 
-        private function populateMetadataFromSMIL(resource:MediaResourceBase, smilElement:SMILElement):void {
-            var metadata:Metadata = resource.getMetadataValue(SMILConstants.SMIL_METADATA_NS) as Metadata;
+        private function populateMetadataFromSMIL(media:MediaElement, smilElement:SMILElement):void {
+            var metadata:Metadata = media.getMetadata(SMILConstants.SMIL_METADATA_NS) as Metadata;
             if (metadata == null)
             {
                 metadata = new Metadata();
-                resource.addMetadataValue(SMILConstants.SMIL_METADATA_NS, metadata);
+                media.addMetadata(SMILConstants.SMIL_METADATA_NS, metadata);
             }
 
             for(var i:uint = 0; i < smilElement.numChildren; i++)
@@ -363,7 +355,7 @@ CONFIG::LOGGING
 
 		CONFIG::LOGGING
 		{
-			private static const logger:Logger = org.osmf.logging.Log.getLogger("org.osmf.smil.media.SMILMediaGenerator");
+			private static const logger:Logger = Log.getLogger("org.osmf.smil.media.SMILMediaGenerator");
 		}
 
 		private var factory:MediaFactory;

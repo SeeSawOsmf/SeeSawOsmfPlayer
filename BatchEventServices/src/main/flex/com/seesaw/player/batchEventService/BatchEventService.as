@@ -1,49 +1,48 @@
 package com.seesaw.player.batchEventService {
+import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.batchEventService.events.BatchEvent;
 import com.seesaw.player.batchEventService.events.ContentEvent;
+import com.seesaw.player.batchEventService.events.CumulativeViewEvent;
+import com.seesaw.player.batchEventService.events.EventTypes;
+import com.seesaw.player.batchEventService.events.UserEvent;
 import com.seesaw.player.batchEventService.events.ViewEvent;
 import com.seesaw.player.batchEventService.services.HTTPServiceRequest;
 import com.seesaw.player.namespaces.contentinfo;
 
+import flash.events.Event;
+
+import mx.rpc.events.FaultEvent;
+import mx.rpc.events.ResultEvent;
+
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ProxyElement;
-import org.osmf.events.MediaElementEvent;
-import org.osmf.events.MetadataEvent;
-import org.osmf.events.PlayEvent;
-import org.osmf.events.SeekEvent;
-import org.osmf.events.TimeEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.metadata.Metadata;
-import org.osmf.traits.MediaTraitType;
-import org.osmf.traits.PlayState;
-import org.osmf.traits.PlayTrait;
-import org.osmf.traits.SeekTrait;
-import org.osmf.traits.TimeTrait;
 
 public class BatchEventService extends ProxyElement {
 
     use namespace contentinfo;
-    
+
     private var logger:ILogger = LoggerFactory.getClassLogger(BatchEventService);
 
-    private var seekTrait:SeekTrait;
-    private var playTrait:PlayTrait;
-    private var timeTrait:TimeTrait;
-    private var seeking:Boolean;
-    private var seekTime:Number;
 
+    private var userEvent:UserEvent;
     private var viewEvent:ViewEvent;
     private var contentEvent:ContentEvent;
+    private var cumulativeViewEvent:CumulativeViewEvent;
+
     private var batchEvent:BatchEvent;
     private var service:HTTPServiceRequest;
     private var batchContainer:Object;
     private var destinationURL:String;
-    
+
     private var viewId:int;
     private var transactionItemId:int;
     private var serverTimeStamp:int;
     private var mainAssetId:int;
+    private var sectionCount:int;
+
 
     public function BatchEventService(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -53,109 +52,65 @@ public class BatchEventService extends ProxyElement {
         if (proxiedElement) {
             super.proxiedElement = proxiedElement;
 
-            proxiedElement.removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
-            proxiedElement.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
+            contentEvent = new ContentEvent();
+            userEvent = new UserEvent();
+            cumulativeViewEvent = new CumulativeViewEvent();
+            batchEvent = new BatchEvent();
 
-            proxiedElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
-            proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
 
-           var metadata:Metadata = getMetadata("http://www.seesaw.com/api/contentinfo/v1.0");
+            var infoData:Metadata = resource.getMetadataValue(PlayerConstants.METADATA_NAMESPACE) as Metadata;
 
-           var infoData:XML = resource.getMetadataValue("videoInfo") as XML;
-              
+            if (infoData) {
 
-            viewId =  infoData.viewId
-            transactionItemId =   infoData.transactionItemId;
-            serverTimeStamp =   infoData.serverTimeStamp;
-            mainAssetId =     infoData.mainAssetID;
-            destinationURL =   infoData.batchEventService;
+                //// viewId = userEvent.viewId = contentEvent.viewId = infoData.getValue("videoInfo").viewId;
+                var newINT:Number =  int(new Date());
+                viewId = userEvent.viewId = contentEvent.viewId = newINT;
 
-            
-          // metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onMetadataChange);
-          //  metadata.addEventListener(MetadataEvent.VALUE_ADD, onMetadataChange);
 
-       //     var settings:Metadata = resource.getMetadataValue(PlayerConstants.CONTENT_ID) as Metadata;
+                transactionItemId = infoData.getValue("videoInfo").transactionItemId;
+                serverTimeStamp = infoData.getValue("videoInfo").serverTimeStamp;
+                mainAssetId = infoData.getValue("videoInfo").mainAssetID;
+                destinationURL = infoData.getValue("contentInfo").batchEventService;
+                sectionCount = infoData.getValue("videoInfo").sectionCount;
 
-       //    trace( settings );
+                userEvent.proxiedElement = proxiedElement;
+                contentEvent.proxiedElement = proxiedElement;
+                contentEvent.addEventListener(EventTypes.USER_EVENT_FIRED, updateContentUserEvtCount)
+                /*cumulativeViewEvent*/
+
+                viewEvent = new ViewEvent(viewId, transactionItemId, serverTimeStamp, sectionCount, mainAssetId);
+                viewEvent.proxiedElement = proxiedElement;
+                viewEvent.addEventListener(EventTypes.FIRE_VIEW_EVENT, fireView);
+            }
+
         }
     }
 
-    private function onMetadataChange(event:MetadataEvent):void {
-          if (event.key == "adMap" && (event.value >=0 ))
-          {
-            viewEvent = new ViewEvent(viewId, transactionItemId, serverTimeStamp, event.value, mainAssetId );
-
-         //   contentEvent = new ContentEvent();
-     //   batchEvent = new BatchEvent();
-     //   service = new HTTPServiceRequest(batchContainer, destinationURL, null, null, null);
-     /*   event.key
-        event.value*/
-        }
-    }
-
-    private function onDurationChange(event:TimeEvent):void {
-       
-    }
-
-    private function onSeekingChange(event:SeekEvent):void {
-        seeking = event.seeking;
-        seekTime = event.time;
-    }
-
-    private function onComplete(event:TimeEvent):void {
-       
-    }
-
-    private function onPlayStateChanged(event:PlayEvent):void {
-        switch (event.playState) {
-            case PlayState.PAUSED:
-              
-
-                break;
-            case PlayState.PLAYING:
-                logger.debug("playing");
-                break;
-            case PlayState.STOPPED:
-              
-                break;
-        }
+    private function updateContentUserEvtCount(event:Event):void {
+        contentEvent.userEventCounter++;
     }
 
 
-
-    private function onTraitAdd(event:MediaElementEvent):void {
-        updateTraitListeners(event.traitType, true);
+    private function fireView(event:Event):void {
+        batchContainer = [viewEvent];
+        service = new HTTPServiceRequest(batchContainer, destinationURL, onSuccess, onFailed, false);
+        viewEvent.removeEventListener(EventTypes.FIRE_VIEW_EVENT, fireView);
+        viewEvent = null;
+        batchContainer = [];
     }
 
-    private function onTraitRemove(event:MediaElementEvent):void {
-        updateTraitListeners(event.traitType, false);
+    private function fireService(event:Event):void {
+        batchContainer = [viewEvent, userEvent.storedEvents, contentEvent.storedEvents];
+        service = new HTTPServiceRequest(batchContainer, destinationURL, onSuccess, onFailed, false);
+        batchContainer = [];
     }
 
-    private function updateTraitListeners(traitType:String, add:Boolean):void {
-        switch (traitType) {
-            case MediaTraitType.SEEK:
-                changeListeners(add, traitType, SeekEvent.SEEKING_CHANGE, onSeekingChange);
-                seekTrait = getTrait(MediaTraitType.SEEK) as SeekTrait;
-                break;
-            case MediaTraitType.PLAY:
-                changeListeners(add, traitType, PlayEvent.PLAY_STATE_CHANGE, onPlayStateChanged);
-                playTrait = getTrait(MediaTraitType.PLAY) as PlayTrait;
-                break;
-            case MediaTraitType.TIME:
-                changeListeners(add, traitType, TimeEvent.COMPLETE, onComplete);
-                changeListeners(add, traitType, TimeEvent.DURATION_CHANGE, onDurationChange);
-                timeTrait = getTrait(MediaTraitType.TIME) as TimeTrait;
-                break;
-        }
+    private function onSuccess(event:ResultEvent):void {
+        trace("success");
     }
 
-    private function changeListeners(add:Boolean, traitType:String, event:String, listener:Function):void {
-        if (add) {
-            getTrait(traitType).addEventListener(event, listener);
-        }
-        else if (hasTrait(traitType)) {
-            getTrait(traitType).removeEventListener(event, listener);
-        }
+    private function onFailed(event:FaultEvent):void {
+        trace("success");
     }
 }
 }
