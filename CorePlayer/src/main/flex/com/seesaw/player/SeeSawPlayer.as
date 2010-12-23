@@ -21,6 +21,7 @@
  */
 
 package com.seesaw.player {
+import com.seesaw.player.ads.LiverailAdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.batchEventService.BatchEventServicePlugin;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;

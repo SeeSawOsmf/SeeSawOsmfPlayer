@@ -49,6 +49,7 @@ import org.osmf.net.NetLoader;
 import org.osmf.net.StreamingURLResource;
 import org.osmf.traits.LoadTrait;
 import org.osmf.traits.MediaTraitType;
+import org.osmf.traits.PlayState;
 import org.osmf.traits.PlayTrait;
 import org.osmf.traits.SeekTrait;
 import org.osmf.traits.TimeTrait;
@@ -312,9 +313,9 @@ public class PlaylistlElement extends ProxyElement {
 
     private function playPauseEventHandler(event:AdEvent):void {
         if (_adTrait && _adTrait.adState == AdState.STARTED) {
-            if (_adTrait.playState == AdState.PLAYING) {
+            if (_adTrait.playState == PlayState.PLAYING) {
                 //     play();
-            } else if (_adTrait.playState == AdState.PAUSED) {
+            } else if (_adTrait.playState == PlayState.PAUSED) {
                 //    pause();
             }
             else {
