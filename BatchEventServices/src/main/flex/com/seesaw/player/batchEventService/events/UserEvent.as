@@ -28,6 +28,7 @@ public class UserEvent extends EventDispatcher {
     private var timeTrait:TimeTrait;
     private var seeking:Boolean;
     private var seekTime:Number;
+    private var culmulativeViewDuration:int;
 
     
     public function UserEvent() {
@@ -35,12 +36,12 @@ public class UserEvent extends EventDispatcher {
     }
 
 
-    private function addEvent() {
+    private function addEvent(eventType:String) {
 
         _userEventCounter++;
         dispatchEvent(new Event(EventTypes.USER_EVENT_FIRED));
         
-        userEventMap = new UserEventMap();
+        userEventMap = new UserEventMap(culmulativeViewDuration , eventType,  userEventCounter);
         _storedEvents.push(userEventMap);
 
         if (_storedEvents.length >= 10) {
