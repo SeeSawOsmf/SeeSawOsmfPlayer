@@ -35,18 +35,21 @@ public class BatchEventServicePlugin extends PluginInfo {
     private static function canHandleResourceFunction(resource:MediaResourceBase):Boolean {
         logger.debug("can handle this resource: " + resource);
         var result:Boolean;
+       
 
         if (resource != null) {
-            var settings:Metadata = resource.getMetadataValue(PlayerConstants.CONTENT_ID) as Metadata;
+            var settings:Metadata = resource.getMetadataValue(PlayerConstants.SMIL_METADATA_NS) as Metadata;
             result = settings != null;
         }
 
         return result;
+    ////     return resource && resource.getMetadataValue(PlayerConstants.SMIL_METADATA_NS) != null && resource.mediaType == MediaType.VIDEO;
     }
 
     private static function mediaElementCreationFunction():MediaElement {
         logger.debug("constructing proxy element");
 
+       // if(!batchEventService)
         batchEventService = new BatchEventService();
 
         return batchEventService;

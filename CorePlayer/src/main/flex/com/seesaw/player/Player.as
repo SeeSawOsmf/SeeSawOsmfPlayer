@@ -40,7 +40,6 @@ import com.seesaw.player.panels.ParentalControlsPanel;
 import com.seesaw.player.panels.PosterFrame;
 import com.seesaw.player.preloader.Preloader;
 import com.seesaw.player.preventscrub.ScrubPreventionConstants;
-import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
 import com.seesaw.player.services.ResumeService;
 
 import flash.display.LoaderInfo;

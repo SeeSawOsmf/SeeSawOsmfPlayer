@@ -21,40 +21,34 @@
  */
 package org.osmf.smil.media
 {
-	import org.osmf.elements.CompositeElement;
-	import org.osmf.elements.DurationElement;
-	import org.osmf.elements.ParallelElement;
-	import org.osmf.elements.ProxyElement;
-	import org.osmf.elements.SerialElement;
-	import org.osmf.elements.VideoElement;
-import org.osmf.events.LoadEvent;
-import org.osmf.events.MediaElementEvent;
+import org.osmf.elements.CompositeElement;
+import org.osmf.elements.DurationElement;
+import org.osmf.elements.ParallelElement;
+import org.osmf.elements.ProxyElement;
+import org.osmf.elements.SerialElement;
+import org.osmf.elements.VideoElement;
 import org.osmf.media.MediaElement;
-	import org.osmf.media.MediaFactory;
-	import org.osmf.media.MediaResourceBase;
-	import org.osmf.media.MediaType;
-	import org.osmf.media.URLResource;
+import org.osmf.media.MediaFactory;
+import org.osmf.media.MediaResourceBase;
+import org.osmf.media.MediaType;
+import org.osmf.media.URLResource;
 import org.osmf.metadata.Metadata;
 import org.osmf.net.DynamicStreamingItem;
-	import org.osmf.net.DynamicStreamingResource;
-	import org.osmf.net.StreamType;
-	import org.osmf.net.StreamingURLResource;
+import org.osmf.net.DynamicStreamingResource;
+import org.osmf.net.StreamType;
+import org.osmf.net.StreamingURLResource;
 import org.osmf.smil.SMILConstants;
-import org.osmf.smil.SMILPluginInfo;
 import org.osmf.smil.model.SMILDocument;
-	import org.osmf.smil.model.SMILElement;
-	import org.osmf.smil.model.SMILElementType;
-	import org.osmf.smil.model.SMILMediaElement;
-	import org.osmf.smil.model.SMILMetaElement;
-import org.osmf.traits.LoadState;
-import org.osmf.traits.LoadTrait;
-import org.osmf.traits.MediaTraitType;
+import org.osmf.smil.model.SMILElement;
+import org.osmf.smil.model.SMILElementType;
+import org.osmf.smil.model.SMILMediaElement;
+import org.osmf.smil.model.SMILMetaElement;
 
 CONFIG::LOGGING
 	{
-	import org.osmf.logging.Logger;
-	import org.osmf.logging.Log;
-	}
+    import org.osmf.logging.Log;
+    import org.osmf.logging.Logger;
+}
 
 	/**
 	 * A utility class for creating MediaElements from a <code>SMILDocument</code>.
@@ -354,7 +348,7 @@ CONFIG::LOGGING
 
 		CONFIG::LOGGING
 		{
-			private static const logger:Logger = org.osmf.logging.Log.getLogger("org.osmf.smil.media.SMILMediaGenerator");
+			private static const logger:Logger = Log.getLogger("org.osmf.smil.media.SMILMediaGenerator");
 		}
 
 		private var factory:MediaFactory;

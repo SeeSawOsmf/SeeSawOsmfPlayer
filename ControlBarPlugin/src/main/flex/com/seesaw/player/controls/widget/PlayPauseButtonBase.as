@@ -20,12 +20,6 @@
  *    Incorporated. All Rights Reserved.
  */
 package com.seesaw.player.controls.widget {
-import com.seesaw.player.ads.AdState;
-import com.seesaw.player.events.AdEvent;
-import com.seesaw.player.traits.ads.AdPlayTrait;
-import com.seesaw.player.traits.ads.AdTrait;
-import com.seesaw.player.traits.ads.AdTraitType;
-
 import flash.events.Event;
 import flash.external.ExternalInterface;
 

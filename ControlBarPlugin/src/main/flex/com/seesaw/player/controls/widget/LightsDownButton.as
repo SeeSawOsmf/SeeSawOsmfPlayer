@@ -21,8 +21,8 @@
  */
 
 package com.seesaw.player.controls.widget {
-import com.seesaw.player.controls.ControlBarMetadata;
 import com.seesaw.player.external.ExternalInterfaceMetadata;
+import com.seesaw.player.external.PlayerExternalInterface;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.ui.PlayerToolTip;
 import com.seesaw.player.ui.StyledTextField;
@@ -38,17 +38,10 @@ import flash.text.TextFormat;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.chrome.widgets.ButtonWidget;
-import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MetadataEvent;
 import org.osmf.media.MediaElement;
-import org.osmf.metadata.CuePoint;
 import org.osmf.metadata.Metadata;
-import org.osmf.metadata.TimelineMetadata;
-import com.seesaw.player.external.PlayerExternalInterface;
-import com.seesaw.player.external.PlayerExternalInterfaceImpl;
 import org.osmf.traits.MediaTraitType;
-import org.osmf.traits.PlayState;
-import org.osmf.traits.TimeTrait;
 
 public class LightsDownButton extends ButtonWidget implements IWidget {
 
