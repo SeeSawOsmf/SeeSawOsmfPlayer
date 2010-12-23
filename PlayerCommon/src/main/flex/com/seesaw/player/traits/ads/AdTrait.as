@@ -73,7 +73,7 @@ public class AdTrait extends MediaTraitBase {
     }
 
     public function started():void {
-        _playState = AdState.PLAYING;
+        // _playState = AdState.PLAYING;
         adState = AdState.STARTED;
     }
 
@@ -88,11 +88,11 @@ public class AdTrait extends MediaTraitBase {
     }
 
     public function play():void {
-        playState = AdState.PLAYING;
+       // playState = AdState.PLAYING;
     }
 
     public function pause():void {
-        playState = AdState.PAUSED;
+       // playState = AdState.PAUSED;
     }
 }
 }

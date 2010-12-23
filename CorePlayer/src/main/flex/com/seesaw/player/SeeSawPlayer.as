@@ -109,6 +109,8 @@ public class SeeSawPlayer extends Sprite {
         factory.addEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onMediaElementCreate);
 
         player = new MediaPlayer();
+//        player.autoPlay = false;
+        
         rootElement = new ParallelElement();
         container = new MediaContainer();
 

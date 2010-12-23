@@ -60,7 +60,6 @@ public class LiverailAdProxy extends ProxyElement {
     private var liverailConfig:LiverailConfiguration;
     private var resumePosition:int;
 
-    private var adMetadata:AdMetadata;
     private var timer:Timer;
 
     private var adTimeTrait:AdTimeTrait;
@@ -106,7 +105,8 @@ public class LiverailAdProxy extends ProxyElement {
             liverailConfig = getSetting(LiverailConstants.CONFIG_OBJECT) as LiverailConfiguration;
             resumePosition = getSetting(LiverailConstants.RESUME_POSITION) as int;
 
-            adMarkers = liverailConfig.adPositions;
+            // block these until the liverail events kick in
+            setTraitsToBlock(MediaTraitType.PLAY, MediaTraitType.TIME);
 
             // After calling initAds(config), the main video player’s controls should be disabled and any requests to
             // play a movie should be cancelled or delayed until the initComplete (or the initError) event is received
@@ -115,20 +115,11 @@ public class LiverailAdProxy extends ProxyElement {
             // This ensures that pre-roll ads are handled properly.
             adManager.initAds(liverailConfig.config);
 
-            setTraitsToBlock(MediaTraitType.PLAY, MediaTraitType.TIME);
-
             // triggers the original load trait
             removeTrait(MediaTraitType.LOAD);
         }
         else if (event.loadState == LoadState.LOAD_ERROR) {
             removeTrait(MediaTraitType.LOAD);
-        }
-    }
-
-    private function onLoadStateChange(event:LoadEvent):void {
-        logger.debug("onLoadStateChange: " + event.loadState);
-        if (event.loadState == LoadState.READY) {
-
         }
     }
 
@@ -139,12 +130,6 @@ public class LiverailAdProxy extends ProxyElement {
 
             proxiedElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
             proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
-
-            adMetadata = getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
-            if (adMetadata == null) {
-                adMetadata = new AdMetadata();
-                addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
-            }
         }
     }
 
@@ -237,6 +222,8 @@ public class LiverailAdProxy extends ProxyElement {
         }
 
         adMetadata.adBreaks = metadataAdBreaks;
+
+        play();
     }
 
     private function onLiveRailInitError(ev:Object):void {
@@ -251,11 +238,7 @@ public class LiverailAdProxy extends ProxyElement {
     }
 
     private function onLiverailAdProgress(event:Object):void {
-        // logger.debug("onLiverailAdProgress: time = {0}, duration = {1}", event.data.time, event.data.duration);
-        if (adTimeTrait == null) {
-            adTimeTrait = new AdTimeTrait(event.data.duration);
-            addTrait(MediaTraitType.TIME, adTimeTrait);
-        }
+        adTimeTrait.adDuration = event.data.duration;
         adTimeTrait.adTime = event.data.time;
     }
 
@@ -266,10 +249,8 @@ public class LiverailAdProxy extends ProxyElement {
 
     private function onLiveRailAdEnd(event:Event):void {
         logger.debug("onLiveRailAdEnd");
-        if (adTimeTrait) {
-            removeTrait(MediaTraitType.TIME);
-            adTimeTrait = null;
-        }
+        adTimeTrait.adDuration = 0;
+        adTimeTrait.adTime = 0;
     }
 
     private function onLiveRailPrerollComplete(event:Event):void {
@@ -280,7 +261,10 @@ public class LiverailAdProxy extends ProxyElement {
 
     private function adbreakStart(event:Object):void {
         logger.debug("adbreakStart");
-        setTraitsToBlock(MediaTraitType.SEEK, MediaTraitType.BUFFER);
+
+        adMetadata.adState = AdState.STARTED;
+
+        setTraitsToBlock(MediaTraitType.SEEK);
         pause();
 
         // mask the existing play trait so we get the play state changes here
@@ -290,6 +274,9 @@ public class LiverailAdProxy extends ProxyElement {
 
         // add a display trait that will display the ads
         addTrait(MediaTraitType.DISPLAY_OBJECT, new DisplayObjectTrait(adManager));
+
+        adTimeTrait = new AdTimeTrait();
+        addTrait(MediaTraitType.TIME, adTimeTrait);
     }
 
     private function adbreakComplete(event:Object):void {
@@ -298,6 +285,9 @@ public class LiverailAdProxy extends ProxyElement {
         removeTrait(MediaTraitType.DISPLAY_OBJECT);
         removeTrait(MediaTraitType.TIME);
         adTimeTrait = null;
+
+        adMetadata.adState = AdState.STOPPED;
+
         setTraitsToBlock();
         play();
     }
@@ -307,7 +297,6 @@ public class LiverailAdProxy extends ProxyElement {
     }
 
     private function onContentUpdate(time:Number, duration:Number):void {
-        // logger.debug("content update: time = {0}, duration = {1}", time, duration);
         adManager.onContentUpdate(time, duration);
     }
 
@@ -331,12 +320,6 @@ public class LiverailAdProxy extends ProxyElement {
         return metadata ? metadata.getValue(key) : null;
     }
 
-    private function set adMarkers(adMarkers:Array):void {
-        if (adMetadata) {
-            adMetadata.adMarkers = adMarkers;
-        }
-    }
-
     private function setTraitsToBlock(...traitTypes):void {
         var traitsToBlock:Vector.<String> = new Vector.<String>();
         for (var i:int = 0; i < traitTypes.length; i++) {
@@ -345,21 +328,29 @@ public class LiverailAdProxy extends ProxyElement {
         blockedTraits = traitsToBlock;
     }
 
-
     private function pause() {
         var playTrait:PlayTrait = getTrait(MediaTraitType.PLAY) as PlayTrait;
-        if (hasTrait(MediaTraitType.PLAY)) {
+        if (playTrait) {
+            // pauses the main content or the ads depending on the current adtrait
             playTrait.pause();
+        }
+    }
+
+    private function stop() {
+        var playTrait:PlayTrait = getTrait(MediaTraitType.PLAY) as PlayTrait;
+        if (playTrait) {
+            // stops the main content - no affect on liverail
+            playTrait.stop();
         }
     }
 
     private function play() {
         var playTrait:PlayTrait = getTrait(MediaTraitType.PLAY) as PlayTrait;
-        if (hasTrait(MediaTraitType.PLAY)) {
+        if (playTrait) {
+            // plays the main content or the ads depending on the current adtrait
             playTrait.play();
         }
     }
-
 
     private function onTraitAdd(event:MediaElementEvent):void {
         var target = event.target as MediaElement;
@@ -375,9 +366,6 @@ public class LiverailAdProxy extends ProxyElement {
         switch (traitType) {
             case MediaTraitType.PLAY:
                 changeListeners(element, add, traitType, PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
-                break;
-            case MediaTraitType.LOAD:
-                changeListeners(element, add, traitType, LoadEvent.LOAD_STATE_CHANGE, onLoadStateChange);
                 break;
             case MediaTraitType.AUDIO:
                 changeListeners(element, add, traitType, AudioEvent.VOLUME_CHANGE, onVolumeChange);
@@ -396,6 +384,15 @@ public class LiverailAdProxy extends ProxyElement {
         else if (element.hasTrait(traitType)) {
             element.getTrait(traitType).removeEventListener(event, listener);
         }
+    }
+
+    private function get adMetadata():AdMetadata {
+        var adMetadata:AdMetadata = getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+        if (adMetadata == null) {
+            adMetadata = new AdMetadata();
+            addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
+        }
+        return adMetadata;
     }
 
 }

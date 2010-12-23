@@ -27,23 +27,14 @@ public class AdMetadata extends Metadata {
 
     public static const AD_NAMESPACE:String = "http://www.seesaw.com/player/ads/1.0";
     public static const AD_STATE:String = "adState";
-    public static const AD_MARKERS:String = "adMarkers";
     public static const AD_BREAKS:String = "adBreaks";
 
     public function get adState():String {
         return getValue(AdMetadata.AD_STATE);
     }
 
-    public function get adMarkers():Array {
-        return getValue(AdMetadata.AD_MARKERS) as Array;
-    }
-
     public function set adState(adState:String):void {
         addValue(AdMetadata.AD_STATE, adState);
-    }
-
-    public function set adMarkers(adMarkers:Array):void {
-        addValue(AdMetadata.AD_MARKERS, adMarkers);
     }
 
     public function get adBreaks():Vector.<AdBreak> {
@@ -51,11 +42,11 @@ public class AdMetadata extends Metadata {
     }
 
     public function set adBreaks(adBreaks:Vector.<AdBreak>):void {
-        addValue(AdMetadata.AD_BREAKS, adMarkers);
+        addValue(AdMetadata.AD_BREAKS, adBreaks);
     }
 
     public function get adMode():Boolean {
-        return adState != AdState.STOPPED;  
+        return adState != AdState.STOPPED;
     }
 }
 }
