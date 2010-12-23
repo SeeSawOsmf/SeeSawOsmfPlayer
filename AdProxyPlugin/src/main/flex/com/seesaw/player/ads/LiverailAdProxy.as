@@ -37,11 +37,11 @@ import org.osmf.events.AudioEvent;
 import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.PlayEvent;
+import org.osmf.events.TimeEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.URLResource;
 import org.osmf.metadata.Metadata;
-import org.osmf.traits.AudioTrait;
 import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.LoadState;
 import org.osmf.traits.LoadTrait;
@@ -68,6 +68,8 @@ public class LiverailAdProxy extends ProxyElement {
     public function LiverailAdProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
         Security.allowDomain("vox-static.liverail.com");
+        timer = new Timer(CONTENT_UPDATE_INTERVAL);
+        timer.addEventListener(TimerEvent.TIMER, onTimerTick);
     }
 
     override public function set resource(value:MediaResourceBase):void {
@@ -86,10 +88,36 @@ public class LiverailAdProxy extends ProxyElement {
     }
 
     private function onLiverailLoadStateChange(event:LoadEvent):void {
+        logger.debug("onLiverailLoadStateChange: " + event.loadState);
         var loadTrait:LiverailLoadTrait = getTrait(MediaTraitType.LOAD) as LiverailLoadTrait;
         if (event.loadState == LoadState.READY) {
             adManager = loadTrait.adManager;
-            setupAdManager();
+            adManager.addEventListener(LiveRailEvent.INIT_COMPLETE, onLiveRailInitComplete);
+            adManager.addEventListener(LiveRailEvent.INIT_ERROR, onLiveRailInitError);
+            adManager.addEventListener(LiveRailEvent.AD_BREAK_START, adbreakStart);
+            adManager.addEventListener(LiveRailEvent.AD_BREAK_COMPLETE, adbreakComplete);
+            adManager.addEventListener(LiveRailEvent.PREROLL_COMPLETE, onLiveRailPrerollComplete);
+            // adManager.addEventListener(LiveRailEvent.POSTROLL_COMPLETE, onLiveRailPostrollComplete);
+            adManager.addEventListener(LiveRailEvent.AD_START, onLiveRailAdStart);
+            adManager.addEventListener(LiveRailEvent.AD_END, onLiveRailAdEnd);
+            adManager.addEventListener(LiveRailEvent.AD_PROGRESS, onLiverailAdProgress);
+            adManager.addEventListener(LiveRailEvent.CLICK_THRU, onLiveRailClickThru);
+
+            liverailConfig = getSetting(LiverailConstants.CONFIG_OBJECT) as LiverailConfiguration;
+            resumePosition = getSetting(LiverailConstants.RESUME_POSITION) as int;
+
+            adMarkers = liverailConfig.adPositions;
+
+            // After calling initAds(config), the main video player’s controls should be disabled and any requests to
+            // play a movie should be cancelled or delayed until the initComplete (or the initError) event is received
+            // from the ad manager. If initComplete has been received, first call lrAdManager.onContentStart() and only
+            // resume your main video after prerollComplete event is triggered.
+            // This ensures that pre-roll ads are handled properly.
+            adManager.initAds(liverailConfig.config);
+
+            setTraitsToBlock(MediaTraitType.PLAY, MediaTraitType.TIME);
+
+            // triggers the original load trait
             removeTrait(MediaTraitType.LOAD);
         }
         else if (event.loadState == LoadState.LOAD_ERROR) {
@@ -97,12 +125,20 @@ public class LiverailAdProxy extends ProxyElement {
         }
     }
 
+    private function onLoadStateChange(event:LoadEvent):void {
+        logger.debug("onLoadStateChange: " + event.loadState);
+        if (event.loadState == LoadState.READY) {
+
+        }
+    }
+
     public override function set proxiedElement(proxiedElement:MediaElement):void {
         if (proxiedElement) {
+            logger.debug("proxiedElement: " + proxiedElement);
             super.proxiedElement = proxiedElement;
 
-            proxiedElement.addEventListener(MediaElementEvent.TRAIT_ADD, onProxiedTraitAdd);
-            proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onProxiedTraitRemove);
+            proxiedElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
+            proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
 
             adMetadata = getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
             if (adMetadata == null) {
@@ -112,153 +148,26 @@ public class LiverailAdProxy extends ProxyElement {
         }
     }
 
-    private function processTrait(traitType:String, added:Boolean):void {
-        switch (traitType) {
-            case MediaTraitType.LOAD:
-                toggleLoadListeners(added);
-                break;
-            case MediaTraitType.AUDIO:
-                toggleAudioListeners(added);
-                break;
-        }
-    }
-
-    private function toggleAudioListeners(added:Boolean):void {
-        var audible:AudioTrait = getTrait(MediaTraitType.AUDIO) as AudioTrait;
-        if (audible) {
-            if (added) {
-                audible.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
-                audible.addEventListener(AudioEvent.MUTED_CHANGE, onVolumeChange);
+    private function onPlayStateChange(event:PlayEvent):void {
+        logger.debug("onPlayStateChange: " + event.playState);
+        if (adManager) {
+            if (event.playState == PlayState.PLAYING) {
+                if (timer == null) {
+                    timer = new Timer(CONTENT_UPDATE_INTERVAL);
+                    timer.addEventListener(TimerEvent.TIMER, onTimerTick);
+                }
+                timer.start();
             }
             else {
-                audible.removeEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
-                audible.removeEventListener(AudioEvent.MUTED_CHANGE, onVolumeChange);
+                if (timer) {
+                    timer.stop();
+                }
             }
-        }
-    }
-
-    private function toggleLoadListeners(added:Boolean):void {
-        var loadable:LoadTrait = getTrait(MediaTraitType.LOAD) as LoadTrait;
-        if (loadable) {
-            if (added) {
-                loadable.addEventListener(LoadEvent.LOAD_STATE_CHANGE, onLoadableStateChange);
-            }
-            else {
-                loadable.removeEventListener(LoadEvent.LOAD_STATE_CHANGE, onLoadableStateChange);
-            }
-        }
-    }
-
-    private function onLoadableStateChange(event:LoadEvent):void {
-        if (event.loadState == LoadState.READY) {
-            if (adManager) {
-                pause();
-                adManager.initAds(liverailConfig.config);
-            }
-        }
-    }
-
-    private function onVolumeChange(event:AudioEvent):void {
-        if (event.muted) {
-            adManager.setVolume(0);
-        }
-        else {
-            adManager.setVolume(event.volume);
-        }
-    }
-
-    private function setupAdManager():void {
-        adManager.addEventListener(LiveRailEvent.INIT_COMPLETE, onLiveRailInitComplete);
-        adManager.addEventListener(LiveRailEvent.AD_BREAK_START, adbreakStart);
-        adManager.addEventListener(LiveRailEvent.AD_BREAK_COMPLETE, adbreakComplete);
-        adManager.addEventListener(LiveRailEvent.PREROLL_COMPLETE, onLiveRailPrerollComplete);
-        adManager.addEventListener(LiveRailEvent.AD_START, onLiveRailAdStart);
-        adManager.addEventListener(LiveRailEvent.AD_END, onLiveRailAdEnd);
-        adManager.addEventListener(LiveRailEvent.AD_PROGRESS, onLiverailAdProgress);
-        adManager.addEventListener(LiveRailEvent.CLICK_THRU, onLiveRailClickThru);
-
-        /*adManager.addEventListener(LiveRailEvent.INIT_ERROR, onLiveRailInitError);
-         adManager.addEventListener(LiveRailEvent.POSTROLL_COMPLETE, onLiveRailPostrollComplete);
-         adManager.addEventListener(LiveRailEvent.AD_END, onLiveRailAdEnd);
-
-         adManager.addEventListener(LiveRailEvent.VOLUME_CHANGE, onLiveRailVolumeChange);
-         */
-
-        liverailConfig = getSetting(LiverailConstants.CONFIG_OBJECT) as LiverailConfiguration;
-        resumePosition = getSetting(LiverailConstants.RESUME_POSITION) as int;
-
-        adMarkers = liverailConfig.adPositions;
-    }
-
-    private function onLiveRailClickThru(event:Object):void {
-        pause();
-    }
-
-    private function onLiverailAdProgress(event:Object):void {
-        if (adTimeTrait == null) {
-            adTimeTrait = new AdTimeTrait(event.data.duration);
-            addTrait(MediaTraitType.TIME, adTimeTrait);
-        }
-        adTimeTrait.adTime = event.data.time;
-    }
-
-    private function onLiveRailAdStart(event:Object):void {
-        logger.debug("onLiveRailAdStart");
-        play();
-    }
-
-    private function onLiveRailAdEnd(event:Event):void {
-        logger.debug("onLiveRailAdEnd");
-        if (adTimeTrait) {
-            removeTrait(MediaTraitType.TIME);
-            adTimeTrait = null;
-        }
-    }
-
-    private function onLiveRailPrerollComplete(event:Event):void {
-        logger.debug("onLiveRailPrerollComplete");
-    }
-
-    private function adbreakStart(event:Object):void {
-        logger.debug("adbreakStart");
-
-        var playTrait:PlayTrait = getTrait(MediaTraitType.PLAY) as PlayTrait;
-        if (playTrait) {
-            setTraitsToBlock(MediaTraitType.SEEK);
-            playTrait.pause();
-        }
-
-        var timeTrait:TimeTrait = getTrait(MediaTraitType.TIME) as TimeTrait;
-        if (timeTrait) {
-            timer.stop();
-        }
-
-        // mask the existing play trait so we get the play state changes here
-        var adPlayTrait:AdPlayTrait = new AdPlayTrait();
-        adPlayTrait.addEventListener(PlayEvent.PLAY_STATE_CHANGE, onAdPlayStateChange);
-        addTrait(MediaTraitType.PLAY, adPlayTrait);
-
-        // add a display trait that will display the ads
-        addTrait(MediaTraitType.DISPLAY_OBJECT, new DisplayObjectTrait(adManager));
-    }
-
-    private function adbreakComplete(event:Event = null):void {
-        removeTrait(MediaTraitType.PLAY);
-        removeTrait(MediaTraitType.DISPLAY_OBJECT);
-
-        var playTrait:PlayTrait = getTrait(MediaTraitType.PLAY) as PlayTrait;
-        if (playTrait) {
-            setTraitsToBlock();
-            playTrait.play();
-        }
-
-        var timeTrait:TimeTrait = getTrait(MediaTraitType.TIME) as TimeTrait;
-        if (timeTrait) {
-            timer.start();
         }
     }
 
     private function onAdPlayStateChange(event:PlayEvent):void {
+        logger.debug("onAdPlayStateChange: " + event.playState);
         switch (event.playState) {
             case PlayState.PAUSED:
                 adManager.pauseAd();
@@ -272,8 +181,22 @@ public class LiverailAdProxy extends ProxyElement {
         }
     }
 
+    private function onVolumeChange(event:AudioEvent):void {
+        logger.debug("onVolumeChange");
+        if (adManager) {
+            if (event.muted) {
+                adManager.setVolume(0);
+            }
+            else {
+                adManager.setVolume(event.volume);
+            }
+        }
+    }
+
     private function onLiveRailInitComplete(ev:Object):void {
         logger.debug("onLiveRailInitComplete");
+
+        adManager.onContentStart();
 
         var adMap:Object = ev.data.adMap;
         var adBreaks:Array = adMap.adBreaks;
@@ -314,29 +237,86 @@ public class LiverailAdProxy extends ProxyElement {
         }
 
         adMetadata.adBreaks = metadataAdBreaks;
-
-        timer = new Timer(CONTENT_UPDATE_INTERVAL);
-        timer.addEventListener(TimerEvent.TIMER, onTimerTick);
-        timer.start();
-
-        adManager.onContentStart();
     }
 
-    public function volume(vol:Number):void {
+    private function onLiveRailInitError(ev:Object):void {
+        logger.debug("onLiveRailInitError");
+        setTraitsToBlock();
+        play();
+    }
+
+    private function onLiveRailClickThru(event:Object):void {
+        logger.debug("onLiveRailClickThru");
+        pause();
+    }
+
+    private function onLiverailAdProgress(event:Object):void {
+        // logger.debug("onLiverailAdProgress: time = {0}, duration = {1}", event.data.time, event.data.duration);
+        if (adTimeTrait == null) {
+            adTimeTrait = new AdTimeTrait(event.data.duration);
+            addTrait(MediaTraitType.TIME, adTimeTrait);
+        }
+        adTimeTrait.adTime = event.data.time;
+    }
+
+    private function onLiveRailAdStart(event:Object):void {
+        logger.debug("onLiveRailAdStart");
+        play();
+    }
+
+    private function onLiveRailAdEnd(event:Event):void {
+        logger.debug("onLiveRailAdEnd");
+        if (adTimeTrait) {
+            removeTrait(MediaTraitType.TIME);
+            adTimeTrait = null;
+        }
+    }
+
+    private function onLiveRailPrerollComplete(event:Event):void {
+        logger.debug("onLiveRailPrerollComplete");
+        setTraitsToBlock();
+        play();
+    }
+
+    private function adbreakStart(event:Object):void {
+        logger.debug("adbreakStart");
+        setTraitsToBlock(MediaTraitType.SEEK, MediaTraitType.BUFFER);
+        pause();
+
+        // mask the existing play trait so we get the play state changes here
+        var adPlayTrait:AdPlayTrait = new AdPlayTrait();
+        adPlayTrait.addEventListener(PlayEvent.PLAY_STATE_CHANGE, onAdPlayStateChange);
+        addTrait(MediaTraitType.PLAY, adPlayTrait);
+
+        // add a display trait that will display the ads
+        addTrait(MediaTraitType.DISPLAY_OBJECT, new DisplayObjectTrait(adManager));
+    }
+
+    private function adbreakComplete(event:Object):void {
+        logger.debug("adbreakComplete");
+        removeTrait(MediaTraitType.PLAY);
+        removeTrait(MediaTraitType.DISPLAY_OBJECT);
+        removeTrait(MediaTraitType.TIME);
+        adTimeTrait = null;
+        setTraitsToBlock();
+        play();
+    }
+
+    private function volume(vol:Number):void {
         adManager.setVolume(vol);
     }
 
-    public function onContentUpdate(time:Number, duration:Number):void {
-        logger.debug("content update: time = {0}, duration = {1}", time, duration);
+    private function onContentUpdate(time:Number, duration:Number):void {
+        // logger.debug("content update: time = {0}, duration = {1}", time, duration);
         adManager.onContentUpdate(time, duration);
     }
 
-    private function onProxiedTraitAdd(event:MediaElementEvent):void {
-        processTrait(event.traitType, true);
-    }
-
-    private function onProxiedTraitRemove(event:MediaElementEvent):void {
-        processTrait(event.traitType, false);
+    private function onComplete(event:TimeEvent) {
+        logger.debug("onComplete");
+        if (adManager) {
+            // This function triggers any available post-roll ads.
+            adManager.onContentEnd();
+        }
     }
 
     private function onTimerTick(event:TimerEvent):void {
@@ -377,6 +357,44 @@ public class LiverailAdProxy extends ProxyElement {
         var playTrait:PlayTrait = getTrait(MediaTraitType.PLAY) as PlayTrait;
         if (hasTrait(MediaTraitType.PLAY)) {
             playTrait.play();
+        }
+    }
+
+
+    private function onTraitAdd(event:MediaElementEvent):void {
+        var target = event.target as MediaElement;
+        updateTraitListeners(target, event.traitType, true);
+    }
+
+    private function onTraitRemove(event:MediaElementEvent):void {
+        var target = event.target as MediaElement;
+        updateTraitListeners(target, event.traitType, false);
+    }
+
+    private function updateTraitListeners(element:MediaElement, traitType:String, add:Boolean):void {
+        switch (traitType) {
+            case MediaTraitType.PLAY:
+                changeListeners(element, add, traitType, PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
+                break;
+            case MediaTraitType.LOAD:
+                changeListeners(element, add, traitType, LoadEvent.LOAD_STATE_CHANGE, onLoadStateChange);
+                break;
+            case MediaTraitType.AUDIO:
+                changeListeners(element, add, traitType, AudioEvent.VOLUME_CHANGE, onVolumeChange);
+                changeListeners(element, add, traitType, AudioEvent.MUTED_CHANGE, onVolumeChange);
+                break;
+            case MediaTraitType.TIME:
+                changeListeners(element, add, traitType, TimeEvent.COMPLETE, onComplete);
+                break;
+        }
+    }
+
+    private function changeListeners(element:MediaElement, add:Boolean, traitType:String, event:String, listener:Function):void {
+        if (add) {
+            element.getTrait(traitType).addEventListener(event, listener);
+        }
+        else if (element.hasTrait(traitType)) {
+            element.getTrait(traitType).removeEventListener(event, listener);
         }
     }
 

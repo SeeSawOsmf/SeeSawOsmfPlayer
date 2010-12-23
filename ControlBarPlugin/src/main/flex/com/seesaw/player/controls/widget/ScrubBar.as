@@ -185,27 +185,30 @@ public class ScrubBar extends Widget implements IWidget {
     }
 
     override protected function onMediaElementTraitAdd(event:MediaElementEvent):void {
+        if (event.traitType == MediaTraitType.TIME) {
+            var timeTrait:TimeTrait = media.getTrait(MediaTraitType.TIME) as TimeTrait;
+            logger.debug("adding time trait: " + timeTrait);
+            timeTrait.addEventListener(TimeEvent.DURATION_CHANGE, onDurationChange);
+        }
         updateState();
     }
 
     override protected function onMediaElementTraitRemove(event:MediaElementEvent):void {
+        if (event.traitType == MediaTraitType.TIME) {
+            var timeTrait:TimeTrait = media.getTrait(MediaTraitType.TIME) as TimeTrait;
+            logger.debug("removing time trait: " + timeTrait);
+            timeTrait.removeEventListener(TimeEvent.DURATION_CHANGE, onDurationChange);
+        }
         updateState();
     }
 
-    override public function set media(value:MediaElement):void {
-        if (media) {
-            media.removeEventListener(MediaElementEvent.TRAIT_ADD, onMediaTraitsChange);
-            media.removeEventListener(MediaElementEvent.METADATA_ADD, onMediaMetadataRemove);
-            media.removeEventListener(MediaElementEvent.METADATA_REMOVE, onMediaMetadataRemove);
+    override protected function processMediaElementChange(oldMediaElement:MediaElement):void {
+        if (oldMediaElement) {
+            oldMediaElement.removeEventListener(MediaElementEvent.METADATA_ADD, onMediaMetadataRemove);
+            oldMediaElement.removeEventListener(MediaElementEvent.METADATA_REMOVE, onMediaMetadataRemove);
         }
-
-        super.media = value;
-
-        if (media) {
-            media.addEventListener(MediaElementEvent.TRAIT_ADD, onMediaTraitsChange);
-            media.addEventListener(MediaElementEvent.METADATA_ADD, onMediaMetadataAdd);
-            media.addEventListener(MediaElementEvent.METADATA_REMOVE, onMediaMetadataRemove);
-        }
+        media.addEventListener(MediaElementEvent.METADATA_ADD, onMediaMetadataAdd);
+        media.addEventListener(MediaElementEvent.METADATA_REMOVE, onMediaMetadataRemove);
     }
 
     private function onMediaMetadataAdd(event:MediaElementEvent):void {
@@ -219,14 +222,6 @@ public class ScrubBar extends Widget implements IWidget {
         if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
             event.metadata.removeEventListener(MetadataEvent.VALUE_ADD, onAdStateMetadataChanged);
             event.metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onAdStateMetadataChanged);
-        }
-    }
-
-    private function onMediaTraitsChange(event:MediaElementEvent):void {
-        var target = event.target as MediaElement;
-        if (event.traitType == MediaTraitType.TIME) {
-            var timeTrait:TimeTrait = target.getTrait(MediaTraitType.TIME) as TimeTrait;
-            timeTrait.addEventListener(TimeEvent.DURATION_CHANGE, onDurationChange);
         }
     }
 

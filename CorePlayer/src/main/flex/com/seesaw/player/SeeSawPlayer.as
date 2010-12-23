@@ -64,6 +64,8 @@ import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.TimeTrait;
 
+import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
+
 public class SeeSawPlayer extends Sprite {
 
     use namespace contentinfo;
