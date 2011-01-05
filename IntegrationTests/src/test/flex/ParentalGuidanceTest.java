@@ -20,7 +20,7 @@ public class ParentalGuidanceTest extends TestCase {
         server = new SeleniumServer();
         server.start();
         pauseForMillis( 1000);
-        browser = new DefaultSelenium("localhost", 4444, "*firefoxproxy", playerURL);
+        browser = new DefaultSelenium("localhost", 4444, "*safari", playerURL);
         pauseForMillis( 1000);
         browser.start();
         pauseForMillis( 1000);

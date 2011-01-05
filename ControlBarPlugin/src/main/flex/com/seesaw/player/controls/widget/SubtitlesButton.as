@@ -106,6 +106,7 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
         logger.debug("Subtitles Constructor");
         subtitlesLabel = new StyledTextField();
         subtitlesLabel.text = "Subtitles are off";
+        subtitlesLabel.width = 90;
         this.toolTip = new PlayerToolTip(this, "Subtitles are off");
         this.formatLabelFont();
 
@@ -116,6 +117,7 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
 
     private function onAddedToStage(event:Event) {
         stage.addChild(this.toolTip);
+        logger.debug("X POS: " + this.x + " WIDTH: " + this.width);
     }
 
     private function formatLabelFont():void {
@@ -132,6 +134,7 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
     }
 
     override protected function onMouseClick(event:MouseEvent):void {
+        logger.debug("X POS: " + this.x + " WIDTH: " + this.width);
         if (this.subtitlesOn == false) {
             subtitlesLabel.text = "Subtitles are on";
             this.toolTip.updateToolTip("Subtitles are on");

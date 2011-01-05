@@ -116,7 +116,7 @@
             <widget
                     id="com.seesaw.player.controls.widget.FullScreen"
                     type="com.seesaw.player.controls.widget.FullScreen"
-                    right="60"
+                    right="18"
                     top="70"
                     />
             <widget

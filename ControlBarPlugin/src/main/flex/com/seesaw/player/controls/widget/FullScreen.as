@@ -58,6 +58,7 @@ public class FullScreen extends ButtonWidget implements IWidget {
         _requiredTraits[0] = MediaTraitType.DISPLAY_OBJECT;
 
         fullScreenLabel = new StyledTextField();
+        fullScreenLabel.width = 100;
         fullScreenLabel.text = FULLSCREEN_LABEL;
         formatLabelFont();
         toolTip = new PlayerToolTip(this, "FullScreen");
@@ -87,6 +88,7 @@ public class FullScreen extends ButtonWidget implements IWidget {
     }
 
     override protected function onMouseClick(event:MouseEvent):void {
+        logger.debug("X POS: " + this.x + " WIDTH: " + this.width);
         if (stage) {
             setFullScreen(stage.displayState == StageDisplayState.NORMAL);
         }
@@ -129,7 +131,6 @@ public class FullScreen extends ButtonWidget implements IWidget {
         textFormat.color = 0x00A78D;
         textFormat.align = "right";
         fullScreenLabel.setTextFormat(textFormat);
-        fullScreenLabel.autoSize = TextFieldAutoSize.RIGHT;
     }
 }
 }
