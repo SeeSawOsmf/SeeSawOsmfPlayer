@@ -110,7 +110,7 @@ public class BatchEventService extends ProxyElement {
     }
 
     private function onFailed(event:FaultEvent):void {
-        trace("success");
+        trace("fail");
     }
 }
 }
