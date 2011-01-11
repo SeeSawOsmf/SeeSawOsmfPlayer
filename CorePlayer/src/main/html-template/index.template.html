@@ -32,9 +32,9 @@
 <body>
 <h1>External Interface Test</h1>
 <div id="playerWrapper">
-	<object type="application/x-shockwave-flash" data="{swf}.swf" width="${width}" height="${height}" id="corePlayer">
+	<object type="application/x-shockwave-flash" data="${swf}.swf" width="${width}" height="${height}" id="corePlayer">
 		<param name="allowScriptAccess" value="<%= @script_access %>" />
-		<param name="movie" value="{swf}.swf" />
+		<param name="movie" value="${swf}.swf" />
 		<param name="quality" value="high" />
 		<param name="allowFullScreen" value="true" />
 		<param name="flashVars" value="playerInitUrl=http://kgd-blue-test-zxtm01.dev.vodco.co.uk/testing=player.playerinitialisation:playerinit?t:ac=TV:FACTUAL/s/7675/Around-the-World-in-80-Days" />
