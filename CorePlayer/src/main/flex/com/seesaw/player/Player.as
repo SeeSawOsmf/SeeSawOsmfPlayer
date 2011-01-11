@@ -95,8 +95,9 @@ public class Player extends Sprite {
 
         loaderParams = LoaderInfo(this.root.loaderInfo).parameters;
 
-        // TODO: this needs to be in a flashvar from the page
-        loaderParams.playerInitUrl = "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/" +
+        // If no flashVar, use a default for testing
+        // TODO: remove this altogether
+        loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/" +
                 "player.playerinitialisation:playerinit?t:ac=TV:FACTUAL/s/7675/Around-the-World-in-80-Days";
 
         stage.scaleMode = StageScaleMode.NO_SCALE;
