@@ -31,6 +31,7 @@ import com.seesaw.player.external.ExternalInterfaceMetadata;
 import com.seesaw.player.external.PlayerExternalInterface;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.namespaces.contentinfo;
+import com.seesaw.player.panels.BufferingPanel;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
 import com.seesaw.player.smil.SeeSawSMILLoader;
 
@@ -43,6 +44,7 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
+import org.osmf.events.BufferEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.events.MetadataEvent;
@@ -81,6 +83,7 @@ public class SeeSawPlayer extends Sprite {
     private var container:MediaContainer;
     private var rootElement:ParallelElement;
     private var subtitleElement:MediaElement;
+    private var bufferingPanel:BufferingPanel;
 
     private var xi:PlayerExternalInterface;
 
@@ -129,10 +132,14 @@ public class SeeSawPlayer extends Sprite {
         logger.debug("initialising media player");
 
         createVideoElement();
+        createBufferingPanel();
         createControlBarElement();
         createSubtitleElement();
 
         player.media = contentElement;
+
+        //handler to show and hide the buffering panel
+        player.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
 
         setRootElementLayout();
 
@@ -142,6 +149,24 @@ public class SeeSawPlayer extends Sprite {
 
         logger.debug("adding media container to stage");
         addChild(container);
+    }
+
+    private function createBufferingPanel():void {
+        //Create the Buffering Panel
+        this.bufferingPanel = new BufferingPanel();
+        addChild(this.bufferingPanel);
+    }
+
+    private function onBufferingChange(event:BufferEvent):void {
+         //if the video is buffering set the visibility of the Buffering Panel to true
+         if (event.buffering) {
+            this.bufferingPanel.visible = true;
+            logger.debug("BUFFERING PANEL - VISIBLE: " + this.bufferingPanel.visible);
+         } else {
+            //if the video has finished buffering set the visibility of the Buffering Panel to false
+            this.bufferingPanel.visible = false;
+            logger.debug("BUFFERING PANEL - VISIBLE: " + this.bufferingPanel.visible);
+         }
     }
 
     private function createSubtitleElement():void {

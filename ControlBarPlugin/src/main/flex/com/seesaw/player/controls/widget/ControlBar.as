@@ -5,6 +5,7 @@ import flash.events.Event;
 import flash.events.MouseEvent;
 
 import flash.events.TimerEvent;
+import flash.ui.Mouse;
 import flash.utils.Timer;
 
 import org.as3commons.logging.ILogger;
@@ -75,6 +76,8 @@ public class ControlBar extends Widget {
         this.mouseOnStage = true;
         //show the control bar
         this.visible = true;
+        //Show the mouse
+        Mouse.show();
         //resent the timer and start it again
         this.controlsTimer.reset();
 		this.controlsTimer.start();
@@ -85,6 +88,8 @@ public class ControlBar extends Widget {
         if (this.mouseOnStage == true) {
             //Show the control bar
             this.visible = true;
+            //Show the mouse
+            Mouse.show();
             //Restart the timer and start it again
             this.controlsTimer.reset();
 		    this.controlsTimer.start();
@@ -96,6 +101,8 @@ public class ControlBar extends Widget {
         if (this.overControls == false) {
             //Hide the control bar
             this.visible = false;
+            //Hide the mouse
+            Mouse.hide();
         }
     }
 

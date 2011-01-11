@@ -88,7 +88,6 @@ public class FullScreen extends ButtonWidget implements IWidget {
     }
 
     override protected function onMouseClick(event:MouseEvent):void {
-        logger.debug("X POS: " + this.x + " WIDTH: " + this.width);
         if (stage) {
             setFullScreen(stage.displayState == StageDisplayState.NORMAL);
         }
