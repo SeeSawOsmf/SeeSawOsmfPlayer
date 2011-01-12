@@ -32,10 +32,14 @@
 <body>
 <h1>External Interface Test</h1>
 <div id="playerWrapper">
-	<object width="${width}" height="${height}">
-        <embed id="corePlayer" src="${swf}.swf" width="${width}" height="${height}" flashvars="">
-        </embed>
-    </object>
+	<object type="application/x-shockwave-flash" data="${swf}.swf" width="${width}" height="${height}" id="corePlayer">
+		<param name="allowScriptAccess" value="<%= @script_access %>" />
+		<param name="movie" value="${swf}.swf" />
+		<param name="quality" value="high" />
+		<param name="allowFullScreen" value="true" />
+		<param name="flashVars" value="playerInitUrl=http://kgd-blue-test-zxtm01.dev.vodco.co.uk/testing=player.playerinitialisation:playerinit?t:ac=TV:FACTUAL/s/7675/Around-the-World-in-80-Days" />
+		<embed id="corePlayer" src="${swf}.swf" width="${width}" height="${height}" flashvars="playerInitUrl=http://kgd-blue-test-zxtm01.dev.vodco.co.uk/testing=player.playerinitialisation:playerinit?t:ac=TV:FACTUAL/s/7675/Around-the-World-in-80-Days"></embed>
+	</object>	
 </div>
 <div id="playerControls">
     <ul>

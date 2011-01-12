@@ -22,7 +22,6 @@
 
 package com.seesaw.player.autoresume {
 import com.seesaw.player.PlayerConstants;
-import com.seesaw.player.traits.fullscreen.FullScreenTrait;
 
 import org.flexunit.asserts.assertNotNull;
 import org.flexunit.asserts.assertTrue;
