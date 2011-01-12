@@ -20,7 +20,7 @@
  *    Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.player.init {
+package com.seesaw.player.utils {
 import flash.events.Event;
 import flash.events.IOErrorEvent;
 import flash.events.SecurityErrorEvent;
@@ -49,7 +49,7 @@ public class ServiceRequest {
         _failHandler = failHandler;
     }
 
-    public function submit():void {
+    public function submit(data=null):void {
         var loader:URLLoader = new URLLoader();
         loader.dataFormat = URLLoaderDataFormat.TEXT;
 
@@ -61,7 +61,13 @@ public class ServiceRequest {
         }
 
         var request:URLRequest = new URLRequest(_requestUrl);
-        request.method = URLRequestMethod.GET;
+
+        if (data == null) {
+            request.method = URLRequestMethod.GET;
+        } else {
+            request.method = URLRequestMethod.POST;
+            request.data = data;
+        }
 
         loader.load(request);
     }

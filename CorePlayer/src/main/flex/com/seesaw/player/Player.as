@@ -27,7 +27,7 @@ import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.external.PlayerExternalInterface;
 import com.seesaw.player.external.PlayerExternalInterfaceImpl;
 import com.seesaw.player.impl.services.ResumeServiceImpl;
-import com.seesaw.player.init.ServiceRequest;
+import com.seesaw.player.utils.ServiceRequest;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.liverail.LiverailConfig;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
@@ -48,6 +48,7 @@ import flash.display.StageAlign;
 import flash.display.StageScaleMode;
 import flash.events.Event;
 import flash.external.ExternalInterface;
+import flash.net.URLVariables;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -278,6 +279,11 @@ public class Player extends Sprite {
         logger.debug("requesting programme data: " + videoInfoUrl);
 
         var request:ServiceRequest = new ServiceRequest(videoInfoUrl, onSuccessFromVideoInfo, onFailFromVideoInfo);
+        /* To post data (needed for C4 ads) use the following:
+        var post_data:URLVariables = new URLVariables();
+        post_data.advertASX = "this is some data";
+        request.submit(post_data);
+        */
         request.submit();
     }
 
