@@ -27,7 +27,7 @@ import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.external.PlayerExternalInterface;
 import com.seesaw.player.external.PlayerExternalInterfaceImpl;
 import com.seesaw.player.impl.services.ResumeServiceImpl;
-import com.seesaw.player.init.ServiceRequest;
+import com.seesaw.player.utils.ServiceRequest;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.liverail.LiverailConfig;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;

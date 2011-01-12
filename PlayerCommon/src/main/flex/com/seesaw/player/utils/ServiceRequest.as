@@ -20,7 +20,7 @@
  *    Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.player.init {
+package com.seesaw.player.utils {
 import flash.events.Event;
 import flash.events.IOErrorEvent;
 import flash.events.SecurityErrorEvent;
