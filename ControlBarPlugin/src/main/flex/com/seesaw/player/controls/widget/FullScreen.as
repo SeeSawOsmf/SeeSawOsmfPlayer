@@ -36,6 +36,8 @@ import flash.text.TextFieldAutoSize;
 import flash.text.TextFormat;
 import flash.ui.Keyboard;
 
+import flash.ui.Mouse;
+
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.chrome.widgets.ButtonWidget;
@@ -61,6 +63,8 @@ public class FullScreen extends ButtonWidget implements IWidget {
         fullScreenLabel.width = 100;
         fullScreenLabel.text = FULLSCREEN_LABEL;
         formatLabelFont();
+        fullScreenLabel.addEventListener(MouseEvent.MOUSE_OVER, onMouseOver);
+        fullScreenLabel.addEventListener(MouseEvent.MOUSE_OUT, onMouseOut);
         toolTip = new PlayerToolTip(this, "FullScreen");
         addChild(fullScreenLabel);
 
@@ -71,6 +75,14 @@ public class FullScreen extends ButtonWidget implements IWidget {
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
         stage.addChild(toolTip);
         stage.addEventListener(FullScreenEvent.FULL_SCREEN, onFullScreen);
+    }
+
+    private function onMouseOver (event:MouseEvent):void {
+        formatLabelHoverFont();
+    }
+
+    private function onMouseOut (event:MouseEvent):void {
+        formatLabelFont();
     }
 
     override protected function get requiredTraits():Vector.<String> {
@@ -129,6 +141,12 @@ public class FullScreen extends ButtonWidget implements IWidget {
         textFormat.size = 12;
         textFormat.color = 0x00A78D;
         textFormat.align = "right";
+        fullScreenLabel.setTextFormat(textFormat);
+    }
+
+    private function formatLabelHoverFont():void {
+        var textFormat:TextFormat = new TextFormat();
+        textFormat.color = 0xFFFFFF;
         fullScreenLabel.setTextFormat(textFormat);
     }
 }

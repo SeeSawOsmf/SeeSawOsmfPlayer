@@ -52,6 +52,8 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
     private var lightsDownOn:Boolean = false;
     private var lightsDownLabel:TextField;
 
+    private var mouseOverLabel:Boolean = false;
+
     private var toolTip:PlayerToolTip;
 
     private var metadata:Metadata;
@@ -66,6 +68,8 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
         logger.debug("Lights Down Constructor");
         lightsDownLabel = new StyledTextField();
         lightsDownLabel.text = "Turn lights up";
+        this.addEventListener(MouseEvent.MOUSE_OVER, onMouseOver);
+        this.addEventListener(MouseEvent.MOUSE_OUT, onMouseOut);
 
         xi = ObjectProvider.getInstance().getObject(PlayerExternalInterface);
         logger.debug("XI IS: " + xi.available);
@@ -77,6 +81,20 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
         this.visible = false;
 
         addChild(lightsDownLabel);
+    }
+
+    private function onMouseOver (event:MouseEvent):void {
+        if (this.mouseOverLabel == false) {
+            this.mouseOverLabel = true;
+            formatLabelHoverFont();
+        }
+    }
+
+    private function onMouseOut (event:MouseEvent):void {
+        if (this.mouseOverLabel == true) {
+            this.mouseOverLabel = false;
+            formatLabelFont();
+        }
     }
 
     override public function set media(value:MediaElement):void {
@@ -122,6 +140,12 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
         this.lightsDownLabel.setTextFormat(textFormat);
     }
 
+    private function formatLabelHoverFont():void {
+        var textFormat:TextFormat = new TextFormat();
+        textFormat.color = 0xFFFFFF;
+        this.lightsDownLabel.setTextFormat(textFormat);
+    }
+
 
     override protected function get requiredTraits():Vector.<String> {
         return _requiredTraits;
@@ -143,6 +167,9 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
         }
         lightsDownLabel.text = "Turn lights up";
         this.toolTip.updateToolTip("Turn lights up");
+        if (this.mouseOverLabel == true) {
+            this.formatLabelHoverFont();
+        }
         this.lightsDownOn = true;
     }
 
@@ -153,6 +180,9 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
         }
         lightsDownLabel.text = "Turn lights down";
         this.toolTip.updateToolTip("Turn lights down");
+        if (this.mouseOverLabel == true) {
+            this.formatLabelHoverFont();
+        }
         this.lightsDownOn = false;
     }
 

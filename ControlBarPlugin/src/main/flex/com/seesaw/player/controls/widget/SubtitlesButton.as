@@ -49,6 +49,8 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
     private var subtitlesOn:Boolean;
     private var subtitlesLabel:TextField;
 
+    private var mouseOverLabel:Boolean = false;
+
     private var toolTip:PlayerToolTip;
 
     /* static */
@@ -107,12 +109,29 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
         subtitlesLabel = new StyledTextField();
         subtitlesLabel.text = "Subtitles are off";
         subtitlesLabel.width = 90;
+        this.addEventListener(MouseEvent.MOUSE_OVER, onMouseOver);
+        this.addEventListener(MouseEvent.MOUSE_OUT, onMouseOut);
         this.toolTip = new PlayerToolTip(this, "Subtitles are off");
+        
         this.formatLabelFont();
 
         this.addEventListener(Event.ADDED_TO_STAGE, this.onAddedToStage);
 
         addChild(subtitlesLabel);
+    }
+
+    private function onMouseOver (event:MouseEvent):void {
+        if (this.mouseOverLabel == false) {
+            this.mouseOverLabel = true;
+            formatLabelHoverFont();
+        }
+    }
+
+    private function onMouseOut (event:MouseEvent):void {
+        if (this.mouseOverLabel == true) {
+            this.mouseOverLabel = false;
+            formatLabelFont();
+        }
     }
 
     private function onAddedToStage(event:Event) {
@@ -128,6 +147,12 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
         this.subtitlesLabel.setTextFormat(textFormat);
     }
 
+    private function formatLabelHoverFont():void {
+        var textFormat:TextFormat = new TextFormat();
+        textFormat.color = 0xFFFFFF;
+        this.subtitlesLabel.setTextFormat(textFormat);
+    }
+
 
     override protected function get requiredTraits():Vector.<String> {
         return _requiredTraits;
@@ -138,10 +163,16 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
         if (this.subtitlesOn == false) {
             subtitlesLabel.text = "Subtitles are on";
             this.toolTip.updateToolTip("Subtitles are on");
+            if (this.mouseOverLabel == true) {
+                this.formatLabelHoverFont();
+            }
             this.subtitlesOn = true;
         } else {
             subtitlesLabel.text = "Subtitles are off";
             this.toolTip.updateToolTip("Subtitles are off");
+            if (this.mouseOverLabel == true) {
+                this.formatLabelHoverFont();
+            }
             this.subtitlesOn = false;
         }
         metadata.addValue(ControlBarMetadata.SUBTITLES_VISIBLE, subtitlesOn);
