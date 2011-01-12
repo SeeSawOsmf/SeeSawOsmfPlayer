@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
  *
  *    The contents of this file are subject to the Mozilla Public License
@@ -44,7 +44,7 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
-import org.osmf.events.BufferEvent;
+import org.osmf.events.BufferEvent; 
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.events.MetadataEvent;
@@ -81,6 +81,10 @@ public class SeeSawPlayer extends Sprite {
     private var factory:MediaFactory;
     private var player:MediaPlayer;
     private var container:MediaContainer;
+    private var mainContainer:MediaContainer;
+    private var bufferingContainer:MediaContainer;
+    private var controlbarContainer:MediaContainer;
+    private var subtitlesContainer:MediaContainer;
     private var rootElement:ParallelElement;
     private var subtitleElement:MediaElement;
     private var bufferingPanel:BufferingPanel;
@@ -130,22 +134,58 @@ public class SeeSawPlayer extends Sprite {
 
     private function initialisePlayer():void {
         logger.debug("initialising media player");
+        
+        mainContainer = new MediaContainer();
+        mainContainer.y = 0;
+        mainContainer.x = 0;
+        mainContainer.layoutMetadata.percentWidth = 100; 
+        mainContainer.layoutMetadata.percentHeight = 100;
+        addChild(mainContainer);
+
+        bufferingContainer = new MediaContainer();
+        bufferingContainer.y = 0;
+        bufferingContainer.x = 0;
+        bufferingContainer.backgroundColor = 0x000000;
+        bufferingContainer.backgroundAlpha = 0;
+        bufferingContainer.layoutMetadata.percentWidth = 100; 
+        bufferingContainer.layoutMetadata.percentHeight = 100;
+        bufferingContainer.layoutMetadata.horizontalAlign = HorizontalAlign.CENTER;
+        bufferingContainer.layoutMetadata.verticalAlign = VerticalAlign.MIDDLE;
+        //bufferingContainer.layoutMetadata.includeInLayout = false;
+        addChild(bufferingContainer);
+
+        controlbarContainer = new MediaContainer();
+        controlbarContainer.y = 0;
+        controlbarContainer.x = 0;
+        controlbarContainer.layoutMetadata.percentWidth = 100; 
+        controlbarContainer.layoutMetadata.height = 100;
+        controlbarContainer.layoutMetadata.verticalAlign = VerticalAlign.BOTTOM;
+        addChild(controlbarContainer);
+
+        subtitlesContainer = new MediaContainer();
+        subtitlesContainer.y = 0;
+        subtitlesContainer.x = 0;
+        subtitlesContainer.layoutMetadata.percentWidth = 100; 
+        subtitlesContainer.layoutMetadata.percentHeight = 100;
+        subtitlesContainer.layoutMetadata.verticalAlign = VerticalAlign.BOTTOM;
+        addChild(subtitlesContainer);
+
+        container.layoutRenderer.addTarget(mainContainer);
+        container.layoutRenderer.addTarget(bufferingContainer);
+        container.layoutRenderer.addTarget(controlbarContainer);
+        container.layoutRenderer.addTarget(subtitlesContainer);
 
         createVideoElement();
-        createBufferingPanel();
         createControlBarElement();
         createSubtitleElement();
+        createBufferingPanel();
 
         player.media = contentElement;
 
         //handler to show and hide the buffering panel
         player.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
 
-        setRootElementLayout();
-
         setContainerSize(contentWidth, contentHeight);
-
-        container.addMediaElement(rootElement);
 
         logger.debug("adding media container to stage");
         addChild(container);
@@ -153,20 +193,12 @@ public class SeeSawPlayer extends Sprite {
 
     private function createBufferingPanel():void {
         //Create the Buffering Panel
-        this.bufferingPanel = new BufferingPanel();
-        addChild(this.bufferingPanel);
+        bufferingPanel = new BufferingPanel(bufferingContainer);
+        bufferingContainer.addMediaElement(bufferingPanel);
     }
 
     private function onBufferingChange(event:BufferEvent):void {
-         //if the video is buffering set the visibility of the Buffering Panel to true
-         if (event.buffering) {
-            this.bufferingPanel.visible = true;
-            logger.debug("BUFFERING PANEL - VISIBLE: " + this.bufferingPanel.visible);
-         } else {
-            //if the video has finished buffering set the visibility of the Buffering Panel to false
-            this.bufferingPanel.visible = false;
-            logger.debug("BUFFERING PANEL - VISIBLE: " + this.bufferingPanel.visible);
-         }
+        (event.buffering) ? bufferingPanel.show() : bufferingPanel.hide();
     }
 
     private function createSubtitleElement():void {
@@ -189,7 +221,7 @@ public class SeeSawPlayer extends Sprite {
             layout.horizontalAlign = HorizontalAlign.CENTER;
             layout.verticalAlign = VerticalAlign.BOTTOM;
 
-            rootElement.addChild(subtitleElement);
+            subtitlesContainer.addMediaElement(subtitleElement);
         }
     }
 
@@ -211,7 +243,7 @@ public class SeeSawPlayer extends Sprite {
         contentElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
         contentElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
 
-        rootElement.addChild(contentElement);
+        mainContainer.addMediaElement(contentElement);
     }
 
     private function createControlBarElement():void {
@@ -238,14 +270,7 @@ public class SeeSawPlayer extends Sprite {
             return;
         }
 
-        var layout:LayoutMetadata = new LayoutMetadata();
-        controlBarElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
-
-        layout.index = 1;
-        layout.verticalAlign = VerticalAlign.BOTTOM;
-        layout.horizontalAlign = HorizontalAlign.CENTER;
-
-        rootElement.addChild(controlBarElement);
+        controlbarContainer.addMediaElement(controlBarElement);
     }
 
     private function updateTraitListeners(element:MediaElement, traitType:String, add:Boolean):void {
@@ -356,15 +381,19 @@ public class SeeSawPlayer extends Sprite {
 
     private function onMediaElementCreate(event:MediaFactoryEvent):void {
         var mediaElement:MediaElement = event.mediaElement;
-        event.mediaElement.addEventListener(MediaElementEvent.METADATA_ADD, function(mediaElementEvent:MediaElementEvent) {
-            if (mediaElementEvent.namespaceURL == SMILConstants.SMIL_METADATA_NS) {
-                mediaElementEvent.metadata.addEventListener(MetadataEvent.VALUE_CHANGE, function(metadataEvent:MetadataEvent) {
-                    if (metadataEvent.key == PlayerConstants.CONTENT_TYPE) {
-                        setContentLayout(metadataEvent.value, mediaElement);
-                    }
-                });
+
+        var _setContentLayout:Function = function(metadataEvent:MetadataEvent):void {
+            if (metadataEvent.key == PlayerConstants.CONTENT_TYPE) {
+                setContentLayout(metadataEvent.value, mediaElement);
             }
-        });
+        }
+
+        event.mediaElement.addEventListener(MediaElementEvent.METADATA_ADD, function(mediaElementEvent:MediaElementEvent):void {
+            if (mediaElementEvent.namespaceURL == SMILConstants.SMIL_METADATA_NS) {
+                mediaElementEvent.metadata.addEventListener(MetadataEvent.VALUE_ADD, _setContentLayout);
+                mediaElementEvent.metadata.addEventListener(MetadataEvent.VALUE_CHANGE, _setContentLayout);
+            }
+        })
     }
 
     private function setRootElementLayout():void {
@@ -383,22 +412,24 @@ public class SeeSawPlayer extends Sprite {
             layout = new LayoutMetadata();
             element.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
         }
-
         switch (contentType) {
             case PlayerConstants.DOG_CONTENT_ID:
                 layout.x = 5;
                 layout.y = 5;
+                layout.width = 20;
+                layout.height = 20;
                 layout.verticalAlign = VerticalAlign.TOP;
                 layout.horizontalAlign = HorizontalAlign.LEFT;
                 break;
             case PlayerConstants.MAIN_CONTENT_ID:
             case PlayerConstants.STING_CONTENT_ID:
             case PlayerConstants.AD_CONTENT_ID:
-                layout.width = contentWidth;
-                layout.height = contentHeight;
+            default:
+                layout.percentWidth = 100; //contentWidth;
+                layout.percentHeight = 100; //contentHeight;
                 layout.verticalAlign = VerticalAlign.MIDDLE;
                 layout.horizontalAlign = HorizontalAlign.CENTER;
-                layout.scaleMode = ScaleMode.STRETCH
+                layout.scaleMode = ScaleMode.LETTERBOX;
                 break;
         }
 
