@@ -48,6 +48,7 @@ import flash.display.StageAlign;
 import flash.display.StageScaleMode;
 import flash.events.Event;
 import flash.external.ExternalInterface;
+import flash.net.URLVariables;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -278,6 +279,11 @@ public class Player extends Sprite {
         logger.debug("requesting programme data: " + videoInfoUrl);
 
         var request:ServiceRequest = new ServiceRequest(videoInfoUrl, onSuccessFromVideoInfo, onFailFromVideoInfo);
+        /* To post data (needed for C4 ads) use the following:
+        var post_data:URLVariables = new URLVariables();
+        post_data.advertASX = "this is some data";
+        request.submit(post_data);
+        */
         request.submit();
     }
 
