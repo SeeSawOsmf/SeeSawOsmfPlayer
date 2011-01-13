@@ -107,10 +107,10 @@ public class BufferingPanel extends MediaElement {
 
     public function hide():void {
       logger.debug("BUFFERING PANEL - HIDE");
-      /*parentContainer.layoutMetadata.includeInLayout = false;
+      parentContainer.layoutMetadata.includeInLayout = false;
       panel.visible = false;
       tooSlowTimer.stop();
-      hideTooSlowMessage();*/
+      hideTooSlowMessage();
     }
 
     private function showTooSlowMessage(event:Event):void {
