@@ -117,7 +117,7 @@ public class SeeSawPlayer extends Sprite {
         factory.addEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onMediaElementCreate);
 
         player = new MediaPlayer();
-//        player.autoPlay = false;
+        player.autoPlay = false;
         
         rootElement = new ParallelElement();
         container = new MediaContainer();
@@ -151,7 +151,6 @@ public class SeeSawPlayer extends Sprite {
         bufferingContainer.layoutMetadata.percentHeight = 100;
         bufferingContainer.layoutMetadata.horizontalAlign = HorizontalAlign.CENTER;
         bufferingContainer.layoutMetadata.verticalAlign = VerticalAlign.MIDDLE;
-        //bufferingContainer.layoutMetadata.includeInLayout = false;
         addChild(bufferingContainer);
 
         controlbarContainer = new MediaContainer();
