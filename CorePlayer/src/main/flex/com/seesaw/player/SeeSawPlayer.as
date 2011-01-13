@@ -416,8 +416,6 @@ public class SeeSawPlayer extends Sprite {
             case PlayerConstants.DOG_CONTENT_ID:
                 layout.x = 5;
                 layout.y = 5;
-                layout.width = 20;
-                layout.height = 20;
                 layout.verticalAlign = VerticalAlign.TOP;
                 layout.horizontalAlign = HorizontalAlign.LEFT;
                 break;

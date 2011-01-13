@@ -380,6 +380,7 @@ public class Player extends Sprite {
      */
     private function registerServices() {
         logger.debug("registering services");
+
         var provider:ObjectProvider = ObjectProvider.getInstance();
         provider.register(ResumeService, new ResumeServiceImpl());
         provider.register(PlayerExternalInterface, new PlayerExternalInterfaceImpl());
@@ -396,6 +397,7 @@ public class Player extends Sprite {
 
     private function getResumePosition():Number {
         var resumeService:ResumeService = ObjectProvider.getInstance().getObject(ResumeService);
+        resumeService.programmeId = playerInit.programmeId; 
         var resumeValue:Number = resumeService.getResumeCookie();
         return resumeValue;
     }
