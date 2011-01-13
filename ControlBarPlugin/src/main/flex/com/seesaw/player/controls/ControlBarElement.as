@@ -143,7 +143,7 @@ public class ControlBarElement extends MediaElement {
             }
         }
     }
-
+        
     private function onMediaTraitsChange(event:MediaElementEvent):void {
         if (event.type == MediaElementEvent.TRAIT_ADD) {
             // Wait for the target element to display before displaying the control bar

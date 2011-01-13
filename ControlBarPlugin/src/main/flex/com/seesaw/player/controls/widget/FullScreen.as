@@ -138,7 +138,7 @@ public class FullScreen extends ButtonWidget implements IWidget {
 
     private function formatLabelFont():void {
         var textFormat:TextFormat = new TextFormat();
-        textFormat.size = 12;
+        textFormat.size = 11;
         textFormat.color = 0x00A78D;
         textFormat.align = "right";
         fullScreenLabel.setTextFormat(textFormat);
