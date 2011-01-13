@@ -236,8 +236,7 @@ public class ScrubBar extends Widget implements IWidget {
     //
 
     private function updateState():void {
-        visible = media != null;
-        scrubber.enabled = media ? media.hasTrait(MediaTraitType.SEEK) : false;
+        visible = scrubber.enabled = media ? media.hasTrait(MediaTraitType.SEEK) : false;
 
         updateTimerState();
     }

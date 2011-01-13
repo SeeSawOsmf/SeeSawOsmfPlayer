@@ -95,6 +95,8 @@ public class BufferingPanel extends MediaElement {
         layoutMetadata.verticalAlign = VerticalAlign.MIDDLE;
 
         this.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layoutMetadata);
+
+        hide();
     }
 
     public function show():void {

@@ -157,13 +157,14 @@ CONFIG::LOGGING
 
                     populateMetadataFromSMIL(imageElement, smilElement);
 
-                    var dur:Number = (smilElement as SMILMediaElement).duration;
-                    if (!isNaN(dur) && dur > 0)
-					{
-                       imageElement = new DurationElement(dur, imageElement);
-                    }
+					/*var dur:Number = (smilElement as SMILMediaElement).duration;
+					if (!isNaN(dur) && dur > 0) {
+						imageElement = new DurationElement(dur, imageElement);
+					}*/
 
-					(parentMediaElement as CompositeElement).addChild(imageElement);
+					if (parentMediaElement is CompositeElement) {
+						(parentMediaElement as CompositeElement).addChild(imageElement);
+					}
 					break;
 				case SMILElementType.AUDIO:
 					var audioResource:URLResource = new URLResource((smilElement as SMILMediaElement).src);

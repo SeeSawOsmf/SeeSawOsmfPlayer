@@ -254,7 +254,7 @@ public class LiverailAdProxy extends ProxyElement {
     private function onLiveRailPrerollComplete(event:Event):void {
         logger.debug("onLiveRailPrerollComplete");
         setTraitsToBlock();
-        play();
+        //play(); //adbreakComplete will handle this
     }
 
     private function adbreakStart(event:Object):void {
@@ -263,7 +263,8 @@ public class LiverailAdProxy extends ProxyElement {
         adMetadata.adState = AdState.STARTED;
 
         setTraitsToBlock(MediaTraitType.SEEK);
-        pause();
+        // Perhaps this is needed for mid-rolls
+        //pause();
 
         // mask the existing play trait so we get the play state changes here
         var adPlayTrait:AdPlayTrait = new AdPlayTrait();
