@@ -58,8 +58,8 @@
             <widget
                     layoutMode="horizontal"
                     horizontalAlign="left"
-                    top="20"
-                    left="20"
+                    top="15"
+                    left="27"
                     >
                 <widget
                         id="com.seesaw.player.controls.widget.PauseButton"
@@ -83,9 +83,9 @@
                     timeFieldsWidth="90"
                     timeFieldsHeight="15"
                     timeFieldSpacing="1"
-                    left="42"
-                    right="120"
-                    top="35"
+                    left="-7"
+                    right="169"
+                    top="27"
                     scrubberUp="scrubberUp"
                     scrubberDown="scrubberDown"
                     scrubberDisabled="scrubberDisabled"
@@ -98,25 +98,25 @@
                     upFace="volumeUp"
                     downFace="volumeUp"
                     disabledFace="volumeDisabled"
-                    left="550"
-                    top="30"
+                    left="520"
+                    top="24"
                     />
             <widget
                     id="com.seesaw.player.controls.widget.LightsDownButton"
                     type="com.seesaw.player.controls.widget.LightsDownButton"
-                    right="240"
+                    right="247"
                     top="70"
                     />
             <widget
                     id="com.seesaw.player.controls.widget.SubtitlesButton"
                     type="com.seesaw.player.controls.widget.SubtitlesButton"
-                    right="120"
+                    right="110"
                     top="70"
                     />
             <widget
                     id="com.seesaw.player.controls.widget.FullScreen"
                     type="com.seesaw.player.controls.widget.FullScreen"
-                    right="18"
+                    right="28"
                     top="70"
                     />
             <widget
@@ -125,9 +125,9 @@
                     timeFieldsWidth="90"
                     timeFieldsHeight="15"
                     timeFieldSpacing="1"
-                    right="25"
-                    top="37"
-                    width="45"
+                    right="22"
+                    top="31"
+                    width="78"
                     scrubberUp="scrubberUp"
                     scrubberDown="scrubberDown"
                     scrubberDisabled="scrubberDisabled"
