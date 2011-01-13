@@ -35,7 +35,8 @@ import org.as3commons.logging.LoggerFactory;
 public class ResumeServiceImpl implements ResumeService {
     
     private var logger:ILogger = LoggerFactory.getClassLogger(ResumeServiceImpl);
-    
+
+    private var _programmeId:String = "default";
     private var tripleDESKey:TripleDESKey;
     private static const ENCRYTION_KEY:String = "this%is%the%new%static%encryption%key%";
     private static const SHARED_OBJECT_LOCAL:String = "Seesaw-Player";
@@ -46,16 +47,25 @@ public class ResumeServiceImpl implements ResumeService {
         localSharedObject = SharedObject.getLocal(SHARED_OBJECT_LOCAL);
     }
 
+    public function get programmeId():String {
+      return _programmeId;
+    }
+
+    public function set programmeId(value:String):void {
+      _programmeId = value;
+    }
+
     public function getResumeCookie():Number {
         var cookie:Number = 0;
-        if (localSharedObject.data.savedValue) {
-            cookie = Number(getDecryptedValue(localSharedObject.data.savedValue));
+        if (localSharedObject.data[programmeId] && localSharedObject.data[programmeId].savedValue) {
+            cookie = Number(getDecryptedValue(localSharedObject.data[programmeId].savedValue));
         }
         return cookie;
     }
 
     public function writeResumeCookie(currentTime:Number):void {
-        localSharedObject.data.savedValue = getEncryptedValue(String(currentTime));
+        if (!localSharedObject.data[programmeId]) localSharedObject.data[programmeId] = {};
+        localSharedObject.data[programmeId].savedValue = getEncryptedValue(String(currentTime));
 
         var flushStatus:String = null;
         try {
