@@ -1,34 +1,29 @@
 package com.seesaw.player.batchEventService.events {
-import flash.events.Event;
-import flash.events.EventDispatcher;
 
-import org.osmf.events.LoadEvent;
-import org.osmf.events.LoaderEvent;
-import org.osmf.events.MediaElementEvent;
-import org.osmf.media.MediaElement;
-import org.osmf.traits.MediaTraitType;
+public class ViewEvent {
 
-public class ViewEvent extends EventDispatcher {
-    
-    private var _viewId:int;
     private var transactionItemId:int;
-    private var serverTimeStamp:int;
+    private var _serverTimeStamp:int;
+    private var _userId:int;
+    private var _anonymousUserId:int;
     private var sectionCount:int;
     private var mainAssetId:int;
-    private var _proxiedElement:MediaElement;
 
-    public function ViewEvent(viewId:int, transactionItemId:int, serverTimeStamp:int, sectionCount:int, mainAssetId:int) {
-
-        this._viewId = viewId;
+    public function ViewEvent(transactionItemId:int, serverTimeStamp:int, sectionCount:int, mainAssetId:int, userId:int, anonymousUserId:int) {
+        this._userId = userId;
+        this._anonymousUserId = anonymousUserId;
         this.transactionItemId = transactionItemId;
-        this.serverTimeStamp = serverTimeStamp;
+        this._serverTimeStamp = serverTimeStamp;
         this.sectionCount = sectionCount;
         this.mainAssetId = mainAssetId;
+    }
 
+    public function get serverTimeStamp():int {
+        return _serverTimeStamp;
     }
 
     public function get getServerTimeStamp():Number {
-        return serverTimeStamp;
+        return _serverTimeStamp;
     }
 
     public function get getMainAssetId():int {
@@ -47,52 +42,20 @@ public class ViewEvent extends EventDispatcher {
         return sectionCount;
     }
 
-       public function get viewId():int {
-        return _viewId;
-    }
-    public function set proxiedElement(value:MediaElement):void {
-        _proxiedElement = value;
-        _proxiedElement.removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
-        _proxiedElement.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
-        _proxiedElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
-        _proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
+    public function get anonymousUserId():int {
+        return _anonymousUserId;
     }
 
-    private function onTraitAdd(event:MediaElementEvent):void {
-        updateTraitListeners(event.traitType, true);
+    public function get getAnonymousUserId():int{
+        return _anonymousUserId;
     }
 
-    private function onTraitRemove(event:MediaElementEvent):void {
-        updateTraitListeners(event.traitType, false);
-    }
-     
-        private function updateTraitListeners(traitType:String, add:Boolean):void {
-        switch (traitType) {
-            case MediaTraitType.LOAD:
-                changeListeners(add, traitType, LoaderEvent.LOAD_STATE_CHANGE, onLoadStateChange);
-                break;
-        
-        }
+    public function get getUserId():int {
+        return _userId;
     }
 
-    private function onLoadStateChange(event:LoadEvent):void {
-        if(event.loadState == "ready"){
-          dispatchEvent(new Event(EventTypes.FIRE_VIEW_EVENT));
-          _proxiedElement.removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
-          _proxiedElement.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
-          changeListeners(false, MediaTraitType.LOAD, LoaderEvent.LOAD_STATE_CHANGE, onLoadStateChange);
-          _proxiedElement = null;
-        }
+    public function get userId():int {
+        return _userId;
     }
-
-    private function changeListeners(add:Boolean, traitType:String, event:String, listener:Function):void {
-        if (add) {
-            _proxiedElement.getTrait(traitType).addEventListener(event, listener);
-        }
-        else if (_proxiedElement.hasTrait(traitType)) {
-            _proxiedElement.getTrait(traitType).removeEventListener(event, listener);
-        }
-    }
-    
 }
 }

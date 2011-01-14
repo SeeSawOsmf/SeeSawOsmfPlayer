@@ -9,18 +9,36 @@ package com.seesaw.player.batchEventService.events {
 
 public class UserEvent {
 
-    private var viewId;Number;
     private var userEventId:int;
     private var cumulativeViewDuration:int;
     private var eventType:String;
-    private var eventOccurred:Date;
+    private var _programmeId:int;
 
-    public function UserEvent( viewId:Number, userEventId:int, cumulativeViewDuration:int, eventType:String, eventOccurred:Date  ) {
-        this.viewId = viewId;
+    public function UserEvent( userEventId:int, cumulativeViewDuration:int, eventType:String, programmeId:int ) {
+        this._programmeId = programmeId;
         this.userEventId = userEventId;
         this.cumulativeViewDuration = cumulativeViewDuration;
         this.eventType = eventType;
-        this.eventOccurred = eventOccurred;
+    }
+
+    public function get getUserEventId():int {
+        return userEventId;
+    }
+
+    public function get getCulmulativeViewDuration():int {
+        return cumulativeViewDuration;
+    }
+
+    public function get getEventType():String {
+        return eventType;
+    }
+
+    public function get getEventOccured():Date {
+        return new Date();
+    }
+
+    public function get getProgrammeId():int {
+        return _programmeId;
     }
 }
 }

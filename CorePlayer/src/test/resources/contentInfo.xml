@@ -35,6 +35,7 @@
     <unavailablePageUrl>http://localhost:8080/unavailable</unavailablePageUrl>
     <videoInfoUrl>http://localhost:8080/player.playerinitialisation:videoinfo?t:ac=TV:DRAMA/p/33535/Sintel</videoInfoUrl>
     <batchEventService>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player.videoplayer:registerbatchevent?t:ac=TV:COMEDY/b/8542/Nathan-Barley</batchEventService>
+    <cumulativeDurationService>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player.videoplayer:playIntervalEvent?t:ac=TV:COMEDY/b/8542/Nathan-Barley</cumulativeDurationService>
     <largeImageUrl>http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/E4_LARGE.png</largeImageUrl>
     <liverail>
         <version>4.1</version>
@@ -43,4 +44,6 @@
     <adMode>liverail</adMode>
     <dogImage>http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png</dogImage>
     <programme>33535</programme>
+    <userId>1234</userId>
+    <anonymousUserId>0000</anonymousUserId>
 </contentInfo>

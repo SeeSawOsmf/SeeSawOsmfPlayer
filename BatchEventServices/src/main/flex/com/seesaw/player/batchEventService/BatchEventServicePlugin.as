@@ -44,7 +44,6 @@ public class BatchEventServicePlugin extends PluginInfo {
         logger.debug("can handle this resource: " + resource);
         var result:Boolean;
 
-
         if (resource != null) {
             var settings:Metadata = resource.getMetadataValue(PlayerConstants.SMIL_METADATA_NS) as Metadata;
             result = settings != null;
