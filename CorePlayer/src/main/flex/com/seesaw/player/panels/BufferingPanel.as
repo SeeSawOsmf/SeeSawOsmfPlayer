@@ -95,6 +95,8 @@ public class BufferingPanel extends MediaElement {
         layoutMetadata.verticalAlign = VerticalAlign.MIDDLE;
 
         this.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layoutMetadata);
+
+        hide();
     }
 
     public function show():void {
@@ -114,7 +116,7 @@ public class BufferingPanel extends MediaElement {
     }
 
     private function showTooSlowMessage(event:Event):void {
-      parentContainer.backgroundAlpha = 0.4;
+      parentContainer.backgroundAlpha = 0.8;
       contentContainer.visible = true;
     }
 
@@ -186,11 +188,10 @@ public class BufferingPanel extends MediaElement {
 
     private function buildFindOutMoreLink():TextField {
         var findOutMoreLink = new TextField();
-        findOutMoreLink.width = 90;
+        findOutMoreLink.width = PANEL_WIDTH;
         findOutMoreLink.height = 20;
         findOutMoreLink.wordWrap = true;
         findOutMoreLink.htmlText = this.findOutWhyLink;
-        findOutMoreLink.x = 34;
         findOutMoreLink.y = 187;
 
         this.applyLinkFormat(findOutMoreLink);
@@ -201,10 +202,10 @@ public class BufferingPanel extends MediaElement {
 
     private function applyWarningFormat(textToFormat:TextField):TextField {
         var textFormat:TextFormat = new TextFormat();
-        textFormat.size = 12;
+        textFormat.size = 10;
         textFormat.font = "Arial";
         textFormat.color = 0xFFFFFF;
-        textFormat.align = "left";
+        textFormat.align = "center";
         textFormat.leading = 3;
 
         textToFormat.setTextFormat(textFormat);
@@ -215,10 +216,10 @@ public class BufferingPanel extends MediaElement {
 
     private function applyLinkFormat(textToFormat:TextField):TextField {
         var textFormat:TextFormat = new TextFormat();
-        textFormat.size = 12;
+        textFormat.size = 10;
         textFormat.font = "Arial";
         textFormat.color = 0x00A88E;
-        textFormat.align = "left";
+        textFormat.align = "center";
         textFormat.leading = 3;
 
         textToFormat.setTextFormat(textFormat);

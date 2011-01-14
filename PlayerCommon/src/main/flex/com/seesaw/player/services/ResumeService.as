@@ -22,13 +22,16 @@
 package com.seesaw.player.services {
 
 public interface ResumeService {
+    function get programmeId():String;
+    function set programmeId(value:String):void;
+
     function getResumeCookie():Number;
 
     function writeResumeCookie(currentTime:Number):void;
 
     function getEncryptedValue(value:String):String;
 
-    function getDecryptedValue(value:String):String
+    function getDecryptedValue(value:String):String;
 
 }
 }
