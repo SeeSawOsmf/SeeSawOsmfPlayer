@@ -153,6 +153,14 @@ public class SeeSawPlayer extends Sprite {
         bufferingContainer.layoutMetadata.verticalAlign = VerticalAlign.MIDDLE;
         addChild(bufferingContainer);
 
+        subtitlesContainer = new MediaContainer();
+        subtitlesContainer.y = 0;
+        subtitlesContainer.x = 0;
+        subtitlesContainer.layoutMetadata.percentWidth = 100; 
+        subtitlesContainer.layoutMetadata.percentHeight = 100;
+        subtitlesContainer.layoutMetadata.verticalAlign = VerticalAlign.BOTTOM;
+        addChild(subtitlesContainer);
+        
         controlbarContainer = new MediaContainer();
         controlbarContainer.y = 0;
         controlbarContainer.x = 0;
@@ -161,23 +169,15 @@ public class SeeSawPlayer extends Sprite {
         controlbarContainer.layoutMetadata.verticalAlign = VerticalAlign.BOTTOM;
         addChild(controlbarContainer);
 
-        subtitlesContainer = new MediaContainer();
-        subtitlesContainer.y = 0;
-        subtitlesContainer.x = 0;
-        subtitlesContainer.layoutMetadata.percentWidth = 100; 
-        subtitlesContainer.layoutMetadata.percentHeight = 100;
-        subtitlesContainer.layoutMetadata.verticalAlign = VerticalAlign.BOTTOM;
-        addChild(subtitlesContainer);
-
         container.layoutRenderer.addTarget(mainContainer);
         container.layoutRenderer.addTarget(bufferingContainer);
-        container.layoutRenderer.addTarget(controlbarContainer);
         container.layoutRenderer.addTarget(subtitlesContainer);
+        container.layoutRenderer.addTarget(controlbarContainer);
 
         createVideoElement();
+        createBufferingPanel();
         createControlBarElement();
         createSubtitleElement();
-        createBufferingPanel();
 
         player.media = contentElement;
 
