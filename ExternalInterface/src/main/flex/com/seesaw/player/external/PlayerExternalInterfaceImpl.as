@@ -27,7 +27,6 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 
 public class PlayerExternalInterfaceImpl implements PlayerExternalInterface {
-
     private var logger:ILogger = LoggerFactory.getClassLogger(PlayerExternalInterfaceImpl);
 
     public function get available():Boolean {
@@ -40,6 +39,10 @@ public class PlayerExternalInterfaceImpl implements PlayerExternalInterface {
 
     public function callLightsUp():void {
         call(ExternalInterfaceConstants.LIGHTS_UP);
+    }
+
+    public function callSWFInit():void {
+        call(ExternalInterfaceConstants.SET_SWF_INIT);
     }
 
     public function addGetGuidanceCallback(callback:Function):void {
@@ -60,6 +63,10 @@ public class PlayerExternalInterfaceImpl implements PlayerExternalInterface {
 
     public function addShowDogCallback(callback:Function):void {
         addCallback(ExternalInterfaceConstants.HIDE_DOG, callback);
+    }
+
+    public function addSetPlaylistCallback(callback:Function):void {
+        addCallback(ExternalInterfaceConstants.SET_PLAYLIST, callback);
     }
 
     private function addCallback(name:String, callback:Function):void {

@@ -117,7 +117,7 @@ CONFIG::LOGGING
 
 					var smilVideoElement:SMILMediaElement = smilElement as SMILMediaElement;
 
-					if (!isNaN(smilVideoElement.clipBegin) && smilVideoElement.clipBegin > 0 &&
+					if (!isNaN(smilVideoElement.clipBegin) && smilVideoElement.clipBegin > -1 &&
 					    !isNaN(smilVideoElement.clipEnd) && smilVideoElement.clipEnd > 0)
 					{
 						resource.clipStartTime = smilVideoElement.clipBegin;
@@ -287,8 +287,7 @@ CONFIG::LOGGING
 			if (streamItems.length)
 			{
 				dsr = new DynamicStreamingResource(hostURL);
-
-                if (!isNaN(videoElement.clipBegin) && videoElement.clipBegin > 0 &&
+                if (!isNaN(videoElement.clipBegin) && videoElement.clipBegin > -1 &&
                     !isNaN(videoElement.clipEnd) && videoElement.clipEnd > 0) {
                     dsr.clipStartTime = videoElement.clipBegin;
                     dsr.clipEndTime = videoElement.clipEnd;

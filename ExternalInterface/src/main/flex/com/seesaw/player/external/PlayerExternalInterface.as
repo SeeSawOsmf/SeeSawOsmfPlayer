@@ -27,9 +27,11 @@ public interface PlayerExternalInterface {
     
     function callLightsDown():void;
     function callLightsUp():void;
+    function callSWFInit():void;
 
     function addGetGuidanceCallback(callback:Function):void;
     function addGetCurrentItemTitleCallback(callback:Function):void;
     function addGetCurrentItemDurationCallback(callback:Function):void;
+    function addSetPlaylistCallback(callback:Function):void;
 }
 }
