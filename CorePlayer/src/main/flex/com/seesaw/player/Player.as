@@ -101,7 +101,7 @@ public class Player extends Sprite {
         // If no flashVar, use a default for testing
         // TODO: remove this altogether
         loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/" +
-                "player.playerinitialisation:playerinit?t:ac=TV:FACTUAL/s/7675/Around-the-World-in-80-Days";
+                "player/initinfo/4663";
 
         stage.scaleMode = StageScaleMode.NO_SCALE;
         stage.align = StageAlign.TOP_LEFT;
