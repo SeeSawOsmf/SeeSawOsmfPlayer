@@ -28,6 +28,7 @@ import com.seesaw.player.ui.StyledTextField;
 import controls.seesaw.widget.interfaces.IWidget;
 
 import flash.events.Event;
+import flash.events.FullScreenEvent;
 import flash.events.MouseEvent;
 import flash.text.TextField;
 import flash.text.TextFormat;
@@ -48,6 +49,8 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
 
     private var subtitlesOn:Boolean;
     private var subtitlesLabel:TextField;
+
+    private var fullscreen:Boolean = false;
 
     private var mouseOverLabel:Boolean = false;
 
@@ -136,7 +139,6 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
 
     private function onAddedToStage(event:Event) {
         stage.addChild(this.toolTip);
-        logger.debug("X POS: " + this.x + " WIDTH: " + this.width);
     }
 
     private function formatLabelFont():void {
@@ -149,6 +151,7 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
 
     private function formatLabelHoverFont():void {
         var textFormat:TextFormat = new TextFormat();
+        textFormat.size = 11;
         textFormat.color = 0xFFFFFF;
         this.subtitlesLabel.setTextFormat(textFormat);
     }

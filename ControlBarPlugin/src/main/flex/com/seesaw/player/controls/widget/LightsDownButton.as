@@ -142,6 +142,7 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
 
     private function formatLabelHoverFont():void {
         var textFormat:TextFormat = new TextFormat();
+        textFormat.size = 11;
         textFormat.color = 0xFFFFFF;
         this.lightsDownLabel.setTextFormat(textFormat);
     }
