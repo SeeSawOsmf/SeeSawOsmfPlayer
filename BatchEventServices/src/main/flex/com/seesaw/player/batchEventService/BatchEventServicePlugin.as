@@ -1,8 +1,17 @@
 package com.seesaw.player.batchEventService {
 import com.seesaw.player.PlayerConstants;
 
+import flash.display.Stage;
+
+import flash.events.Event;
+
+import flash.events.FullScreenEvent;
+
+import mx.containers.ControlBar;
+
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
+import org.osmf.elements.VideoElement;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactoryItem;
 import org.osmf.media.MediaFactoryItemType;
@@ -15,7 +24,6 @@ public class BatchEventServicePlugin extends PluginInfo {
     private static var logger:ILogger = LoggerFactory.getClassLogger(BatchEventServicePlugin);
 
     public static const ID:String = "com.seesaw.player.batchEventService";
-    private static var batchEventService:BatchEventService;
 
       public function BatchEventServicePlugin() {
         logger.debug("com.seesaw.player.batchEventService -- initialise");
@@ -35,7 +43,6 @@ public class BatchEventServicePlugin extends PluginInfo {
     private static function canHandleResourceFunction(resource:MediaResourceBase):Boolean {
         logger.debug("can handle this resource: " + resource);
         var result:Boolean;
-       
 
         if (resource != null) {
             var settings:Metadata = resource.getMetadataValue(PlayerConstants.SMIL_METADATA_NS) as Metadata;
@@ -43,22 +50,15 @@ public class BatchEventServicePlugin extends PluginInfo {
         }
 
         return result;
-    ////     return resource && resource.getMetadataValue(PlayerConstants.SMIL_METADATA_NS) != null && resource.mediaType == MediaType.VIDEO;
     }
 
     private static function mediaElementCreationFunction():MediaElement {
         logger.debug("constructing proxy element");
-
-       // if(!batchEventService)
-        batchEventService = new BatchEventService();
-
-        return batchEventService;
+        return new BatchEventService();
     }
 
     private function mediaElementCreationNotificationCallback(target:MediaElement):void {
-        logger.debug("mediaElementCreationNotificationCallback: " + target);
-
-
+        logger.debug("mediaElementCreationNotificationCallback:" + target);
     }
 }
 }

@@ -1,7 +1,7 @@
 package com.seesaw.player.batchEventService.events.maps {
 public class UserEventMap {
 
-		private var culmulativeViewDuration:int;
+	private var culmulativeViewDuration:int;
 		private var eventType:String;
 		private var eventOccured:Date;
 		private var userEventId:int;

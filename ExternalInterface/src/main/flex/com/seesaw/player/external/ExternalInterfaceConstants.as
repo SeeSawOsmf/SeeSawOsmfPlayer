@@ -31,5 +31,9 @@ public class ExternalInterfaceConstants {
 
     public static const SHOW_DOG:String = "showDog";
     public static const HIDE_DOG:String = "hideDog";
+
+    public static const SET_PLAYLIST:String = "setPlaylist";
+
+    public static const SET_SWF_INIT:String = "VODCO.ads.player.setSWFInit";
 }
 }

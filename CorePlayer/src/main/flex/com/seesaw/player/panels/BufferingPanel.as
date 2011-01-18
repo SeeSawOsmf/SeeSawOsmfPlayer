@@ -46,7 +46,7 @@ import org.osmf.traits.MediaTraitType;
 
 public class BufferingPanel extends MediaElement {
     private const PANEL_WIDTH:Number = 260;
-    private const PANEL_HEIGHT:Number = 230;
+    private const PANEL_HEIGHT:Number = 110;
 
     private var logger:ILogger = LoggerFactory.getClassLogger(BufferingPanel);
 
@@ -70,7 +70,7 @@ public class BufferingPanel extends MediaElement {
      */
     public function BufferingPanel(container:MediaContainer) {
         parentContainer = container;
-
+        
         //set the private variables
         this.bufferingMessage = "<p><font color='#FFFFFF'>Your internet connection speed is too slow.</font></p>";
         this.findOutWhyLink = "<font color='#00A88E'><a href='/help'>Find out why</a></font>.";
@@ -95,20 +95,16 @@ public class BufferingPanel extends MediaElement {
         layoutMetadata.verticalAlign = VerticalAlign.MIDDLE;
 
         this.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layoutMetadata);
-
+        
         hide();
     }
 
     public function show():void {
-      logger.debug("BUFFERING PANEL - SHOW");
-      parentContainer.layoutMetadata.includeInLayout = true;
-      panel.visible = true;
       tooSlowTimer.reset();
       tooSlowTimer.start();
     }
 
     public function hide():void {
-      logger.debug("BUFFERING PANEL - HIDE");
       parentContainer.layoutMetadata.includeInLayout = false;
       panel.visible = false;
       tooSlowTimer.stop();
@@ -117,12 +113,12 @@ public class BufferingPanel extends MediaElement {
 
     private function showTooSlowMessage(event:Event):void {
       parentContainer.backgroundAlpha = 0.8;
-      contentContainer.visible = true;
+      parentContainer.layoutMetadata.includeInLayout = true;
+      panel.visible = true;
     }
 
     private function hideTooSlowMessage():void {
       parentContainer.backgroundAlpha = 0.0;
-      contentContainer.visible = false;
     }
 
     private function buildCSS():void {
@@ -143,43 +139,30 @@ public class BufferingPanel extends MediaElement {
     private function buildPanel():Sprite {
         panel = new Sprite();
 
-        contentContainer = this.buildContentContainer();
-        contentContainer.addChild(this.buildWarning());
-        contentContainer.addChild(this.buildFindOutMoreLink());
-
         preloader = new Preloader();
         panel.addEventListener(Event.ADDED_TO_STAGE, positionPreloader);
         panel.addChild(preloader);
-
-        panel.addChild(contentContainer);
+        
+        panel.addChild(this.buildWarning());
+        panel.addChild(this.buildFindOutMoreLink());
 
         return panel;
     }
 
     private function positionPreloader(event:Event):void {
         preloader.x = (PANEL_WIDTH / 2) - (preloader.width / 2);
-        preloader.y = (PANEL_HEIGHT / 2) - (preloader.height / 2);
-    }
-
-    private function buildContentContainer():Sprite {
-        var contentContainer:Sprite = new Sprite();
-        //the x and y of this container are the equivalent to padding in CSS
-        contentContainer.x = 0;
-        contentContainer.y = 0;
-        contentContainer.visible = false; //we only show this after 2.5 seconds of buffering
-
-        return contentContainer;
+        preloader.y = 0;
     }
 
     private function buildWarning():TextField {
         var warningLabel = new TextField();
         warningLabel.width = PANEL_WIDTH;
-        warningLabel.height = PANEL_HEIGHT;
+        warningLabel.height = 20;
         warningLabel.multiline = true;
         warningLabel.wordWrap = true;
         warningLabel.htmlText = this.bufferingMessage;
 
-        warningLabel.y = 0;
+        warningLabel.y = 70;
 
         this.applyWarningFormat(warningLabel);
 
@@ -192,7 +175,7 @@ public class BufferingPanel extends MediaElement {
         findOutMoreLink.height = 20;
         findOutMoreLink.wordWrap = true;
         findOutMoreLink.htmlText = this.findOutWhyLink;
-        findOutMoreLink.y = 187;
+        findOutMoreLink.y = 90;
 
         this.applyLinkFormat(findOutMoreLink);
         //var formattedWarningLabel:TextField = this.applyWarningFormat(warningLabel);

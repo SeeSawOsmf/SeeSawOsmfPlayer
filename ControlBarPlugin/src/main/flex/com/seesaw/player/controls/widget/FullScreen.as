@@ -21,6 +21,8 @@
  */
 
 package com.seesaw.player.controls.widget {
+
+import com.seesaw.player.controls.ControlBarMetadata;
 import com.seesaw.player.ui.PlayerToolTip;
 import com.seesaw.player.ui.StyledTextField;
 
@@ -32,7 +34,6 @@ import flash.events.FullScreenEvent;
 import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.text.TextField;
-import flash.text.TextFieldAutoSize;
 import flash.text.TextFormat;
 import flash.ui.Keyboard;
 
@@ -42,6 +43,7 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.chrome.widgets.ButtonWidget;
 import org.osmf.media.MediaElement;
+import org.osmf.metadata.Metadata;
 import org.osmf.traits.MediaTraitType;
 
 public class FullScreen extends ButtonWidget implements IWidget {
@@ -54,6 +56,8 @@ public class FullScreen extends ButtonWidget implements IWidget {
     private var fullScreenLabel:TextField;
     private var toolTip:PlayerToolTip;
     private var _requiredTraits:Vector.<String> = new Vector.<String>;
+
+    private var metadata:Metadata;
 
     public function FullScreen() {
         logger.debug("FullScreen()");
@@ -69,6 +73,18 @@ public class FullScreen extends ButtonWidget implements IWidget {
         addChild(fullScreenLabel);
 
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+    }
+
+    override public function set media(value:MediaElement):void {
+        super.media = value;
+        if (media) {
+            metadata = media.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+            if (metadata == null) {
+                metadata = new Metadata();
+                media.addMetadata(ControlBarMetadata.CONTROL_BAR_METADATA, metadata);
+            }
+            metadata.addValue(ControlBarMetadata.FULL_SCREEN, false);
+        }
     }
 
     private function onAddedToStage(event:Event) {
@@ -130,6 +146,7 @@ public class FullScreen extends ButtonWidget implements IWidget {
             fullScreenLabel.text = FULLSCREEN_LABEL;
             toolTip.updateToolTip(FULLSCREEN_LABEL);
         }
+        metadata.addValue(ControlBarMetadata.FULL_SCREEN, event.fullScreen);
     }
 
     public function get classDefinition():String {

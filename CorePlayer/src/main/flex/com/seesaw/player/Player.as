@@ -82,6 +82,8 @@ public class Player extends Sprite {
 
     private var playerInit:XML;
     private var videoInfo:XML;
+  
+    private var ASX_data:String;
 
     var testApi:TestApi;
 
@@ -125,6 +127,9 @@ public class Player extends Sprite {
             xi.addGetGuidanceCallback(checkGuidance);
             xi.addGetCurrentItemTitleCallback(getCurrentItemTitle);
             xi.addGetCurrentItemDurationCallback(getCurrentItemDuration);
+            xi.addSetPlaylistCallback(setPlaylist);
+            // Let JS know we're ready to receive calls (e.g. C4 ad script):
+            xi.callSWFInit();
         }
     }
 
@@ -250,6 +255,16 @@ public class Player extends Sprite {
         }
     }
 
+    private function setPlaylist(asx:String):void {
+      logger.info("Retreived ASX data from C4");
+      logger.info(asx);
+
+      ASX_data = asx;
+
+      resetInitialisationStages();
+      nextInitialisationStage();
+    }
+
     private function attemptPlaybackStart():void {
         requestProgrammeData(playerInit.videoInfoUrl);
     }
@@ -271,20 +286,24 @@ public class Player extends Sprite {
 
         playerInit = xmlDoc;
         setupExternalInterface();
-        resetInitialisationStages();
-        nextInitialisationStage();
+
+        if (playerInit.adMode != "channel4") {
+          resetInitialisationStages();
+          nextInitialisationStage();
+        }
     }
 
     private function requestProgrammeData(videoInfoUrl:String):void {
         logger.debug("requesting programme data: " + videoInfoUrl);
-
         var request:ServiceRequest = new ServiceRequest(videoInfoUrl, onSuccessFromVideoInfo, onFailFromVideoInfo);
-        /* To post data (needed for C4 ads) use the following:
-        var post_data:URLVariables = new URLVariables();
-        post_data.advertASX = "this is some data";
-        request.submit(post_data);
-        */
-        request.submit();
+        // For C4 ads we POST the ASX we receive from the ad script. For liverail and auditude, there's no need
+        if (playerInit.adMode != "channel4") {
+          request.submit();
+        } else {
+          var post_data:URLVariables = new URLVariables();
+          post_data.advertASX = ASX_data;
+          request.submit(post_data);
+        }
     }
 
     private function onSuccessFromVideoInfo(response:Object):void {
@@ -319,6 +338,10 @@ public class Player extends Sprite {
         var config:PlayerConfiguration = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, content);
         videoPlayer = new SeeSawPlayer(config);
 
+        // Since we have autoPlay to false for liverail, we need to manually call play for C4:
+        if (playerInit.adMode == "channel4")
+            videoPlayer.mediaPlayer().autoPlay = true;
+        
         addChild(videoPlayer);
     }
 
