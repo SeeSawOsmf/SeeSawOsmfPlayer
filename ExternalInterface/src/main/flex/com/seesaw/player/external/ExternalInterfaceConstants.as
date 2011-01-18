@@ -22,8 +22,8 @@
 
 package com.seesaw.player.external {
 public class ExternalInterfaceConstants {
-    public static const LIGHTS_DOWN:String = "lightsDown.lightsDown";
-    public static const LIGHTS_UP:String = "lightsDown.lightsUp";
+    public static const LIGHTS_DOWN:String = "VODCO.ads.player.onPlayerLightsDown";
+    public static const LIGHTS_UP:String = "VODCO.ads.player.onPlayerLightsUp";
 
     public static const GET_GUIDANCE:String = "getGuidance";
     public static const GET_CURRENT_ITEM_TITLE:String = "getCurrentItemTitle";
