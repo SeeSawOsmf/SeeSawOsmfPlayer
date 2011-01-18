@@ -168,6 +168,7 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
         }
         lightsDownLabel.text = "Turn lights up";
         this.toolTip.updateToolTip("Turn lights up");
+        this.formatLabelFont();
         if (this.mouseOverLabel == true) {
             this.formatLabelHoverFont();
         }
@@ -181,6 +182,7 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
         }
         lightsDownLabel.text = "Turn lights down";
         this.toolTip.updateToolTip("Turn lights down");
+        this.formatLabelFont();
         if (this.mouseOverLabel == true) {
             this.formatLabelHoverFont();
         }
