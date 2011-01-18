@@ -142,6 +142,7 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
 
     private function formatLabelHoverFont():void {
         var textFormat:TextFormat = new TextFormat();
+        textFormat.size = 11;
         textFormat.color = 0xFFFFFF;
         this.lightsDownLabel.setTextFormat(textFormat);
     }
@@ -167,6 +168,7 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
         }
         lightsDownLabel.text = "Turn lights up";
         this.toolTip.updateToolTip("Turn lights up");
+        this.formatLabelFont();
         if (this.mouseOverLabel == true) {
             this.formatLabelHoverFont();
         }
@@ -180,6 +182,7 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
         }
         lightsDownLabel.text = "Turn lights down";
         this.toolTip.updateToolTip("Turn lights down");
+        this.formatLabelFont();
         if (this.mouseOverLabel == true) {
             this.formatLabelHoverFont();
         }
