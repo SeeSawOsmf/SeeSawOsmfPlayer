@@ -42,7 +42,7 @@ public class PlayerExternalInterfaceImpl implements PlayerExternalInterface {
     }
 
     public function callSWFInit():void {
-        call(ExternalInterfaceConstants.SET_SWF_INIT);
+        call(ExternalInterfaceConstants.SET_SWF_INIT, true);
     }
 
     public function addGetGuidanceCallback(callback:Function):void {
@@ -76,10 +76,10 @@ public class PlayerExternalInterfaceImpl implements PlayerExternalInterface {
         }
     }
 
-    private function call(name:String) {
+    private function call(...args) {
         if (available) {
-            logger.debug("calling {0}", name);
-            ExternalInterface.call(name);
+            logger.debug("calling {0}", args[0].toString());
+            ExternalInterface.call.apply(null, args);
         }
     }
 }
