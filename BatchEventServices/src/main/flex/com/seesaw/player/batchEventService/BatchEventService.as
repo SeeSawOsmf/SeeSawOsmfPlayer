@@ -21,7 +21,6 @@ import org.osmf.elements.ProxyElement;
 import org.osmf.events.BufferEvent;
 import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
-import org.osmf.events.MediaErrorEvent;
 import org.osmf.events.MetadataEvent;
 import org.osmf.events.PlayEvent;
 import org.osmf.events.SeekEvent;
@@ -88,7 +87,6 @@ public class BatchEventService extends ProxyElement {
         super(proxiedElement);
         var provider:ObjectProvider = ObjectProvider.getInstance();
         resumeService = provider.getObject(ResumeService);
-        addEventListener(MediaErrorEvent.MEDIA_ERROR, onLoadableStateChange);
         if (resumeService == null) {
             throw ArgumentError("no resume service implementation provided");
         }
@@ -110,10 +108,6 @@ public class BatchEventService extends ProxyElement {
                     processTrait(traitType, true);
                 }
             }
-
-            /*  var setVideoElement: VideoElement =    proxiedElement    as VideoElement;
-             if(setVideoElement)
-             setVideoElement.client.addHandler(NetStreamCodes.ON_META_DATA, onLoadableStateChange);*/
 
             cumulativeDurationCount = 0;
             cumulativeDurationMonitor = new Timer(CUMULATIVE_DURATION_MONITOR_TIMER_DELAY_INTERVAL, 0);
@@ -377,7 +371,7 @@ public class BatchEventService extends ProxyElement {
     }
 
 
-    private function onLoadableStateChange(event:MediaErrorEvent):void {
+    private function onLoadableStateChange(event:LoadEvent):void {
         switch (event) {
 
             case LoadState.READY:
