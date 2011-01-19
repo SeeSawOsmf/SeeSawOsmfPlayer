@@ -21,7 +21,6 @@
  */
 
 package com.seesaw.player {
-import org.osmf.media.DefaultMediaFactory;
 import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaResourceBase;
 
@@ -60,7 +59,7 @@ public class PlayerConfiguration {
      * @return the factory
      */
     protected function constructFactory():MediaFactory {
-        return new DefaultMediaFactory();
+        return new FriendlyMediaFactory();
     }
 
     public function get width():int {
