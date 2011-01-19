@@ -82,6 +82,7 @@ public class BatchEventService extends ProxyElement {
 
     private var eventsManager:EventsManager;
     private var tooSlowTimer:Timer;
+    private var mainContentCount:int;
 
     public function BatchEventService(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -110,9 +111,9 @@ public class BatchEventService extends ProxyElement {
                 }
             }
 
-          /*  var setVideoElement: VideoElement =    proxiedElement    as VideoElement;
-            if(setVideoElement)
-            setVideoElement.client.addHandler(NetStreamCodes.ON_META_DATA, onLoadableStateChange);*/
+            /*  var setVideoElement: VideoElement =    proxiedElement    as VideoElement;
+             if(setVideoElement)
+             setVideoElement.client.addHandler(NetStreamCodes.ON_META_DATA, onLoadableStateChange);*/
 
             cumulativeDurationCount = 0;
             cumulativeDurationMonitor = new Timer(CUMULATIVE_DURATION_MONITOR_TIMER_DELAY_INTERVAL, 0);
@@ -202,6 +203,7 @@ public class BatchEventService extends ProxyElement {
                 case "mainContent" :
                     playingMainContent = true;
                     contentViewingSequenceNumber++;
+                    mainContentCount++;
                     eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.MAIN_CONTENT));
                     eventsManager.flushAll();
                     break;
@@ -211,7 +213,7 @@ public class BatchEventService extends ProxyElement {
                 default : trace("############ unknown content type found in meta data ############### " + contentType)
 
             }
-        }else  if (event.namespaceURL == "http://www.seesaw.com/netstatus/metadata") {
+        } else if (event.namespaceURL == "http://www.seesaw.com/netstatus/metadata") {
             trace("http://www.seesaw.com/netstatus/metadata");
         }
     }
@@ -269,7 +271,7 @@ public class BatchEventService extends ProxyElement {
                 tooSlowTimer = new Timer(2500, 1);
                 tooSlowTimer.start();
                 tooSlowTimer.addEventListener(TimerEvent.TIMER_COMPLETE, bufferShowEvent);
-            }else{
+            } else {
                 tooSlowTimer.stop();
             }
         }
@@ -296,7 +298,7 @@ public class BatchEventService extends ProxyElement {
             case MediaTraitType.LOAD:
                 toggleLoadListeners(added);
                 break;
-           /// case   private var playTrait:PlayTrait;
+            /// case   private var playTrait:PlayTrait;
         }
     }
 
@@ -311,12 +313,12 @@ public class BatchEventService extends ProxyElement {
             }
         }
     }
+
     private function toggleLoadListeners(added:Boolean):void {
         var loadable:LoadTrait = proxiedElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
         if (loadable) {
             if (added) {
-                proxiedElement.addEventListener(MediaErrorEvent.MEDIA_ERROR, onLoadableStateChange);
-               ///proxiedElement.client.addHandler(NetStreamCodes.ON_META_DATA, onLoadableStateChange)
+                loadable.addEventListener(LoadEvent.LOAD_STATE_CHANGE, onLoadableStateChange);
             }
             else {
                 loadable.removeEventListener(LoadEvent.LOAD_STATE_CHANGE, onLoadableStateChange);
@@ -376,13 +378,12 @@ public class BatchEventService extends ProxyElement {
 
 
     private function onLoadableStateChange(event:MediaErrorEvent):void {
-         switch (event)
-         {
+        switch (event) {
 
             case LoadState.READY:
-             /// trace(event.target.resource.loader.netStream);
-             /*    var loadedContext:NetLoadedContext = event.loadable.loadedContext as  NetLoadedContext;
-                var netStream:NetStream =  loadedContext.stream;*/
+            /// trace(event.target.resource.loader.netStream);
+            /*    var loadedContext:NetLoadedContext = event.loadable.loadedContext as  NetLoadedContext;
+             var netStream:NetStream =  loadedContext.stream;*/
 
         }
     }
@@ -413,8 +414,10 @@ public class BatchEventService extends ProxyElement {
     }
 
     private function onComplete(event:TimeEvent):void {
-        eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.END));
-        eventsManager.flushAll();
+        if (mainContentCount * 2 == sectionCount) {
+            eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.END));
+            eventsManager.flushAll();
+        }
     }
 
 
