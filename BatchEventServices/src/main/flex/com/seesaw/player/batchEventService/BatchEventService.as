@@ -81,6 +81,7 @@ public class BatchEventService extends ProxyElement {
     private var contentDuration = 5;
 
     private var eventsManager:EventsManager;
+    private var tooSlowTimer:Timer;
 
     public function BatchEventService(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -265,9 +266,17 @@ public class BatchEventService extends ProxyElement {
     private function onBufferingChange(event:BufferEvent):void {
         if (playingMainContent) {
             if (event.buffering) {
-                eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.BUFFERING));
+                tooSlowTimer = new Timer(2500, 1);
+                tooSlowTimer.start();
+                tooSlowTimer.addEventListener(TimerEvent.TIMER_COMPLETE, bufferShowEvent);
+            }else{
+                tooSlowTimer.stop();
             }
         }
+    }
+
+    private function bufferShowEvent(event:TimerEvent):void {
+        eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.BUFFERING));
     }
 
     private function processTrait(traitType:String, added:Boolean):void {
