@@ -83,6 +83,12 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
         addChild(lightsDownLabel);
     }
 
+    private function setupExternalInterface():void {
+        if (ExternalInterface.available) {
+            ExternalInterface.addCallback("updateLightsStatus", this.updateLightsStatus);
+        }
+    }
+
     private function onMouseOver (event:MouseEvent):void {
         if (this.mouseOverLabel == false) {
             this.mouseOverLabel = true;
@@ -94,6 +100,14 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
         if (this.mouseOverLabel == true) {
             this.mouseOverLabel = false;
             formatLabelFont();
+        }
+    }
+
+    private function updateLightsStatus ():void {
+        if (lightsDownOn) {
+            this.turnLightsUp();
+        } else {
+            this.turnLightsDown();
         }
     }
 
@@ -142,6 +156,7 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
 
     private function formatLabelHoverFont():void {
         var textFormat:TextFormat = new TextFormat();
+        textFormat.size = 11;
         textFormat.color = 0xFFFFFF;
         this.lightsDownLabel.setTextFormat(textFormat);
     }
@@ -167,6 +182,7 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
         }
         lightsDownLabel.text = "Turn lights up";
         this.toolTip.updateToolTip("Turn lights up");
+        this.formatLabelFont();
         if (this.mouseOverLabel == true) {
             this.formatLabelHoverFont();
         }
@@ -180,6 +196,7 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
         }
         lightsDownLabel.text = "Turn lights down";
         this.toolTip.updateToolTip("Turn lights down");
+        this.formatLabelFont();
         if (this.mouseOverLabel == true) {
             this.formatLabelHoverFont();
         }

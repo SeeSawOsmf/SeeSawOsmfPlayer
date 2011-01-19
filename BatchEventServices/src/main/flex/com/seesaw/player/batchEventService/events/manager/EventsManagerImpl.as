@@ -100,7 +100,8 @@ public class EventsManagerImpl implements EventsManager {
         flushAll();
     }
 
-    private function onCumulativeDurationFailed(response:Object):void {
+    // There's no actual response sent as an argument for ServiceRequest failHandlers...
+    private function onCumulativeDurationFailed(response:Object=null):void {
          trace("onCumulativeDurationFailed");
     }
 
