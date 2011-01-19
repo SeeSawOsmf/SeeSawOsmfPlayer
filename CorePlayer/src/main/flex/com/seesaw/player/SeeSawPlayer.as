@@ -48,7 +48,6 @@ import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
 import org.osmf.events.BufferEvent;
 import org.osmf.events.MediaElementEvent;
-import org.osmf.events.MediaErrorEvent;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.events.MetadataEvent;
 import org.osmf.events.PlayEvent;
@@ -239,12 +238,12 @@ public class SeeSawPlayer extends Sprite {
 
         logger.debug("creating video element");
         contentElement = factory.createMediaElement(config.resource);
+
         contentElement.addEventListener(MediaElementEvent.METADATA_ADD, onContentMetadataAdd);
         contentElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onContentMetadataRemove);
 
         contentElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
         contentElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
-
 
         mainContainer.addMediaElement(contentElement);
     }
@@ -308,7 +307,7 @@ public class SeeSawPlayer extends Sprite {
 
         var metadata:Metadata = contentElement.getMetadata(ExternalInterfaceMetadata.EXTERNAL_INTERFACE_METADATA);
 
-        if (metadata == null) {
+        if(metadata == null) {
             metadata = new Metadata();
             contentElement.addMetadata(ExternalInterfaceMetadata.EXTERNAL_INTERFACE_METADATA, metadata);
         }
@@ -400,8 +399,6 @@ public class SeeSawPlayer extends Sprite {
     private function onMediaElementCreate(event:MediaFactoryEvent):void {
         var mediaElement:MediaElement = event.mediaElement;
 
-        mediaElement.addEventListener(MediaErrorEvent.MEDIA_ERROR, onLoadableStateChange);
-
         var _setContentLayout:Function = function(metadataEvent:MetadataEvent):void {
             if (metadataEvent.key == PlayerConstants.CONTENT_TYPE) {
                 setContentLayout(metadataEvent.value, mediaElement);
@@ -414,10 +411,6 @@ public class SeeSawPlayer extends Sprite {
                 mediaElementEvent.metadata.addEventListener(MetadataEvent.VALUE_CHANGE, _setContentLayout);
             }
         })
-    }
-
-    private function onLoadableStateChange(event:MediaErrorEvent):void {
-        trace("error");
     }
 
     private function setRootElementLayout():void {
