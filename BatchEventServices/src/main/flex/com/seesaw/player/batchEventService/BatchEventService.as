@@ -210,6 +210,8 @@ public class BatchEventService extends ProxyElement {
                 default : trace("############ unknown content type found in meta data ############### " + contentType)
 
             }
+        }else  if (event.namespaceURL == "http://www.seesaw.com/netstatus/metadata") {
+            trace("http://www.seesaw.com/netstatus/metadata");
         }
     }
 
