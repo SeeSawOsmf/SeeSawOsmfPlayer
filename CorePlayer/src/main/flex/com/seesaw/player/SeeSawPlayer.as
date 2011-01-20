@@ -137,38 +137,6 @@ public class SeeSawPlayer extends Sprite {
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
     }
 
-
-    private function onPluginLoaded(event:MediaFactoryEvent):void {
-      //loadMainVideo(REMOTE_STREAM);
-      logger.debug("LOADED " + event.toString());
-      pluginsToLoad--;
-      if (pluginsToLoad <= 0) {
-        factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
-        factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadFailed);
-      
-        logger.debug("creating video element");
-        contentElement = factory.createMediaElement(config.resource);
-
-        contentElement.addEventListener(MediaElementEvent.METADATA_ADD, onContentMetadataAdd);
-        contentElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onContentMetadataRemove);
-
-        contentElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
-        contentElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
-
-        mainContainer.addMediaElement(contentElement);
-        player.media = contentElement;
-
-        createControlBarElement();
-        createSubtitleElement()
-      }
-    }
-
-    private function onPluginLoadFailed(event:MediaFactoryEvent):void {
-      // load failed, continue with regular playback.
-logger.debug("PROBLEM LOADING " + event.toString());
-    }
-
-
     private function onAddedToStage(event:Event) {
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
         stage.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
@@ -216,20 +184,30 @@ logger.debug("PROBLEM LOADING " + event.toString());
         container.layoutRenderer.addTarget(subtitlesContainer);
         container.layoutRenderer.addTarget(controlbarContainer);
 
-        createVideoElement();
-        createBufferingPanel();
-        //createControlBarElement();
-        //createSubtitleElement();
-
-        //player.media = contentElement;
+        loadPlugins();
 
         //handler to show and hide the buffering panel
         player.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
 
         setContainerSize(contentWidth, contentHeight);
 
-        logger.debug("adding media container to stage");
         addChild(container);
+    }
+
+    private function onPluginLoaded(event:MediaFactoryEvent):void {
+      logger.debug("LOADED " + event.toString());
+      pluginsToLoad--;
+
+      if (pluginsToLoad <= 0) {
+        factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
+        factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadFailed);
+        
+        createVideoElement();
+      }
+    }
+
+    private function onPluginLoadFailed(event:MediaFactoryEvent):void {
+      logger.debug("PROBLEM LOADING " + event.toString());
     }
 
     private function createBufferingPanel():void {
@@ -266,7 +244,7 @@ logger.debug("PROBLEM LOADING " + event.toString());
         }
     }
 
-    private function createVideoElement():void {
+    private function loadPlugins():void {
         logger.debug("loading the proxy plugins that wrap the video element");
         factory.loadPlugin(new URLResource(AUDITUDE_PLUGIN_URL));
         factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo(new SeeSawSMILLoader())));
@@ -276,9 +254,10 @@ logger.debug("PROBLEM LOADING " + event.toString());
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.liverail.AdProxyPluginInfo()));
         //factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.auditude.AdProxyPluginInfo()));
+    }
 
-
-        /*logger.debug("creating video element");
+    private function createVideoElement():void {
+        logger.debug("creating video element");
         contentElement = factory.createMediaElement(config.resource);
 
         contentElement.addEventListener(MediaElementEvent.METADATA_ADD, onContentMetadataAdd);
@@ -287,7 +266,13 @@ logger.debug("PROBLEM LOADING " + event.toString());
         contentElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
         contentElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
 
-        mainContainer.addMediaElement(contentElement);*/
+        mainContainer.addMediaElement(contentElement);
+
+        createBufferingPanel();
+        createControlBarElement();
+        createSubtitleElement();
+
+        player.media = contentElement;
     }
 
     private function createControlBarElement():void {
@@ -429,7 +414,6 @@ logger.debug("PROBLEM LOADING " + event.toString());
         if (mediaElement is IAuditudeMediaElement) {
           var _auditude:AuditudePlugin = IAuditudeMediaElement(mediaElement).plugin;
 logger.debug("AUDITUDE PLUGIN SEEMS TO HAVE LOADED?");
-          //addAuditudeListeners();
         }
 
         var _setContentLayout:Function = function(metadataEvent:MetadataEvent):void {
