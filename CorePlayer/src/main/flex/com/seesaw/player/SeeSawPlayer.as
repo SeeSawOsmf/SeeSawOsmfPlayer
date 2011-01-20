@@ -21,7 +21,8 @@
  */
 
 package com.seesaw.player {
-import com.seesaw.player.ads.LiverailAdProxyPluginInfo;
+import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
+import com.seesaw.player.ads.auditude.AdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.batchEventService.BatchEventServicePlugin;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
@@ -34,6 +35,9 @@ import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.panels.BufferingPanel;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
 import com.seesaw.player.smil.SeeSawSMILLoader;
+
+  import com.auditude.ads.AuditudePlugin;
+  import com.auditude.ads.osmf.IAuditudeMediaElement;
 
 import flash.display.Sprite;
 import flash.display.StageDisplayState;
@@ -75,6 +79,8 @@ public class SeeSawPlayer extends Sprite {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
 
+    private static const AUDITUDE_PLUGIN_URL:String = "http://asset.cdn.auditude.com/flash/sandbox/plugin/osmf/AuditudeOSMFProxyPlugin.swf";
+
     private var config:PlayerConfiguration;
     private var contentElement:MediaElement;
 
@@ -90,6 +96,8 @@ public class SeeSawPlayer extends Sprite {
     private var bufferingPanel:BufferingPanel;
 
     private var xi:PlayerExternalInterface;
+
+    private var pluginsToLoad:int = 6;
 
     private var playerInit:XML;
     private var videoInfo:XML;
@@ -114,6 +122,8 @@ public class SeeSawPlayer extends Sprite {
         }
 
         factory = config.factory;
+        factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
+        factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadFailed);
         factory.addEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onMediaElementCreate);
 
         player = new MediaPlayer();
@@ -126,6 +136,38 @@ public class SeeSawPlayer extends Sprite {
 
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
     }
+
+
+    private function onPluginLoaded(event:MediaFactoryEvent):void {
+      //loadMainVideo(REMOTE_STREAM);
+      logger.debug("LOADED " + event.toString());
+      pluginsToLoad--;
+      if (pluginsToLoad <= 0) {
+        factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
+        factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadFailed);
+      
+        logger.debug("creating video element");
+        contentElement = factory.createMediaElement(config.resource);
+
+        contentElement.addEventListener(MediaElementEvent.METADATA_ADD, onContentMetadataAdd);
+        contentElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onContentMetadataRemove);
+
+        contentElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
+        contentElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
+
+        mainContainer.addMediaElement(contentElement);
+        player.media = contentElement;
+
+        createControlBarElement();
+        createSubtitleElement()
+      }
+    }
+
+    private function onPluginLoadFailed(event:MediaFactoryEvent):void {
+      // load failed, continue with regular playback.
+logger.debug("PROBLEM LOADING " + event.toString());
+    }
+
 
     private function onAddedToStage(event:Event) {
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
@@ -176,10 +218,10 @@ public class SeeSawPlayer extends Sprite {
 
         createVideoElement();
         createBufferingPanel();
-        createControlBarElement();
-        createSubtitleElement();
+        //createControlBarElement();
+        //createSubtitleElement();
 
-        player.media = contentElement;
+        //player.media = contentElement;
 
         //handler to show and hide the buffering panel
         player.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
@@ -226,14 +268,17 @@ public class SeeSawPlayer extends Sprite {
 
     private function createVideoElement():void {
         logger.debug("loading the proxy plugins that wrap the video element");
+        factory.loadPlugin(new URLResource(AUDITUDE_PLUGIN_URL));
         factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo(new SeeSawSMILLoader())));
         factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
-        factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
+        //factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
         factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
-        factory.loadPlugin(new PluginInfoResource(new LiverailAdProxyPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.liverail.AdProxyPluginInfo()));
+        //factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.auditude.AdProxyPluginInfo()));
 
-        logger.debug("creating video element");
+
+        /*logger.debug("creating video element");
         contentElement = factory.createMediaElement(config.resource);
 
         contentElement.addEventListener(MediaElementEvent.METADATA_ADD, onContentMetadataAdd);
@@ -242,7 +287,7 @@ public class SeeSawPlayer extends Sprite {
         contentElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
         contentElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
 
-        mainContainer.addMediaElement(contentElement);
+        mainContainer.addMediaElement(contentElement);*/
     }
 
     private function createControlBarElement():void {
@@ -380,6 +425,12 @@ public class SeeSawPlayer extends Sprite {
 
     private function onMediaElementCreate(event:MediaFactoryEvent):void {
         var mediaElement:MediaElement = event.mediaElement;
+
+        if (mediaElement is IAuditudeMediaElement) {
+          var _auditude:AuditudePlugin = IAuditudeMediaElement(mediaElement).plugin;
+logger.debug("AUDITUDE PLUGIN SEEMS TO HAVE LOADED?");
+          //addAuditudeListeners();
+        }
 
         var _setContentLayout:Function = function(metadataEvent:MetadataEvent):void {
             if (metadataEvent.key == PlayerConstants.CONTENT_TYPE) {

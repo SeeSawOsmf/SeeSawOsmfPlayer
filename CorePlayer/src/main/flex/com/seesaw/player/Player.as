@@ -21,7 +21,10 @@
  */
 
 package com.seesaw.player {
+import com.auditude.ads.osmf.constants.AuditudeOSMFConstants;
+
 import com.seesaw.player.ads.LiverailConstants;
+import com.seesaw.player.ads.AuditudeConstants;
 import com.seesaw.player.buttons.PlayStartButton;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.external.PlayerExternalInterface;
@@ -68,6 +71,11 @@ public class Player extends Sprite {
 
     private static var loggerSetup:* = (LoggerFactory.loggerFactory = new TraceAndArthropodLoggerFactory());
     private static var osmfLoggerSetup:* = (Log.loggerFactory = new CommonsOsmfLoggerFactory());
+
+		//private static const AUDITUDE_PLUGIN_URL:String = "http://asset.cdn.auditude.com/flash/sandbox/plugin/osmf/AuditudeOSMFProxyPlugin.swf";
+    //private static const AUDITUDE_PLUGIN_URL:String = "http://asset.cdn.auditude.com/flash/sandbox/plugin/osmf/AuditudeOSMFPlugin.swf";
+    private static const AUDITUDE_PLUGIN_URL:String = "http://asset.cdn.auditude.com/flash/sandbox/plugin/osmf/AuditudeOSMFStandardPlugin.swf";
+		private static const LIVERAIL_PLUGIN_URL:String = "http://vox-static.liverail.com/swf/v4/admanager.swf";
 
     private var logger:ILogger = LoggerFactory.getClassLogger(Player);
 
@@ -256,6 +264,8 @@ public class Player extends Sprite {
     }
 
     private function setPlaylist(asx:String):void {
+      if (playerInit.adMode != "channel4") return; //we don't care
+
       logger.info("Retreived ASX data from C4");
       logger.info(asx);
 
@@ -341,6 +351,11 @@ public class Player extends Sprite {
         // Since we have autoPlay to false for liverail, we need to manually call play for C4:
         if (playerInit.adMode == "channel4")
             videoPlayer.mediaPlayer().autoPlay = true;
+        else if (playerInit.adMode == "auditude") {
+            videoPlayer.mediaPlayer().autoPlay = true;
+            var metadata:Metadata = content.getMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) as Metadata;
+            metadata.addValue(AuditudeOSMFConstants.PLAYER_INSTANCE, videoPlayer.mediaPlayer());
+        }
         
         addChild(videoPlayer);
     }
@@ -373,8 +388,37 @@ public class Player extends Sprite {
             metadata.addValue(LiverailConstants.PUBLISHER_ID, playerInit.liverail.publisherId);
             metadata.addValue(LiverailConstants.CONFIG_OBJECT, new LiverailConfig(playerInit));
             metadata.addValue(LiverailConstants.RESUME_POSITION, getResumePosition());
-            metadata.addValue(LiverailConstants.ADMANAGER_URL,  "http://vox-static.liverail.com/swf/v4/admanager.swf");
+            metadata.addValue(LiverailConstants.ADMANAGER_URL, LIVERAIL_PLUGIN_URL);
             resource.addMetadataValue(LiverailConstants.SETTINGS_NAMESPACE, metadata);
+        } else if (playerInit && playerInit.adMode == AuditudeConstants.AD_MODE_ID) {
+logger.debug("ADDING AUDITUDE METADATA");
+            metadata = new Metadata();
+            /*metadata.addValue(Constants.VERSION, playerInit.liverail.version);
+            metadata.addValue(LiverailConstants.PUBLISHER_ID, playerInit.liverail.publisherId);
+            metadata.addValue(LiverailConstants.CONFIG_OBJECT, new LiverailConfig(playerInit));
+            metadata.addValue(LiverailConstants.RESUME_POSITION, getResumePosition());
+            metadata.addValue(LiverailConstants.ADMANAGER_URL,  "http://vox-static.liverail.com/swf/v4/admanager.swf");
+            resource.addMetadataValue(AuditudeConstants.SETTINGS_NAMESPACE, metadata);*/
+
+            // the following 4 keys are required attributes for the Auditude plug-in
+            // a) version: version of auditude plug-in
+            // b) domain: adserver domain
+            // c) zone-id: zone id assigned by Auditude
+            // d) media-id: The video id of the currently playing content
+            metadata.addValue(AuditudeOSMFConstants.VERSION, "adunitv2-1.0");
+            metadata.addValue(AuditudeOSMFConstants.DOMAIN, "sandbox.auditude.com");
+            metadata.addValue(AuditudeOSMFConstants.ZONE_ID, 1947);
+            metadata.addValue(AuditudeOSMFConstants.MEDIA_ID, "GcE_e7ewtw2lMJVbDEJClpllo6mVJXSb");
+
+            // pass the mediaplayer instance to Auditude. This is required to listen for audio and content progress updates
+            //metadata.addValue(AuditudeOSMFConstants.PLAYER_INSTANCE, videoPlayer.mediaPlayer());
+
+            // any additional metadata can be passed to the Auditude plug-in through this key.
+            metadata.addValue(AuditudeOSMFConstants.USER_DATA, null);
+
+            //metadata.addValue(AuditudeConstants.ADMANAGER_URL, AUDITUDE_PLUGIN_URL);
+            //metadata.addValue(AuditudeConstants.RESUME_POSITION, getResumePosition());
+            resource.addMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE, metadata)
         }
 
         return resource;
