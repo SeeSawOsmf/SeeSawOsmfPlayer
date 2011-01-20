@@ -3,18 +3,15 @@ import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.batchEventService.events.ContentEvent;
 import com.seesaw.player.batchEventService.events.ContentTypes;
 import com.seesaw.player.batchEventService.events.CumulativeDurationEvent;
-import com.seesaw.player.batchEventService.events.CumulativeDurationEvent;
-import com.seesaw.player.batchEventService.events.EventTypes;
-import com.seesaw.player.batchEventService.events.UserEvent;
 import com.seesaw.player.batchEventService.events.UserEvent;
 import com.seesaw.player.batchEventService.events.UserEventTypes;
-import com.seesaw.player.batchEventService.events.ViewEvent;
 import com.seesaw.player.batchEventService.events.ViewEvent;
 import com.seesaw.player.batchEventService.events.manager.EventsManager;
 import com.seesaw.player.batchEventService.events.manager.EventsManagerImpl;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.services.ResumeService;
+
 import flash.events.TimerEvent;
 import flash.utils.Timer;
 
@@ -31,6 +28,7 @@ import org.osmf.events.TimeEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.metadata.Metadata;
 import org.osmf.traits.BufferTrait;
+import org.osmf.traits.LoadState;
 import org.osmf.traits.LoadTrait;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
@@ -50,7 +48,7 @@ public class BatchEventService extends ProxyElement {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(BatchEventService);
 
-    private var resumeService;ResumeService;
+    private var resumeService:ResumeService;
 
     private var cumulativeDurationFlushTimer:Timer;
     private var cumulativeDurationCount:Number;
@@ -82,13 +80,15 @@ public class BatchEventService extends ProxyElement {
     private var contentDuration = 5;
 
     private var eventsManager:EventsManager;
+    private var tooSlowTimer:Timer;
+    private var mainContentCount:int;
 
     public function BatchEventService(proxiedElement:MediaElement = null) {
         super(proxiedElement);
         var provider:ObjectProvider = ObjectProvider.getInstance();
         resumeService = provider.getObject(ResumeService);
         if (resumeService == null) {
-           throw ArgumentError("no resume service implementation provided");
+            throw ArgumentError("no resume service implementation provided");
         }
     }
 
@@ -104,17 +104,17 @@ public class BatchEventService extends ProxyElement {
             }
             if (proxiedElement != null) {
                 toggleTraitListeners(true);
-                    for each (traitType in proxiedElement.traitTypes) {
+                for each (traitType in proxiedElement.traitTypes) {
                     processTrait(traitType, true);
                 }
             }
 
             cumulativeDurationCount = 0;
-            cumulativeDurationMonitor = new Timer(CUMULATIVE_DURATION_MONITOR_TIMER_DELAY_INTERVAL,0);
-            cumulativeDurationMonitor.addEventListener( TimerEvent.TIMER , incrementCumulativeDurationCounter);
+            cumulativeDurationMonitor = new Timer(CUMULATIVE_DURATION_MONITOR_TIMER_DELAY_INTERVAL, 0);
+            cumulativeDurationMonitor.addEventListener(TimerEvent.TIMER, incrementCumulativeDurationCounter);
             cumulativeDurationMonitor.start();
 
-            cumulativeDurationFlushTimer = new Timer(CUMULATIVE_DURATION_FLUSH_DELAY_INTERVAL,0);
+            cumulativeDurationFlushTimer = new Timer(CUMULATIVE_DURATION_FLUSH_DELAY_INTERVAL, 0);
             cumulativeDurationFlushTimer.addEventListener(TimerEvent.TIMER, onTimerTick);
             cumulativeDurationFlushTimer.start();
 
@@ -131,28 +131,29 @@ public class BatchEventService extends ProxyElement {
                 anonymousUserId = infoData.getValue("contentInfo").anonymousUserId;
                 programmeId = infoData.getValue("contentInfo").programme;
 
-                var viewEvent:ViewEvent = new ViewEvent(transactionItemId,serverTimeStamp,sectionCount,mainAssetId,userId,anonymousUserId);
+                var viewEvent:ViewEvent = new ViewEvent(transactionItemId, serverTimeStamp, sectionCount, mainAssetId, userId, anonymousUserId);
                 var number:Number = resumeService.getResumeCookie();
                 var userEvent:UserEvent;
-                if ( number == 0 ) {
+                if (number == 0) {
                     userEvent = buildAndReturnUserEvent(UserEventTypes.AUTO_PLAY);
                 } else {
                     userEvent = buildAndReturnUserEvent(UserEventTypes.AUTO_RESUME);
                 }
 
-                eventsManager = new EventsManagerImpl( viewEvent );
+                eventsManager = new EventsManagerImpl(viewEvent);
                 eventsManager.addUserEvent(userEvent);
                 eventsManager.flushAll();
             }
         }
     }
 
-    private function toggleTraitListeners( add:Boolean ):void {
-        if ( add ) {
+    private function toggleTraitListeners(add:Boolean):void {
+        if (add) {
             addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
             addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
             addEventListener(MediaElementEvent.METADATA_ADD, onMetaDataAdd);
             addEventListener(MediaElementEvent.METADATA_REMOVE, onMetaDataRemove);
+
         } else {
             removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
             removeEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
@@ -170,10 +171,10 @@ public class BatchEventService extends ProxyElement {
             var metadata:Metadata = event.target.getMetadata("http://www.osmf.org/samples/controlbar/metadata");
             metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
             metadata.removeEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
-        } else if ( event.namespaceURL == "http://www.seesaw.com/player/ads/1.0" ) {
-            var metadata:Metadata = event.target.getMetadata( "http://www.seesaw.com/player/ads/1.0" );
-            metadata.removeEventListener( MetadataEvent.VALUE_ADD, onAdsMetaDataAdd ) ;
-            metadata.removeEventListener( MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
+        } else if (event.namespaceURL == "http://www.seesaw.com/player/ads/1.0") {
+            var metadata:Metadata = event.target.getMetadata("http://www.seesaw.com/player/ads/1.0");
+            metadata.removeEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
+            metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
         }
     }
 
@@ -183,34 +184,37 @@ public class BatchEventService extends ProxyElement {
             metadata = event.target.getMetadata("http://www.osmf.org/samples/controlbar/metadata");
             metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
             metadata.addEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
-        } else if ( event.namespaceURL == "http://www.seesaw.com/player/ads/1.0" ) {
-            metadata = event.target.getMetadata( "http://www.seesaw.com/player/ads/1.0" );
-            metadata.addEventListener( MetadataEvent.VALUE_ADD, onAdsMetaDataAdd ) ;
-            metadata.addEventListener( MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
-        } else if ( event.namespaceURL == "http://www.w3.org/ns/SMIL" ) {
+        } else if (event.namespaceURL == "http://www.seesaw.com/player/ads/1.0") {
+            metadata = event.target.getMetadata("http://www.seesaw.com/player/ads/1.0");
+            metadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
+            metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
+        } else if (event.namespaceURL == "http://www.w3.org/ns/SMIL") {
             // TODO this seems to be the only way currently to detect main content is being loaded and played
             // TODO there is a bug outstanding where stings are appearing as mainContent
-            metadata = event.target.getMetadata( "http://www.w3.org/ns/SMIL" );
-            var contentType:String = metadata.getValue( "contentType" );
-            switch ( contentType ) {
+            metadata = event.target.getMetadata("http://www.w3.org/ns/SMIL");
+            var contentType:String = metadata.getValue("contentType");
+            switch (contentType) {
                 case "mainContent" :
                     playingMainContent = true;
                     contentViewingSequenceNumber++;
+                    mainContentCount++;
                     eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.MAIN_CONTENT));
                     eventsManager.flushAll();
                     break;
                 case "sting" :
                     playingMainContent = false;
                     break;
-                default : trace( "############ unknown content type found in meta data ############### " + contentType )
+                default : trace("############ unknown content type found in meta data ############### " + contentType)
 
             }
+        } else if (event.namespaceURL == "http://www.seesaw.com/netstatus/metadata") {
+            trace("http://www.seesaw.com/netstatus/metadata");
         }
     }
 
     private function onAdsMetaDataChange(event:MetadataEvent):void {
-        if ( event.key == "adState") {
-            if ( event.value == "stopped" ) {
+        if (event.key == "adState") {
+            if (event.value == "stopped") {
                 // TODO - this may be duplicated by the onMetaDataAdd event handler - which adds a content event data when SMIL data is added
                 playingMainContent = true;
                 contentViewingSequenceNumber++;
@@ -221,49 +225,57 @@ public class BatchEventService extends ProxyElement {
     }
 
     private function onAdsMetaDataAdd(event:MetadataEvent):void {
-        if ( event.key == "adState" ) {
-            if ( event.value == "started" ) {
+        if (event.key == "adState") {
+            if (event.value == "started") {
                 playingMainContent = false;
                 contentViewingSequenceNumber++;
                 currentAdBreakSequenceNumber++;
-                eventsManager.addContentEvent( buildAndReturnContentEvent( ContentTypes.AD_BREAK ) );
+                eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.AD_BREAK));
             }
         }
     }
 
     private function onControlBarMetadataChange(event:MetadataEvent):void {
         var userEventType:String;
-        if ( event.key == "subtitlesVisible" ) {
-            if ( event.value ) {
+        if (event.key == "subtitlesVisible") {
+            if (event.value) {
                 userEventType = UserEventTypes.SUBTITLES_ON;
             } else {
                 userEventType = UserEventTypes.SUBTITLES_OFF;
             }
-        } else if ( event.key == "fullScreen" ) {
+        } else if (event.key == "fullScreen") {
             if (event.value) {
                 userEventType = UserEventTypes.ENTER_FULL_SCREEN;
             } else {
                 userEventType = UserEventTypes.EXIT_FULL_SCREEN;
             }
         }
-        if ( userEventType != null ) {
-            eventsManager.addUserEvent( buildAndReturnUserEvent(userEventType));
+        if (userEventType != null) {
+            eventsManager.addUserEvent(buildAndReturnUserEvent(userEventType));
         }
     }
 
     private function onTimerTick(event:TimerEvent):void {
-        eventsManager.flushCumulativeDuration(new CumulativeDurationEvent( programmeId , transactionItemId ));
+        eventsManager.flushCumulativeDuration(new CumulativeDurationEvent(programmeId, transactionItemId));
     }
 
     private function onBufferingChange(event:BufferEvent):void {
-        if ( playingMainContent ) {
-            if ( event.buffering ) {
-                eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.BUFFERING));
+        if (playingMainContent) {
+            if (event.buffering) {
+                tooSlowTimer = new Timer(2500, 1);
+                tooSlowTimer.start();
+                tooSlowTimer.addEventListener(TimerEvent.TIMER_COMPLETE, bufferShowEvent);
+            } else {
+                tooSlowTimer.stop();
             }
         }
     }
 
-     private function processTrait(traitType:String, added:Boolean):void {
+    private function bufferShowEvent(event:TimerEvent):void {
+        eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.BUFFERING));
+    }
+
+    private function processTrait(traitType:String, added:Boolean):void {
         switch (traitType) {
             case MediaTraitType.BUFFER:
                 toggleBufferListeners(added);
@@ -277,6 +289,10 @@ public class BatchEventService extends ProxyElement {
             case MediaTraitType.PLAY:
                 togglePlayListeners(added);
                 break;
+            case MediaTraitType.LOAD:
+                toggleLoadListeners(added);
+                break;
+            /// case   private var playTrait:PlayTrait;
         }
     }
 
@@ -292,6 +308,18 @@ public class BatchEventService extends ProxyElement {
         }
     }
 
+    private function toggleLoadListeners(added:Boolean):void {
+        var loadable:LoadTrait = proxiedElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
+        if (loadable) {
+            if (added) {
+                loadable.addEventListener(LoadEvent.LOAD_STATE_CHANGE, onLoadableStateChange);
+            }
+            else {
+                loadable.removeEventListener(LoadEvent.LOAD_STATE_CHANGE, onLoadableStateChange);
+            }
+        }
+    }
+
 
     private function onPlayStateChange(event:PlayEvent):void {
         if (playingMainContent) {
@@ -300,14 +328,14 @@ public class BatchEventService extends ProxyElement {
                     cumulativeDurationMonitor.stop();
                     break;
                 case PlayState.PLAYING:
-                        if (!cumulativeDurationMonitor.running ) {
-                            cumulativeDurationMonitor.start();
-                        }
+                    if (!cumulativeDurationMonitor.running) {
+                        cumulativeDurationMonitor.start();
+                    }
                     break;
                 case PlayState.STOPPED:
-                        if (cumulativeDurationMonitor.running) {
-                            cumulativeDurationMonitor.stop();
-                        }
+                    if (cumulativeDurationMonitor.running) {
+                        cumulativeDurationMonitor.stop();
+                    }
                     break;
             }
         }
@@ -321,7 +349,7 @@ public class BatchEventService extends ProxyElement {
         processTrait(event.traitType, false);
     }
 
-     private function toggleBufferListeners(added:Boolean):void {
+    private function toggleBufferListeners(added:Boolean):void {
         var buffer:BufferTrait = proxiedElement.getTrait(MediaTraitType.BUFFER) as BufferTrait;
         if (buffer) {
             if (added) {
@@ -342,9 +370,22 @@ public class BatchEventService extends ProxyElement {
         }
     }
 
+
+    private function onLoadableStateChange(event:LoadEvent):void {
+        switch (event) {
+
+            case LoadState.READY:
+            /// trace(event.target.resource.loader.netStream);
+            /*    var loadedContext:NetLoadedContext = event.loadable.loadedContext as  NetLoadedContext;
+             var netStream:NetStream =  loadedContext.stream;*/
+
+        }
+    }
+
+
     private function onSeekingChange(event:SeekEvent):void {
         if (playingMainContent) {
-            if ( event.seeking ) {
+            if (event.seeking) {
                 if (!seeking) {
                     cumulativeDurationMonitor.stop();
                     eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.SCRUB));
@@ -367,8 +408,10 @@ public class BatchEventService extends ProxyElement {
     }
 
     private function onComplete(event:TimeEvent):void {
-        eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.END));
-        eventsManager.flushAll();
+        if (mainContentCount * 2 == sectionCount) {
+            eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.END));
+            eventsManager.flushAll();
+        }
     }
 
 
@@ -382,11 +425,11 @@ public class BatchEventService extends ProxyElement {
         return contentEventId;
     }
 
-    private function buildAndReturnUserEvent( userEventType:String):UserEvent {
+    private function buildAndReturnUserEvent(userEventType:String):UserEvent {
         return new UserEvent(incrementAndGetUserEventId(), cumulativeDurationCount, userEventType, programmeId);
     }
 
-    private function buildAndReturnContentEvent( contentType:String ):ContentEvent {
+    private function buildAndReturnContentEvent(contentType:String):ContentEvent {
         return new ContentEvent(isPopupInteractive, mainAssetId, new Date(), isOverlayInteractive, contentViewingSequenceNumber, incrementAndGetContentEventId(), campaignId, cumulativeDurationCount, userEventId, contentDuration, contentType, currentAdBreakSequenceNumber, contentUrl);
     }
 }
