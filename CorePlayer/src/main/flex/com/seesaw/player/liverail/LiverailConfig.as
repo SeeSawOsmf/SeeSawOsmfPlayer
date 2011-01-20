@@ -21,10 +21,10 @@
  */
 
 package com.seesaw.player.liverail {
-import com.seesaw.player.ads.LiverailConfiguration;
+import com.seesaw.player.ads.liverail.Configuration;
 import com.seesaw.player.namespaces.contentinfo;
 
-public class LiverailConfig extends LiverailConfiguration {
+public class LiverailConfig extends Configuration {
 
     private var contentInfo:XML;
     private var liveRailAdMap:String = "";
