@@ -360,6 +360,8 @@
                 <!--<activeByDefault>true</activeByDefault>-->
             </activation>
             <properties>
+            	<sonar.language>flex</sonar.language>
+    			<sonar.dynamicAnalysis>false</sonar.dynamicAnalysis>
 
                 <sonar.jdbc.url>
                     jdbc:postgresql://kgd-devtools01.dev.vodco.co.uk/sonar
