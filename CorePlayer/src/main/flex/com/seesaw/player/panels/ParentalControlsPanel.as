@@ -593,7 +593,7 @@ public class ParentalControlsPanel extends Sprite {
     private function onParentalControlClick(event:Event):void {
         var request:URLRequest = new URLRequest(this.moreAboutParentalControlsLink);
         try {
-            navigateToURL(request);
+            navigateToURL(request, "_self");
         } catch (e:Error) {
             trace("Error occurred!");
         }
@@ -635,7 +635,7 @@ public class ParentalControlsPanel extends Sprite {
     private function onFindOutMoreClick(event:Event):void {
         var request:URLRequest = new URLRequest(this.turnOffParentalControlsLink);
         try {
-            navigateToURL(request);
+            navigateToURL(request, "_self");
         } catch (e:Error) {
             trace("Error occurred!");
         }

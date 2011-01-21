@@ -153,7 +153,6 @@ public class GuidancePanel extends Sprite {
         var panelBG:Sprite = new Sprite();
 
         with (panelBG.graphics) {
-            lineStyle(1, 0x000000);
             beginFill(0x000000, 0.8);
             drawRoundRect(0, 0, 525, 253, 10);
             endFill();
@@ -393,7 +392,7 @@ public class GuidancePanel extends Sprite {
     private function onParentalControlClick(event:Event):void {
         var request:URLRequest = new URLRequest(this.parentalControlsSetupLink);
         try {
-            navigateToURL(request);
+            navigateToURL(request, "_self");
         } catch (e:Error) {
             trace("Error occurred!");
         }
@@ -435,7 +434,7 @@ public class GuidancePanel extends Sprite {
     private function onFindOutMoreClick(event:Event):void {
         var request:URLRequest = new URLRequest(this.findOutMoreLink);
         try {
-            navigateToURL(request);
+            navigateToURL(request, "_self");
         } catch (e:Error) {
             trace("Error occurred!");
         }
