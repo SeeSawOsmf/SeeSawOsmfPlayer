@@ -256,6 +256,8 @@ public class Player extends Sprite {
     }
 
     private function setPlaylist(asx:String):void {
+      if (playerInit.adMode != "channel4") return; //we don't care
+
       logger.info("Retreived ASX data from C4");
       logger.info(asx);
 
