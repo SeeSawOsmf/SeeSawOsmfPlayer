@@ -36,14 +36,14 @@
         <module>CorePlayer</module>
         <module>ControlBarPlugin</module>
         <module>DebugProxyPlugin</module>
-        <module>LiverailPlugin</module>
+        <!--<module>LiverailPlugin</module>-->
         <module>PlayerLogging</module>
         <module>PlayerInitialisation</module>
         <module>AdProxyPlugin</module>
         <module>PlayerCommon</module>
         <module>ScrubPreventionProxy</module>
         <module>AutoResumeProxy</module>
-        <module>PlaylistPlugin</module>
+        <!--<module>PlaylistPlugin</module>-->
         <module>SMILObjectProxy</module>
         <module>SubtitlePlugin</module>
         <module>IntegrationTests</module>

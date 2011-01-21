@@ -184,7 +184,7 @@ public class SeeSawPlayer extends Sprite {
         container.layoutRenderer.addTarget(subtitlesContainer);
         container.layoutRenderer.addTarget(controlbarContainer);
 
-        loadPlugins();
+        loadPlugins(); // Once the plugins are loaded, we'll set up the video and controls etc
 
         //handler to show and hide the buffering panel
         player.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
@@ -192,6 +192,17 @@ public class SeeSawPlayer extends Sprite {
         setContainerSize(contentWidth, contentHeight);
 
         addChild(container);
+    }
+
+    private function loadPlugins():void {
+        logger.debug("loading the proxy plugins that wrap the video element");
+        factory.loadPlugin(new URLResource(AUDITUDE_PLUGIN_URL));
+        factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo(new SeeSawSMILLoader())));
+        factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.liverail.AdProxyPluginInfo()));
+        //factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.auditude.AdProxyPluginInfo()));
     }
 
     private function onPluginLoaded(event:MediaFactoryEvent):void {
@@ -203,6 +214,9 @@ public class SeeSawPlayer extends Sprite {
         factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadFailed);
         
         createVideoElement();
+
+        // this relies on the other proxies being loaded 
+        factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
       }
     }
 
@@ -242,18 +256,6 @@ public class SeeSawPlayer extends Sprite {
 
             subtitlesContainer.addMediaElement(subtitleElement);
         }
-    }
-
-    private function loadPlugins():void {
-        logger.debug("loading the proxy plugins that wrap the video element");
-        factory.loadPlugin(new URLResource(AUDITUDE_PLUGIN_URL));
-        factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo(new SeeSawSMILLoader())));
-        factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
-        //factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
-        factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
-        factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
-        factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.liverail.AdProxyPluginInfo()));
-        //factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.auditude.AdProxyPluginInfo()));
     }
 
     private function createVideoElement():void {
