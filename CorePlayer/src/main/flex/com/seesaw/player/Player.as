@@ -100,8 +100,8 @@ public class Player extends Sprite {
 
         // If no flashVar, use a default for testing
         // TODO: remove this altogether
-        loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/" +
-                "player/initinfo/4663";
+        loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://localhost:8080/player/initinfo/29053";
+        // loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://localhost:8080/player/initinfo/13602";
 
         stage.scaleMode = StageScaleMode.NO_SCALE;
         stage.align = StageAlign.TOP_LEFT;
@@ -175,7 +175,7 @@ public class Player extends Sprite {
         });
 
         //if there is guidance, show the guidance bar
-        if (playerInit.guidance) {
+        if (playerInit.guidance.length() > 0) {
             guidanceBar = new GuidanceBar(playerInit.guidance.warning);
             posterFrame.addChild(guidanceBar);
         }
