@@ -47,6 +47,7 @@ import org.as3commons.logging.LoggerFactory;
 import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
 import org.osmf.events.BufferEvent;
+import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.events.MetadataEvent;
@@ -280,7 +281,14 @@ public class SeeSawPlayer extends Sprite {
             case MediaTraitType.PLAY:
                 changeListeners(element, add, traitType, PlayEvent.PLAY_STATE_CHANGE, onPlayStateChanged);
                 break;
+              case MediaTraitType.LOAD:
+                changeListeners(element, add, traitType, LoadEvent.LOAD_STATE_CHANGE, onLoadStateChanged);
+                break;
         }
+    }
+
+    private function onLoadStateChanged(event:LoadEvent):void {
+        trace(event.loadState);
     }
 
     private function onTraitAdd(event:MediaElementEvent):void {
