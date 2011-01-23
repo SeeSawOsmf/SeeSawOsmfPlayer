@@ -153,7 +153,6 @@ public class GuidancePanel extends Sprite {
         var panelBG:Sprite = new Sprite();
 
         with (panelBG.graphics) {
-            lineStyle(1, 0x000000);
             beginFill(0x000000, 0.8);
             drawRoundRect(0, 0, 525, 253, 10);
             endFill();

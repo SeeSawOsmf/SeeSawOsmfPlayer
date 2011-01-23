@@ -100,8 +100,8 @@ public class Player extends Sprite {
 
         // If no flashVar, use a default for testing
         // TODO: remove this altogether
-        loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/" +
-                "player.playerinitialisation:playerinit?t:ac=TV:FACTUAL/s/7675/Around-the-World-in-80-Days";
+        loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://localhost:8080/player/initinfo/29053";
+        // loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://localhost:8080/player/initinfo/13602";
 
         stage.scaleMode = StageScaleMode.NO_SCALE;
         stage.align = StageAlign.TOP_LEFT;
@@ -175,7 +175,7 @@ public class Player extends Sprite {
         });
 
         //if there is guidance, show the guidance bar
-        if (playerInit.guidance) {
+        if (playerInit.guidance.length() > 0) {
             guidanceBar = new GuidanceBar(playerInit.guidance.warning);
             posterFrame.addChild(guidanceBar);
         }
@@ -256,6 +256,8 @@ public class Player extends Sprite {
     }
 
     private function setPlaylist(asx:String):void {
+      if (playerInit.adMode != "channel4") return; //we don't care
+
       logger.info("Retreived ASX data from C4");
       logger.info(asx);
 

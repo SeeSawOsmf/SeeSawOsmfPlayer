@@ -338,5 +338,54 @@
             <url>http://repository.sonatype.org/content/groups/flexgroup/</url>
         </repository>
     </repositories>
+    
+    <pluginRepositories>
+    <pluginRepository>
+      <id>flexpmd.opensource.adobe</id>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <name>FlexPMD repository on opensource.adobe.com</name>
+      <url>http://opensource.adobe.com/svn/opensource/flexpmd/maven-repository/release/</url>   
+    </pluginRepository>
+  </pluginRepositories>
+  
+   <profiles>
+        <profile>
+            <id>sonar</id>
+            <activation>
+                <!--<activeByDefault>true</activeByDefault>-->
+            </activation>
+            <properties>
+            	<sonar.language>flex</sonar.language>
+    			<sonar.dynamicAnalysis>false</sonar.dynamicAnalysis>
+
+                <sonar.jdbc.url>
+                    jdbc:postgresql://kgd-devtools01.dev.vodco.co.uk/sonar
+                </sonar.jdbc.url>
+                <sonar.jdbc.driver>org.postgresql.Driver</sonar.jdbc.driver>
+                <sonar.jdbc.username>sonar</sonar.jdbc.username>
+                <sonar.jdbc.password>sonar</sonar.jdbc.password>
+
+                <!-- SERVER ON A REMOTE HOST -->
+                <sonar.host.url>http://kgd-devtools01.dev.vodco.co.uk:9000/sonar</sonar.host.url>
+            </properties>
+
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>sonar-maven-plugin</artifactId>
+                            <version>1.0-beta-2</version>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
