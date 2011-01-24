@@ -27,6 +27,7 @@ import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.external.PlayerExternalInterface;
 import com.seesaw.player.external.PlayerExternalInterfaceImpl;
 import com.seesaw.player.impl.services.ResumeServiceImpl;
+import com.seesaw.player.panels.OverUsePanel;
 import com.seesaw.player.utils.ServiceRequest;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.liverail.LiverailConfig;
@@ -195,6 +196,22 @@ public class Player extends Sprite {
             nextInitialisationStage();
         });
         addChild(playButton);
+    }
+
+    private function showOverUsePanel():void {
+        //over use panel checks if the error is "NO_ADS", if it is it show no ads messaging, otherwise it shows pack messaging.
+        var errorType:String = "NO_ADS";
+        var overUsePanel = new OverUsePanel(errorType, playerInit.parentalControls.termsAndConditionsLinkURL);
+        addChild(overUsePanel);
+
+        overUsePanel.addEventListener(OverUsePanel.OVERUSE_ACCEPTED, function(event:Event) {
+            nextInitialisationStage();
+        });
+
+        overUsePanel.addEventListener(OverUsePanel.OVERUSE_REJECTED, function(event:Event) {
+            resetInitialisationStages(); // sends the user back to stage 0
+            nextInitialisationStage();
+        });
     }
 
     private function showGuidancePanel():void {
