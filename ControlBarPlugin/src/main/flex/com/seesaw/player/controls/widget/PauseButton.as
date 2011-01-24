@@ -55,6 +55,7 @@ public class PauseButton extends PlayPauseButtonBase implements IWidget {
 
     override protected function onMouseClick(event:MouseEvent):void {
         playTrait.pause();
+        updateMetadata();
     }
 
     public function get classDefinition():String {

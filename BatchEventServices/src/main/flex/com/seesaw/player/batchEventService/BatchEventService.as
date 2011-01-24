@@ -26,6 +26,7 @@ import org.osmf.events.SeekEvent;
 import org.osmf.events.TimeEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.metadata.Metadata;
+import org.osmf.net.StreamingURLResource;
 import org.osmf.traits.BufferTrait;
 import org.osmf.traits.LoadTrait;
 import org.osmf.traits.MediaTraitType;
@@ -80,7 +81,8 @@ public class BatchEventService extends ProxyElement {
     private var eventsManager:EventsManager;
     private var tooSlowTimer:Timer;
     private var mainContentCount:int;
-    private var oldContentType:String = "default";
+    private var playable:PlayTrait;
+    private var loadable:LoadTrait;
 
     public function BatchEventService(proxiedElement:MediaElement = null) {
         var provider:ObjectProvider = ObjectProvider.getInstance();
@@ -189,10 +191,6 @@ private function onMetaDataAdd(event:MediaElementEvent):void {
         // TODO this seems to be the only way currently to detect main content is being loaded and played
         // TODO there is a bug outstanding where stings are appearing as mainContent
         metadata = event.target.getMetadata("http://www.w3.org/ns/SMIL");
-            if (metadata == null) {
-                metadata = new Metadata();
-                addMetadata("http://www.w3.org/ns/SMIL", metadata);
-            }
 
         var contentType:String = metadata.getValue("contentType");
             switch (contentType) {
@@ -209,9 +207,23 @@ private function onMetaDataAdd(event:MediaElementEvent):void {
             }
 
     } else if (event.namespaceURL == "http://www.seesaw.com/netstatus/metadata") {
-        trace("http://www.seesaw.com/netstatus/metadata");
+            metadata = event.target.getMetadata("http://www.seesaw.com/netstatus/metadata");
+            metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onNetstatusMetadataChange);
+            metadata.addEventListener(MetadataEvent.VALUE_ADD, onNetstatusMetadataChange);
     }
 }
+
+    private function onNetstatusMetadataChange(event:MetadataEvent):void {
+        if(event.value == "NetConnection.Connect.NetworkChange")
+          eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.CONNECTION_CLOSED));
+
+         if(event.value == "NetConnection.Connect.Reconnection") // Todo this event does not exist yet...
+         {
+             eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.CONNECTION_RESTART));
+             eventsManager.flushAll();        /// since we have just lost connection and reconnected we want to force an event record..
+
+         }
+    }
 
 
 private function onAdsMetaDataChange(event:MetadataEvent):void {
@@ -250,6 +262,12 @@ private function onControlBarMetadataChange(event:MetadataEvent):void {
             userEventType = UserEventTypes.ENTER_FULL_SCREEN;
         } else {
             userEventType = UserEventTypes.EXIT_FULL_SCREEN;
+        }
+    }else if(event.key == "userClickState"){
+          if (event.value == "playing") {
+            userEventType = UserEventTypes.PLAY;
+        }  if (event.value == "pause") {
+            userEventType = UserEventTypes.PAUSE;
         }
     }
     if (userEventType != null) {
@@ -298,7 +316,7 @@ private function processTrait(traitType:String, added:Boolean):void {
 }
 
 private function togglePlayListeners(added:Boolean):void {
-    var playable:PlayTrait = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
+   playable = proxiedElement.getTrait(MediaTraitType.PLAY) as PlayTrait;
     if (playable) {
         if (added) {
             playable.addEventListener(PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
@@ -310,7 +328,7 @@ private function togglePlayListeners(added:Boolean):void {
 }
 
 private function toggleLoadListeners(added:Boolean):void {
-    var loadable:LoadTrait = proxiedElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
+   loadable = proxiedElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
     if (loadable) {
        /* if (added) {
             loadable.addEventListener(LoadEvent.LOAD_STATE_CHANGE, onLoadableStateChange);
@@ -408,13 +426,27 @@ private function onComplete(event:TimeEvent):void {
     }
 }
      private function onDurationChange(event:TimeEvent):void {
+
+         defineContentUrl();
          ///MetaDataAdded of the MediaElementEvent, fires 3 times, so wiring this to the duration change seems to be the next most reliable event....
          if(playingMainContent){
                     contentViewingSequenceNumber++;
                     mainContentCount++;
                     eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.MAIN_CONTENT));
                     eventsManager.flushAll();
+         }else{
+                    eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.AD_BREAK));
          }
+    }
+
+    private function defineContentUrl():void {
+        if(loadable){
+
+            var streamingUrlResource:StreamingURLResource = loadable.resource as StreamingURLResource;
+             if(streamingUrlResource){
+               contentUrl =  streamingUrlResource.url;
+             }
+        }
     }
 
 private function incrementAndGetUserEventId():int {

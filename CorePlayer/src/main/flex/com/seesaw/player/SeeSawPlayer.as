@@ -339,7 +339,7 @@ public class SeeSawPlayer extends Sprite {
 
     }
 
-    private function netStatusChanged(event:*):void {
+    private function netStatusChanged(event:NetStatusEvent):void {
 
          if(event.info == "NetConnection.Connect.NetworkChange"){
 
@@ -352,7 +352,7 @@ public class SeeSawPlayer extends Sprite {
                 contentElement.addMetadata(NetStatusMetadata.NET_STATUS_METADATA, metadata);
             }
 
-                metadata.addValue(NetStatusMetadata.STATUS, event.type);
+                metadata.addValue(NetStatusMetadata.STATUS, event.info);
         }
     }
 
