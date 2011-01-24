@@ -31,7 +31,7 @@ public class PlayerConstants {
     public static const CONTENT_TYPE:String = "contentType";
 
     public static const MAIN_CONTENT_ID:String = "mainContent";
-    public static const AD_CONTENT_ID:String = "instreamAds";
+    public static const AD_CONTENT_ID:String = "advert";
     public static const STING_CONTENT_ID:String = "sting";
     public static const DOG_CONTENT_ID:String = "dogImage";
     

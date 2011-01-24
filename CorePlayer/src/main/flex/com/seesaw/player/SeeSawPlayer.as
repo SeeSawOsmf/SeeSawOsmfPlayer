@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
  *
  *    The contents of this file are subject to the Mozilla Public License
@@ -32,23 +32,26 @@ import com.seesaw.player.external.ExternalInterfaceMetadata;
 import com.seesaw.player.external.PlayerExternalInterface;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.namespaces.contentinfo;
+import com.seesaw.player.netstatus.NetStatusMetadata;
 import com.seesaw.player.panels.BufferingPanel;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
 import com.seesaw.player.smil.SeeSawSMILLoader;
-
   import com.auditude.ads.AuditudePlugin;
   import com.auditude.ads.osmf.IAuditudeMediaElement;
+
 
 import flash.display.Sprite;
 import flash.display.StageDisplayState;
 import flash.events.Event;
 import flash.events.FullScreenEvent;
+import flash.events.NetStatusEvent;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
-import org.osmf.events.BufferEvent; 
+import org.osmf.events.BufferEvent;
+import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.events.MetadataEvent;
@@ -78,8 +81,8 @@ public class SeeSawPlayer extends Sprite {
     use namespace contentinfo;
 
     private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
-
     private static const AUDITUDE_PLUGIN_URL:String = "http://asset.cdn.auditude.com/flash/sandbox/plugin/osmf/AuditudeOSMFProxyPlugin.swf";
+
 
     private var config:PlayerConfiguration;
     private var contentElement:MediaElement;
@@ -96,8 +99,8 @@ public class SeeSawPlayer extends Sprite {
     private var bufferingPanel:BufferingPanel;
 
     private var xi:PlayerExternalInterface;
-
     private var pluginsToLoad:int = 6;
+
 
     private var playerInit:XML;
     private var videoInfo:XML;
@@ -124,11 +127,12 @@ public class SeeSawPlayer extends Sprite {
         factory = config.factory;
         factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
         factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadFailed);
+        factory.addEventListener(NetStatusEvent.NET_STATUS, netStatusChanged);
         factory.addEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onMediaElementCreate);
 
         player = new MediaPlayer();
         player.autoPlay = false;
-        
+
         rootElement = new ParallelElement();
         container = new MediaContainer();
 
@@ -144,11 +148,11 @@ public class SeeSawPlayer extends Sprite {
 
     private function initialisePlayer():void {
         logger.debug("initialising media player");
-        
+
         mainContainer = new MediaContainer();
         mainContainer.y = 0;
         mainContainer.x = 0;
-        mainContainer.layoutMetadata.percentWidth = 100; 
+        mainContainer.layoutMetadata.percentWidth = 100;
         mainContainer.layoutMetadata.percentHeight = 100;
         addChild(mainContainer);
 
@@ -157,7 +161,7 @@ public class SeeSawPlayer extends Sprite {
         bufferingContainer.x = 0;
         bufferingContainer.backgroundColor = 0x000000;
         bufferingContainer.backgroundAlpha = 0;
-        bufferingContainer.layoutMetadata.percentWidth = 100; 
+        bufferingContainer.layoutMetadata.percentWidth = 100;
         bufferingContainer.layoutMetadata.percentHeight = 100;
         bufferingContainer.layoutMetadata.horizontalAlign = HorizontalAlign.CENTER;
         bufferingContainer.layoutMetadata.verticalAlign = VerticalAlign.MIDDLE;
@@ -166,15 +170,15 @@ public class SeeSawPlayer extends Sprite {
         subtitlesContainer = new MediaContainer();
         subtitlesContainer.y = 0;
         subtitlesContainer.x = 0;
-        subtitlesContainer.layoutMetadata.percentWidth = 100; 
+        subtitlesContainer.layoutMetadata.percentWidth = 100;
         subtitlesContainer.layoutMetadata.percentHeight = 100;
         subtitlesContainer.layoutMetadata.verticalAlign = VerticalAlign.BOTTOM;
         addChild(subtitlesContainer);
-        
+
         controlbarContainer = new MediaContainer();
         controlbarContainer.y = 0;
         controlbarContainer.x = 0;
-        controlbarContainer.layoutMetadata.percentWidth = 100; 
+        controlbarContainer.layoutMetadata.percentWidth = 100;
         controlbarContainer.layoutMetadata.height = 100;
         controlbarContainer.layoutMetadata.verticalAlign = VerticalAlign.BOTTOM;
         addChild(controlbarContainer);
@@ -189,8 +193,7 @@ public class SeeSawPlayer extends Sprite {
         //handler to show and hide the buffering panel
         player.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
 
-        setContainerSize(contentWidth, contentHeight);
-
+        logger.debug("adding media container to stage");
         addChild(container);
     }
 
@@ -268,13 +271,13 @@ public class SeeSawPlayer extends Sprite {
         contentElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
         contentElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
 
-        mainContainer.addMediaElement(contentElement);
-
         createBufferingPanel();
         createControlBarElement();
         createSubtitleElement();
 
         player.media = contentElement;
+
+        mainContainer.addMediaElement(contentElement);
     }
 
     private function createControlBarElement():void {
@@ -309,7 +312,14 @@ public class SeeSawPlayer extends Sprite {
             case MediaTraitType.PLAY:
                 changeListeners(element, add, traitType, PlayEvent.PLAY_STATE_CHANGE, onPlayStateChanged);
                 break;
+              case MediaTraitType.LOAD:
+                changeListeners(element, add, traitType, LoadEvent.LOAD_STATE_CHANGE, onLoadStateChanged);
+                break;
         }
+    }
+
+    private function onLoadStateChanged(event:LoadEvent):void {
+        trace(event.loadState);
     }
 
     private function onTraitAdd(event:MediaElementEvent):void {
@@ -359,6 +369,24 @@ public class SeeSawPlayer extends Sprite {
 
 
     }
+
+    private function netStatusChanged(event:*):void {
+
+         if(event.info == "NetConnection.Connect.NetworkChange"){
+
+            factory.removeEventListener(NetStatusEvent.NET_STATUS, netStatusChanged);
+
+            var metadata:Metadata = contentElement.getMetadata(NetStatusMetadata.NET_STATUS_METADATA);
+
+            if (metadata == null) {
+                metadata = new Metadata();
+                contentElement.addMetadata(NetStatusMetadata.NET_STATUS_METADATA, metadata);
+            }
+
+                metadata.addValue(NetStatusMetadata.STATUS, event.type);
+        }
+    }
+
 
     private function onFullscreen(event:FullScreenEvent):void {
         logger.debug("onFullscreen: " + event.fullScreen);
@@ -412,7 +440,6 @@ public class SeeSawPlayer extends Sprite {
 
     private function onMediaElementCreate(event:MediaFactoryEvent):void {
         var mediaElement:MediaElement = event.mediaElement;
-
         if (mediaElement is IAuditudeMediaElement) {
           var _auditude:AuditudePlugin = IAuditudeMediaElement(mediaElement).plugin;
 logger.debug("AUDITUDE PLUGIN SEEMS TO HAVE LOADED?");

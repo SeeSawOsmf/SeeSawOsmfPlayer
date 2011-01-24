@@ -30,7 +30,6 @@ import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.external.PlayerExternalInterface;
 import com.seesaw.player.external.PlayerExternalInterfaceImpl;
 import com.seesaw.player.impl.services.ResumeServiceImpl;
-import com.seesaw.player.utils.ServiceRequest;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.liverail.LiverailConfig;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
@@ -44,6 +43,7 @@ import com.seesaw.player.panels.PosterFrame;
 import com.seesaw.player.preloader.Preloader;
 import com.seesaw.player.preventscrub.ScrubPreventionConstants;
 import com.seesaw.player.services.ResumeService;
+import com.seesaw.player.utils.ServiceRequest;
 
 import flash.display.LoaderInfo;
 import flash.display.Sprite;
@@ -108,8 +108,8 @@ public class Player extends Sprite {
 
         // If no flashVar, use a default for testing
         // TODO: remove this altogether
-        loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/" +
-                "player.playerinitialisation:playerinit?t:ac=TV:FACTUAL/s/7675/Around-the-World-in-80-Days";
+        //loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player/initinfo/29053";
+        loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player/initinfo/13602";
 
         stage.scaleMode = StageScaleMode.NO_SCALE;
         stage.align = StageAlign.TOP_LEFT;
@@ -142,7 +142,7 @@ public class Player extends Sprite {
     }
 
     private function checkGuidance():Boolean {
-        if (playerInit.guidance) {
+        if (playerInit.guidance.length() > 0) {
             return true;
         } else {
             return false;
@@ -183,8 +183,8 @@ public class Player extends Sprite {
         });
 
         //if there is guidance, show the guidance bar
-        if (playerInit.guidance) {
-            guidanceBar = new GuidanceBar(playerInit.guidance.warning);
+        if (playerInit.guidance.length() > 0) {
+            guidanceBar = new GuidanceBar(playerInit.guidance.message);
             posterFrame.addChild(guidanceBar);
         }
         addChild(posterFrame);
@@ -216,12 +216,18 @@ public class Player extends Sprite {
                 logger.debug("COOKIE PASSWORD: " + hashedPassword);
             }
 
+            var assetType:String = "programme";
+
+            if (playerInit.guidance.type != "tv" && playerInit.guidance.type != "TV") {
+                assetType = "film";
+            }
+
             if (hashedPassword) {
                 var parentalControlsPanel = new ParentalControlsPanel(
                         hashedPassword,
-                        playerInit.guidance.warning,
-                        playerInit.guidance.explanation,
-                        playerInit.guidance.guidance,
+                        playerInit.guidance.message,
+                        assetType,
+                        playerInit.guidance.age,
                         playerInit.parentalControls.parentalControlsPageURL,
                         playerInit.parentalControls.whatsThisLinkURL
                         );
@@ -238,9 +244,9 @@ public class Player extends Sprite {
                 addChild(parentalControlsPanel);
             } else {
                 var guidancePanel = new GuidancePanel(
-                        playerInit.guidance.warning,
-                        playerInit.guidance.explanation,
-                        playerInit.guidance.guidance,
+                        playerInit.guidance.message,
+                        assetType,
+                        playerInit.guidance.age,
                         playerInit.parentalControls.parentalControlsPageURL,
                         playerInit.parentalControls.whatsThisLinkURL
                         );
@@ -349,7 +355,7 @@ public class Player extends Sprite {
         videoPlayer = new SeeSawPlayer(config);
 
         // Since we have autoPlay to false for liverail, we need to manually call play for C4:
-        if (playerInit.adMode == "channel4")
+        if (playerInit.adMode != "liverail")
             videoPlayer.mediaPlayer().autoPlay = true;
         else if (playerInit.adMode == "auditude") {
             videoPlayer.mediaPlayer().autoPlay = true;

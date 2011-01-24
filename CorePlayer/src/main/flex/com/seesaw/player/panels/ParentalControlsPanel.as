@@ -52,8 +52,12 @@ public class ParentalControlsPanel extends Sprite {
 
     //Guidance warning string passed into the constructor
     private var guidanceWarning:String;
-    private var guidanceExplanation:String;
-    private var confirmationMessage:String;
+    private var assetType:String;
+    private var age:String;
+    private var ageMessage:String = "Please confirm you are aged %AGE_TOKEN% or older " +
+				"and accept our <a href=\"%TERMSURL%\"><font color=\"#00A88E\">Terms and Conditions.</font></a>";
+    private var assetWarning:String = "This %TYPE_TOKEN% isn't suitable for younger viewers.<br/><br/>";
+    
     private var moreAboutParentalControlsLink:String;
     private var turnOffParentalControlsLink:String;
 
@@ -90,16 +94,16 @@ public class ParentalControlsPanel extends Sprite {
      * Takes: warning:String - the guidance warning that appears at the top of the panel
      *
      */
-    public function ParentalControlsPanel(password:String, warning:String, explanation:String, confirmationMessage:String, moreAboutParentalControlsLink:String, turnOffParentalControlsLink:String) {
+    public function ParentalControlsPanel(password:String, warning:String, assetType:String, age:String, moreAboutParentalControlsLink:String, turnOffParentalControlsLink:String) {
         
         this.hashedPassword = password;
         //set the private variables
         if (ExternalInterface.available) {
             this.hashedPassword = ParentalControlsPanel.getHashedPassword();
         }
+        this.assetType = assetType;
+        this.age = age;
         this.guidanceWarning = warning;
-        this.guidanceExplanation = explanation;
-        this.confirmationMessage = confirmationMessage;
         this.moreAboutParentalControlsLink = moreAboutParentalControlsLink;
         this.turnOffParentalControlsLink = turnOffParentalControlsLink;
 
@@ -197,7 +201,6 @@ public class ParentalControlsPanel extends Sprite {
         contentContainer.addChild(this.buildWarning());
         contentContainer.addChild(this.buildWarningIcon());
         contentContainer.addChild(this.buildExplanation());
-        contentContainer.addChild(this.buildConfirmationMessage());
         contentContainer.addChild(this.buildEnterMessage());
         contentContainer.addChild(this.buildPasswordLabel());
         contentContainer.addChild(this.buildPasswordEntryBG());
@@ -268,7 +271,7 @@ public class ParentalControlsPanel extends Sprite {
 
         var explanationLabel = new StyledTextField();
         explanationLabel.width = 500;
-        explanationLabel.htmlText = this.guidanceExplanation;
+        explanationLabel.htmlText = this.assetWarning.replace("%TYPE_TOKEN%", this.assetType);
         explanationLabel.y = 66;
         var formattedWarningLabel:TextField = this.applyInfoFormat(explanationLabel);
 
@@ -389,19 +392,6 @@ public class ParentalControlsPanel extends Sprite {
         forgotPasswordButton.x = 0;
 
         return forgotPasswordButton;
-    }
-
-    private function buildConfirmationMessage():TextField {
-
-        var confirmationLabel = new StyledTextField();
-        confirmationLabel.width = 500;
-        confirmationLabel.htmlText = this.confirmationMessage;
-        confirmationLabel.y = 67;
-        var formattedWarningLabel:TextField = this.applyInfoFormat(confirmationLabel);
-
-        confirmationLabel.styleSheet = this.css;
-
-        return confirmationLabel;
     }
 
     private function applyTitleFormat(textToFormat:TextField):TextField {
@@ -593,7 +583,7 @@ public class ParentalControlsPanel extends Sprite {
     private function onParentalControlClick(event:Event):void {
         var request:URLRequest = new URLRequest(this.moreAboutParentalControlsLink);
         try {
-            navigateToURL(request);
+            navigateToURL(request, "_self");
         } catch (e:Error) {
             trace("Error occurred!");
         }
@@ -635,7 +625,7 @@ public class ParentalControlsPanel extends Sprite {
     private function onFindOutMoreClick(event:Event):void {
         var request:URLRequest = new URLRequest(this.turnOffParentalControlsLink);
         try {
-            navigateToURL(request);
+            navigateToURL(request, "_self");
         } catch (e:Error) {
             trace("Error occurred!");
         }

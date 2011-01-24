@@ -112,7 +112,7 @@ public class GuidanceBar extends Sprite {
         guidanceLabel.width = 540;
         guidanceLabel.htmlText = "Guidance:";
         guidanceLabel.y = 0;
-        this.applyWarningFormat(guidanceLabel);
+        this.applyTitleFormat(guidanceLabel);
 
         return guidanceLabel;
     }
@@ -134,6 +134,18 @@ public class GuidanceBar extends Sprite {
         warningIconHolder.x = 639;
         warningIconHolder.y = 10;
         return warningIconHolder;
+    }
+
+    private function applyTitleFormat(textToFormat:TextField):TextField {
+        var textFormat:TextFormat = new TextFormat();
+        textFormat.size = 11;
+        textFormat.color = 0xFFFFFF;
+        textFormat.align = "left";
+        textFormat.bold = true;
+
+        textToFormat.setTextFormat(textFormat);
+
+        return textToFormat;
     }
 
     private function applyWarningFormat(textToFormat:TextField):TextField {

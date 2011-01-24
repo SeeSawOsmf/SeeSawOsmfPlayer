@@ -67,6 +67,8 @@ public class ScrubBar extends Widget implements IWidget {
     private var markerContainer:Sprite;
     private var currentTimeInSeconds:Number = 0;
 
+    private var duration:Number;
+
     public function ScrubBar() {
         currentTime = new StyledTextField();
         addChild(currentTime);
@@ -229,6 +231,8 @@ public class ScrubBar extends Widget implements IWidget {
 
     private function onDurationChange(event:TimeEvent):void {
         var timeTrait:TimeTrait = event.target as TimeTrait;
+        duration = timeTrait.duration;
+        createAdMarkers();
         // positionOffset = timeTrait.currentTime;
     }
 
@@ -259,10 +263,13 @@ public class ScrubBar extends Widget implements IWidget {
             removeAllChildren(markerContainer);
 
             for each (var value:AdBreak in adBreaks) {
+                if (value.startTime <= currentTimeInSeconds) continue;
+
                 var sprite:Sprite = new Sprite();
                 sprite.graphics.beginFill(0xffffff);
-                sprite.graphics.drawRect(scrubBarTrack.width * value.startTime +
-                        (scrubBarTrack.x) - 2, scrubBarTrack.y - 0.5, 6, 4);
+                sprite.graphics.drawRect(0, 0, 6, 4);
+                sprite.x = scrubBarTrack.x + getPositionOnScrubBar(value.startTime) - 3;
+                sprite.y = scrubBarTrack.y - 0.5;
                 sprite.graphics.endFill();
                 markerContainer.addChild(sprite);
             }
@@ -292,7 +299,7 @@ public class ScrubBar extends Widget implements IWidget {
 
         var temporal:TimeTrait = media ? media.getTrait(MediaTraitType.TIME) as TimeTrait : null;
         if (temporal != null && !isNaN(temporal.duration) && !isNaN(temporal.currentTime)) {
-            var duration:Number = temporal.duration - positionOffset;
+            duration = temporal.duration - positionOffset;
             var position:Number = temporal.currentTime - positionOffset;
 
             this.currentTimeInSeconds = position;
@@ -300,13 +307,7 @@ public class ScrubBar extends Widget implements IWidget {
             currentTime.text
                     = prettyPrintSeconds(position) + " / " + prettyPrintSeconds(duration);
 
-            var scrubberX:Number
-                    = scrubberStart
-                    + (    (scrubberEnd - scrubberStart)
-                    * position
-                    )
-                    / duration
-                    || scrubberStart; // defaul value if calc. returns NaN.
+            var scrubberX:Number = scrubberStart + getPositionOnScrubBar(position);
 
             scrubber.x = Math.min(scrubberEnd, Math.max(scrubberStart, scrubberX));
             scrubBarTrail.width = scrubber.x - scrubBarTrail.x + 4;
@@ -314,6 +315,10 @@ public class ScrubBar extends Widget implements IWidget {
         else {
             resetUI();
         }
+    }
+
+    private function getPositionOnScrubBar(position:Number):Number {
+        return ((position / duration) * (scrubberEnd - scrubberStart)) || 0; // default value if calc. returns NaN.
     }
 
     private function prettyPrintSeconds(seconds:Number):String {
@@ -367,6 +372,9 @@ public class ScrubBar extends Widget implements IWidget {
             seekable.removeEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
             seekToTime = NaN;
             onTimerTick();
+        } else {
+            //redraw the blips, as we should now be past a break point
+            createAdMarkers();
         }
     }
 
