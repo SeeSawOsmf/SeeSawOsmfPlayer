@@ -100,8 +100,8 @@ public class Player extends Sprite {
 
         // If no flashVar, use a default for testing
         // TODO: remove this altogether
-        loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://localhost:8080/player/initinfo/29053";
-        // loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://localhost:8080/player/initinfo/13602";
+        //loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player/initinfo/29053";
+        loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player/initinfo/13602";
 
         stage.scaleMode = StageScaleMode.NO_SCALE;
         stage.align = StageAlign.TOP_LEFT;
@@ -134,7 +134,7 @@ public class Player extends Sprite {
     }
 
     private function checkGuidance():Boolean {
-        if (playerInit.guidance) {
+        if (playerInit.guidance.length() > 0) {
             return true;
         } else {
             return false;
@@ -176,7 +176,7 @@ public class Player extends Sprite {
 
         //if there is guidance, show the guidance bar
         if (playerInit.guidance.length() > 0) {
-            guidanceBar = new GuidanceBar(playerInit.guidance.warning);
+            guidanceBar = new GuidanceBar(playerInit.guidance.message);
             posterFrame.addChild(guidanceBar);
         }
         addChild(posterFrame);
@@ -208,12 +208,18 @@ public class Player extends Sprite {
                 logger.debug("COOKIE PASSWORD: " + hashedPassword);
             }
 
+            var assetType:String = "programme";
+
+            if (playerInit.guidance.type != "tv" && playerInit.guidance.type != "TV") {
+                assetType = "film";
+            }
+
             if (hashedPassword) {
                 var parentalControlsPanel = new ParentalControlsPanel(
                         hashedPassword,
-                        playerInit.guidance.warning,
-                        playerInit.guidance.explanation,
-                        playerInit.guidance.guidance,
+                        playerInit.guidance.message,
+                        assetType,
+                        playerInit.guidance.age,
                         playerInit.parentalControls.parentalControlsPageURL,
                         playerInit.parentalControls.whatsThisLinkURL
                         );
@@ -230,9 +236,9 @@ public class Player extends Sprite {
                 addChild(parentalControlsPanel);
             } else {
                 var guidancePanel = new GuidancePanel(
-                        playerInit.guidance.warning,
-                        playerInit.guidance.explanation,
-                        playerInit.guidance.guidance,
+                        playerInit.guidance.message,
+                        assetType,
+                        playerInit.guidance.age,
                         playerInit.parentalControls.parentalControlsPageURL,
                         playerInit.parentalControls.whatsThisLinkURL
                         );

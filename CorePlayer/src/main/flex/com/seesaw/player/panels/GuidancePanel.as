@@ -45,10 +45,14 @@ public class GuidancePanel extends Sprite {
 
     //Guidance warning string passed into the constructor
     private var guidanceWarning:String;
-    private var guidanceExplanation:String;
-    private var confirmationMessage:String;
+    private var assetType:String;
+    private var age:String;
     private var parentalControlsSetupLink:String;
     private var findOutMoreLink:String;
+
+    private var assetWarning:String = "This %TYPE_TOKEN% isn't suitable for younger viewers.<br/><br/>";
+    private var ageMessage:String = "Please confirm you are aged %AGE_TOKEN% or older " +
+				"and accept our <a href=\"%TERMSURL%\"><font color=\"#00A88E\">Terms and Conditions.</font></a>";
 
     //components which need tooltips
     private var acceptButton:Sprite = new Sprite();
@@ -74,15 +78,15 @@ public class GuidancePanel extends Sprite {
      * Takes: warning:String - the guidance warning that appears at the top of the panel
      *
      */
-    public function GuidancePanel(warning:String, explanation:String, confirmationMessage:String, parentalControlsSetup:String, findOutMore:String) {
+    public function GuidancePanel(warning:String, assetType:String, age:String, parentalControlsSetup:String, findOutMore:String) {
 
         this.acceptButton.name = PlayerConstants.GUIDANCE_PANEL_ACCEPT_BUTTON_NAME;
         this.cancelButton.name = PlayerConstants.GUIDANCE_PANEL_CANCEL_BUTTON_NAME;
 
         //set the private variables
         this.guidanceWarning = warning;
-        this.guidanceExplanation = explanation;
-        this.confirmationMessage = confirmationMessage;
+        this.assetType = assetType;
+        this.age = age;
         this.parentalControlsSetupLink = parentalControlsSetup;
         this.findOutMoreLink = findOutMore;
 
@@ -190,8 +194,9 @@ public class GuidancePanel extends Sprite {
     private function buildExplanation():TextField {
 
         var explanationLabel = new StyledTextField();
-        explanationLabel.width = 540;
-        explanationLabel.htmlText = this.guidanceExplanation;
+        explanationLabel.width = 500;
+        explanationLabel.wordWrap = true;
+        explanationLabel.htmlText = this.assetWarning.replace("%TYPE_TOKEN%", this.assetType);
         explanationLabel.y = 32;
         var formattedWarningLabel:TextField = this.applyInfoFormat(explanationLabel);
 
@@ -201,8 +206,9 @@ public class GuidancePanel extends Sprite {
     private function buildConfirmationMessage():TextField {
 
         var confirmationLabel = new StyledTextField();
-        confirmationLabel.width = 540;
-        confirmationLabel.htmlText = this.confirmationMessage;
+        confirmationLabel.width = 500;
+        confirmationLabel.wordWrap = true;
+        confirmationLabel.htmlText = this.ageMessage.replace("%TYPE_TOKEN%", this.assetType).replace("%AGE_TOKEN%", this.age).replace("%TERMSURL%", "http://www.seesaw.com/help");
         confirmationLabel.y = 66;
         var formattedWarningLabel:TextField = this.applyInfoFormat(confirmationLabel);
 
@@ -225,7 +231,7 @@ public class GuidancePanel extends Sprite {
 
     private function applyInfoFormat(textToFormat:TextField):TextField {
         var textFormat:TextFormat = new TextFormat();
-        textFormat.size = 14;
+        textFormat.size = 12;
         textFormat.color = 0xFFFFFF;
         textFormat.align = "left";
 
