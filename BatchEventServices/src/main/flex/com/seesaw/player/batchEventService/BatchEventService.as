@@ -19,7 +19,6 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ProxyElement;
 import org.osmf.events.BufferEvent;
-import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MetadataEvent;
 import org.osmf.events.PlayEvent;
@@ -28,7 +27,6 @@ import org.osmf.events.TimeEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.metadata.Metadata;
 import org.osmf.traits.BufferTrait;
-import org.osmf.traits.LoadState;
 import org.osmf.traits.LoadTrait;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
@@ -191,28 +189,25 @@ private function onMetaDataAdd(event:MediaElementEvent):void {
         // TODO this seems to be the only way currently to detect main content is being loaded and played
         // TODO there is a bug outstanding where stings are appearing as mainContent
         metadata = event.target.getMetadata("http://www.w3.org/ns/SMIL");
+            if (metadata == null) {
+                metadata = new Metadata();
+                addMetadata("http://www.w3.org/ns/SMIL", metadata);
+            }
 
         var contentType:String = metadata.getValue("contentType");
-
-
-        if (oldContentType != contentType) {
-            oldContentType = contentType;
-            // TODO this checker is to block the metaDataEvent firing 4 times... Should be changed to only fire once.
             switch (contentType) {
                 case "mainContent" :
                     playingMainContent = true;
-                    contentViewingSequenceNumber++;
-                    mainContentCount++;
-                    eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.MAIN_CONTENT));
-                    eventsManager.flushAll();
                     break;
                 case "sting" :
                     playingMainContent = false;
                     break;
-                default : trace("############ unknown content type found in meta data ############### " + contentType)
-
+                case "advert" :
+                    playingMainContent = false;
+                    break;
+                default : trace("############ unknown content type found in meta data ############### " + contentType);
             }
-        }
+
     } else if (event.namespaceURL == "http://www.seesaw.com/netstatus/metadata") {
         trace("http://www.seesaw.com/netstatus/metadata");
     }
@@ -299,7 +294,6 @@ private function processTrait(traitType:String, added:Boolean):void {
         case MediaTraitType.LOAD:
             toggleLoadListeners(added);
             break;
-        /// case   private var playTrait:PlayTrait;
     }
 }
 
@@ -318,14 +312,17 @@ private function togglePlayListeners(added:Boolean):void {
 private function toggleLoadListeners(added:Boolean):void {
     var loadable:LoadTrait = proxiedElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
     if (loadable) {
-        if (added) {
+       /* if (added) {
             loadable.addEventListener(LoadEvent.LOAD_STATE_CHANGE, onLoadableStateChange);
+             loadable.addEventListener(LoadEvent.BYTES_TOTAL_CHANGE, onBytesTotalChange);
         }
         else {
             loadable.removeEventListener(LoadEvent.LOAD_STATE_CHANGE, onLoadableStateChange);
-        }
+             loadable.removeEventListener(LoadEvent.BYTES_TOTAL_CHANGE, onBytesTotalChange);
+        }*/
     }
 }
+
 
 
 private function onPlayStateChange(event:PlayEvent):void {
@@ -378,19 +375,6 @@ private function toggleSeekListeners(added:Boolean):void {
 }
 
 
-private function onLoadableStateChange(event:LoadEvent):void {
-    trace(event.currentTarget.resource);
-    switch (event) {
-
-        case LoadState.READY:
-        /// trace(event.target.resource.loader.netStream);
-        /*    var loadedContext:NetLoadedContext = event.loadable.loadedContext as  NetLoadedContext;
-         var netStream:NetStream =  loadedContext.stream;*/
-
-    }
-}
-
-
 private function onSeekingChange(event:SeekEvent):void {
     if (playingMainContent) {
         if (event.seeking) {
@@ -410,8 +394,10 @@ private function toggleTimeListeners(added:Boolean):void {
     var time:TimeTrait = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
     if (time) {
         time.addEventListener(TimeEvent.COMPLETE, onComplete);
+        time.addEventListener(TimeEvent.DURATION_CHANGE, onDurationChange);
     } else {
         time.removeEventListener(TimeEvent.COMPLETE, onComplete);
+        time.removeEventListener(TimeEvent.DURATION_CHANGE, onDurationChange);
     }
 }
 
@@ -421,7 +407,15 @@ private function onComplete(event:TimeEvent):void {
         eventsManager.flushAll();
     }
 }
-
+     private function onDurationChange(event:TimeEvent):void {
+         ///MetaDataAdded of the MediaElementEvent, fires 3 times, so wiring this to the duration change seems to be the next most reliable event....
+         if(playingMainContent){
+                    contentViewingSequenceNumber++;
+                    mainContentCount++;
+                    eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.MAIN_CONTENT));
+                    eventsManager.flushAll();
+         }
+    }
 
 private function incrementAndGetUserEventId():int {
     userEventId++;
