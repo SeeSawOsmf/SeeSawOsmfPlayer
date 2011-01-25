@@ -345,12 +345,16 @@ public class Player extends Sprite {
 
         var config:PlayerConfiguration = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, content);
         videoPlayer = new SeeSawPlayer(config);
-
+        videoPlayer.addEventListener(PlayerConstants.DESTROY,reBuildPlayer);
         // Since we have autoPlay to false for liverail, we need to manually call play for C4:
         if (playerInit.adMode != "liverail")
             videoPlayer.mediaPlayer().autoPlay = true;
         
         addChild(videoPlayer);
+    }
+
+    private function reBuildPlayer(event:Event):void {
+       onAddedToStage(event);
     }
 
     private function createMediaResource(videoInfo:XML):MediaResourceBase {

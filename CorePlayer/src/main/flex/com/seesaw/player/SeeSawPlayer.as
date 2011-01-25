@@ -106,6 +106,9 @@ public class SeeSawPlayer extends Sprite {
 
         var metadata:Metadata = config.resource.getMetadataValue(PlayerConstants.METADATA_NAMESPACE) as Metadata;
 
+        metadata.addEventListener(MetadataEvent.VALUE_ADD, playerMetaChange);
+        metadata.addEventListener(MetadataEvent.VALUE_CHANGE, playerMetaChange);
+
         playerInit = metadata.getValue(PlayerConstants.CONTENT_INFO) as XML;
         if (playerInit == null) {
             throw new ArgumentError("player initialisation metadata not specified");
@@ -129,6 +132,25 @@ public class SeeSawPlayer extends Sprite {
         initialisePlayer();
 
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+    }
+
+    private function playerMetaChange(event:MetadataEvent):void {
+        if (event.key == PlayerConstants.DESTROY) {
+            if (event.value) {
+
+                ///// wipe out the objects from memory and off the displayList.   removeChild seems to throw errors when trying to removeChild( container ) etc..
+                mainContainer.removeMediaElement(contentElement);
+                mainContainer = null;
+                bufferingContainer = null;
+                subtitlesContainer = null;
+                controlbarContainer = null;
+                contentElement = null;
+                player = null;
+                container = null;
+
+                dispatchEvent(new Event(PlayerConstants.DESTROY));
+            }
+        }
     }
 
     private function onAddedToStage(event:Event) {
@@ -281,7 +303,7 @@ public class SeeSawPlayer extends Sprite {
             case MediaTraitType.PLAY:
                 changeListeners(element, add, traitType, PlayEvent.PLAY_STATE_CHANGE, onPlayStateChanged);
                 break;
-              case MediaTraitType.LOAD:
+            case MediaTraitType.LOAD:
                 changeListeners(element, add, traitType, LoadEvent.LOAD_STATE_CHANGE, onLoadStateChanged);
                 break;
         }
@@ -315,7 +337,7 @@ public class SeeSawPlayer extends Sprite {
 
         var metadata:Metadata = contentElement.getMetadata(ExternalInterfaceMetadata.EXTERNAL_INTERFACE_METADATA);
 
-        if(metadata == null) {
+        if (metadata == null) {
             metadata = new Metadata();
             contentElement.addMetadata(ExternalInterfaceMetadata.EXTERNAL_INTERFACE_METADATA, metadata);
         }
@@ -341,7 +363,7 @@ public class SeeSawPlayer extends Sprite {
 
     private function netStatusChanged(event:NetStatusEvent):void {
 
-         if(event.info == "NetConnection.Connect.NetworkChange"){
+        if (event.info == "NetConnection.Connect.NetworkChange") {
 
             factory.removeEventListener(NetStatusEvent.NET_STATUS, netStatusChanged);
 
@@ -352,7 +374,7 @@ public class SeeSawPlayer extends Sprite {
                 contentElement.addMetadata(NetStatusMetadata.NET_STATUS_METADATA, metadata);
             }
 
-                metadata.addValue(NetStatusMetadata.STATUS, event.info);
+            metadata.addValue(NetStatusMetadata.STATUS, event.info);
         }
     }
 

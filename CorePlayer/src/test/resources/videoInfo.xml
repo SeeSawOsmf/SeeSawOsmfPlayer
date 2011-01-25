@@ -6,7 +6,7 @@
         </ns2:head>
         <ns2:body>
             <ns2:seq>
-<!--                <ns2:video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Seesaw_Blackpool.mp4">
+               <ns2:video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Seesaw_Blackpool.mp4">
 					<ns2:metadata>
 						<ns2:meta content="advert" name="contentType" />
 						<ns2:meta content="http://kgd-blue-test-zxtm01.dev.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/channel4/tv/entertainment/quizzes_and_gameshows/45276/45276/001/L18/11445641909/x13/4OD/SS_IDENT_Feb10_x90/2362406/5532494162557958586b77414364414e" name="trackback" />
@@ -17,7 +17,7 @@
                     <ns2:metadata>
                         <ns2:meta content="sting" name="contentType"/>
                     </ns2:metadata>
-                </ns2:video>-->
+                </ns2:video>
               <ns2:par>
                <!--        <ns2:video src="http://kgd-red-delivery01.dev.vodco.co.uk/encrypted-hsm-newcert/sintel_500kbs.f4m">
                    <ns2:metadata>

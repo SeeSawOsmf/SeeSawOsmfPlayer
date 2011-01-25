@@ -85,6 +85,8 @@ public class BatchEventService extends ProxyElement {
     private var playable:PlayTrait;
     private var loadable:LoadTrait;
     private var adMetadata:Metadata;
+    private var SMILMetadata:Metadata;
+    private var playerMetadata:Metadata;
 
     public function BatchEventService(proxiedElement:MediaElement = null) {
         var provider:ObjectProvider = ObjectProvider.getInstance();
@@ -117,18 +119,18 @@ public class BatchEventService extends ProxyElement {
         cumulativeDurationFlushTimer.addEventListener(TimerEvent.TIMER, onTimerTick);
         cumulativeDurationFlushTimer.start();
 
-        var infoData:Metadata = proxiedElement.resource.getMetadataValue(PlayerConstants.METADATA_NAMESPACE) as Metadata;
+        playerMetadata = proxiedElement.resource.getMetadataValue(PlayerConstants.METADATA_NAMESPACE) as Metadata;
 
-        if (infoData) {
-            transactionItemId = infoData.getValue("videoInfo").transactionItemId;
-            serverTimeStamp = infoData.getValue("videoInfo").serverTimeStamp;
-            mainAssetId = infoData.getValue("videoInfo").mainAssetID;
-            batchEventURL = infoData.getValue("contentInfo").batchEventService;
-            cumulativeDurationURL = infoData.getValue("contentInfo").cumulativeDurationService;
-            sectionCount = infoData.getValue("videoInfo").sectionCount;
-            userId = infoData.getValue("contentInfo").userId;
-            anonymousUserId = infoData.getValue("contentInfo").anonymousUserId;
-            programmeId = infoData.getValue("contentInfo").programme;
+        if (playerMetadata) {
+            transactionItemId = playerMetadata.getValue("videoInfo").transactionItemId;
+            serverTimeStamp = playerMetadata.getValue("videoInfo").serverTimeStamp;
+            mainAssetId = playerMetadata.getValue("videoInfo").mainAssetID;
+            batchEventURL = playerMetadata.getValue("contentInfo").batchEventService;
+            cumulativeDurationURL = playerMetadata.getValue("contentInfo").cumulativeDurationService;
+            sectionCount = playerMetadata.getValue("videoInfo").sectionCount;
+            userId = playerMetadata.getValue("contentInfo").userId;
+            anonymousUserId = playerMetadata.getValue("contentInfo").anonymousUserId;
+            programmeId = playerMetadata.getValue("contentInfo").programme;
 
             var viewEvent:ViewEvent = new ViewEvent(transactionItemId, serverTimeStamp, sectionCount, mainAssetId, userId, anonymousUserId);
             var number:Number = resumeService.getResumeCookie();
@@ -147,20 +149,6 @@ public class BatchEventService extends ProxyElement {
 }
 
 
-private function toggleTraitListeners(value:MediaElement, add:Boolean):void {
-    if (add) {
-        value.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
-        value.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
-       value.addEventListener(MediaElementEvent.METADATA_ADD, onMetaDataAdd);
-        value.addEventListener(MediaElementEvent.METADATA_REMOVE, onMetaDataRemove);
-
-    } else {
-        value.removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
-        value.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
-        value.removeEventListener(MediaElementEvent.METADATA_ADD, onMetaDataAdd);
-        value.removeEventListener(MediaElementEvent.METADATA_REMOVE, onMetaDataRemove);
-    }
-}
 
 private function incrementCumulativeDurationCounter(event:TimerEvent):void {
     cumulativeDurationCount += CUMULATIVE_DURATION_MONITOR_TIMER_DELAY_INTERVAL;
@@ -172,9 +160,9 @@ private function onMetaDataRemove(event:MediaElementEvent):void {
         metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
         metadata.removeEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
     } else if (event.namespaceURL == "http://www.seesaw.com/player/ads/1.0") {
-        var metadata:Metadata = event.target.getMetadata("http://www.seesaw.com/player/ads/1.0");
-        metadata.removeEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
-        metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
+        adMetadata = event.target.getMetadata("http://www.seesaw.com/player/ads/1.0");
+        adMetadata.removeEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
+        adMetadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
     }
 }
 
@@ -192,7 +180,7 @@ private function onMetaDataAdd(event:MediaElementEvent):void {
     } else if (event.namespaceURL == "http://www.w3.org/ns/SMIL") {
         // TODO this seems to be the only way currently to detect main content is being loaded and played
         // TODO there is a bug outstanding where stings are appearing as mainContent
-        metadata = event.target.getMetadata("http://www.w3.org/ns/SMIL");
+        SMILMetadata = event.target.getMetadata("http://www.w3.org/ns/SMIL");
 
         var contentType:String = metadata.getValue("contentType");
             switch (contentType) {
@@ -333,6 +321,7 @@ private function toggleLoadListeners(added:Boolean):void {
    loadable = proxiedElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
     if (loadable) {
 
+
          trace(loadable.loadState);
            /* loadable.addEventListener(LoadEvent.LOAD_STATE_CHANGE, onLoadableStateChange);
              loadable.addEventListener(LoadEvent.BYTES_TOTAL_CHANGE, onBytesTotalChange);*/
@@ -431,6 +420,7 @@ private function onComplete(event:TimeEvent):void {
     if (mainContentCount * 2 == sectionCount) {
         eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.END));
         eventsManager.flushAll();
+        playerMetadata.addValue(PlayerConstants.DESTROY, true);   //// main content has finished so we need to reInit the Player... This might not be the best location for this event, but we can look at moving it in the future.
     }
 }
      private function onDurationChange(event:TimeEvent):void {
@@ -443,7 +433,7 @@ private function onComplete(event:TimeEvent):void {
                     mainContentCount++;
                     eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.MAIN_CONTENT));
                     eventsManager.flushAll();
-         }else{
+         }else if(!adMetadata){
                     defineContentUrl(true);
                     eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.AD_BREAK));
          }
@@ -455,8 +445,10 @@ private function onComplete(event:TimeEvent):void {
              if(streamingUrlResource){
                contentUrl =  streamingUrlResource.url;
              }
-        }else{
+        }else if(!adMetadata){
              contentUrl =  "mainResource";
+        }else{
+
         }
     }
 
