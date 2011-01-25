@@ -28,6 +28,7 @@ public class AuditudeConstants {
     public static const VERSION:String = "version";
     public static const CONFIG_OBJECT:String = "config";
     public static const RESUME_POSITION:String = "resume";
-    public static const ADMANAGER_URL = "swfLocation";
+    public static const MEDIA_FACTORY = "mediaFactory";
+    public static const PLUGIN_INSTANCE = "auditudePlugin";
 }
 }

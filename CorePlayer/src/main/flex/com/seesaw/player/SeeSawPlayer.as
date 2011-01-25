@@ -36,9 +36,11 @@ import com.seesaw.player.netstatus.NetStatusMetadata;
 import com.seesaw.player.panels.BufferingPanel;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
 import com.seesaw.player.smil.SeeSawSMILLoader;
+
+import com.auditude.ads.osmf.constants.AuditudeOSMFConstants;
   import com.auditude.ads.AuditudePlugin;
   import com.auditude.ads.osmf.IAuditudeMediaElement;
-
+import com.seesaw.player.ads.AuditudeConstants;
 
 import flash.display.Sprite;
 import flash.display.StageDisplayState;
@@ -80,9 +82,9 @@ public class SeeSawPlayer extends Sprite {
 
     use namespace contentinfo;
 
-    private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
     private static const AUDITUDE_PLUGIN_URL:String = "http://asset.cdn.auditude.com/flash/sandbox/plugin/osmf/AuditudeOSMFProxyPlugin.swf";
 
+    private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
 
     private var config:PlayerConfiguration;
     private var contentElement:MediaElement;
@@ -99,8 +101,9 @@ public class SeeSawPlayer extends Sprite {
     private var bufferingPanel:BufferingPanel;
 
     private var xi:PlayerExternalInterface;
-    private var pluginsToLoad:int = 6;
-
+    
+    // This is so we wait on Auditude loading before setting up the rest of the plugins and player
+    private var pluginsToLoad:int = 2;
 
     private var playerInit:XML;
     private var videoInfo:XML;
@@ -136,8 +139,6 @@ public class SeeSawPlayer extends Sprite {
         rootElement = new ParallelElement();
         container = new MediaContainer();
 
-        initialisePlayer();
-
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
     }
 
@@ -146,7 +147,7 @@ public class SeeSawPlayer extends Sprite {
         stage.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
     }
 
-    private function initialisePlayer():void {
+    public function init():void {
         logger.debug("initialising media player");
 
         mainContainer = new MediaContainer();
@@ -188,7 +189,8 @@ public class SeeSawPlayer extends Sprite {
         container.layoutRenderer.addTarget(subtitlesContainer);
         container.layoutRenderer.addTarget(controlbarContainer);
 
-        loadPlugins(); // Once the plugins are loaded, we'll set up the video and controls etc
+        // TODO: Only do this if we need auditude, otherwise just load the SMIL Plugin and then loadPlugins()
+        loadAuditude(); // Once the auditude plugin is loaded, we'll set up the video and controls etc
 
         //handler to show and hide the buffering panel
         player.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
@@ -197,31 +199,35 @@ public class SeeSawPlayer extends Sprite {
         addChild(container);
     }
 
-    private function loadPlugins():void {
-        logger.debug("loading the proxy plugins that wrap the video element");
+    private function loadAuditude():void {
         factory.loadPlugin(new URLResource(AUDITUDE_PLUGIN_URL));
         factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo(new SeeSawSMILLoader())));
+    }
+
+    private function onPluginLoaded(event:MediaFactoryEvent):void {
+      logger.debug("Loaded plugin " + event.resource);
+
+      if (--pluginsToLoad <= 0) {
+          logger.debug("All plugins loaded");
+          loadPlugins();
+      }
+    }
+
+    private function loadPlugins():void {
+        logger.debug("loading the proxy plugins that wrap the video element");
+
+        factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
+        factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadFailed);
+
         factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.liverail.AdProxyPluginInfo()));
-        //factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.auditude.AdProxyPluginInfo()));
-    }
-
-    private function onPluginLoaded(event:MediaFactoryEvent):void {
-      logger.debug("LOADED " + event.toString());
-      pluginsToLoad--;
-
-      if (pluginsToLoad <= 0) {
-        factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
-        factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadFailed);
+        factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.auditude.AdProxyPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
         
         createVideoElement();
-
-        // this relies on the other proxies being loaded 
-        factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
-      }
-    }
+    }    
 
     private function onPluginLoadFailed(event:MediaFactoryEvent):void {
       logger.debug("PROBLEM LOADING " + event.toString());
@@ -275,7 +281,17 @@ public class SeeSawPlayer extends Sprite {
         createControlBarElement();
         createSubtitleElement();
 
+        if (contentElement is IAuditudeMediaElement) {
+          var _auditude:AuditudePlugin = IAuditudeMediaElement(contentElement).plugin;
+
+          // We set this in the metadata so the auditude AdProxy can pick up the plugin
+          var metadata:Metadata = config.resource.getMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) as Metadata;
+          metadata.addValue(AuditudeConstants.PLUGIN_INSTANCE, _auditude);
+        }
+
         player.media = contentElement;
+
+        setContainerSize(contentWidth, contentHeight);
 
         mainContainer.addMediaElement(contentElement);
     }
@@ -440,10 +456,6 @@ public class SeeSawPlayer extends Sprite {
 
     private function onMediaElementCreate(event:MediaFactoryEvent):void {
         var mediaElement:MediaElement = event.mediaElement;
-        if (mediaElement is IAuditudeMediaElement) {
-          var _auditude:AuditudePlugin = IAuditudeMediaElement(mediaElement).plugin;
-logger.debug("AUDITUDE PLUGIN SEEMS TO HAVE LOADED?");
-        }
 
         var _setContentLayout:Function = function(metadataEvent:MetadataEvent):void {
             if (metadataEvent.key == PlayerConstants.CONTENT_TYPE) {
