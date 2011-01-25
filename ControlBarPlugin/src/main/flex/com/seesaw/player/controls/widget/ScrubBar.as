@@ -257,6 +257,8 @@ public class ScrubBar extends Widget implements IWidget {
     }
 
     private function createAdMarkers():void {
+        if (adMetadata == null) return;
+
         var adBreaks:Vector.<AdBreak> = adMetadata.adBreaks;
 
         if (adBreaks && adBreaks.length > 0) {
