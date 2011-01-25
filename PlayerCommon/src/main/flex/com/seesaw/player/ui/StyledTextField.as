@@ -29,8 +29,8 @@ public class StyledTextField extends TextField {
 
     public function StyledTextField():void {
         this.selectable = false;
-        this.multiline = true;
-        this.wordWrap = true;
+        //this.multiline = true;
+        //this.wordWrap = true;
         this.autoSize = TextFieldAutoSize.LEFT;
 
         //Instantiate the TextFormat

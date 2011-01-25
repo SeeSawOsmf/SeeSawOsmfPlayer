@@ -202,6 +202,8 @@ public class OverUsePanel extends Sprite {
         warningLabel.width = 445;
         warningLabel.wordWrap = true;
         warningLabel.htmlText = this.title;
+        warningLabel.multiline = true;
+        warningLabel.wordWrap = true;
         warningLabel.y = 0;
         warningLabel.x = 15;
         var formattedWarningLabel:TextField = this.applyWarningFormat(warningLabel);
@@ -222,6 +224,7 @@ public class OverUsePanel extends Sprite {
         var explanationLabel = new StyledTextField();
         explanationLabel.width = 460;
         explanationLabel.wordWrap = true;
+        explanationLabel.multiline = true;
         explanationLabel.htmlText = this.text;
         explanationLabel.y = 75;
         var formattedWarningLabel:TextField = this.applyInfoFormat(explanationLabel);
