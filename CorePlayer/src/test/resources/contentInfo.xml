@@ -22,8 +22,9 @@
         </break>
     </loggingSheet>
     <guidance>
-        <warning>Strong language and adult humour</warning>
-        <explanation>This programme isn't suitable for younger viewers</explanation>
+        <age>16</age>
+        <message>May contain content unsuitable for young viewers.</message>
+        <type>TV</type>
     </guidance>
     <parentalControls>
         <parentalControlsPageURL>http://localhost:8080/ParentalControls</parentalControlsPageURL>
@@ -41,7 +42,7 @@
         <version>4.1</version>
         <publisherId>1332</publisherId>
     </liverail>
-    <adMode>none</adMode>
+    <adMode>liverail</adMode>
     <dogImage>http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png</dogImage>
     <programme>33535</programme>
     <userId>1234</userId>

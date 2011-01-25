@@ -25,7 +25,6 @@ com.seesaw.player.controls.widget {
 import com.seesaw.player.ads.AdBreak;
 import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.ads.AdState;
-import com.seesaw.player.traits.ads.AdTimeTrait;
 import com.seesaw.player.traits.ads.AdTraitType;
 import com.seesaw.player.ui.StyledTextField;
 
@@ -257,6 +256,8 @@ public class ScrubBar extends Widget implements IWidget {
     }
 
     private function createAdMarkers():void {
+        if (adMetadata == null) return;
+
         var adBreaks:Vector.<AdBreak> = adMetadata.adBreaks;
 
         if (adBreaks && adBreaks.length > 0) {

@@ -182,7 +182,7 @@ private function onMetaDataAdd(event:MediaElementEvent):void {
         // TODO there is a bug outstanding where stings are appearing as mainContent
         SMILMetadata = event.target.getMetadata("http://www.w3.org/ns/SMIL");
 
-        var contentType:String = metadata.getValue("contentType");
+        var contentType:String = SMILMetadata.getValue("contentType");
             switch (contentType) {
                 case "mainContent" :
                     playingMainContent = true;
@@ -417,10 +417,12 @@ private function toggleTimeListeners(added:Boolean):void {
 }
 
 private function onComplete(event:TimeEvent):void {
+
     if (mainContentCount * 2 == sectionCount) {
         eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.END));
         eventsManager.flushAll();
-        playerMetadata.addValue(PlayerConstants.DESTROY, true);   //// main content has finished so we need to reInit the Player... This might not be the best location for this event, but we can look at moving it in the future.
+       /// todo reinstate this method when we get section counts in...
+       // playerMetadata.addValue(PlayerConstants.DESTROY, true);   //// main content has finished so we need to reInit the Player... This might not be the best location for this event, but we can look at moving it in the future.
     }
 }
      private function onDurationChange(event:TimeEvent):void {

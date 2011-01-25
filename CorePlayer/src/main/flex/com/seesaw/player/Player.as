@@ -35,6 +35,7 @@ import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.namespaces.smil;
 import com.seesaw.player.panels.GuidanceBar;
 import com.seesaw.player.panels.GuidancePanel;
+import com.seesaw.player.panels.OverUsePanel;
 import com.seesaw.player.panels.ParentalControlsPanel;
 import com.seesaw.player.panels.PosterFrame;
 import com.seesaw.player.preloader.Preloader;
@@ -163,8 +164,13 @@ public class Player extends Sprite {
         preInitStages[0] = showPosterFrame;
         preInitStages[1] = showPlayPanel;
         preInitStages[2] = showGuidancePanel;
-        preInitStages[3] = removePosterFrame;
+        preInitStages[3] = checkEntitlements;
         preInitStages[4] = attemptPlaybackStart;
+    }
+
+    private function checkEntitlements():void {
+        requestProgrammeData(playerInit.videoInfoUrl);
+        //nextInitialisationStage();
     }
 
     private function showPosterFrame():void {
@@ -195,6 +201,23 @@ public class Player extends Sprite {
             nextInitialisationStage();
         });
         addChild(playButton);
+    }
+
+    private function showOverUsePanel(errorType:String):void {
+        
+        //over use panel checks if the error is "NO_ADS", if it is it show no ads messaging, otherwise it shows pack messaging.
+        //var errorType:String = "NO_ADS";
+        var overUsePanel = new OverUsePanel(errorType, playerInit.parentalControls.termsAndConditionsLinkURL);
+        addChild(overUsePanel);
+
+        overUsePanel.addEventListener(OverUsePanel.OVERUSE_ACCEPTED, function(event:Event) {
+            nextInitialisationStage();
+        });
+
+        overUsePanel.addEventListener(OverUsePanel.OVERUSE_REJECTED, function(event:Event) {
+            resetInitialisationStages(); // sends the user back to stage 0
+            nextInitialisationStage();
+        });
     }
 
     private function showGuidancePanel():void {
@@ -274,7 +297,10 @@ public class Player extends Sprite {
     }
 
     private function attemptPlaybackStart():void {
-        requestProgrammeData(playerInit.videoInfoUrl);
+        if (videoInfo.smil != null) {
+            var resource:MediaResourceBase = createMediaResource(videoInfo);
+            loadVideo(resource);
+        }
     }
 
     private function requestPlayerInitData(playerInitUrl:String):void {
@@ -326,10 +352,22 @@ public class Player extends Sprite {
             return;
         }
 
-        if (videoInfo.smil != null) {
-            var resource:MediaResourceBase = createMediaResource(videoInfo);
-            loadVideo(resource);
+        if (videoInfo.exceededDrmRule == "true" && videoInfo.noAdsPlayable == "true") {
+            this.showOverUsePanel("NO_ADS");
+            return;
         }
+
+        if (videoInfo.exceededDrmRule == "true" && videoInfo.svodPlayable == "true") {
+            this.showOverUsePanel("SVOD");
+            return;
+        }
+
+        if (videoInfo.exceededDrmRule == "true" && videoInfo.tvodPlayable == "true") {
+            this.showOverUsePanel("TVOD");
+            return;
+        }
+
+        nextInitialisationStage();
     }
 
     private function loadVideo(content:MediaResourceBase):void {
@@ -349,6 +387,8 @@ public class Player extends Sprite {
         // Since we have autoPlay to false for liverail, we need to manually call play for C4:
         if (playerInit.adMode != "liverail")
             videoPlayer.mediaPlayer().autoPlay = true;
+
+        removePosterFrame();
         
         addChild(videoPlayer);
     }
