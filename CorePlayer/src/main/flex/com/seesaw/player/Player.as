@@ -42,6 +42,7 @@ import com.seesaw.player.panels.PosterFrame;
 import com.seesaw.player.preloader.Preloader;
 import com.seesaw.player.preventscrub.ScrubPreventionConstants;
 import com.seesaw.player.services.ResumeService;
+import com.seesaw.player.utils.ServiceRequest;
 
 import flash.display.LoaderInfo;
 import flash.display.Sprite;
@@ -364,7 +365,7 @@ public class Player extends Sprite {
         videoPlayer = new SeeSawPlayer(config);
 
         // Since we have autoPlay to false for liverail, we need to manually call play for C4:
-        if (playerInit.adMode == "channel4")
+        if (playerInit.adMode != "liverail")
             videoPlayer.mediaPlayer().autoPlay = true;
         
         addChild(videoPlayer);
