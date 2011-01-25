@@ -34,7 +34,7 @@ public class ScrubPreventionProxyPluginInfo extends PluginInfo {
 
     private static var logger:ILogger = LoggerFactory.getClassLogger(ScrubPreventionProxyPluginInfo);
 
-    public static const ID:String = "com.seesaw.player.preventscrub.ScrubPreventionProxy";
+    public static const ID:String = "com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo";
 
     public function ScrubPreventionProxyPluginInfo() {
         logger.debug("ScrubPreventionProxyPluginInfo()");
@@ -52,8 +52,9 @@ public class ScrubPreventionProxyPluginInfo extends PluginInfo {
     }
 
     private static function canHandleResourceFunction(resource:MediaResourceBase):Boolean {
-        logger.debug("can handle this resource: " + resource);
-        return resource && resource.mediaType == MediaType.VIDEO;
+        var canHandle:Boolean = resource && resource.mediaType == MediaType.VIDEO;
+        logger.debug("can handle this resource {0} = {1}", resource, canHandle);
+        return canHandle;
     }
 
     private static function mediaElementCreationFunction():MediaElement {
