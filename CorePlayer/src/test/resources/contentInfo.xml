@@ -22,8 +22,9 @@
         </break>
     </loggingSheet>
     <guidance>
-        <warning>Strong language and adult humour</warning>
-        <explanation>This programme isn't suitable for younger viewers</explanation>
+        <age>16</age>
+        <message>May contain content unsuitable for young viewers.</message>
+        <type>TV</type>
     </guidance>
     <parentalControls>
         <parentalControlsPageURL>http://localhost:8080/ParentalControls</parentalControlsPageURL>
