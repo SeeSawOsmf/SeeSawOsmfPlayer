@@ -242,6 +242,10 @@ public class LiverailAdProxy extends ProxyElement {
 
     private function onLiveRailAdStart(event:Object):void {
         logger.debug("onLiveRailAdStart");
+       trace(event.data.ad.linear.url);
+    /*     event.data.ad.clickThruUrl
+        event.data.ad.campaignID
+        event.data.ad.creativeID*/
         play();
     }
 

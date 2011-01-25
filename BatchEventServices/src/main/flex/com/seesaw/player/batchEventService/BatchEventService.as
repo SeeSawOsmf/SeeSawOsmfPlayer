@@ -19,6 +19,7 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ProxyElement;
 import org.osmf.events.BufferEvent;
+import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MetadataEvent;
 import org.osmf.events.PlayEvent;
@@ -83,6 +84,7 @@ public class BatchEventService extends ProxyElement {
     private var mainContentCount:int;
     private var playable:PlayTrait;
     private var loadable:LoadTrait;
+    private var adMetadata:Metadata;
 
     public function BatchEventService(proxiedElement:MediaElement = null) {
         var provider:ObjectProvider = ObjectProvider.getInstance();
@@ -184,9 +186,9 @@ private function onMetaDataAdd(event:MediaElementEvent):void {
         metadata.addEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
         return
     } else if (event.namespaceURL == "http://www.seesaw.com/player/ads/1.0") {
-        metadata = event.target.getMetadata("http://www.seesaw.com/player/ads/1.0");
-        metadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
-        metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
+        adMetadata = event.target.getMetadata("http://www.seesaw.com/player/ads/1.0");
+        adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
+        adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
     } else if (event.namespaceURL == "http://www.w3.org/ns/SMIL") {
         // TODO this seems to be the only way currently to detect main content is being loaded and played
         // TODO there is a bug outstanding where stings are appearing as mainContent
@@ -251,13 +253,13 @@ private function onAdsMetaDataAdd(event:MetadataEvent):void {
 
 private function onControlBarMetadataChange(event:MetadataEvent):void {
     var userEventType:String;
-    if (event.key == "subtitlesVisible") {
+    if (event.key == "subtitlesVisible" && event.type != MetadataEvent.VALUE_ADD) {
         if (event.value) {
             userEventType = UserEventTypes.SUBTITLES_ON;
         } else {
             userEventType = UserEventTypes.SUBTITLES_OFF;
         }
-    } else if (event.key == "fullScreen") {
+    } else if (event.key == "fullScreen" && event.type != MetadataEvent.VALUE_ADD) {
         if (event.value) {
             userEventType = UserEventTypes.ENTER_FULL_SCREEN;
         } else {
@@ -330,16 +332,22 @@ private function togglePlayListeners(added:Boolean):void {
 private function toggleLoadListeners(added:Boolean):void {
    loadable = proxiedElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
     if (loadable) {
-       /* if (added) {
-            loadable.addEventListener(LoadEvent.LOAD_STATE_CHANGE, onLoadableStateChange);
-             loadable.addEventListener(LoadEvent.BYTES_TOTAL_CHANGE, onBytesTotalChange);
-        }
-        else {
-            loadable.removeEventListener(LoadEvent.LOAD_STATE_CHANGE, onLoadableStateChange);
-             loadable.removeEventListener(LoadEvent.BYTES_TOTAL_CHANGE, onBytesTotalChange);
-        }*/
+
+         trace(loadable.loadState);
+           /* loadable.addEventListener(LoadEvent.LOAD_STATE_CHANGE, onLoadableStateChange);
+             loadable.addEventListener(LoadEvent.BYTES_TOTAL_CHANGE, onBytesTotalChange);*/
+
+
+
     }
 }
+
+    private function onBytesTotalChange(event:LoadEvent):void {
+    }
+
+    private function onLoadableStateChange(event:LoadEvent):void {
+        trace(event);
+    }
 
 
 
@@ -427,25 +435,28 @@ private function onComplete(event:TimeEvent):void {
 }
      private function onDurationChange(event:TimeEvent):void {
 
-         defineContentUrl();
+
          ///MetaDataAdded of the MediaElementEvent, fires 3 times, so wiring this to the duration change seems to be the next most reliable event....
          if(playingMainContent){
+                    defineContentUrl(false);
                     contentViewingSequenceNumber++;
                     mainContentCount++;
                     eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.MAIN_CONTENT));
                     eventsManager.flushAll();
          }else{
+                    defineContentUrl(true);
                     eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.AD_BREAK));
          }
     }
 
-    private function defineContentUrl():void {
-        if(loadable){
-
+    private function defineContentUrl(checkResource:Boolean):void {
+        if(loadable && checkResource){
             var streamingUrlResource:StreamingURLResource = loadable.resource as StreamingURLResource;
              if(streamingUrlResource){
                contentUrl =  streamingUrlResource.url;
              }
+        }else{
+             contentUrl =  "mainResource";
         }
     }
 
