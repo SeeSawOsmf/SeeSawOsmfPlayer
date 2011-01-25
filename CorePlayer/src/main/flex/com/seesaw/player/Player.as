@@ -30,8 +30,6 @@ import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.external.PlayerExternalInterface;
 import com.seesaw.player.external.PlayerExternalInterfaceImpl;
 import com.seesaw.player.impl.services.ResumeServiceImpl;
-import com.seesaw.player.panels.OverUsePanel;
-import com.seesaw.player.utils.ServiceRequest;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.liverail.LiverailConfig;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
@@ -40,6 +38,7 @@ import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.namespaces.smil;
 import com.seesaw.player.panels.GuidanceBar;
 import com.seesaw.player.panels.GuidancePanel;
+import com.seesaw.player.panels.OverUsePanel;
 import com.seesaw.player.panels.ParentalControlsPanel;
 import com.seesaw.player.panels.PosterFrame;
 import com.seesaw.player.preloader.Preloader;
@@ -109,8 +108,8 @@ public class Player extends Sprite {
 
         // If no flashVar, use a default for testing
         // TODO: remove this altogether
-        //loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player/initinfo/29053";
-        loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player/initinfo/13602";
+      loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://localhost/player/initinfo/29053";
+       /// loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player/initinfo/13602";
 
         stage.scaleMode = StageScaleMode.NO_SCALE;
         stage.align = StageAlign.TOP_LEFT;
@@ -392,7 +391,7 @@ public class Player extends Sprite {
         //var config:PlayerConfiguration = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, content);
         config = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, content);
         videoPlayer = new SeeSawPlayer(config);
-
+        videoPlayer.addEventListener(PlayerConstants.DESTROY,reBuildPlayer);
         // Since we have autoPlay to false for liverail, we need to manually call play for C4:
         if (playerInit.adMode != "liverail") {
             videoPlayer.mediaPlayer().autoPlay = true;
@@ -407,6 +406,10 @@ public class Player extends Sprite {
         addChild(videoPlayer);
 
         videoPlayer.init();
+    }
+
+    private function reBuildPlayer(event:Event):void {
+       onAddedToStage(event);
     }
 
     private function createMediaResource(videoInfo:XML):MediaResourceBase {

@@ -38,8 +38,8 @@ import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
 import com.seesaw.player.smil.SeeSawSMILLoader;
 
 import com.auditude.ads.osmf.constants.AuditudeOSMFConstants;
-  import com.auditude.ads.AuditudePlugin;
-  import com.auditude.ads.osmf.IAuditudeMediaElement;
+import com.auditude.ads.AuditudePlugin;
+import com.auditude.ads.osmf.IAuditudeMediaElement;
 import com.seesaw.player.ads.AuditudeConstants;
 
 import flash.display.Sprite;
@@ -117,6 +117,9 @@ public class SeeSawPlayer extends Sprite {
 
         var metadata:Metadata = config.resource.getMetadataValue(PlayerConstants.METADATA_NAMESPACE) as Metadata;
 
+        metadata.addEventListener(MetadataEvent.VALUE_ADD, playerMetaChange);
+        metadata.addEventListener(MetadataEvent.VALUE_CHANGE, playerMetaChange);
+
         playerInit = metadata.getValue(PlayerConstants.CONTENT_INFO) as XML;
         if (playerInit == null) {
             throw new ArgumentError("player initialisation metadata not specified");
@@ -140,6 +143,25 @@ public class SeeSawPlayer extends Sprite {
         container = new MediaContainer();
 
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+    }
+
+    private function playerMetaChange(event:MetadataEvent):void { 
+        if (event.key == PlayerConstants.DESTROY) { 
+            if (event.value) {
+                // wipe out the objects from memory and off the displayList
+                // removeChild seems to throw errors when trying to removeChild( container ) etc..
+                mainContainer.removeMediaElement(contentElement);
+                mainContainer = null;
+                bufferingContainer = null;
+                subtitlesContainer = null;
+                controlbarContainer = null
+                contentElement = null;
+                player = null;
+                container = null;
+
+                dispatchEvent(new Event(PlayerConstants.DESTROY)); 
+            }
+        }
     }
 
     private function onAddedToStage(event:Event) {
@@ -386,7 +408,7 @@ public class SeeSawPlayer extends Sprite {
 
     }
 
-    private function netStatusChanged(event:*):void {
+    private function netStatusChanged(event:NetStatusEvent):void {
 
          if(event.info == "NetConnection.Connect.NetworkChange"){
 
@@ -399,7 +421,7 @@ public class SeeSawPlayer extends Sprite {
                 contentElement.addMetadata(NetStatusMetadata.NET_STATUS_METADATA, metadata);
             }
 
-                metadata.addValue(NetStatusMetadata.STATUS, event.type);
+                metadata.addValue(NetStatusMetadata.STATUS, event.info);
         }
     }
 

@@ -29,6 +29,7 @@ public class PlayerConstants {
     public static const CONTENT_ID:String = "contentId";
     public static const VIDEO_INFO:String = "videoInfo";
     public static const CONTENT_TYPE:String = "contentType";
+    public static const DESTROY:String = "destroyPlayer";
 
     public static const MAIN_CONTENT_ID:String = "mainContent";
     public static const AD_CONTENT_ID:String = "advert";

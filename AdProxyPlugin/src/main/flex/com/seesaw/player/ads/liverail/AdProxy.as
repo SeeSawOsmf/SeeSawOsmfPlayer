@@ -248,6 +248,10 @@ public class AdProxy extends ProxyElement {
 
     private function onAdStart(event:Object):void {
         logger.debug("onAdStart");
+       trace(event.data.ad.linear.url);
+    /*     event.data.ad.clickThruUrl
+        event.data.ad.campaignID
+        event.data.ad.creativeID*/
         play();
     }
 
