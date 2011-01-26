@@ -20,7 +20,8 @@
  *    Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.player.ads {
+package com.seesaw.player.ads.liverail {
+import com.seesaw.player.ads.LiverailConstants;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.media.MediaElement;
@@ -29,14 +30,14 @@ import org.osmf.media.MediaFactoryItemType;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfo;
 
-public class LiverailAdProxyPluginInfo extends PluginInfo {
+public class AdProxyPluginInfo extends PluginInfo {
 
-    private static var logger:ILogger = LoggerFactory.getClassLogger(LiverailAdProxyPluginInfo);
+    private static var logger:ILogger = LoggerFactory.getClassLogger(AdProxyPluginInfo);
 
     public static const ID:String = "com.seesaw.player.ads.Liverail";
 
-    public function LiverailAdProxyPluginInfo() {
-        logger.debug("LiverailAdProxyPluginInfo()");
+    public function AdProxyPluginInfo() {
+        logger.debug("AdProxyPluginInfo()");
 
         var item:MediaFactoryItem = new MediaFactoryItem(
                 ID,
@@ -57,7 +58,7 @@ public class LiverailAdProxyPluginInfo extends PluginInfo {
     }
 
     private static function mediaElementCreationFunction():MediaElement {
-        return new LiverailAdProxy();
+        return new AdProxy();
     }
 }
 }

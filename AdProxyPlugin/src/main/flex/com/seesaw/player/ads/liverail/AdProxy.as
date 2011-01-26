@@ -20,7 +20,13 @@
  *    Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.player.ads {
+package com.seesaw.player.ads.liverail {
+// These three rom PlayerCommon, not here
+import com.seesaw.player.ads.AdBreak;
+import com.seesaw.player.ads.AdMetadata; 
+import com.seesaw.player.ads.AdState; 
+
+import com.seesaw.player.ads.LiverailConstants; 
 import com.seesaw.player.ads.events.LiveRailEvent;
 import com.seesaw.player.traits.ads.AdPlayTrait;
 import com.seesaw.player.traits.ads.AdTimeTrait;
@@ -50,21 +56,21 @@ import org.osmf.traits.PlayState;
 import org.osmf.traits.PlayTrait;
 import org.osmf.traits.TimeTrait;
 
-public class LiverailAdProxy extends ProxyElement {
+public class AdProxy extends ProxyElement {
 
-    private var logger:ILogger = LoggerFactory.getClassLogger(LiverailAdProxy);
+    private var logger:ILogger = LoggerFactory.getClassLogger(AdProxy);
 
     private static const CONTENT_UPDATE_INTERVAL:int = 500;
 
     private var adManager:*;
-    private var liverailConfig:LiverailConfiguration;
+    private var config:Configuration;
     private var resumePosition:int;
 
     private var timer:Timer;
 
     private var adTimeTrait:AdTimeTrait;
 
-    public function LiverailAdProxy(proxiedElement:MediaElement = null) {
+    public function AdProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
         Security.allowDomain("vox-static.liverail.com");
         timer = new Timer(CONTENT_UPDATE_INTERVAL);
@@ -80,29 +86,29 @@ public class LiverailAdProxy extends ProxyElement {
         var loadTrait:LoadTrait = getTrait(MediaTraitType.LOAD) as LoadTrait;
         var liverailPath:String = getSetting(LiverailConstants.ADMANAGER_URL) as String;
         if (loadTrait && liverailPath) {
-            var liverailLoadTrait:LiverailLoadTrait = new LiverailLoadTrait(new LiverailLoader(), new URLResource(liverailPath));
-            liverailLoadTrait.addEventListener(LoadEvent.LOAD_STATE_CHANGE, onLiverailLoadStateChange);
-            addTrait(MediaTraitType.LOAD, liverailLoadTrait);
+            var proxiedLoadTrait:LiveRailLoadTrait = new LiveRailLoadTrait(new Loader(), new URLResource(liverailPath));
+            proxiedLoadTrait.addEventListener(LoadEvent.LOAD_STATE_CHANGE, onLoadStateChange);
+            addTrait(MediaTraitType.LOAD, proxiedLoadTrait);
         }
     }
 
-    private function onLiverailLoadStateChange(event:LoadEvent):void {
-        logger.debug("onLiverailLoadStateChange: " + event.loadState);
-        var loadTrait:LiverailLoadTrait = getTrait(MediaTraitType.LOAD) as LiverailLoadTrait;
+    private function onLoadStateChange(event:LoadEvent):void {
+        logger.debug("onLoadStateChange: " + event.loadState);
+        var loadTrait:LiveRailLoadTrait = getTrait(MediaTraitType.LOAD) as LiveRailLoadTrait;
         if (event.loadState == LoadState.READY) {
             adManager = loadTrait.adManager;
-            adManager.addEventListener(LiveRailEvent.INIT_COMPLETE, onLiveRailInitComplete);
-            adManager.addEventListener(LiveRailEvent.INIT_ERROR, onLiveRailInitError);
+            adManager.addEventListener(LiveRailEvent.INIT_COMPLETE, onInitComplete);
+            adManager.addEventListener(LiveRailEvent.INIT_ERROR, onInitError);
             adManager.addEventListener(LiveRailEvent.AD_BREAK_START, adbreakStart);
             adManager.addEventListener(LiveRailEvent.AD_BREAK_COMPLETE, adbreakComplete);
-            adManager.addEventListener(LiveRailEvent.PREROLL_COMPLETE, onLiveRailPrerollComplete);
-            // adManager.addEventListener(LiveRailEvent.POSTROLL_COMPLETE, onLiveRailPostrollComplete);
-            adManager.addEventListener(LiveRailEvent.AD_START, onLiveRailAdStart);
-            adManager.addEventListener(LiveRailEvent.AD_END, onLiveRailAdEnd);
-            adManager.addEventListener(LiveRailEvent.AD_PROGRESS, onLiverailAdProgress);
-            adManager.addEventListener(LiveRailEvent.CLICK_THRU, onLiveRailClickThru);
+            adManager.addEventListener(LiveRailEvent.PREROLL_COMPLETE, onPrerollComplete);
+            // adManager.addEventListener(LiveRailEvent.POSTROLL_COMPLETE, onPostrollComplete);
+            adManager.addEventListener(LiveRailEvent.AD_START, onAdStart);
+            adManager.addEventListener(LiveRailEvent.AD_END, onAdEnd);
+            adManager.addEventListener(LiveRailEvent.AD_PROGRESS, onAdProgress);
+            adManager.addEventListener(LiveRailEvent.CLICK_THRU, onClickThru);
 
-            liverailConfig = getSetting(LiverailConstants.CONFIG_OBJECT) as LiverailConfiguration;
+            config = getSetting(LiverailConstants.CONFIG_OBJECT) as Configuration;
             resumePosition = getSetting(LiverailConstants.RESUME_POSITION) as int;
 
             // block these until the liverail events kick in
@@ -113,7 +119,7 @@ public class LiverailAdProxy extends ProxyElement {
             // from the ad manager. If initComplete has been received, first call lrAdManager.onContentStart() and only
             // resume your main video after prerollComplete event is triggered.
             // This ensures that pre-roll ads are handled properly.
-            adManager.initAds(liverailConfig.config);
+            adManager.initAds(config.config);
 
             // triggers the original load trait
             removeTrait(MediaTraitType.LOAD);
@@ -178,8 +184,8 @@ public class LiverailAdProxy extends ProxyElement {
         }
     }
 
-    private function onLiveRailInitComplete(ev:Object):void {
-        logger.debug("onLiveRailInitComplete");
+    private function onInitComplete(ev:Object):void {
+        logger.debug("onInitComplete");
 
         adManager.onContentStart();
 
@@ -224,24 +230,24 @@ public class LiverailAdProxy extends ProxyElement {
         adMetadata.adBreaks = metadataAdBreaks;
     }
 
-    private function onLiveRailInitError(ev:Object):void {
-        logger.debug("onLiveRailInitError");
+    private function onInitError(ev:Object):void {
+        logger.debug("onInitError");
         setTraitsToBlock();
         play();
     }
 
-    private function onLiveRailClickThru(event:Object):void {
-        logger.debug("onLiveRailClickThru");
+    private function onClickThru(event:Object):void {
+        logger.debug("onClickThru");
         pause();
     }
 
-    private function onLiverailAdProgress(event:Object):void {
+    private function onAdProgress(event:Object):void {
         adTimeTrait.adDuration = event.data.duration;
         adTimeTrait.adTime = event.data.time;
     }
 
-    private function onLiveRailAdStart(event:Object):void {
-        logger.debug("onLiveRailAdStart");
+    private function onAdStart(event:Object):void {
+        logger.debug("onAdStart");
        trace(event.data.ad.linear.url);
     /*     event.data.ad.clickThruUrl
         event.data.ad.campaignID
@@ -249,14 +255,14 @@ public class LiverailAdProxy extends ProxyElement {
         play();
     }
 
-    private function onLiveRailAdEnd(event:Event):void {
-        logger.debug("onLiveRailAdEnd");
+    private function onAdEnd(event:Event):void {
+        logger.debug("onAdEnd");
         adTimeTrait.adDuration = 0;
         adTimeTrait.adTime = 0;
     }
 
-    private function onLiveRailPrerollComplete(event:Event):void {
-        logger.debug("onLiveRailPrerollComplete");
+    private function onPrerollComplete(event:Event):void {
+        logger.debug("onPrerollComplete");
         setTraitsToBlock();
         //play(); //adbreakComplete will handle this
     }

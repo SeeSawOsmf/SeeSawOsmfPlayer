@@ -20,7 +20,7 @@
  * Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.player.ads {
+package com.seesaw.player.ads.liverail {
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.SWFLoader;
@@ -33,13 +33,13 @@ import org.osmf.traits.LoadState;
 import org.osmf.traits.LoadTrait;
 import org.osmf.traits.LoaderBase;
 
-public class LiverailLoader extends LoaderBase {
+public class Loader extends LoaderBase {
 
-    private var logger:ILogger = LoggerFactory.getClassLogger(LiverailLoader);
+    private var logger:ILogger = LoggerFactory.getClassLogger(Loader);
 
     private var swfLoader:LoaderBase;
 
-    public function LiverailLoader(loader:LoaderBase = null) {
+    public function Loader(loader:LoaderBase = null) {
         super();
         this.swfLoader = loader != null ? loader : new SWFLoader();
     }
@@ -76,7 +76,7 @@ public class LiverailLoader extends LoaderBase {
                 loaderLoadTrait.removeEventListener(MediaErrorEvent.MEDIA_ERROR, onLoadError);
 
                 try {
-                    LiverailLoadTrait(loadTrait).adManager = loaderLoadTrait.loader.content;
+                    LiveRailLoadTrait(loadTrait).adManager = loaderLoadTrait.loader.content;
                     updateLoadTrait(loadTrait, LoadState.READY);
                 }
                 catch(e:Error) {

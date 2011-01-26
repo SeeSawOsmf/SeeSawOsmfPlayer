@@ -20,14 +20,25 @@
  * Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.player.ads {
-public class LiverailConstants {
-    public static const SETTINGS_NAMESPACE:String = "http://www.seesaw.com/player/plugins/liverail/settings";
-    public static const AD_MODE_ID:String = "liverail";
-    public static const PUBLISHER_ID:String = "publisher";
-    public static const VERSION:String = "version";
-    public static const CONFIG_OBJECT:String = "config";
-    public static const RESUME_POSITION:String = "resume";
-    public static const ADMANAGER_URL = "swfLocation";
+package com.seesaw.player.ads.liverail {
+import org.osmf.media.MediaResourceBase;
+import org.osmf.traits.LoadTrait;
+import org.osmf.traits.LoaderBase;
+
+public class LiveRailLoadTrait extends LoadTrait {
+
+    private var _adManager:*;
+
+    public function LiveRailLoadTrait(loader:LoaderBase, resource:MediaResourceBase) {
+        super(loader, resource);
+    }
+
+    public function get adManager():* {
+        return _adManager;
+    }
+
+    public function set adManager(value:*):void {
+        _adManager = value;
+    }
 }
 }

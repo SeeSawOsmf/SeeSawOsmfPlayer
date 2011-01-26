@@ -20,25 +20,40 @@
  * Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.player.ads {
-import org.osmf.media.MediaResourceBase;
-import org.osmf.traits.LoadTrait;
-import org.osmf.traits.LoaderBase;
+package com.seesaw.player.ads.auditude {
+public class Configuration {
 
-public class LiverailLoadTrait extends LoadTrait {
+    private var _adPositions:Array = [];
+    private var _totalAdPositions:Array = [];
+    private var _config:Object;
 
-    private var _adManager:*;
-
-    public function LiverailLoadTrait(loader:LoaderBase, resource:MediaResourceBase) {
-        super(loader, resource);
+    public function get adPositions():Array {
+        return _adPositions;
     }
 
-    public function get adManager():* {
-        return _adManager;
+    public function set adPositions(value:Array):void {
+        _adPositions = value;
     }
 
-    public function set adManager(value:*):void {
-        _adManager = value;
+    public function get totalAdPositions():Array {
+        return _totalAdPositions;
     }
+
+    public function set totalAdPositions(value:Array):void {
+        _totalAdPositions = value;
+    }
+
+    public function get config():Object {
+        return _config;
+    }
+
+    public function set config(value:Object):void {
+        _config = value;
+    }
+
+    public function generateMap():void {
+
+    }
+
 }
 }
