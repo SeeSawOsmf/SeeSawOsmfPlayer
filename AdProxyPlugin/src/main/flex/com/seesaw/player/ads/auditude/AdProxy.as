@@ -26,52 +26,26 @@ import com.auditude.ads.event.AdClickThroughEvent;
 import com.auditude.ads.event.AdPluginEvent;
 import com.auditude.ads.event.LinearAdEvent;
 import com.auditude.ads.event.NonLinearAdEvent;
-import com.auditude.ads.model.ILinearAsset;
-import com.auditude.ads.osmf.IAuditudeMediaElement;
 import com.auditude.ads.osmf.constants.AuditudeOSMFConstants;
-import com.auditude.ads.NotificationType;
-
-// These three are from PlayerCommon, not here
 import com.seesaw.player.ads.AdBreak;
-import com.seesaw.player.ads.AdMetadata; 
-import com.seesaw.player.ads.AdState; 
-
+import com.seesaw.player.ads.AdMetadata;
+import com.seesaw.player.ads.AdState;
 import com.seesaw.player.ads.AuditudeConstants;
-import com.seesaw.player.ads.events.LiveRailEvent;
-import com.seesaw.player.traits.ads.AdPlayTrait;
 import com.seesaw.player.traits.ads.AdTimeTrait;
 
-import flash.events.Event;
-import flash.events.TimerEvent;
 import flash.system.Security;
-import flash.utils.Timer;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ProxyElement;
-import org.osmf.events.AudioEvent;
-import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
-import org.osmf.events.MediaFactoryEvent;
-import org.osmf.events.PlayEvent;
-import org.osmf.events.TimeEvent;
-import org.osmf.media.MediaElement;
-import org.osmf.media.MediaResourceBase;
-import org.osmf.media.URLResource;
-import org.osmf.metadata.Metadata;
 import org.osmf.events.MetadataEvent;
-import org.osmf.traits.DisplayObjectTrait;
-import org.osmf.traits.LoadState;
-import org.osmf.traits.LoadTrait;
+import org.osmf.media.MediaElement;
+import org.osmf.metadata.Metadata;
 import org.osmf.traits.MediaTraitType;
-import org.osmf.traits.PlayState;
 import org.osmf.traits.PlayTrait;
-import org.osmf.traits.TimeTrait;
 
-import org.osmf.media.PluginInfo;
-
-import org.osmf.media.MediaFactory;
-
+// These three are from PlayerCommon, not here
 public class AdProxy extends ProxyElement {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(AdProxy);

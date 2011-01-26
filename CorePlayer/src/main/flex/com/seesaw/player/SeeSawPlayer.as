@@ -21,8 +21,12 @@
  */
 
 package com.seesaw.player {
-import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
+import com.auditude.ads.AuditudePlugin;
+import com.auditude.ads.osmf.IAuditudeMediaElement;
+import com.auditude.ads.osmf.constants.AuditudeOSMFConstants;
+import com.seesaw.player.ads.AuditudeConstants;
 import com.seesaw.player.ads.auditude.AdProxyPluginInfo;
+import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.batchEventService.BatchEventServicePlugin;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
@@ -36,11 +40,6 @@ import com.seesaw.player.netstatus.NetStatusMetadata;
 import com.seesaw.player.panels.BufferingPanel;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
 import com.seesaw.player.smil.SeeSawSMILLoader;
-
-import com.auditude.ads.osmf.constants.AuditudeOSMFConstants;
-import com.auditude.ads.AuditudePlugin;
-import com.auditude.ads.osmf.IAuditudeMediaElement;
-import com.seesaw.player.ads.AuditudeConstants;
 
 import flash.display.Sprite;
 import flash.display.StageDisplayState;
@@ -103,10 +102,11 @@ public class SeeSawPlayer extends Sprite {
     private var xi:PlayerExternalInterface;
     
     // This is so we wait on Auditude loading before setting up the rest of the plugins and player
-    private var pluginsToLoad:int = 2;
+    private var pluginsToLoad:int = 1;
 
     private var playerInit:XML;
     private var videoInfo:XML;
+    private var adMode:String;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
@@ -121,6 +121,7 @@ public class SeeSawPlayer extends Sprite {
         metadata.addEventListener(MetadataEvent.VALUE_CHANGE, playerMetaChange);
 
         playerInit = metadata.getValue(PlayerConstants.CONTENT_INFO) as XML;
+        adMode = String(metadata.getValue(PlayerConstants.CONTENT_INFO).adMode);
         if (playerInit == null) {
             throw new ArgumentError("player initialisation metadata not specified");
         }
@@ -211,8 +212,12 @@ public class SeeSawPlayer extends Sprite {
         container.layoutRenderer.addTarget(subtitlesContainer);
         container.layoutRenderer.addTarget(controlbarContainer);
 
-        // TODO: Only do this if we need auditude, otherwise just load the SMIL Plugin and then loadPlugins()
-        loadAuditude(); // Once the auditude plugin is loaded, we'll set up the video and controls etc
+        if (adMode == "auditude") {
+            loadAuditude();
+        } else {
+            loadPlugins();
+        }
+
 
         //handler to show and hide the buffering panel
         player.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
@@ -223,7 +228,6 @@ public class SeeSawPlayer extends Sprite {
 
     private function loadAuditude():void {
         factory.loadPlugin(new URLResource(AUDITUDE_PLUGIN_URL));
-        factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo(new SeeSawSMILLoader())));
     }
 
     private function onPluginLoaded(event:MediaFactoryEvent):void {
@@ -240,7 +244,7 @@ public class SeeSawPlayer extends Sprite {
 
         factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
         factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadFailed);
-
+        factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo(new SeeSawSMILLoader())));
         factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
