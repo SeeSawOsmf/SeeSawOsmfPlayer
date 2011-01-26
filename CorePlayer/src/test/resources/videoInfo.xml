@@ -31,6 +31,7 @@
                         <ns2:video system-bitrate="844000" dur="852" src="mp4:e4/test/ccp/p/STD_RES/00000418/41805.mp4?s=1292344952&amp;e=1292345702&amp;h=211fc21bb0d08355019fd1b70b474199" clipEnd="852" clipBegin="0"/>
                         <ns2:metadata>
                             <ns2:meta content="mainContent" name="contentType"/>
+                            <ns2:meta content="http://kgd-blue-test-zxtm01.dev.vodco.co.uk/s/ccp/00000002/298.smi" name="subtitleLocation"/>
                         </ns2:metadata>
                     </ns2:switch>
                     <ns2:img src="http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png">
@@ -43,7 +44,6 @@
         </ns2:body>
     </ns2:smil>
     <geoblocked>false</geoblocked>
-    <subtitleLocation>http://kgd-blue-test-zxtm01.dev.vodco.co.uk/s/ccp/00000047/4722.smi</subtitleLocation>
     <exceededDrmRule>false</exceededDrmRule>
     <avod>true</avod>
     <tvodPlayable>false</tvodPlayable>

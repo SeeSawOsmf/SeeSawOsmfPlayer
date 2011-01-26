@@ -22,7 +22,6 @@
 
 package com.seesaw.player {
 import com.seesaw.player.ads.LiverailAdProxyPluginInfo;
-import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.batchEventService.BatchEventServicePlugin;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.controls.ControlBarMetadata;
@@ -88,7 +87,7 @@ public class SeeSawPlayer extends Sprite {
     private var bufferingContainer:MediaContainer;
     private var controlbarContainer:MediaContainer;
     private var subtitlesContainer:MediaContainer;
-    private var rootElement:ParallelElement;
+    private var mainElement:ParallelElement;
     private var subtitleElement:MediaElement;
     private var bufferingPanel:BufferingPanel;
 
@@ -123,7 +122,7 @@ public class SeeSawPlayer extends Sprite {
         player = new MediaPlayer();
         player.autoPlay = false;
 
-        rootElement = new ParallelElement();
+        mainElement = new ParallelElement();
         container = new MediaContainer();
 
         initialisePlayer();
@@ -181,9 +180,10 @@ public class SeeSawPlayer extends Sprite {
         createVideoElement();
         createBufferingPanel();
         createControlBarElement();
-        createSubtitleElement();
 
-        player.media = contentElement;
+        mainContainer.addMediaElement(mainElement);
+
+        player.media = mainElement;
 
         //handler to show and hide the buffering panel
         player.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
@@ -204,28 +204,27 @@ public class SeeSawPlayer extends Sprite {
         (event.buffering) ? bufferingPanel.show() : bufferingPanel.hide();
     }
 
-    private function createSubtitleElement():void {
-        if (captionUrl) {
-            logger.debug("creating captions: " + captionUrl);
+    private function createSubtitleElement(captionUrl:String, targetElement:MediaElement):void {
+        logger.debug("creating captions: " + captionUrl);
 
-            var targetMetadata:Metadata = new Metadata();
-            targetMetadata.addValue(PlayerConstants.CONTENT_ID, PlayerConstants.MAIN_CONTENT_ID);
-            contentElement.addMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT, targetMetadata);
+        var targetMetadata:Metadata = new Metadata();
+        targetMetadata.addValue(PlayerConstants.CONTENT_ID, PlayerConstants.MAIN_CONTENT_ID);
+        targetElement.addMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT, targetMetadata);
 
-            factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
-            subtitleElement = factory.createMediaElement(new URLResource(captionUrl));
+        factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
+        subtitleElement = factory.createMediaElement(new URLResource(captionUrl));
 
-            var layout:LayoutMetadata = new LayoutMetadata();
-            subtitleElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+        var layout:LayoutMetadata = new LayoutMetadata();
+        subtitleElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
 
-            layout.percentWidth = 100;
-            layout.height = 50;
-            layout.bottom = 100;
-            layout.horizontalAlign = HorizontalAlign.CENTER;
-            layout.verticalAlign = VerticalAlign.BOTTOM;
+        layout.percentWidth = 100;
+        layout.height = 50;
+        layout.bottom = 100;
+        layout.horizontalAlign = HorizontalAlign.CENTER;
+        layout.verticalAlign = VerticalAlign.BOTTOM;
+        layout.index = 10;
 
-            subtitlesContainer.addMediaElement(subtitleElement);
-        }
+        mainElement.addChild(subtitleElement);
     }
 
     private function createVideoElement():void {
@@ -233,7 +232,7 @@ public class SeeSawPlayer extends Sprite {
         factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo(new SeeSawSMILLoader())));
         factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
-        factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
+        // factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new LiverailAdProxyPluginInfo()));
 
@@ -246,7 +245,7 @@ public class SeeSawPlayer extends Sprite {
         contentElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
         contentElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
 
-        mainContainer.addMediaElement(contentElement);
+        mainElement.addChild(contentElement);
     }
 
     private function createControlBarElement():void {
@@ -281,7 +280,7 @@ public class SeeSawPlayer extends Sprite {
             case MediaTraitType.PLAY:
                 changeListeners(element, add, traitType, PlayEvent.PLAY_STATE_CHANGE, onPlayStateChanged);
                 break;
-              case MediaTraitType.LOAD:
+            case MediaTraitType.LOAD:
                 changeListeners(element, add, traitType, LoadEvent.LOAD_STATE_CHANGE, onLoadStateChanged);
                 break;
         }
@@ -315,7 +314,7 @@ public class SeeSawPlayer extends Sprite {
 
         var metadata:Metadata = contentElement.getMetadata(ExternalInterfaceMetadata.EXTERNAL_INTERFACE_METADATA);
 
-        if(metadata == null) {
+        if (metadata == null) {
             metadata = new Metadata();
             contentElement.addMetadata(ExternalInterfaceMetadata.EXTERNAL_INTERFACE_METADATA, metadata);
         }
@@ -335,13 +334,11 @@ public class SeeSawPlayer extends Sprite {
                 metadata.addValue(ExternalInterfaceMetadata.LIGHTS_DOWN, false);
             }
         }
-
-
     }
 
     private function netStatusChanged(event:*):void {
 
-         if(event.info == "NetConnection.Connect.NetworkChange"){
+        if (event.info == "NetConnection.Connect.NetworkChange") {
 
             factory.removeEventListener(NetStatusEvent.NET_STATUS, netStatusChanged);
 
@@ -352,7 +349,7 @@ public class SeeSawPlayer extends Sprite {
                 contentElement.addMetadata(NetStatusMetadata.NET_STATUS_METADATA, metadata);
             }
 
-                metadata.addValue(NetStatusMetadata.STATUS, event.type);
+            metadata.addValue(NetStatusMetadata.STATUS, event.type);
         }
     }
 
@@ -410,49 +407,47 @@ public class SeeSawPlayer extends Sprite {
     private function onMediaElementCreate(event:MediaFactoryEvent):void {
         var mediaElement:MediaElement = event.mediaElement;
 
-        var _setContentLayout:Function = function(metadataEvent:MetadataEvent):void {
-            if (metadataEvent.key == PlayerConstants.CONTENT_TYPE) {
-                setContentLayout(metadataEvent.value, mediaElement);
-            }
-        }
-
-        event.mediaElement.addEventListener(MediaElementEvent.METADATA_ADD, function(mediaElementEvent:MediaElementEvent):void {
+        mediaElement.addEventListener(MediaElementEvent.METADATA_ADD, function(mediaElementEvent:MediaElementEvent):void {
             if (mediaElementEvent.namespaceURL == SMILConstants.SMIL_METADATA_NS) {
-                mediaElementEvent.metadata.addEventListener(MetadataEvent.VALUE_ADD, _setContentLayout);
-                mediaElementEvent.metadata.addEventListener(MetadataEvent.VALUE_CHANGE, _setContentLayout);
+                configureSmilElement(mediaElement);
             }
-        })
+        });
     }
 
-    private function setRootElementLayout():void {
-        var layout:LayoutMetadata = rootElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
-        if (layout == null) {
-            layout = new LayoutMetadata();
-            rootElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
-        }
-        layout.percentWidth = 100;
-        layout.percentHeight = 100;
-    }
+    private function configureSmilElement(element:MediaElement):void {
+        var smilMetadata:Metadata = element.getMetadata(SMILConstants.SMIL_METADATA_NS) as Metadata;
 
-    private function setContentLayout(contentType:String, element:MediaElement):void {
-        var layout:LayoutMetadata = element.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
-        if (layout == null) {
-            layout = new LayoutMetadata();
-            element.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+        if (smilMetadata == null) {
+            return;
         }
+
+        var contentType:String = smilMetadata.getValue(PlayerConstants.CONTENT_TYPE);
+        var layout:LayoutMetadata = new LayoutMetadata();
+
         switch (contentType) {
             case PlayerConstants.DOG_CONTENT_ID:
+                // Layout the DOG image in the top left corner
                 layout.x = 5;
                 layout.y = 5;
                 layout.verticalAlign = VerticalAlign.TOP;
                 layout.horizontalAlign = HorizontalAlign.LEFT;
+                layout.index = 5;
                 break;
             case PlayerConstants.MAIN_CONTENT_ID:
+                // Tell the subtitle plugin to target this element and make sure it only does this once
+                var subtitleLocation:String = smilMetadata.getValue(PlayerConstants.SUBTITLE_LOCATION);
+                if (subtitleLocation && !subtitleElement) {
+                    var subtitleMetadata:Metadata = new Metadata();
+                    subtitleMetadata.addValue(SAMIPluginInfo.METADATA_KEY_URI, subtitleLocation);
+                    element.resource.addMetadataValue(SAMIPluginInfo.METADATA_NAMESPACE, subtitleMetadata);
+                    createSubtitleElement(subtitleLocation, element);
+                }
             case PlayerConstants.STING_CONTENT_ID:
             case PlayerConstants.AD_CONTENT_ID:
-            default:
-                layout.percentWidth = 100; //contentWidth;
-                layout.percentHeight = 100; //contentHeight;
+                // This layout applies to main content, stings and ads (notice there is no break above - this is
+                // intentional).
+                layout.width = contentWidth;
+                layout.height = contentHeight;
                 layout.verticalAlign = VerticalAlign.MIDDLE;
                 layout.horizontalAlign = HorizontalAlign.CENTER;
                 layout.scaleMode = ScaleMode.LETTERBOX;
@@ -474,14 +469,6 @@ public class SeeSawPlayer extends Sprite {
             return config.height;
         }
         return stage.displayState == StageDisplayState.FULL_SCREEN ? stage.fullScreenHeight : config.height;
-    }
-
-    private function get captionUrl():String {
-        var metadata:Metadata = config.resource.getMetadataValue(SAMIPluginInfo.METADATA_NAMESPACE) as Metadata;
-        if (metadata) {
-            return metadata.getValue(SAMIPluginInfo.METADATA_KEY_URI) as String;
-        }
-        return null;
     }
 
     public function mediaPlayer():MediaPlayer {

@@ -21,7 +21,6 @@
  */
 
 package com.seesaw.player.captioning.sami {
-import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 
@@ -81,13 +80,10 @@ public class SAMIPluginInfo extends PluginInfo {
     }
 
     private function mediaElementCreationNotificationCallback(target:MediaElement):void {
-        var targetMetadata:Metadata = target.getMetadata("http://www.w3.org/ns/SMIL");
+        var targetMetadata:Metadata = target.getMetadata(NS_TARGET_ELEMENT);
         if (targetMetadata) {
-            var contentType:String = targetMetadata.getValue(PlayerConstants.CONTENT_TYPE) as String;
-            if(contentType == PlayerConstants.MAIN_CONTENT_ID) {
-                targetElement = target;
-                updateMediaTarget();
-            }
+            targetElement = target;
+            updateMediaTarget();
         }
     }
 

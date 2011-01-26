@@ -22,6 +22,7 @@
 
 package com.seesaw.player {
 import com.seesaw.player.ads.LiverailConstants;
+import com.seesaw.player.autoresume.AutoResumeConstants;
 import com.seesaw.player.buttons.PlayStartButton;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.external.PlayerExternalInterface;
@@ -82,7 +83,7 @@ public class Player extends Sprite {
 
     private var playerInit:XML;
     private var videoInfo:XML;
-  
+
     private var ASX_data:String;
 
     var testApi:TestApi;
@@ -262,15 +263,15 @@ public class Player extends Sprite {
     }
 
     private function setPlaylist(asx:String):void {
-      if (playerInit.adMode != "channel4") return; //we don't care
+        if (playerInit.adMode != "channel4") return; //we don't care
 
-      logger.info("Retreived ASX data from C4");
-      logger.info(asx);
+        logger.info("Retreived ASX data from C4");
+        logger.info(asx);
 
-      ASX_data = asx;
+        ASX_data = asx;
 
-      resetInitialisationStages();
-      nextInitialisationStage();
+        resetInitialisationStages();
+        nextInitialisationStage();
     }
 
     private function attemptPlaybackStart():void {
@@ -296,8 +297,8 @@ public class Player extends Sprite {
         setupExternalInterface();
 
         if (playerInit.adMode != "channel4") {
-          resetInitialisationStages();
-          nextInitialisationStage();
+            resetInitialisationStages();
+            nextInitialisationStage();
         }
     }
 
@@ -306,11 +307,11 @@ public class Player extends Sprite {
         var request:ServiceRequest = new ServiceRequest(videoInfoUrl, onSuccessFromVideoInfo, onFailFromVideoInfo);
         // For C4 ads we POST the ASX we receive from the ad script. For liverail and auditude, there's no need
         if (playerInit.adMode != "channel4") {
-          request.submit();
+            request.submit();
         } else {
-          var post_data:URLVariables = new URLVariables();
-          post_data.advertASX = ASX_data;
-          request.submit(post_data);
+            var post_data:URLVariables = new URLVariables();
+            post_data.advertASX = ASX_data;
+            request.submit(post_data);
         }
     }
 
@@ -349,7 +350,7 @@ public class Player extends Sprite {
         // Since we have autoPlay to false for liverail, we need to manually call play for C4:
         if (playerInit.adMode != "liverail")
             videoPlayer.mediaPlayer().autoPlay = true;
-        
+
         addChild(videoPlayer);
     }
 
@@ -369,11 +370,8 @@ public class Player extends Sprite {
         metadata = new Metadata();
         resource.addMetadataValue(ScrubPreventionConstants.SETTINGS_NAMESPACE, metadata);
 
-        if (videoInfo && videoInfo.subtitleLocation) {
-            metadata = new Metadata();
-            metadata.addValue(SAMIPluginInfo.METADATA_KEY_URI, String(videoInfo.subtitleLocation));
-            resource.addMetadataValue(SAMIPluginInfo.METADATA_NAMESPACE, metadata);
-        }
+        metadata = new Metadata();
+        resource.addMetadataValue(AutoResumeConstants.SETTINGS_NAMESPACE, metadata);
 
         if (playerInit && playerInit.adMode == LiverailConstants.AD_MODE_ID) {
             metadata = new Metadata();
@@ -381,7 +379,7 @@ public class Player extends Sprite {
             metadata.addValue(LiverailConstants.PUBLISHER_ID, playerInit.liverail.publisherId);
             metadata.addValue(LiverailConstants.CONFIG_OBJECT, new LiverailConfig(playerInit));
             metadata.addValue(LiverailConstants.RESUME_POSITION, getResumePosition());
-            metadata.addValue(LiverailConstants.ADMANAGER_URL,  "http://vox-static.liverail.com/swf/v4/admanager.swf");
+            metadata.addValue(LiverailConstants.ADMANAGER_URL, "http://vox-static.liverail.com/swf/v4/admanager.swf");
             resource.addMetadataValue(LiverailConstants.SETTINGS_NAMESPACE, metadata);
         }
 
@@ -428,7 +426,7 @@ public class Player extends Sprite {
 
     private function getResumePosition():Number {
         var resumeService:ResumeService = ObjectProvider.getInstance().getObject(ResumeService);
-        resumeService.programmeId = playerInit.programmeId; 
+        resumeService.programmeId = playerInit.programmeId;
         var resumeValue:Number = resumeService.getResumeCookie();
         return resumeValue;
     }
