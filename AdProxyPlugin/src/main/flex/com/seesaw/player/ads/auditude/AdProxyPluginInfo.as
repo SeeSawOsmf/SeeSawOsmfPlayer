@@ -27,13 +27,10 @@ import com.seesaw.player.ads.AuditudeConstants;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.media.MediaElement;
-import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaFactoryItem;
 import org.osmf.media.MediaFactoryItemType;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfo;
-import org.osmf.metadata.Metadata;
-import org.osmf.media.URLResource;
 
 
 public class AdProxyPluginInfo extends PluginInfo {
@@ -41,9 +38,6 @@ public class AdProxyPluginInfo extends PluginInfo {
     private static var logger:ILogger = LoggerFactory.getClassLogger(AdProxyPluginInfo);
 
     public static const ID:String = "com.seesaw.player.ads.Auditude";
-
-		private static var mediaFactory:MediaFactory;
-    private static const AUDITUDE_PLUGIN_URL:String = "http://asset.cdn.auditude.com/flash/sandbox/plugin/osmf/AuditudeOSMFProxyPlugin.swf";
 
     public function AdProxyPluginInfo() {
         logger.debug("AdProxyPluginInfo()");
