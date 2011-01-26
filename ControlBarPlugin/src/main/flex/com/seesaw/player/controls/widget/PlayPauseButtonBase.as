@@ -20,6 +20,8 @@
  *    Incorporated. All Rights Reserved.
  */
 package com.seesaw.player.controls.widget {
+import com.seesaw.player.controls.ControlBarMetadata;
+
 import flash.events.Event;
 import flash.external.ExternalInterface;
 
@@ -28,6 +30,7 @@ import org.as3commons.logging.LoggerFactory;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.PlayEvent;
 import org.osmf.media.MediaElement;
+import org.osmf.metadata.Metadata;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.PlayTrait;
@@ -37,6 +40,22 @@ public class PlayPauseButtonBase extends ButtonWidget {
     private var logger:ILogger = LoggerFactory.getClassLogger(PlayPauseButtonBase);
 
     private var _requiredTraits:Vector.<String> = new Vector.<String>;
+
+    private var metadata:Metadata;
+
+      override public function set media(value:MediaElement):void {
+
+          super.media = value;
+
+          if (media) {
+              metadata = media.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+              if (metadata == null) {
+                  metadata = new Metadata();
+                  media.addMetadata(ControlBarMetadata.CONTROL_BAR_METADATA, metadata);
+              }
+          }
+      }
+
 
     public function PlayPauseButtonBase() {
         logger.debug("PlayPauseButtonBase()");
@@ -57,6 +76,11 @@ public class PlayPauseButtonBase extends ButtonWidget {
         else {
             playTrait.play();
         }
+
+    }
+
+    public function updateMetadata():void{
+         metadata.addValue(ControlBarMetadata.USER_CLICK_STATE, playTrait.playState);
     }
 
     override protected function get requiredTraits():Vector.<String> {

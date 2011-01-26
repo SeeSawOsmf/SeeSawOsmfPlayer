@@ -21,8 +21,11 @@
  */
 
 package com.seesaw.player {
+import com.auditude.ads.osmf.constants.AuditudeOSMFConstants;
+
 import com.seesaw.player.ads.LiverailConstants;
 import com.seesaw.player.autoresume.AutoResumeConstants;
+import com.seesaw.player.ads.AuditudeConstants;
 import com.seesaw.player.buttons.PlayStartButton;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.external.PlayerExternalInterface;
@@ -36,6 +39,7 @@ import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.namespaces.smil;
 import com.seesaw.player.panels.GuidanceBar;
 import com.seesaw.player.panels.GuidancePanel;
+import com.seesaw.player.panels.OverUsePanel;
 import com.seesaw.player.panels.ParentalControlsPanel;
 import com.seesaw.player.panels.PosterFrame;
 import com.seesaw.player.preloader.Preloader;
@@ -70,6 +74,8 @@ public class Player extends Sprite {
     private static var loggerSetup:* = (LoggerFactory.loggerFactory = new TraceAndArthropodLoggerFactory());
     private static var osmfLoggerSetup:* = (Log.loggerFactory = new CommonsOsmfLoggerFactory());
 
+    private static const LIVERAIL_PLUGIN_URL:String = "http://vox-static.liverail.com/swf/v4/admanager.swf";
+
     private var logger:ILogger = LoggerFactory.getClassLogger(Player);
 
     private var _videoPlayer:SeeSawPlayer;
@@ -86,6 +92,8 @@ public class Player extends Sprite {
 
     private var ASX_data:String;
 
+    private var config:PlayerConfiguration;
+
     var testApi:TestApi;
 
     public function Player() {
@@ -101,9 +109,8 @@ public class Player extends Sprite {
 
         // If no flashVar, use a default for testing
         // TODO: remove this altogether
-        //loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player/initinfo/29053";
         loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player/initinfo/13602";
-
+        
         stage.scaleMode = StageScaleMode.NO_SCALE;
         stage.align = StageAlign.TOP_LEFT;
 
@@ -164,8 +171,13 @@ public class Player extends Sprite {
         preInitStages[0] = showPosterFrame;
         preInitStages[1] = showPlayPanel;
         preInitStages[2] = showGuidancePanel;
-        preInitStages[3] = removePosterFrame;
+        preInitStages[3] = checkEntitlements;
         preInitStages[4] = attemptPlaybackStart;
+    }
+
+    private function checkEntitlements():void {
+        requestProgrammeData(playerInit.videoInfoUrl);
+        //nextInitialisationStage();
     }
 
     private function showPosterFrame():void {
@@ -196,6 +208,23 @@ public class Player extends Sprite {
             nextInitialisationStage();
         });
         addChild(playButton);
+    }
+
+    private function showOverUsePanel(errorType:String):void {
+        
+        //over use panel checks if the error is "NO_ADS", if it is it show no ads messaging, otherwise it shows pack messaging.
+        //var errorType:String = "NO_ADS";
+        var overUsePanel = new OverUsePanel(errorType, playerInit.parentalControls.termsAndConditionsLinkURL);
+        addChild(overUsePanel);
+
+        overUsePanel.addEventListener(OverUsePanel.OVERUSE_ACCEPTED, function(event:Event) {
+            nextInitialisationStage();
+        });
+
+        overUsePanel.addEventListener(OverUsePanel.OVERUSE_REJECTED, function(event:Event) {
+            resetInitialisationStages(); // sends the user back to stage 0
+            nextInitialisationStage();
+        });
     }
 
     private function showGuidancePanel():void {
@@ -275,7 +304,10 @@ public class Player extends Sprite {
     }
 
     private function attemptPlaybackStart():void {
-        requestProgrammeData(playerInit.videoInfoUrl);
+        if (videoInfo.smil != null) {
+            var resource:MediaResourceBase = createMediaResource(videoInfo);
+            loadVideo(resource);
+        }
     }
 
     private function requestPlayerInitData(playerInitUrl:String):void {
@@ -327,10 +359,22 @@ public class Player extends Sprite {
             return;
         }
 
-        if (videoInfo.smil != null) {
-            var resource:MediaResourceBase = createMediaResource(videoInfo);
-            loadVideo(resource);
+        if (videoInfo.exceededDrmRule == "true" && videoInfo.noAdsPlayable == "true") {
+            this.showOverUsePanel("NO_ADS");
+            return;
         }
+
+        if (videoInfo.exceededDrmRule == "true" && videoInfo.svodPlayable == "true") {
+            this.showOverUsePanel("SVOD");
+            return;
+        }
+
+        if (videoInfo.exceededDrmRule == "true" && videoInfo.tvodPlayable == "true") {
+            this.showOverUsePanel("TVOD");
+            return;
+        }
+
+        nextInitialisationStage();
     }
 
     private function loadVideo(content:MediaResourceBase):void {
@@ -344,14 +388,28 @@ public class Player extends Sprite {
 
         logger.debug("creating player");
 
-        var config:PlayerConfiguration = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, content);
+        //var config:PlayerConfiguration = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, content);
+        config = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, content);
         videoPlayer = new SeeSawPlayer(config);
-
+        videoPlayer.addEventListener(PlayerConstants.DESTROY,reBuildPlayer);
         // Since we have autoPlay to false for liverail, we need to manually call play for C4:
-        if (playerInit.adMode != "liverail")
+        if (playerInit.adMode != "liverail") {
             videoPlayer.mediaPlayer().autoPlay = true;
+            if (playerInit.adMode == "auditude") {
+              var metadata:Metadata = content.getMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) as Metadata;
+              metadata.addValue(AuditudeOSMFConstants.PLAYER_INSTANCE, videoPlayer.mediaPlayer());
+            }
+        }
 
+        removePosterFrame();
+        
         addChild(videoPlayer);
+
+        videoPlayer.init();
+    }
+
+    private function reBuildPlayer(event:Event):void {
+       onAddedToStage(event);
     }
 
     private function createMediaResource(videoInfo:XML):MediaResourceBase {
@@ -379,8 +437,29 @@ public class Player extends Sprite {
             metadata.addValue(LiverailConstants.PUBLISHER_ID, playerInit.liverail.publisherId);
             metadata.addValue(LiverailConstants.CONFIG_OBJECT, new LiverailConfig(playerInit));
             metadata.addValue(LiverailConstants.RESUME_POSITION, getResumePosition());
-            metadata.addValue(LiverailConstants.ADMANAGER_URL, "http://vox-static.liverail.com/swf/v4/admanager.swf");
+            metadata.addValue(LiverailConstants.ADMANAGER_URL, LIVERAIL_PLUGIN_URL);
             resource.addMetadataValue(LiverailConstants.SETTINGS_NAMESPACE, metadata);
+        } else if (playerInit && playerInit.adMode == AuditudeConstants.AD_MODE_ID) {
+            metadata = new Metadata();
+
+            // the following 4 keys are required attributes for the Auditude plug-in
+            // a) version: version of auditude plug-in
+            // b) domain: adserver domain
+            // c) zone-id: zone id assigned by Auditude
+            // d) media-id: The video id of the currently playing content
+            metadata.addValue(AuditudeOSMFConstants.VERSION, "adunitv2-1.0");
+            metadata.addValue(AuditudeOSMFConstants.DOMAIN, "sandbox.auditude.com");
+            metadata.addValue(AuditudeOSMFConstants.ZONE_ID, 1947);
+            metadata.addValue(AuditudeOSMFConstants.MEDIA_ID, "GcE_e7ewtw2lMJVbDEJClpllo6mVJXSb"); //playerInit.programmeId
+
+            // pass the mediaplayer instance to Auditude. This is required to listen for audio and content progress updates
+            //metadata.addValue(AuditudeOSMFConstants.PLAYER_INSTANCE, videoPlayer.mediaPlayer());
+
+            // any additional metadata can be passed to the Auditude plug-in through this key.
+            metadata.addValue(AuditudeOSMFConstants.USER_DATA, null);
+
+            metadata.addValue(AuditudeConstants.RESUME_POSITION, getResumePosition());
+            resource.addMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE, metadata)
         }
 
         return resource;

@@ -20,14 +20,40 @@
  * Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.player.ads {
-public class LiverailConstants {
-    public static const SETTINGS_NAMESPACE:String = "http://www.seesaw.com/player/plugins/liverail/settings";
-    public static const AD_MODE_ID:String = "liverail";
-    public static const PUBLISHER_ID:String = "publisher";
-    public static const VERSION:String = "version";
-    public static const CONFIG_OBJECT:String = "config";
-    public static const RESUME_POSITION:String = "resume";
-    public static const ADMANAGER_URL = "swfLocation";
+package com.seesaw.player.ads.auditude {
+public class Configuration {
+
+    private var _adPositions:Array = [];
+    private var _totalAdPositions:Array = [];
+    private var _config:Object;
+
+    public function get adPositions():Array {
+        return _adPositions;
+    }
+
+    public function set adPositions(value:Array):void {
+        _adPositions = value;
+    }
+
+    public function get totalAdPositions():Array {
+        return _totalAdPositions;
+    }
+
+    public function set totalAdPositions(value:Array):void {
+        _totalAdPositions = value;
+    }
+
+    public function get config():Object {
+        return _config;
+    }
+
+    public function set config(value:Object):void {
+        _config = value;
+    }
+
+    public function generateMap():void {
+
+    }
+
 }
 }

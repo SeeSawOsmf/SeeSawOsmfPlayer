@@ -21,7 +21,13 @@
  */
 
 package com.seesaw.player {
-import com.seesaw.player.ads.LiverailAdProxyPluginInfo;
+import com.auditude.ads.AuditudePlugin;
+import com.auditude.ads.osmf.IAuditudeMediaElement;
+import com.auditude.ads.osmf.constants.AuditudeOSMFConstants;
+import com.seesaw.player.ads.AuditudeConstants;
+import com.seesaw.player.ads.auditude.AdProxyPluginInfo;
+import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
+import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.batchEventService.BatchEventServicePlugin;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.controls.ControlBarMetadata;
@@ -75,6 +81,8 @@ public class SeeSawPlayer extends Sprite {
 
     use namespace contentinfo;
 
+    private static const AUDITUDE_PLUGIN_URL:String = "http://asset.cdn.auditude.com/flash/sandbox/plugin/osmf/AuditudeOSMFProxyPlugin.swf";
+
     private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
 
     private var config:PlayerConfiguration;
@@ -92,9 +100,13 @@ public class SeeSawPlayer extends Sprite {
     private var bufferingPanel:BufferingPanel;
 
     private var xi:PlayerExternalInterface;
+    
+    // This is so we wait on Auditude loading before setting up the rest of the plugins and player
+    private var pluginsToLoad:int = 1;
 
     private var playerInit:XML;
     private var videoInfo:XML;
+    private var adMode:String;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
@@ -105,7 +117,11 @@ public class SeeSawPlayer extends Sprite {
 
         var metadata:Metadata = config.resource.getMetadataValue(PlayerConstants.METADATA_NAMESPACE) as Metadata;
 
+        metadata.addEventListener(MetadataEvent.VALUE_ADD, playerMetaChange);
+        metadata.addEventListener(MetadataEvent.VALUE_CHANGE, playerMetaChange);
+
         playerInit = metadata.getValue(PlayerConstants.CONTENT_INFO) as XML;
+        adMode = String(metadata.getValue(PlayerConstants.CONTENT_INFO).adMode);
         if (playerInit == null) {
             throw new ArgumentError("player initialisation metadata not specified");
         }
@@ -116,6 +132,8 @@ public class SeeSawPlayer extends Sprite {
         }
 
         factory = config.factory;
+        factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
+        factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadFailed);
         factory.addEventListener(NetStatusEvent.NET_STATUS, netStatusChanged);
         factory.addEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onMediaElementCreate);
 
@@ -125,9 +143,26 @@ public class SeeSawPlayer extends Sprite {
         mainElement = new ParallelElement();
         container = new MediaContainer();
 
-        initialisePlayer();
-
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+    }
+
+    private function playerMetaChange(event:MetadataEvent):void { 
+        if (event.key == PlayerConstants.DESTROY) { 
+            if (event.value) {
+                // wipe out the objects from memory and off the displayList
+                // removeChild seems to throw errors when trying to removeChild( container ) etc..
+                mainContainer.removeMediaElement(contentElement);
+                mainContainer = null;
+                bufferingContainer = null;
+                subtitlesContainer = null;
+                controlbarContainer = null
+                contentElement = null;
+                player = null;
+                container = null;
+
+                dispatchEvent(new Event(PlayerConstants.DESTROY)); 
+            }
+        }
     }
 
     private function onAddedToStage(event:Event) {
@@ -135,7 +170,7 @@ public class SeeSawPlayer extends Sprite {
         stage.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
     }
 
-    private function initialisePlayer():void {
+    public function init():void {
         logger.debug("initialising media player");
 
         mainContainer = new MediaContainer();
@@ -177,9 +212,11 @@ public class SeeSawPlayer extends Sprite {
         container.layoutRenderer.addTarget(subtitlesContainer);
         container.layoutRenderer.addTarget(controlbarContainer);
 
-        createVideoElement();
-        createBufferingPanel();
-        createControlBarElement();
+        if (adMode == "auditude") {
+            loadAuditude();
+        } else {
+            loadPlugins();
+        }
 
         mainContainer.addMediaElement(mainElement);
 
@@ -188,10 +225,41 @@ public class SeeSawPlayer extends Sprite {
         //handler to show and hide the buffering panel
         player.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
 
-        setContainerSize(contentWidth, contentHeight);
-
         logger.debug("adding media container to stage");
         addChild(container);
+    }
+
+    private function loadAuditude():void {
+        factory.loadPlugin(new URLResource(AUDITUDE_PLUGIN_URL));
+    }
+
+    private function onPluginLoaded(event:MediaFactoryEvent):void {
+      logger.debug("Loaded plugin " + event.resource);
+
+      if (--pluginsToLoad <= 0) {
+          logger.debug("All plugins loaded");
+          loadPlugins();
+      }
+    }
+
+    private function loadPlugins():void {
+        logger.debug("loading the proxy plugins that wrap the video element");
+
+        factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
+        factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadFailed);
+        factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo(new SeeSawSMILLoader())));
+        factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.liverail.AdProxyPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.auditude.AdProxyPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
+        
+        createVideoElement();
+    }    
+
+    private function onPluginLoadFailed(event:MediaFactoryEvent):void {
+      logger.debug("PROBLEM LOADING " + event.toString());
     }
 
     private function createBufferingPanel():void {
@@ -228,14 +296,6 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function createVideoElement():void {
-        logger.debug("loading the proxy plugins that wrap the video element");
-        factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo(new SeeSawSMILLoader())));
-        factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
-        factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
-        // factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
-        factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
-        factory.loadPlugin(new PluginInfoResource(new LiverailAdProxyPluginInfo()));
-
         logger.debug("creating video element");
         contentElement = factory.createMediaElement(config.resource);
 
@@ -245,7 +305,22 @@ public class SeeSawPlayer extends Sprite {
         contentElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
         contentElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
 
-        mainElement.addChild(contentElement);
+        createBufferingPanel();
+        createControlBarElement();
+
+        if (contentElement is IAuditudeMediaElement) {
+          var _auditude:AuditudePlugin = IAuditudeMediaElement(contentElement).plugin;
+
+          // We set this in the metadata so the auditude AdProxy can pick up the plugin
+          var metadata:Metadata = config.resource.getMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) as Metadata;
+          metadata.addValue(AuditudeConstants.PLUGIN_INSTANCE, _auditude);
+        }
+
+        player.media = contentElement;
+
+        setContainerSize(contentWidth, contentHeight);
+
+        mainContainer.addMediaElement(contentElement);
     }
 
     private function createControlBarElement():void {
@@ -336,7 +411,7 @@ public class SeeSawPlayer extends Sprite {
         }
     }
 
-    private function netStatusChanged(event:*):void {
+    private function netStatusChanged(event:NetStatusEvent):void {
 
         if (event.info == "NetConnection.Connect.NetworkChange") {
 
@@ -349,7 +424,7 @@ public class SeeSawPlayer extends Sprite {
                 contentElement.addMetadata(NetStatusMetadata.NET_STATUS_METADATA, metadata);
             }
 
-            metadata.addValue(NetStatusMetadata.STATUS, event.type);
+                metadata.addValue(NetStatusMetadata.STATUS, event.info);
         }
     }
 

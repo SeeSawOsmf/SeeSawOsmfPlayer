@@ -6,7 +6,7 @@
         </ns2:head>
         <ns2:body>
             <ns2:seq>
-                <ns2:video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Seesaw_Blackpool.mp4">
+<!--               <ns2:video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Seesaw_Blackpool.mp4">
 					<ns2:metadata>
 						<ns2:meta content="advert" name="contentType" />
 						<ns2:meta content="http://kgd-blue-test-zxtm01.dev.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/channel4/tv/entertainment/quizzes_and_gameshows/45276/45276/001/L18/11445641909/x13/4OD/SS_IDENT_Feb10_x90/2362406/5532494162557958586b77414364414e" name="trackback" />
@@ -17,9 +17,9 @@
                     <ns2:metadata>
                         <ns2:meta content="sting" name="contentType"/>
                     </ns2:metadata>
-                </ns2:video>
-                <ns2:par>
-                 <!--    <ns2:video src="http://kgd-red-delivery01.dev.vodco.co.uk/encrypted-hsm-newcert/sintel_500kbs.f4m">
+                </ns2:video>-->
+              <ns2:par>
+               <!--        <ns2:video src="http://kgd-red-delivery01.dev.vodco.co.uk/encrypted-hsm-newcert/sintel_500kbs.f4m">
                    <ns2:metadata>
                       <ns2:meta content="encrypted" name="contentType" />
                       </ns2:metadata>
@@ -34,7 +34,7 @@
                             <ns2:meta content="http://kgd-blue-test-zxtm01.dev.vodco.co.uk/s/ccp/00000002/298.smi" name="subtitleLocation"/>
                         </ns2:metadata>
                     </ns2:switch>
-                    <ns2:img src="http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png">
+                <ns2:img src="http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png">
                         <ns2:metadata>
                             <ns2:meta content="dogImage" name="contentType"/>
                         </ns2:metadata>
@@ -44,13 +44,12 @@
         </ns2:body>
     </ns2:smil>
     <geoblocked>false</geoblocked>
-    <exceededDrmRule>false</exceededDrmRule>
-    <avod>true</avod>
+    <serverTimestamp>1295949842789</serverTimestamp>
+    <anonymousUserId>231266723204534</anonymousUserId>
+    <availabilityType>AVOD</availabilityType>
+    <noAdsPlayable>true</noAdsPlayable>
     <tvodPlayable>false</tvodPlayable>
     <svodPlayable>false</svodPlayable>
-    <viewId>51495731292928751555</viewId>
-    <transactionItemId>5161572</transactionItemId>
-    <serverTimeStamp>1292929864387</serverTimeStamp>
+    <exceededDrmRule>false</exceededDrmRule>
     <sectionCount>2</sectionCount>
-    <mainAssetID>444444449999999</mainAssetID>
 </videoInfo>
