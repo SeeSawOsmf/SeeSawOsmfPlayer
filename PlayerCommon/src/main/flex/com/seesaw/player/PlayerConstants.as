@@ -25,10 +25,13 @@ public class PlayerConstants {
     public static const ID:String = "ID";
     public static const METADATA_NAMESPACE:String = "http://www.seesaw.com/player/1.0";
     public static const SMIL_METADATA_NS:String = "http://www.w3.org/ns/SMIL";
+    public static const CONTROL_BAR_METADATA:String = "http://www.osmf.org/samples/controlbar/metadata";
     public static const CONTENT_INFO:String = "contentInfo";
     public static const CONTENT_ID:String = "contentId";
     public static const VIDEO_INFO:String = "videoInfo";
     public static const CONTENT_TYPE:String = "contentType";
+    public static const SUBTITLE_LOCATION:String = "subtitleLocation";
+    public static const DESTROY:String = "destroyPlayer";
 
     public static const MAIN_CONTENT_ID:String = "mainContent";
     public static const AD_CONTENT_ID:String = "advert";

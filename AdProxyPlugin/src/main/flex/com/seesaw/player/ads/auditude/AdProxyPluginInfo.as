@@ -20,7 +20,9 @@
  *    Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.player.ads {
+package com.seesaw.player.ads.auditude {
+import com.auditude.ads.osmf.constants.AuditudeOSMFConstants;
+
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.media.MediaElement;
@@ -29,14 +31,14 @@ import org.osmf.media.MediaFactoryItemType;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfo;
 
-public class LiverailAdProxyPluginInfo extends PluginInfo {
+public class AdProxyPluginInfo extends PluginInfo {
 
-    private static var logger:ILogger = LoggerFactory.getClassLogger(LiverailAdProxyPluginInfo);
+    private static var logger:ILogger = LoggerFactory.getClassLogger(AdProxyPluginInfo);
 
-    public static const ID:String = "com.seesaw.player.ads.Liverail";
+    public static const ID:String = "com.seesaw.player.ads.Auditude";
 
-    public function LiverailAdProxyPluginInfo() {
-        logger.debug("LiverailAdProxyPluginInfo()");
+    public function AdProxyPluginInfo() {
+        logger.debug("AdProxyPluginInfo()");
 
         var item:MediaFactoryItem = new MediaFactoryItem(
                 ID,
@@ -51,13 +53,14 @@ public class LiverailAdProxyPluginInfo extends PluginInfo {
     }
 
     private static function canHandleResourceFunction(resource:MediaResourceBase):Boolean {
-        var canHandle:Boolean = resource && resource.getMetadataValue(LiverailConstants.SETTINGS_NAMESPACE) != null;
+        var canHandle:Boolean = resource && resource.getMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) != null;
         logger.debug("can handle this resource: {0} = {1}", resource, canHandle);
         return canHandle;
     }
 
     private static function mediaElementCreationFunction():MediaElement {
-        return new LiverailAdProxy();
+        return new AdProxy();
     }
+
 }
 }

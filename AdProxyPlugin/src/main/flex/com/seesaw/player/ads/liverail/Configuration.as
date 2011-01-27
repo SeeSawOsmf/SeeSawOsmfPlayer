@@ -20,8 +20,8 @@
  * Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.player.ads {
-public class LiverailConfiguration {
+package com.seesaw.player.ads.liverail {
+public class Configuration {
 
     private var _adPositions:Array = [];
     private var _totalAdPositions:Array = [];

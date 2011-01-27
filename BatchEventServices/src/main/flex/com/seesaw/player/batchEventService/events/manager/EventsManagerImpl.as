@@ -28,16 +28,22 @@ public class EventsManagerImpl implements EventsManager {
     private var userEvents:Array;
     private var contentEvents:Array;
 
-    // TODO Upkar - remove hardcoded URLS
-    private var batchEventURL:String = "http://localhost:8080/player.videoplayer:registerbatchevent?t:ac=TV:COMEDY/b/8542/Nathan-Barley";
-    private var cumlativeDurationURL:String = "http://localhost:8080/player.videoplayer:playIntervalEvent?t:ac=TV:COMEDY/b/8542/Nathan-Barley";
+
+    private var batchEventURL:String;
+    private var cumlativeDurationURL:String;
 
     private var flushing:Boolean = false;
+    private var allowEvent:Boolean = true;
 
-    public function EventsManagerImpl( view:ViewEvent ) {
+    public function EventsManagerImpl(view:ViewEvent, availabilityType:String, batchUrl:String, cumulativeUrl:String) {
         this.view = view;
         userEvents = new Array();
         contentEvents = new Array();
+        if (availabilityType == "PREVIEW") {
+            allowEvent = false;
+        }
+        batchEventURL = batchUrl;
+        cumlativeDurationURL = cumulativeUrl;
     }
 
     private function onFailed():void {
@@ -53,38 +59,44 @@ public class EventsManagerImpl implements EventsManager {
     }
 
 
-    public function addUserEvent( userEvent:UserEvent ):void {
+    public function addUserEvent(userEvent:UserEvent):void {
         userEventCount++;
         userEvents.push(userEvent);
-        if ( userEventCount >= 10 ) {
+        if (userEventCount >= 10) {
             flushAll();
         }
     }
 
-    public function addContentEvent( contentEvent:ContentEvent ):void {
+    public function addContentEvent(contentEvent:ContentEvent):void {
         contentEventCount++;
         contentEvents.push(contentEvent);
-        if ( contentEventCount >= 10 ) {
+        if (contentEventCount >= 10) {
             flushAll();
         }
     }
 
     public function flushAll():void {
 
-        trace( "############## flushing all user data with view id : " + view.userId + view.serverTimeStamp );
+        if (allowEvent) {
 
-        flushing = true;
+            flushing = true;
 
-        var eventsArray:Array = new Array(4);
-        eventsArray[0] = view;
-        eventsArray[1] = userEvents;
-        eventsArray[2] = contentEvents;
-        eventsArray[3] = new BatchEvent(userEventCount, incrementAndGetBatchEventId(), contentEventCount );
+            var eventsArray:Array = new Array(4);
+            eventsArray[0] = view;
+            eventsArray[1] = userEvents;
+            eventsArray[2] = contentEvents;
+            eventsArray[3] = new BatchEvent(userEventCount, incrementAndGetBatchEventId(), contentEventCount);
 
-        var request:ServiceRequest = new ServiceRequest(batchEventURL, onSuccess, onFailed);
-        var post_data:URLVariables = new URLVariables();
-        post_data.data = JSON.encode(eventsArray);
-        request.submit(post_data);
+            var request:ServiceRequest = new ServiceRequest(batchEventURL, onSuccess, onFailed);
+            var post_data:URLVariables = new URLVariables();
+            post_data.data = JSON.encode(eventsArray);
+            request.submit(post_data);
+        } else {
+            userEvents = [];
+            contentEvents = [];
+            userEventCount = 0;
+            contentEventCount = 0;
+        }
     }
 
     private function incrementAndGetBatchEventId():int {
@@ -93,16 +105,18 @@ public class EventsManagerImpl implements EventsManager {
     }
 
     public function flushCumulativeDuration(cumulativeDuration:CumulativeDurationEvent):void {
-        var request:ServiceRequest = new ServiceRequest(cumlativeDurationURL, onCumulativeDurationSuccess, onCumulativeDurationFailed);
-        var post_data:URLVariables = new URLVariables();
-        post_data.data = JSON.encode(cumulativeDuration);
-        request.submit(post_data);
-        flushAll();
+        if (allowEvent) {
+            var request:ServiceRequest = new ServiceRequest(cumlativeDurationURL, onCumulativeDurationSuccess, onCumulativeDurationFailed);
+            var post_data:URLVariables = new URLVariables();
+            post_data.data = JSON.encode(cumulativeDuration);
+            request.submit(post_data);
+            flushAll();
+        }
     }
 
     // There's no actual response sent as an argument for ServiceRequest failHandlers...
-    private function onCumulativeDurationFailed(response:Object=null):void {
-         trace("onCumulativeDurationFailed");
+    private function onCumulativeDurationFailed(response:Object = null):void {
+        trace("onCumulativeDurationFailed");
     }
 
     private function onCumulativeDurationSuccess(response:Object):void {

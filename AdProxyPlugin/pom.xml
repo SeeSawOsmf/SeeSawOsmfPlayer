@@ -77,5 +77,10 @@
             <artifactId>flexunit</artifactId>
             <type>swc</type>
         </dependency>
+        <dependency>
+            <groupId>com.auditude.osmf</groupId>
+            <artifactId>auditude</artifactId>
+            <type>swc</type>
+        </dependency>
     </dependencies>
 </project>

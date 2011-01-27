@@ -21,14 +21,15 @@
  */
 
 package com.seesaw.player {
+import com.auditude.ads.osmf.constants.AuditudeOSMFConstants;
+import com.seesaw.player.ads.AdMetadata;
+import com.seesaw.player.ads.AuditudeConstants;
 import com.seesaw.player.ads.LiverailConstants;
+import com.seesaw.player.autoresume.AutoResumeConstants;
 import com.seesaw.player.buttons.PlayStartButton;
-import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.external.PlayerExternalInterface;
 import com.seesaw.player.external.PlayerExternalInterfaceImpl;
 import com.seesaw.player.impl.services.ResumeServiceImpl;
-import com.seesaw.player.panels.OverUsePanel;
-import com.seesaw.player.utils.ServiceRequest;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.liverail.LiverailConfig;
 import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
@@ -37,6 +38,7 @@ import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.namespaces.smil;
 import com.seesaw.player.panels.GuidanceBar;
 import com.seesaw.player.panels.GuidancePanel;
+import com.seesaw.player.panels.OverUsePanel;
 import com.seesaw.player.panels.ParentalControlsPanel;
 import com.seesaw.player.panels.PosterFrame;
 import com.seesaw.player.preloader.Preloader;
@@ -71,6 +73,8 @@ public class Player extends Sprite {
     private static var loggerSetup:* = (LoggerFactory.loggerFactory = new TraceAndArthropodLoggerFactory());
     private static var osmfLoggerSetup:* = (Log.loggerFactory = new CommonsOsmfLoggerFactory());
 
+    private static const LIVERAIL_PLUGIN_URL:String = "http://vox-static.liverail.com/swf/v4/admanager.swf";
+
     private var logger:ILogger = LoggerFactory.getClassLogger(Player);
 
     private var _videoPlayer:SeeSawPlayer;
@@ -84,8 +88,10 @@ public class Player extends Sprite {
 
     private var playerInit:XML;
     private var videoInfo:XML;
-  
+
     private var ASX_data:String;
+
+    private var config:PlayerConfiguration;
 
     var testApi:TestApi;
 
@@ -102,8 +108,8 @@ public class Player extends Sprite {
 
         // If no flashVar, use a default for testing
         // TODO: remove this altogether
-        //loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player/initinfo/29053";
-        loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player/initinfo/13602";
+        loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://localhost/player/initinfo/29053";
+        /// loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player/initinfo/13602";
 
         stage.scaleMode = StageScaleMode.NO_SCALE;
         stage.align = StageAlign.TOP_LEFT;
@@ -205,7 +211,7 @@ public class Player extends Sprite {
     }
 
     private function showOverUsePanel(errorType:String):void {
-        
+
         //over use panel checks if the error is "NO_ADS", if it is it show no ads messaging, otherwise it shows pack messaging.
         //var errorType:String = "NO_ADS";
         var overUsePanel = new OverUsePanel(errorType, playerInit.parentalControls.termsAndConditionsLinkURL);
@@ -286,15 +292,15 @@ public class Player extends Sprite {
     }
 
     private function setPlaylist(asx:String):void {
-      if (playerInit.adMode != "channel4") return; //we don't care
+        if (playerInit.adMode != AdMetadata.CHANNEL_4_AD_TYPE) return; //we don't care
 
-      logger.info("Retreived ASX data from C4");
-      logger.info(asx);
+        logger.info("Retreived ASX data from C4");
+        logger.info(asx);
 
-      ASX_data = asx;
+        ASX_data = asx;
 
-      resetInitialisationStages();
-      nextInitialisationStage();
+        resetInitialisationStages();
+        nextInitialisationStage();
     }
 
     private function attemptPlaybackStart():void {
@@ -322,9 +328,10 @@ public class Player extends Sprite {
         playerInit = xmlDoc;
         setupExternalInterface();
 
-        if (playerInit.adMode != "channel4") {
-          resetInitialisationStages();
-          nextInitialisationStage();
+        ///adModulePlayableEvaluation
+        if (playerInit.adMode != AdMetadata.CHANNEL_4_AD_TYPE) {
+            resetInitialisationStages();
+            nextInitialisationStage();
         }
     }
 
@@ -332,12 +339,12 @@ public class Player extends Sprite {
         logger.debug("requesting programme data: " + videoInfoUrl);
         var request:ServiceRequest = new ServiceRequest(videoInfoUrl, onSuccessFromVideoInfo, onFailFromVideoInfo);
         // For C4 ads we POST the ASX we receive from the ad script. For liverail and auditude, there's no need
-        if (playerInit.adMode != "channel4") {
-          request.submit();
+        if (playerInit.adMode != AdMetadata.CHANNEL_4_AD_TYPE) {
+            request.submit();
         } else {
-          var post_data:URLVariables = new URLVariables();
-          post_data.advertASX = ASX_data;
-          request.submit(post_data);
+            var post_data:URLVariables = new URLVariables();
+            post_data.advertASX = ASX_data;
+            request.submit(post_data);
         }
     }
 
@@ -348,6 +355,8 @@ public class Player extends Sprite {
         xmlDoc.ignoreWhitespace = true;
 
         videoInfo = xmlDoc;
+        /// we need to evaluate if ads are not required for SVOD, TVOD and NO_ADS and adjust the adMode which is then persisted as metaData
+        playerInit.adMode[0] = adModulePlayableEvaluation();
 
         if (videoInfo.geoblocked == "true") {
             return;
@@ -382,16 +391,28 @@ public class Player extends Sprite {
 
         logger.debug("creating player");
 
-        var config:PlayerConfiguration = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, content);
+        //var config:PlayerConfiguration = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, content);
+        config = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, content);
         videoPlayer = new SeeSawPlayer(config);
-
+        videoPlayer.addEventListener(PlayerConstants.DESTROY, reBuildPlayer);
         // Since we have autoPlay to false for liverail, we need to manually call play for C4:
-        if (playerInit.adMode != "liverail")
+        if (playerInit.adMode != AdMetadata.LR_AD_TYPE) {
             videoPlayer.mediaPlayer().autoPlay = true;
+            if (playerInit.adMode == AdMetadata.AUDITUDE_AD_TYPE) {
+                var metadata:Metadata = content.getMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) as Metadata;
+                metadata.addValue(AuditudeOSMFConstants.PLAYER_INSTANCE, videoPlayer.mediaPlayer());
+            }
+        }
 
         removePosterFrame();
-        
+
         addChild(videoPlayer);
+
+        videoPlayer.init();
+    }
+
+    private function reBuildPlayer(event:Event):void {
+        onAddedToStage(event);
     }
 
     private function createMediaResource(videoInfo:XML):MediaResourceBase {
@@ -410,11 +431,8 @@ public class Player extends Sprite {
         metadata = new Metadata();
         resource.addMetadataValue(ScrubPreventionConstants.SETTINGS_NAMESPACE, metadata);
 
-        if (videoInfo && videoInfo.subtitleLocation) {
-            metadata = new Metadata();
-            metadata.addValue(SAMIPluginInfo.METADATA_KEY_URI, String(videoInfo.subtitleLocation));
-            resource.addMetadataValue(SAMIPluginInfo.METADATA_NAMESPACE, metadata);
-        }
+        metadata = new Metadata();
+        resource.addMetadataValue(AutoResumeConstants.SETTINGS_NAMESPACE, metadata);
 
         if (playerInit && playerInit.adMode == LiverailConstants.AD_MODE_ID) {
             metadata = new Metadata();
@@ -422,8 +440,29 @@ public class Player extends Sprite {
             metadata.addValue(LiverailConstants.PUBLISHER_ID, playerInit.liverail.publisherId);
             metadata.addValue(LiverailConstants.CONFIG_OBJECT, new LiverailConfig(playerInit));
             metadata.addValue(LiverailConstants.RESUME_POSITION, getResumePosition());
-            metadata.addValue(LiverailConstants.ADMANAGER_URL,  "http://vox-static.liverail.com/swf/v4/admanager.swf");
+            metadata.addValue(LiverailConstants.ADMANAGER_URL, LIVERAIL_PLUGIN_URL);
             resource.addMetadataValue(LiverailConstants.SETTINGS_NAMESPACE, metadata);
+        } else if (playerInit && playerInit.adMode == AuditudeConstants.AD_MODE_ID) {
+            metadata = new Metadata();
+
+            // the following 4 keys are required attributes for the Auditude plug-in
+            // a) version: version of auditude plug-in
+            // b) domain: adserver domain
+            // c) zone-id: zone id assigned by Auditude
+            // d) media-id: The video id of the currently playing content
+            metadata.addValue(AuditudeOSMFConstants.VERSION, "adunitv2-1.0");
+            metadata.addValue(AuditudeOSMFConstants.DOMAIN, "sandbox.auditude.com");
+            metadata.addValue(AuditudeOSMFConstants.ZONE_ID, 1947);
+            metadata.addValue(AuditudeOSMFConstants.MEDIA_ID, "GcE_e7ewtw2lMJVbDEJClpllo6mVJXSb"); //playerInit.programmeId
+
+            // pass the mediaplayer instance to Auditude. This is required to listen for audio and content progress updates
+            //metadata.addValue(AuditudeOSMFConstants.PLAYER_INSTANCE, videoPlayer.mediaPlayer());
+
+            // any additional metadata can be passed to the Auditude plug-in through this key.
+            metadata.addValue(AuditudeOSMFConstants.USER_DATA, null);
+
+            metadata.addValue(AuditudeConstants.RESUME_POSITION, getResumePosition());
+            resource.addMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE, metadata)
         }
 
         return resource;
@@ -469,7 +508,7 @@ public class Player extends Sprite {
 
     private function getResumePosition():Number {
         var resumeService:ResumeService = ObjectProvider.getInstance().getObject(ResumeService);
-        resumeService.programmeId = playerInit.programmeId; 
+        resumeService.programmeId = playerInit.programmeId;
         var resumeValue:Number = resumeService.getResumeCookie();
         return resumeValue;
     }
@@ -479,6 +518,20 @@ public class Player extends Sprite {
             removeChild(preloader);
             preloader = null;
         }
+    }
+
+    private function adModulePlayableEvaluation():String {
+        var playableType:String;
+        var noAdsPlayable:String = videoInfo.noAdsPlayable;
+        var svodPlayable:String = videoInfo.svodPlayable;
+        var tvodPlayable:String = videoInfo.tvodPlayable;
+
+        if (noAdsPlayable == "true" || svodPlayable == "true" || tvodPlayable == "true") {
+            playableType = "none"
+        } else {
+            playableType = playerInit.adMode;
+        }
+        return playableType;
     }
 
     public function get videoPlayer():SeeSawPlayer {

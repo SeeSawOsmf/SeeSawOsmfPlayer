@@ -25,5 +25,7 @@ package  com.seesaw.player.ads {
 public final class AdState {
     public static const STOPPED:String = "stopped";
     public static const STARTED:String = "started";
+    public static const AD_BREAK_START:String = "adBreakStarted";
+    public static const AD_BREAK_COMPLETE:String = "adBreakStopped";
 }
 }

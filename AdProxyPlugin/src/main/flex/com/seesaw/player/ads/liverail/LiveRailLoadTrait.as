@@ -20,12 +20,25 @@
  * Incorporated. All Rights Reserved.
  */
 
-package com.seesaw.player.controls {
-public class ControlBarMetadata {
-    public static const CONTROL_BAR_METADATA:String = "http://www.osmf.org/samples/controlbar/metadata";
-    public static const CONTROL_BAR_HIDDEN:String = "controlBarHidden";
-    public static const SUBTITLES_VISIBLE:String = "subtitlesVisible";
-    public static const FULL_SCREEN:String = "fullScreen";
-    public static const USER_CLICK_STATE:String = "userClickState";
+package com.seesaw.player.ads.liverail {
+import org.osmf.media.MediaResourceBase;
+import org.osmf.traits.LoadTrait;
+import org.osmf.traits.LoaderBase;
+
+public class LiveRailLoadTrait extends LoadTrait {
+
+    private var _adManager:*;
+
+    public function LiveRailLoadTrait(loader:LoaderBase, resource:MediaResourceBase) {
+        super(loader, resource);
+    }
+
+    public function get adManager():* {
+        return _adManager;
+    }
+
+    public function set adManager(value:*):void {
+        _adManager = value;
+    }
 }
 }

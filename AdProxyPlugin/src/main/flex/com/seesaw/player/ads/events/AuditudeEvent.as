@@ -20,10 +20,10 @@
  *    Incorporated. All Rights Reserved.
  */
 
-package uk.vodco.liverail.events {
+package com.seesaw.player.ads.events {
 import flash.events.Event;
 
-public class LiveRailEvent extends Event {
+public class AuditudeEvent extends Event {
     public static const INIT_COMPLETE:String = "initComplete";
     public static const INIT_ERROR:String = "initError";
     public static const PREROLL_COMPLETE:String = "prerollComplete";
@@ -47,7 +47,7 @@ public class LiveRailEvent extends Event {
 
     public var data:Object;
 
-    public function LiveRailEvent(type:String, _data:Object = null, bubbles:Boolean = false, cancelable:Boolean = false) {
+    public function AuditudeEvent(type:String, _data:Object = null, bubbles:Boolean = false, cancelable:Boolean = false) {
         super(type, bubbles, cancelable);
 
         data = _data;
