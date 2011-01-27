@@ -28,9 +28,9 @@ public class EventsManagerImpl implements EventsManager {
     private var userEvents:Array;
     private var contentEvents:Array;
 
-    // TODO Upkar - remove hardcoded URLS
-    private var batchEventURL:String = "http://localhost:8080/player.videoplayer:registerbatchevent?t:ac=TV:COMEDY/b/8542/Nathan-Barley";
-    private var cumlativeDurationURL:String = "http://localhost:8080/player.videoplayer:playIntervalEvent?t:ac=TV:COMEDY/b/8542/Nathan-Barley";
+
+    private var batchEventURL:String;
+    private var cumlativeDurationURL:String;
 
     private var flushing:Boolean = false;
     private var allowEvent:Boolean = true;
@@ -42,6 +42,8 @@ public class EventsManagerImpl implements EventsManager {
         if (availabilityType == "PREVIEW") {
             allowEvent = false;
         }
+        batchEventURL = batchUrl;
+        cumlativeDurationURL = cumulativeUrl;
     }
 
     private function onFailed():void {
@@ -89,7 +91,7 @@ public class EventsManagerImpl implements EventsManager {
             var post_data:URLVariables = new URLVariables();
             post_data.data = JSON.encode(eventsArray);
             request.submit(post_data);
-        }else{
+        } else {
             userEvents = [];
             contentEvents = [];
             userEventCount = 0;
@@ -103,11 +105,13 @@ public class EventsManagerImpl implements EventsManager {
     }
 
     public function flushCumulativeDuration(cumulativeDuration:CumulativeDurationEvent):void {
-        var request:ServiceRequest = new ServiceRequest(cumlativeDurationURL, onCumulativeDurationSuccess, onCumulativeDurationFailed);
-        var post_data:URLVariables = new URLVariables();
-        post_data.data = JSON.encode(cumulativeDuration);
-        request.submit(post_data);
-        flushAll();
+        if (allowEvent) {
+            var request:ServiceRequest = new ServiceRequest(cumlativeDurationURL, onCumulativeDurationSuccess, onCumulativeDurationFailed);
+            var post_data:URLVariables = new URLVariables();
+            post_data.data = JSON.encode(cumulativeDuration);
+            request.submit(post_data);
+            flushAll();
+        }
     }
 
     // There's no actual response sent as an argument for ServiceRequest failHandlers...

@@ -188,7 +188,7 @@ public class ScrubPreventionProxy extends ProxyElement {
 
     private function finalSeek(event:AdEvent):void {
 
-        if (_adTrait.adState == AdState.STOPPED) {
+        if (_adTrait.adState == AdState.AD_BREAK_COMPLETE) {
             if (finalSeekPoint > 0) {
 
 

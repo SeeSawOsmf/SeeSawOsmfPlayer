@@ -22,12 +22,14 @@
 
 package com.seesaw.player.ads.liverail {
 // These three rom PlayerCommon, not here
-import com.seesaw.player.ads.AdBreak;
-import com.seesaw.player.ads.AdMetadata; 
-import com.seesaw.player.ads.AdState; 
 
-import com.seesaw.player.ads.LiverailConstants; 
+import com.seesaw.player.PlayerConstants;
+import com.seesaw.player.ads.AdBreak;
+import com.seesaw.player.ads.AdMetadata;
+import com.seesaw.player.ads.AdState;
+import com.seesaw.player.ads.LiverailConstants;
 import com.seesaw.player.ads.events.LiveRailEvent;
+import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.traits.ads.AdPlayTrait;
 import com.seesaw.player.traits.ads.AdTimeTrait;
 
@@ -58,6 +60,9 @@ import org.osmf.traits.TimeTrait;
 
 public class AdProxy extends ProxyElement {
 
+
+    use namespace contentinfo;
+
     private var logger:ILogger = LoggerFactory.getClassLogger(AdProxy);
 
     private static const CONTENT_UPDATE_INTERVAL:int = 500;
@@ -69,6 +74,7 @@ public class AdProxy extends ProxyElement {
     private var timer:Timer;
 
     private var adTimeTrait:AdTimeTrait;
+    private var playerMetadata:Metadata;
 
     public function AdProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -79,8 +85,12 @@ public class AdProxy extends ProxyElement {
 
     override public function set resource(value:MediaResourceBase):void {
         super.resource = value;
+
+        playerMetadata = proxiedElement.resource.getMetadataValue(PlayerConstants.METADATA_NAMESPACE) as Metadata;
+
         updateLoadTrait();
     }
+
 
     private function updateLoadTrait():void {
         var loadTrait:LoadTrait = getTrait(MediaTraitType.LOAD) as LoadTrait;
@@ -187,10 +197,16 @@ public class AdProxy extends ProxyElement {
     private function onInitComplete(ev:Object):void {
         logger.debug("onInitComplete");
 
-        adManager.onContentStart();
+
 
         var adMap:Object = ev.data.adMap;
         var adBreaks:Array = adMap.adBreaks;
+
+
+        playerMetadata.addValue("sectionCount", adBreaks.length);
+
+
+        adManager.onContentStart();
 
         var metadataAdBreaks:Vector.<AdBreak> = new Vector.<AdBreak>(adBreaks.length, true);
 
@@ -237,7 +253,7 @@ public class AdProxy extends ProxyElement {
     }
 
     private function onClickThru(event:Object):void {
-        logger.debug("onClickThru");
+        adMetadata.clickThru = event.data.ad.clickThruUrl;    ///use the Url to force a value change event to occur..
         pause();
     }
 
@@ -248,10 +264,10 @@ public class AdProxy extends ProxyElement {
 
     private function onAdStart(event:Object):void {
         logger.debug("onAdStart");
-       trace(event.data.ad.linear.url);
-    /*     event.data.ad.clickThruUrl
-        event.data.ad.campaignID
-        event.data.ad.creativeID*/
+        trace(event.data.ad.linear.url);
+        /*     event.data.ad.clickThruUrl
+         event.data.ad.campaignID
+         event.data.ad.creativeID*/
         play();
     }
 
@@ -270,7 +286,7 @@ public class AdProxy extends ProxyElement {
     private function adbreakStart(event:Object):void {
         logger.debug("adbreakStart");
 
-        adMetadata.adState = AdState.STARTED;
+        adMetadata.adState = AdState.AD_BREAK_START;
 
         setTraitsToBlock(MediaTraitType.SEEK);
         // Perhaps this is needed for mid-rolls
@@ -295,7 +311,7 @@ public class AdProxy extends ProxyElement {
         removeTrait(MediaTraitType.TIME);
         adTimeTrait = null;
 
-        adMetadata.adState = AdState.STOPPED;
+        adMetadata.adState = AdState.AD_BREAK_COMPLETE;
 
         setTraitsToBlock();
         play();
