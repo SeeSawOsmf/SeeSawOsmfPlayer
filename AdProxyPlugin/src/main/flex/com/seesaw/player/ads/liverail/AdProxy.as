@@ -91,7 +91,6 @@ public class AdProxy extends ProxyElement {
         updateLoadTrait();
     }
 
-
     private function updateLoadTrait():void {
         var loadTrait:LoadTrait = getTrait(MediaTraitType.LOAD) as LoadTrait;
         var liverailPath:String = getSetting(LiverailConstants.ADMANAGER_URL) as String;

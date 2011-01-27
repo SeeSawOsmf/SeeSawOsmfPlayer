@@ -117,7 +117,7 @@ public class SAMIElement extends LoadableElementBase {
             var captionDisplayObject:CaptionDisplayObject = displayTrait.displayObject as CaptionDisplayObject;
             var caption:String = cuePoint.parameters as String;
             captionDisplayObject.text = caption;
-            logger.debug("displaying caption: " + caption);
+            logger.debug("caption: time = {0}, duration = {1}", cuePoint.time, cuePoint.duration);
         }
     }
 

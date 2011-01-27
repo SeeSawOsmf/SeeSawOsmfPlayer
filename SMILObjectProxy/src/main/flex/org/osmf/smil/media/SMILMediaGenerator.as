@@ -22,7 +22,6 @@
 package org.osmf.smil.media
 {
 import org.osmf.elements.CompositeElement;
-import org.osmf.elements.DurationElement;
 import org.osmf.elements.ParallelElement;
 import org.osmf.elements.ProxyElement;
 import org.osmf.elements.SerialElement;
@@ -219,12 +218,7 @@ CONFIG::LOGGING
         }
 
         private function populateMetadataFromSMIL(media:MediaElement, smilElement:SMILElement):void {
-            var metadata:Metadata = media.getMetadata(SMILConstants.SMIL_METADATA_NS) as Metadata;
-            if (metadata == null)
-            {
-                metadata = new Metadata();
-                media.addMetadata(SMILConstants.SMIL_METADATA_NS, metadata);
-            }
+            var metadata:Metadata = new Metadata();
 
             for(var i:uint = 0; i < smilElement.numChildren; i++)
             {
@@ -238,6 +232,8 @@ CONFIG::LOGGING
                     }
                 }
             }
+
+            media.addMetadata(SMILConstants.SMIL_METADATA_NS, metadata);
         }
 
 		private function createDynamicStreamingResource(switchElement:SMILElement, smilDocument:SMILDocument):MediaResourceBase
