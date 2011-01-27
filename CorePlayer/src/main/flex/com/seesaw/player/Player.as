@@ -355,7 +355,9 @@ public class Player extends Sprite {
         xmlDoc.ignoreWhitespace = true;
 
         videoInfo = xmlDoc;
+        /// we need to evaluate if ads are not required for SVOD, TVOD and NO_ADS and adjust the adMode which is then persisted as metaData
         playerInit.adMode[0] = adModulePlayableEvaluation();
+
         if (videoInfo.geoblocked == "true") {
             return;
         }
