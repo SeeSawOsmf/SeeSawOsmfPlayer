@@ -27,7 +27,6 @@ import com.auditude.ads.osmf.constants.AuditudeOSMFConstants;
 import com.seesaw.player.ads.AuditudeConstants;
 import com.seesaw.player.ads.auditude.AdProxyPluginInfo;
 import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
-import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.batchEventService.BatchEventServicePlugin;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.controls.ControlBarMetadata;
@@ -40,6 +39,7 @@ import com.seesaw.player.netstatus.NetStatusMetadata;
 import com.seesaw.player.panels.BufferingPanel;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
 import com.seesaw.player.smil.SeeSawSMILLoader;
+import com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo;
 
 import flash.display.Sprite;
 import flash.display.StageDisplayState;
@@ -100,7 +100,7 @@ public class SeeSawPlayer extends Sprite {
     private var bufferingPanel:BufferingPanel;
 
     private var xi:PlayerExternalInterface;
-    
+
     // This is so we wait on Auditude loading before setting up the rest of the plugins and player
     private var pluginsToLoad:int = 1;
 
@@ -139,8 +139,8 @@ public class SeeSawPlayer extends Sprite {
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
     }
 
-    private function playerMetaChange(event:MetadataEvent):void { 
-        if (event.key == PlayerConstants.DESTROY) { 
+    private function playerMetaChange(event:MetadataEvent):void {
+        if (event.key == PlayerConstants.DESTROY) {
             if (event.value) {
                 // wipe out the objects from memory and off the displayList
                 // removeChild seems to throw errors when trying to removeChild( container ) etc..
@@ -153,7 +153,7 @@ public class SeeSawPlayer extends Sprite {
                 player = null;
                 container = null;
 
-                dispatchEvent(new Event(PlayerConstants.DESTROY)); 
+                dispatchEvent(new Event(PlayerConstants.DESTROY));
             }
         }
     }
@@ -227,12 +227,12 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onPluginLoaded(event:MediaFactoryEvent):void {
-      logger.debug("Loaded plugin " + event.resource);
+        logger.debug("Loaded plugin " + event.resource);
 
-      if (--pluginsToLoad <= 0) {
-          logger.debug("All plugins loaded");
-          loadPlugins();
-      }
+        if (--pluginsToLoad <= 0) {
+            logger.debug("All plugins loaded");
+            loadPlugins();
+        }
     }
 
     private function loadPlugins():void {
@@ -242,17 +242,18 @@ public class SeeSawPlayer extends Sprite {
         factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadFailed);
         factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo(new SeeSawSMILLoader())));
         factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
-        factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
+        // factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.liverail.AdProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.auditude.AdProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
-        
+        factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
+
         createVideoElement();
-    }    
+    }
 
     private function onPluginLoadFailed(event:MediaFactoryEvent):void {
-      logger.debug("PROBLEM LOADING " + event.toString());
+        logger.debug("PROBLEM LOADING " + event.toString());
     }
 
     private function createBufferingPanel():void {
@@ -302,11 +303,11 @@ public class SeeSawPlayer extends Sprite {
         createControlBarElement();
 
         if (contentElement is IAuditudeMediaElement) {
-          var _auditude:AuditudePlugin = IAuditudeMediaElement(contentElement).plugin;
+            var _auditude:AuditudePlugin = IAuditudeMediaElement(contentElement).plugin;
 
-          // We set this in the metadata so the auditude AdProxy can pick up the plugin
-          var metadata:Metadata = config.resource.getMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) as Metadata;
-          metadata.addValue(AuditudeConstants.PLUGIN_INSTANCE, _auditude);
+            // We set this in the metadata so the auditude AdProxy can pick up the plugin
+            var metadata:Metadata = config.resource.getMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) as Metadata;
+            metadata.addValue(AuditudeConstants.PLUGIN_INSTANCE, _auditude);
         }
 
         setContainerSize(contentWidth, contentHeight);
@@ -415,7 +416,7 @@ public class SeeSawPlayer extends Sprite {
                 contentElement.addMetadata(NetStatusMetadata.NET_STATUS_METADATA, metadata);
             }
 
-                metadata.addValue(NetStatusMetadata.STATUS, event.info);
+            metadata.addValue(NetStatusMetadata.STATUS, event.info);
         }
     }
 

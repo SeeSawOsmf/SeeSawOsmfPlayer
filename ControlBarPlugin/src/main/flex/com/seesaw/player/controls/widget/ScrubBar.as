@@ -232,7 +232,6 @@ public class ScrubBar extends Widget implements IWidget {
         var timeTrait:TimeTrait = event.target as TimeTrait;
         duration = timeTrait.duration;
         createAdMarkers();
-        // positionOffset = timeTrait.currentTime;
     }
 
     // Internals
@@ -298,8 +297,8 @@ public class ScrubBar extends Widget implements IWidget {
 
         var temporal:TimeTrait = media ? media.getTrait(MediaTraitType.TIME) as TimeTrait : null;
         if (temporal != null && !isNaN(temporal.duration) && !isNaN(temporal.currentTime)) {
-            duration = temporal.duration - positionOffset;
-            var position:Number = temporal.currentTime - positionOffset;
+            duration = temporal.duration;
+            var position:Number = temporal.currentTime;
 
             this.currentTimeInSeconds = position;
 
@@ -422,8 +421,6 @@ public class ScrubBar extends Widget implements IWidget {
     public function get classDefinition():String {
         return QUALIFIED_NAME;
     }
-
-    private var positionOffset:Number = 0.0;
 
     private var scrubber:Scrubber;
     private var scrubBarClickArea:Sprite;

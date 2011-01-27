@@ -22,7 +22,8 @@
 
 package org.osmf.smil {
 public class SMILConstants {
-    public static const SMIL_METADATA_NS = "http://www.w3.org/ns/SMIL";
+    public static const SMIL_METADATA_NS = "http://www.w3.org/ns/SMIL/metadata";
+    public static const SMIL_CONTENT_NS = "http://www.w3.org/ns/SMIL/content";
     public static const SMIL_DOCUMENT:String = "smilDocument";
 }
 }

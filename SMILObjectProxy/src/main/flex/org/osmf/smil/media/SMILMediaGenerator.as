@@ -27,6 +27,8 @@ import org.osmf.elements.ParallelElement;
 import org.osmf.elements.ProxyElement;
 import org.osmf.elements.SerialElement;
 import org.osmf.elements.VideoElement;
+import org.osmf.events.MediaFactoryEvent;
+import org.osmf.events.SerialElementEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaResourceBase;
@@ -105,11 +107,23 @@ CONFIG::LOGGING
 					break;
 				case SMILElementType.SEQUENCE:
 					var serialElement:SerialElement = new SerialElement();
+                    serialElement.addEventListener(SerialElementEvent.CURRENT_CHILD_CHANGE, function(event:SerialElementEvent) {
+                        var index:int = serialElement.getChildIndex(serialElement.currentChild) - 1;
+                        if(index >= 0) {
+                            var childElem:MediaElement = serialElement.getChildAt(index);
+                            var metadata:Metadata = childElem.getMetadata(SMILConstants.SMIL_METADATA_NS);
+                            if(metadata && metadata.getValue("contentType") == "advert" ||
+                                    metadata.getValue("contentType") == "sting") {
+                                serialElement.removeChild(childElem);
+                            }
+                        }
+                     });
                     mediaElement = serialElement;
 					break;
 				case SMILElementType.VIDEO:
 					var resource:StreamingURLResource = new StreamingURLResource((smilElement as SMILMediaElement).src);
 					resource.mediaType = MediaType.VIDEO;
+                    populateResourceMetadataFromSMIL(resource, smilElement);
 
 					var videoElement:MediaElement = factory.createMediaElement(resource);
 
@@ -125,27 +139,7 @@ CONFIG::LOGGING
 					}
 
 					var duration:Number = (smilElement as SMILMediaElement).duration;
-					if (!isNaN(duration) && duration > 0)
-					{
-						if (videoElement is VideoElement)
-						{
-							(videoElement as VideoElement).defaultDuration = duration;
-						}
-						else if (videoElement is ProxyElement)
-						{
-							// Try to find the proxied video element (fix for FM-1020)
-							var tempMediaElement:MediaElement = videoElement;
-							while (tempMediaElement is ProxyElement)
-							{
-								tempMediaElement = (tempMediaElement as ProxyElement).proxiedElement;
-							}
-
-							if (tempMediaElement != null && tempMediaElement is VideoElement)
-							{
-								(tempMediaElement as VideoElement).defaultDuration = duration;
-							}
-						}
-					}
+					setVideoDuration(duration, videoElement);
 
 					(parentMediaElement as CompositeElement).addChild(videoElement);
 					break;
@@ -195,8 +189,28 @@ CONFIG::LOGGING
 			else if (mediaResource != null)
 			{
                 mediaResource.mediaType = MediaType.VIDEO;
+                populateResourceMetadataFromSMIL(mediaResource, smilElement);
 
+                var switchVideoElement:SMILMediaElement = null;
+                for (var i:int = 0; i < smilElement.numChildren; i++)
+                {
+                    var smilElement:SMILElement = smilElement.getChildAt(i);
+                    if (smilElement.type == SMILElementType.VIDEO)
+                    {
+                        switchVideoElement = smilElement as SMILMediaElement;
+                        break;
+                    }
+                }
+
+                var defaultDuration:Number = switchVideoElement ? switchVideoElement.duration : NaN;
+                var onCreate:Function = function(event:MediaFactoryEvent)
+                {
+                    setVideoDuration(defaultDuration, event.mediaElement);
+                }
+
+                factory.addEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onCreate);
 				mediaElement = factory.createMediaElement(mediaResource);
+                factory.removeEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onCreate);
 
                 populateMetadataFromSMIL(mediaElement, smilElement);
 
@@ -209,7 +223,33 @@ CONFIG::LOGGING
 			return mediaElement;
 		}
 
-        private function populateMetdataFromResource(originalResource:MediaResourceBase, mediaResource:MediaResourceBase):void {
+        private function setVideoDuration(duration:Number, videoElement:MediaElement):void
+        {
+            if (!isNaN(duration) && duration > 0)
+            {
+                if (videoElement is VideoElement)
+                {
+                    (videoElement as VideoElement).defaultDuration = duration;
+                }
+                else if (videoElement is ProxyElement)
+                {
+                    // Try to find the proxied video element (fix for FM-1020)
+                    var tempMediaElement:MediaElement = videoElement;
+                    while (tempMediaElement is ProxyElement)
+                    {
+                        tempMediaElement = (tempMediaElement as ProxyElement).proxiedElement;
+                    }
+
+                    if (tempMediaElement != null && tempMediaElement is VideoElement)
+                    {
+                        (tempMediaElement as VideoElement).defaultDuration = duration;
+                    }
+                }
+            }
+        }
+
+        private function populateMetdataFromResource(originalResource:MediaResourceBase, mediaResource:MediaResourceBase):void
+        {
             // Make sure we transfer any resource metadata from the original resource
             for each (var metadataNS:String in originalResource.metadataNamespaceURLs)
             {
@@ -218,7 +258,31 @@ CONFIG::LOGGING
             }
         }
 
-        private function populateMetadataFromSMIL(media:MediaElement, smilElement:SMILElement):void {
+        private function populateResourceMetadataFromSMIL(media:MediaResourceBase, smilElement:SMILElement):void
+        {
+            var metadata:Metadata = media.getMetadataValue(SMILConstants.SMIL_CONTENT_NS) as Metadata;
+            if(metadata == null)
+            {
+                metadata = new Metadata();
+                media.addMetadataValue(SMILConstants.SMIL_CONTENT_NS, metadata);
+            }
+
+            for(var i:uint = 0; i < smilElement.numChildren; i++)
+            {
+                var child:SMILElement = smilElement.getChildAt(i);
+                if(child is SMILMetaElement)
+                {
+                    var smilMeta:SMILMetaElement = child as SMILMetaElement;
+                    if(smilMeta.name && smilMeta.content)
+                    {
+                        metadata.addValue(smilMeta.name, smilMeta.content);
+                    }
+                }
+            }
+        }
+
+        private function populateMetadataFromSMIL(media:MediaElement, smilElement:SMILElement):void
+        {
             var metadata:Metadata = new Metadata();
 
             for(var i:uint = 0; i < smilElement.numChildren; i++)
