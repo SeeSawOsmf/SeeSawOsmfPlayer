@@ -61,10 +61,10 @@ public class GuidancePanel extends Sprite {
     private var findOutMoreButton:Sprite = new Sprite();
 
     //Embed images
-    [Embed(source="resources/acceptButton_up.png")]
+    [Embed(source="resources/accept_up.png")]
     private var acceptImageUpEmbed:Class;
     private var acceptImageUp:Bitmap = new acceptImageUpEmbed();
-    [Embed(source="resources/acceptButton_over.png")]
+    [Embed(source="resources/accept_over.png")]
     private var acceptImageOverEmbed:Class;
     private var acceptImageOver:Bitmap = new acceptImageOverEmbed();
     [Embed(source="resources/Gcircle.png")]
@@ -289,9 +289,10 @@ public class GuidancePanel extends Sprite {
         }
 
         //position the button
-        this.acceptButton.y = 106;
-        this.acceptButton.height = 40;
-        this.acceptButton.width = 100;
+        this.acceptButton.x = -5;
+        this.acceptButton.y = 102;
+        this.acceptButton.height = 48;
+        this.acceptButton.width = 108;
 
         return this.acceptButton;
     }

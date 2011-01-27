@@ -73,12 +73,20 @@ public class OverUsePanel extends Sprite {
     private var okButton:Sprite = new Sprite();
 
     //Embed images
-    [Embed(source="resources/acceptButton_up.png")]
+    [Embed(source="resources/accept_up.png")]
     private var acceptImageUpEmbed:Class;
     private var acceptImageUp:Bitmap = new acceptImageUpEmbed();
-    [Embed(source="resources/acceptButton_over.png")]
+    [Embed(source="resources/accept_over.png")]
     private var acceptImageOverEmbed:Class;
     private var acceptImageOver:Bitmap = new acceptImageOverEmbed();
+
+    [Embed(source="resources/ok_up.png")]
+    private var okImageUpEmbed:Class;
+    private var okImageUp:Bitmap = new okImageUpEmbed();
+    [Embed(source="resources/ok_over.png")]
+    private var okImageOverEmbed:Class;
+    private var okImageOver:Bitmap = new okImageOverEmbed();
+
     [Embed(source="resources/warning_icon.png")]
     private var warningIconEmbed:Class;
     private var warningIcon:Bitmap = new warningIconEmbed();
@@ -296,9 +304,10 @@ public class OverUsePanel extends Sprite {
         }
 
         //position the button
-        this.acceptButton.y = 186;
-        this.acceptButton.height = 40;
-        this.acceptButton.width = 100;
+        this.acceptButton.x = -5;
+        this.acceptButton.y = 184;
+        this.acceptButton.height = 48;
+        this.acceptButton.width = 108;
 
         return this.acceptButton;
     }
@@ -377,7 +386,7 @@ public class OverUsePanel extends Sprite {
         this.okButton.buttonMode = true;
         this.okButton.mouseChildren = false;
 
-        this.okButton.addChild(this.acceptImageUp);
+        this.okButton.addChild(this.okImageUp);
 
         this.okButton.addEventListener(MouseEvent.MOUSE_OVER, this.onOkMouseOver);
         this.okButton.addEventListener(MouseEvent.MOUSE_OUT, this.onOkMouseOut);
@@ -387,22 +396,23 @@ public class OverUsePanel extends Sprite {
         }
 
         //position the button
-        this.okButton.y = 186;
-        this.okButton.height = 40;
-        this.okButton.width = 100;
+        this.okButton.x = -5;
+        this.okButton.y = 184;
+        this.okButton.height = 48;
+        this.okButton.width = 108;
 
         return this.okButton;
     }
 
     private function onOkMouseOver(event:MouseEvent):void {
-        event.currentTarget.removeChild(this.acceptImageUp);
-        event.currentTarget.addChild(this.acceptImageOver);
+        event.currentTarget.removeChild(this.okImageUp);
+        event.currentTarget.addChild(this.okImageOver);
 
     }
 
     private function onOkMouseOut(event:MouseEvent):void {
-        event.currentTarget.removeChild(this.acceptImageOver);
-        event.currentTarget.addChild(this.acceptImageUp);
+        event.currentTarget.removeChild(this.okImageOver);
+        event.currentTarget.addChild(this.okImageUp);
     }
 
     private function onOkClick(event:MouseEvent = null):void {
