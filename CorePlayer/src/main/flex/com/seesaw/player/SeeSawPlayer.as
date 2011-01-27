@@ -57,6 +57,7 @@ import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.events.MetadataEvent;
 import org.osmf.events.PlayEvent;
+import org.osmf.events.SerialElementEvent;
 import org.osmf.layout.HorizontalAlign;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.layout.ScaleMode;
@@ -70,6 +71,7 @@ import org.osmf.media.URLResource;
 import org.osmf.metadata.Metadata;
 import org.osmf.smil.SMILConstants;
 import org.osmf.smil.SMILPluginInfo;
+import org.osmf.smil.elements.SMILElement;
 import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
@@ -242,7 +244,7 @@ public class SeeSawPlayer extends Sprite {
         factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadFailed);
         factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo(new SeeSawSMILLoader())));
         factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
-        factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
+        // factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.liverail.AdProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.auditude.AdProxyPluginInfo()));
@@ -471,11 +473,16 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onMediaElementCreate(event:MediaFactoryEvent):void {
-        var mediaElement:MediaElement = event.mediaElement;
-
-        mediaElement.addEventListener(MediaElementEvent.METADATA_ADD, function(mediaElementEvent:MediaElementEvent):void {
+        event.mediaElement.addEventListener(MediaElementEvent.METADATA_ADD, function(mediaElementEvent:MediaElementEvent):void {
             if (mediaElementEvent.namespaceURL == SMILConstants.SMIL_METADATA_NS) {
-                configureSmilElement(mediaElement);
+                mediaElementEvent.metadata.addEventListener(MetadataEvent.VALUE_ADD, function(event:MetadataEvent) {
+                    logger.debug("SMIL METADATA ADD: {0} = {1}", event.key, event.value);
+                    configureSmilElement(event.value);
+                });
+                mediaElementEvent.metadata.addEventListener(MetadataEvent.VALUE_CHANGE, function(event:MetadataEvent) {
+                    logger.debug("SMIL METADATA CHANGE: {0} = {1}", event.key, event.value);
+                    configureSmilElement(event.value);
+                });
             }
         });
     }

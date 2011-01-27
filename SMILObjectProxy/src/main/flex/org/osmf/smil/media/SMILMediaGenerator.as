@@ -27,6 +27,7 @@ import org.osmf.elements.ParallelElement;
 import org.osmf.elements.ProxyElement;
 import org.osmf.elements.SerialElement;
 import org.osmf.elements.VideoElement;
+import org.osmf.events.SerialElementEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaResourceBase;
@@ -105,6 +106,13 @@ CONFIG::LOGGING
 					break;
 				case SMILElementType.SEQUENCE:
 					var serialElement:SerialElement = new SerialElement();
+                    serialElement.addMetadata(SMILConstants.SMIL_METADATA_NS, new Metadata());
+                    serialElement.addEventListener(SerialElementEvent.CURRENT_CHILD_CHANGE, function(event:SerialElementEvent) {
+                        var playlistMetadata = serialElement.getMetadata(SMILConstants.SMIL_METADATA_NS) as Metadata;
+                        if(playlistMetadata) {
+                            playlistMetadata.addValue(SMILConstants.CURRENT_CHILD, event.currentChild);
+                        }
+                    });
                     mediaElement = serialElement;
 					break;
 				case SMILElementType.VIDEO:
