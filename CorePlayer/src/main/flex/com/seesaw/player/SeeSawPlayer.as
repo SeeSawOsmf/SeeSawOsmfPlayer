@@ -122,14 +122,7 @@ public class SeeSawPlayer extends Sprite {
 
         playerInit = metadata.getValue(PlayerConstants.CONTENT_INFO) as XML;
         adMode = String(metadata.getValue(PlayerConstants.CONTENT_INFO).adMode);
-        if (playerInit == null) {
-            throw new ArgumentError("player initialisation metadata not specified");
-        }
-
         videoInfo = metadata.getValue(PlayerConstants.VIDEO_INFO) as XML;
-        if (videoInfo == null) {
-            throw new ArgumentError("video initialisation metadata not specified");
-        }
 
         factory = config.factory;
         factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
@@ -151,7 +144,7 @@ public class SeeSawPlayer extends Sprite {
             if (event.value) {
                 // wipe out the objects from memory and off the displayList
                 // removeChild seems to throw errors when trying to removeChild( container ) etc..
-                mainContainer.removeMediaElement(contentElement);
+                mainContainer.removeMediaElement(mainElement);
                 mainContainer = null;
                 bufferingContainer = null;
                 subtitlesContainer = null;
@@ -316,11 +309,9 @@ public class SeeSawPlayer extends Sprite {
           metadata.addValue(AuditudeConstants.PLUGIN_INSTANCE, _auditude);
         }
 
-        player.media = contentElement;
-
         setContainerSize(contentWidth, contentHeight);
 
-        mainContainer.addMediaElement(contentElement);
+        mainElement.addChild(contentElement);
     }
 
     private function createControlBarElement():void {
