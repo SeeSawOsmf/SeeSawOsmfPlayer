@@ -127,8 +127,8 @@ public class PlayStartButton extends Sprite {
             ExternalInterface.addCallback("playStart", this.onProceedClick);
         }
 
-        proceedButton.height = 170;
-        proceedButton.width = 170;
+        proceedButton.height = 169;
+        proceedButton.width = 169;
 
         return proceedButton;
     }

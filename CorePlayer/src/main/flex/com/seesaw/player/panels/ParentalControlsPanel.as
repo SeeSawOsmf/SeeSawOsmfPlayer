@@ -77,10 +77,10 @@ public class ParentalControlsPanel extends Sprite {
     private var attempts:int = 0;
     
     //Embed images
-    [Embed(source="resources/acceptButton_up.png")]
+    [Embed(source="resources/enter_up.png")]
     private var acceptImageUpEmbed:Class;
     private var acceptImageUp:Bitmap = new acceptImageUpEmbed();
-    [Embed(source="resources/acceptButton_over.png")]
+    [Embed(source="resources/enter_over.png")]
     private var acceptImageOverEmbed:Class;
     private var acceptImageOver:Bitmap = new acceptImageOverEmbed();
     [Embed(source="resources/Gcircle.png")]
@@ -477,7 +477,8 @@ public class ParentalControlsPanel extends Sprite {
         acceptButton.addEventListener(MouseEvent.CLICK, this.onAcceptClick);
 
         //position the button
-        acceptButton.y = 201;
+        acceptButton.x = -5;
+        acceptButton.y = 199;
         acceptButton.height = 40;
         acceptButton.width = 100;
 
