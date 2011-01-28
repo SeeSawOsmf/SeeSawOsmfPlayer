@@ -32,9 +32,9 @@ import org.osmf.elements.ProxyElement;
 import org.osmf.media.MediaElement;
 import org.osmf.traits.MediaTraitType;
 
-public class SMILAdHandlerProxy extends ProxyElement {
+public class AdHandlerProxy extends ProxyElement {
 
-    public function SMILAdHandlerProxy(proxiedElement:MediaElement = null) {
+    public function AdHandlerProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
         var traitsToBlock:Vector.<String> = new Vector.<String>();
         traitsToBlock[0] = MediaTraitType.TIME;
