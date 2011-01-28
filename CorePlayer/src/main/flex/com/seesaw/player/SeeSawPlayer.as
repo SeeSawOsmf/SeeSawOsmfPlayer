@@ -24,6 +24,7 @@ package com.seesaw.player {
 import com.auditude.ads.AuditudePlugin;
 import com.auditude.ads.osmf.IAuditudeMediaElement;
 import com.auditude.ads.osmf.constants.AuditudeOSMFConstants;
+import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.ads.AuditudeConstants;
 import com.seesaw.player.ads.auditude.AdProxyPluginInfo;
 import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
@@ -206,7 +207,7 @@ public class SeeSawPlayer extends Sprite {
         container.layoutRenderer.addTarget(subtitlesContainer);
         container.layoutRenderer.addTarget(controlbarContainer);
 
-        if (adMode == "auditude") {
+        if (adMode == AdMetadata.AUDITUDE_AD_TYPE) {
             loadAuditude();
         } else {
             loadPlugins();
@@ -246,12 +247,10 @@ public class SeeSawPlayer extends Sprite {
         factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         // factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
-
-        if (playerInit.adMode == PlayerConstants.LIVERAIL_AD_MODE)
+        if (adMode == AdMetadata.LR_AD_TYPE)
             factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.liverail.AdProxyPluginInfo()));
-        else if (playerInit.adMode == PlayerConstants.C5_AD_MODE)
+        if (adMode == AdMetadata.AUDITUDE_AD_TYPE)
             factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.auditude.AdProxyPluginInfo()));
-
         factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
         factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
 

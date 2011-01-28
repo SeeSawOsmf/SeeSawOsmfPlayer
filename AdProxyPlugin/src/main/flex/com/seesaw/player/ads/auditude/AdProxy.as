@@ -200,12 +200,12 @@ public class AdProxy extends ProxyElement {
 
     private function onBreakBegin(event:AdPluginEvent):void {
         logger.debug("AD BREAK BEGIN");
-        adMetadata.adState = AdState.STARTED;
+        adMetadata.adState = AdState.AD_BREAK_START;
     }
 
     private function onBreakEnd(event:AdPluginEvent):void {
         logger.debug("AD BREAK END");
-        adMetadata.adState = AdState.STOPPED;
+        adMetadata.adState = AdState.AD_BREAK_COMPLETE;
     }
 
     private function onLinearAdBegin(event:LinearAdEvent):void {

@@ -22,7 +22,6 @@
 package org.osmf.smil.media
 {
 import org.osmf.elements.CompositeElement;
-import org.osmf.elements.DurationElement;
 import org.osmf.elements.ParallelElement;
 import org.osmf.elements.ProxyElement;
 import org.osmf.elements.SerialElement;

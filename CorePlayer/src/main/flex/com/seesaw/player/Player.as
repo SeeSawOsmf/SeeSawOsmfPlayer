@@ -22,12 +22,11 @@
 
 package com.seesaw.player {
 import com.auditude.ads.osmf.constants.AuditudeOSMFConstants;
-
+import com.seesaw.player.ads.AdMetadata;
+import com.seesaw.player.ads.AuditudeConstants;
 import com.seesaw.player.ads.LiverailConstants;
 import com.seesaw.player.autoresume.AutoResumeConstants;
-import com.seesaw.player.ads.AuditudeConstants;
 import com.seesaw.player.buttons.PlayStartButton;
-import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.external.PlayerExternalInterface;
 import com.seesaw.player.external.PlayerExternalInterfaceImpl;
 import com.seesaw.player.impl.services.ResumeServiceImpl;
@@ -109,8 +108,9 @@ public class Player extends Sprite {
 
         // If no flashVar, use a default for testing
         // TODO: remove this altogether
-        loaderParams.playerInitUrl = "http://localhost:8080/player/initinfo/2"; // loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player/initinfo/13602";
-        
+        loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://localhost/player/initinfo/29053";
+        /// loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player/initinfo/13602";
+
         stage.scaleMode = StageScaleMode.NO_SCALE;
         stage.align = StageAlign.TOP_LEFT;
 
@@ -211,7 +211,7 @@ public class Player extends Sprite {
     }
 
     private function showOverUsePanel(errorType:String):void {
-        
+
         //over use panel checks if the error is "NO_ADS", if it is it show no ads messaging, otherwise it shows pack messaging.
         //var errorType:String = "NO_ADS";
         var overUsePanel = new OverUsePanel(errorType, playerInit.parentalControls.termsAndConditionsLinkURL);
@@ -292,7 +292,7 @@ public class Player extends Sprite {
     }
 
     private function setPlaylist(asx:String):void {
-        if (playerInit.adMode != PlayerConstants.C4_AD_MODE) return; //we don't care
+        if (playerInit.adMode != AdMetadata.CHANNEL_4_AD_TYPE) return; //we don't care
 
         logger.info("Retreived ASX data from C4");
         logger.info(asx);
@@ -328,7 +328,8 @@ public class Player extends Sprite {
         playerInit = xmlDoc;
         setupExternalInterface();
 
-        if (playerInit.adMode != "channel4") {
+        ///adModulePlayableEvaluation
+        if (playerInit.adMode != AdMetadata.CHANNEL_4_AD_TYPE) {
             resetInitialisationStages();
             nextInitialisationStage();
         }
@@ -338,7 +339,7 @@ public class Player extends Sprite {
         logger.debug("requesting programme data: " + videoInfoUrl);
         var request:ServiceRequest = new ServiceRequest(videoInfoUrl, onSuccessFromVideoInfo, onFailFromVideoInfo);
         // For C4 ads we POST the ASX we receive from the ad script. For liverail and auditude, there's no need
-        if (playerInit.adMode != PlayerConstants.C4_AD_MODE) {
+        if (playerInit.adMode != AdMetadata.CHANNEL_4_AD_TYPE) {
             request.submit();
         } else {
             var post_data:URLVariables = new URLVariables();
@@ -354,6 +355,8 @@ public class Player extends Sprite {
         xmlDoc.ignoreWhitespace = true;
 
         videoInfo = xmlDoc;
+        /// we need to evaluate if ads are not required for SVOD, TVOD and NO_ADS and adjust the adMode which is then persisted as metaData
+        playerInit.adMode[0] = adModulePlayableEvaluation();
 
         if (videoInfo.geoblocked == "true") {
             return;
@@ -391,25 +394,25 @@ public class Player extends Sprite {
         //var config:PlayerConfiguration = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, content);
         config = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, content);
         videoPlayer = new SeeSawPlayer(config);
-        videoPlayer.addEventListener(PlayerConstants.DESTROY,reBuildPlayer);
+        videoPlayer.addEventListener(PlayerConstants.DESTROY, reBuildPlayer);
         // Since we have autoPlay to false for liverail, we need to manually call play for C4:
-        if (playerInit.adMode != "liverail") {
+        if (playerInit.adMode != AdMetadata.LR_AD_TYPE) {
             videoPlayer.mediaPlayer().autoPlay = true;
-            if (playerInit.adMode == "auditude") {
-              var metadata:Metadata = content.getMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) as Metadata;
-              metadata.addValue(AuditudeOSMFConstants.PLAYER_INSTANCE, videoPlayer.mediaPlayer());
+            if (playerInit.adMode == AdMetadata.AUDITUDE_AD_TYPE) {
+                var metadata:Metadata = content.getMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) as Metadata;
+                metadata.addValue(AuditudeOSMFConstants.PLAYER_INSTANCE, videoPlayer.mediaPlayer());
             }
         }
 
         removePosterFrame();
-        
+
         addChild(videoPlayer);
 
         videoPlayer.init();
     }
 
     private function reBuildPlayer(event:Event):void {
-       onAddedToStage(event);
+        onAddedToStage(event);
     }
 
     private function createMediaResource(videoInfo:XML):MediaResourceBase {
@@ -515,6 +518,20 @@ public class Player extends Sprite {
             removeChild(preloader);
             preloader = null;
         }
+    }
+
+    private function adModulePlayableEvaluation():String {
+        var playableType:String;
+        var noAdsPlayable:String = videoInfo.noAdsPlayable;
+        var svodPlayable:String = videoInfo.svodPlayable;
+        var tvodPlayable:String = videoInfo.tvodPlayable;
+
+        if (noAdsPlayable == "true" || svodPlayable == "true" || tvodPlayable == "true") {
+            playableType = "none"
+        } else {
+            playableType = playerInit.adMode;
+        }
+        return playableType;
     }
 
     public function get videoPlayer():SeeSawPlayer {

@@ -66,7 +66,7 @@ public class AdTrait extends MediaTraitBase {
     }
 
     public function set playState(value:String):void {
-        if (value != _playState && _adState == AdState.STARTED) {
+        if (value != _playState && _adState == AdState.AD_BREAK_START) {
             _playState = value;
             dispatchEvent(new AdEvent(AdEvent.PLAY_PAUSE_CHANGE, false, false, _playState));
         }
@@ -74,7 +74,7 @@ public class AdTrait extends MediaTraitBase {
 
     public function started():void {
         // _playState = AdState.PLAYING;
-        adState = AdState.STARTED;
+        adState = AdState.AD_BREAK_START;
     }
 
     public function createMarkers(object:Array):void {

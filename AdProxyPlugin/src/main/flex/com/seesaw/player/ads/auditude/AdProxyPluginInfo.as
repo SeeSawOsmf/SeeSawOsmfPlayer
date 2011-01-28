@@ -23,7 +23,6 @@
 package com.seesaw.player.ads.auditude {
 import com.auditude.ads.osmf.constants.AuditudeOSMFConstants;
 
-import com.seesaw.player.ads.AuditudeConstants;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.media.MediaElement;
@@ -31,7 +30,6 @@ import org.osmf.media.MediaFactoryItem;
 import org.osmf.media.MediaFactoryItemType;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfo;
-
 
 public class AdProxyPluginInfo extends PluginInfo {
 

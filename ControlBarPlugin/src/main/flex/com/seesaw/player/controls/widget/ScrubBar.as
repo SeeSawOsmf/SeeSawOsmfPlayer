@@ -248,7 +248,7 @@ public class ScrubBar extends Widget implements IWidget {
     }
 
     private function onAdStateMetadataChanged(event:MetadataEvent):void {
-        if (event.key == AdMetadata.AD_STATE && event.value == AdState.STOPPED) {
+        if (event.key == AdMetadata.AD_STATE && event.value == AdState.AD_BREAK_COMPLETE) {
             logger.debug("ad markers changed");
             createAdMarkers();
         }
