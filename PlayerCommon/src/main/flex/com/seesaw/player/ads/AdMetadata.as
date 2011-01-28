@@ -30,15 +30,16 @@ public class AdMetadata extends Metadata {
     public static const AD_BREAKS:String = "adBreaks";
     public static const CLICK_THRU:String = "clickThru";
     public static const LR_AD_TYPE:String = "liverail";
+    public static const SECTION_COUNT:String = "sectionCount";
     public static const AUDITUDE_AD_TYPE:String = "auditude";
     public static const CHANNEL_4_AD_TYPE:String = "channel4";
     public static const NONE_AD_TYPE:String = "none";
 
-    public function get adState():String {
+    public function get adState():* {
         return getValue(AdMetadata.AD_STATE);
     }
 
-    public function set adState(adState:String):void {
+    public function set adState(adState:*):void {
         addValue(AdMetadata.AD_STATE, adState);
     }
 
