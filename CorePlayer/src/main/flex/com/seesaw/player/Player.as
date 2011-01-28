@@ -109,7 +109,7 @@ public class Player extends Sprite {
 
         // If no flashVar, use a default for testing
         // TODO: remove this altogether
-        loaderParams.playerInitUrl = "http://localhost:8080/player/initinfo/13602"; // loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player/initinfo/13602";
+        loaderParams.playerInitUrl = "http://localhost:8080/player/initinfo/1"; // loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player/initinfo/13602";
         
         stage.scaleMode = StageScaleMode.NO_SCALE;
         stage.align = StageAlign.TOP_LEFT;

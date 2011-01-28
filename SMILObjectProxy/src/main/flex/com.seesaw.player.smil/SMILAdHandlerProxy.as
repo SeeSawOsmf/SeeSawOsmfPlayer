@@ -30,31 +30,22 @@
 package com.seesaw.player.smil {
 import org.osmf.elements.ProxyElement;
 import org.osmf.media.MediaElement;
-import org.osmf.net.ModifiableTimeTrait;
 import org.osmf.traits.MediaTraitType;
 
 public class SMILAdHandlerProxy extends ProxyElement {
 
-    private var timeTrait:ModifiableTimeTrait;
-
     public function SMILAdHandlerProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
-        setTraitsToBlock(MediaTraitType.TIME, MediaTraitType.SEEK);
+        var traitsToBlock:Vector.<String> = new Vector.<String>();
+        traitsToBlock[0] = MediaTraitType.TIME;
+        traitsToBlock[0] = MediaTraitType.SEEK;
+        blockedTraits = traitsToBlock;
     }
 
     override public function set proxiedElement(value:MediaElement):void {
         if (value) {
             super.proxiedElement = value;
         }
-    }
-
-
-    private function setTraitsToBlock(...traitTypes):void {
-        var traitsToBlock:Vector.<String> = new Vector.<String>();
-        for (var i:int = 0; i < traitTypes.length; i++) {
-            traitsToBlock[i] = traitTypes[i];
-        }
-        blockedTraits = traitsToBlock;
     }
 }
 }

@@ -35,6 +35,7 @@ import com.seesaw.player.external.ExternalInterfaceMetadata;
 import com.seesaw.player.external.PlayerExternalInterface;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.namespaces.contentinfo;
+import com.seesaw.player.namespaces.smil;
 import com.seesaw.player.netstatus.NetStatusMetadata;
 import com.seesaw.player.panels.BufferingPanel;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
@@ -266,8 +267,11 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function createSubtitleElement():void {
-        if (videoInfo.subtitleLocation) {
-            logger.debug("creating captions: " + videoInfo.subtitleLocation);
+        // The subtitle location is actually in the smil document so we have to search for it
+        var subtitleLocation:String = getSmilHeadMetaValue(PlayerConstants.SUBTITLE_LOCATION);
+
+        if (subtitleLocation) {
+            logger.debug("creating captions: " + subtitleLocation);
 
             var targetMetadata:Metadata = new Metadata();
             targetMetadata.addValue(PlayerConstants.CONTENT_ID, PlayerConstants.MAIN_CONTENT_ID);
@@ -276,7 +280,7 @@ public class SeeSawPlayer extends Sprite {
             logger.debug("loading subtitle plugin");
             factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
 
-            subtitleElement = factory.createMediaElement(new URLResource(videoInfo.subtitleLocation));
+            subtitleElement = factory.createMediaElement(new URLResource(subtitleLocation));
 
             var layout:LayoutMetadata = new LayoutMetadata();
             subtitleElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
@@ -536,6 +540,18 @@ public class SeeSawPlayer extends Sprite {
 
     public function mediaPlayer():MediaPlayer {
         return player;
+    }
+
+    private function getSmilHeadMetaValue(key:String):String {
+        use namespace smil;
+        var value:String = null;
+        for each (var meta:XML in videoInfo.smil.head..meta) {
+            if (meta.@name == key) {
+                value = meta.@content;
+                break;
+            }
+        }
+        return value;
     }
 }
 }
