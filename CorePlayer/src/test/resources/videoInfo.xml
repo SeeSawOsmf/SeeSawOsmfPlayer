@@ -46,11 +46,11 @@
     <geoblocked>false</geoblocked>
     <serverTimestamp>1295949842789</serverTimestamp>
     <anonymousUserId>231266723204534</anonymousUserId>
-    <transactionItemId>38281717777</transactionItemId>
+    <transactionItemId>38281717</transactionItemId>
     <availabilityType>AVOD</availabilityType>
     <noAdsPlayable>false</noAdsPlayable>
     <tvodPlayable>false</tvodPlayable>
     <svodPlayable>false</svodPlayable>
     <exceededDrmRule>false</exceededDrmRule>
-    <sectionCount>2</sectionCount>
+    <sectionCount>1</sectionCount>
 </videoInfo>
