@@ -38,8 +38,8 @@ import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.netstatus.NetStatusMetadata;
 import com.seesaw.player.panels.BufferingPanel;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
-import com.seesaw.player.smil.SeeSawSMILLoader;
 import com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo;
+import com.seesaw.player.smil.SeeSawSMILLoader;
 
 import flash.display.Sprite;
 import flash.display.StageDisplayState;
@@ -74,8 +74,6 @@ import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.TimeTrait;
-
-import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
 
 public class SeeSawPlayer extends Sprite {
 
@@ -240,8 +238,9 @@ public class SeeSawPlayer extends Sprite {
 
         factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
         factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadFailed);
+
         factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo(new SeeSawSMILLoader())));
-        factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
+        // factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         // factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.liverail.AdProxyPluginInfo()));
@@ -266,27 +265,31 @@ public class SeeSawPlayer extends Sprite {
         (event.buffering) ? bufferingPanel.show() : bufferingPanel.hide();
     }
 
-    private function createSubtitleElement(captionUrl:String, targetElement:MediaElement):void {
-        logger.debug("creating captions: " + captionUrl);
+    private function createSubtitleElement():void {
+        if (videoInfo.subtitleLocation) {
+            logger.debug("creating captions: " + videoInfo.subtitleLocation);
 
-        var targetMetadata:Metadata = new Metadata();
-        targetMetadata.addValue(PlayerConstants.CONTENT_ID, PlayerConstants.MAIN_CONTENT_ID);
-        targetElement.addMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT, targetMetadata);
+            var targetMetadata:Metadata = new Metadata();
+            targetMetadata.addValue(PlayerConstants.CONTENT_ID, PlayerConstants.MAIN_CONTENT_ID);
+            contentElement.addMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT, targetMetadata);
 
-        factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
-        subtitleElement = factory.createMediaElement(new URLResource(captionUrl));
+            logger.debug("loading subtitle plugin");
+            factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
 
-        var layout:LayoutMetadata = new LayoutMetadata();
-        subtitleElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+            subtitleElement = factory.createMediaElement(new URLResource(videoInfo.subtitleLocation));
 
-        layout.percentWidth = 100;
-        layout.height = 50;
-        layout.bottom = 100;
-        layout.horizontalAlign = HorizontalAlign.CENTER;
-        layout.verticalAlign = VerticalAlign.BOTTOM;
-        layout.index = 10;
+            var layout:LayoutMetadata = new LayoutMetadata();
+            subtitleElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
 
-        mainElement.addChild(subtitleElement);
+            layout.percentWidth = 100;
+            layout.height = 50;
+            layout.bottom = 100;
+            layout.horizontalAlign = HorizontalAlign.CENTER;
+            layout.verticalAlign = VerticalAlign.BOTTOM;
+            layout.index = 10;
+
+            mainElement.addChild(subtitleElement);
+        }
     }
 
     private function createVideoElement():void {
@@ -301,6 +304,7 @@ public class SeeSawPlayer extends Sprite {
 
         createBufferingPanel();
         createControlBarElement();
+        createSubtitleElement();
 
         if (contentElement is IAuditudeMediaElement) {
             var _auditude:AuditudePlugin = IAuditudeMediaElement(contentElement).plugin;
@@ -501,14 +505,6 @@ public class SeeSawPlayer extends Sprite {
                 layout.index = 5;
                 break;
             case PlayerConstants.MAIN_CONTENT_ID:
-                // Tell the subtitle plugin to target this element and make sure it only does this once
-                var subtitleLocation:String = smilMetadata.getValue(PlayerConstants.SUBTITLE_LOCATION);
-                if (subtitleLocation && !subtitleElement) {
-                    var subtitleMetadata:Metadata = new Metadata();
-                    subtitleMetadata.addValue(SAMIPluginInfo.METADATA_KEY_URI, subtitleLocation);
-                    element.resource.addMetadataValue(SAMIPluginInfo.METADATA_NAMESPACE, subtitleMetadata);
-                    createSubtitleElement(subtitleLocation, element);
-                }
             case PlayerConstants.STING_CONTENT_ID:
             case PlayerConstants.AD_CONTENT_ID:
                 // This layout applies to main content, stings and ads (notice there is no break above - this is
