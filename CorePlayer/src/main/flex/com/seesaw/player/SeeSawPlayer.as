@@ -247,9 +247,9 @@ public class SeeSawPlayer extends Sprite {
         // factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
 
-        if(playerInit.adMode == PlayerConstants.LIVERAIL_AD_MODE)
+        if (playerInit.adMode == PlayerConstants.LIVERAIL_AD_MODE)
             factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.liverail.AdProxyPluginInfo()));
-        else if(playerInit.adMode == PlayerConstants.C5_AD_MODE)
+        else if (playerInit.adMode == PlayerConstants.C5_AD_MODE)
             factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.auditude.AdProxyPluginInfo()));
 
         factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
@@ -297,6 +297,19 @@ public class SeeSawPlayer extends Sprite {
             layout.horizontalAlign = HorizontalAlign.CENTER;
             layout.verticalAlign = VerticalAlign.BOTTOM;
             layout.index = 10;
+
+            // The subtitle element needs to check and set visibility every time it sets a new display object
+            subtitleElement.addEventListener(MediaElementEvent.TRAIT_ADD, function(event:MediaElementEvent) {
+                if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
+                    var metadata:Metadata = contentElement.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+                    if (metadata) {
+                        var visible:Boolean = metadata.getValue(ControlBarMetadata.SUBTITLES_VISIBLE) as Boolean;
+                        var displayObjectTrait:DisplayObjectTrait =
+                                subtitleElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
+                        displayObjectTrait.displayObject.visible = visible == null ? false : visible;
+                    }
+                }
+            });
 
             mainElement.addChild(subtitleElement);
         }
@@ -550,6 +563,7 @@ public class SeeSawPlayer extends Sprite {
 
     private function getSmilHeadMetaValue(key:String):String {
         use namespace smil;
+
         var value:String = null;
         for each (var meta:XML in videoInfo.smil.head..meta) {
             if (meta.@name == key) {
