@@ -109,7 +109,7 @@ public class Player extends Sprite {
 
         // If no flashVar, use a default for testing
         // TODO: remove this altogether
-        loaderParams.playerInitUrl = "http://localhost:8080/player/initinfo/1"; // loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player/initinfo/13602";
+        loaderParams.playerInitUrl = "http://localhost:8080/player/initinfo/2"; // loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player/initinfo/13602";
         
         stage.scaleMode = StageScaleMode.NO_SCALE;
         stage.align = StageAlign.TOP_LEFT;
@@ -292,7 +292,7 @@ public class Player extends Sprite {
     }
 
     private function setPlaylist(asx:String):void {
-        if (playerInit.adMode != "channel4") return; //we don't care
+        if (playerInit.adMode != PlayerConstants.C4_AD_MODE) return; //we don't care
 
         logger.info("Retreived ASX data from C4");
         logger.info(asx);
@@ -338,7 +338,7 @@ public class Player extends Sprite {
         logger.debug("requesting programme data: " + videoInfoUrl);
         var request:ServiceRequest = new ServiceRequest(videoInfoUrl, onSuccessFromVideoInfo, onFailFromVideoInfo);
         // For C4 ads we POST the ASX we receive from the ad script. For liverail and auditude, there's no need
-        if (playerInit.adMode != "channel4") {
+        if (playerInit.adMode != PlayerConstants.C4_AD_MODE) {
             request.submit();
         } else {
             var post_data:URLVariables = new URLVariables();

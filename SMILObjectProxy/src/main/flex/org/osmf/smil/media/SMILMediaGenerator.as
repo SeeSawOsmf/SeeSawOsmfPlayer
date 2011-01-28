@@ -27,6 +27,7 @@ import org.osmf.elements.ParallelElement;
 import org.osmf.elements.ProxyElement;
 import org.osmf.elements.SerialElement;
 import org.osmf.elements.VideoElement;
+import org.osmf.events.MediaErrorEvent;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.events.SerialElementEvent;
 import org.osmf.media.MediaElement;
@@ -108,7 +109,8 @@ CONFIG::LOGGING
 				case SMILElementType.SEQUENCE:
 					var serialElement:SerialElement = new SerialElement();
                     serialElement.addEventListener(SerialElementEvent.CURRENT_CHILD_CHANGE, function(event:SerialElementEvent) {
-                        var index:int = serialElement.getChildIndex(serialElement.currentChild) - 1;
+                        var serialElement:SerialElement = event.currentTarget as SerialElement;
+                        var index:int = serialElement.getChildIndex(event.currentChild) - 1;
                         if(index >= 0) {
                             var childElem:MediaElement = serialElement.getChildAt(index);
                             var metadata:Metadata = childElem.getMetadata(SMILConstants.SMIL_METADATA_NS);
@@ -205,7 +207,7 @@ CONFIG::LOGGING
                 var defaultDuration:Number = switchVideoElement ? switchVideoElement.duration : NaN;
                 var onCreate:Function = function(event:MediaFactoryEvent)
                 {
-                    setVideoDuration(defaultDuration, event.mediaElement);
+                   setVideoDuration(defaultDuration, event.mediaElement);
                 }
 
                 factory.addEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onCreate);
@@ -313,7 +315,7 @@ CONFIG::LOGGING
 				{
 					case SMILElementType.META:
 						hostURL = (smilElement as SMILMetaElement).base;
-						if (hostURL != null)
+						if (hostURL)
 						{
 							dsr = createDynamicStreamingItems(switchElement, hostURL);
 						}

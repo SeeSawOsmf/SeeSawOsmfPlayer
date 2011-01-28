@@ -41,6 +41,9 @@ public class PlayerConstants {
     public static const PROCEED_BUTTON_NAME = "PlayerStartButton.proceedButton";
     public static const GUIDANCE_PANEL_ACCEPT_BUTTON_NAME:String = "GuidancePanel.acceptButton" ;
     public static const GUIDANCE_PANEL_CANCEL_BUTTON_NAME:String = "GuidancePanel.cancelButton" ;
-}
 
+    public static const LIVERAIL_AD_MODE:String = "liverail";
+    public static const C4_AD_MODE:String = "channel4";
+    public static const C5_AD_MODE:String = "channel5";
+}
 }
