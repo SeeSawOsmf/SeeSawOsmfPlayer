@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:videoInfo xmlns:ns2="http://www.seesaw.com/api/contentinfo/v1.0" xmlns="http://www.w3.org/ns/SMIL">
+<videoInfo xmlns:ns2="http://www.seesaw.com/api/contentinfo/v1.0" xmlns="http://www.w3.org/ns/SMIL">
     <smil>
         <head>
             <meta base="rtmpe://cdn-flash-blue-dev.vodco.co.uk/a2703"/>
+            <meta content="http://kgd-blue-test-zxtm01.dev.vodco.co.uk/s/ccp/00000002/298.smi"
+                      name="subtitleLocation"/>
         </head>
         <body>
             <seq>
-                <video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/eng-izor002-020-SD.mp4" clipEnd="3"
-                       clipBegin="0">
+                <video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/eng-izor002-020-SD.mp4">
                     <metadata>
                         <meta content="advert" name="contentType"/>
                         <meta content="http://seesaw.stage.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/channel4/tv/comedy/alternative/35925/35925/001/L64/11583353263/x12/4OD/UNIVERSAL_MUSIC_011111_13647_2/2701060/553249624b3079475550554142667248"
