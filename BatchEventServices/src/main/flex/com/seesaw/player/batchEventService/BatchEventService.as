@@ -100,16 +100,16 @@ public class BatchEventService extends ProxyElement {
     private var adUrlResource:String;
     private var oldUserEventId:int = 0;
 
-    public function BatchEventService(proxiedElement:MediaElement = null) {
-        var provider:ObjectProvider = ObjectProvider.getInstance();
-        resumeService = provider.getObject(ResumeService);
-        if (resumeService == null) {
-            throw ArgumentError("no resume service implementation provided");
-        }
-        if (ExternalInterface.available) {
-            ExternalInterface.addCallback("exitPlayerWindow", exitEvent);  // fire the exit event hooked into the widow.onUnLoad we currently use...
-        }
-    }
+       public function BatchEventService(proxiedElement:MediaElement = null) {
+           var provider:ObjectProvider = ObjectProvider.getInstance();
+           resumeService = provider.getObject(ResumeService);
+           if (resumeService == null) {
+               throw ArgumentError("no resume service implementation provided");
+           }
+           if (ExternalInterface.available) {
+               ExternalInterface.addCallback("exitPlayerWindow", exitEvent);  // fire the exit event hooked into the widow.onUnLoad we currently use...
+           }
+       }
 
     public override function set proxiedElement(proxiedElement:MediaElement):void {
         if (proxiedElement) {
@@ -161,7 +161,7 @@ public class BatchEventService extends ProxyElement {
                 } else {
                     userEvent = buildAndReturnUserEvent(UserEventTypes.AUTO_RESUME);
                 }
-                if (adMode != AdMetadata.LR_AD_TYPE || adMode != AdMetadata.AUDITUDE_AD_TYPE) {
+                if (adMode != AdMetadata.LR_AD_TYPE && adMode != AdMetadata.AUDITUDE_AD_TYPE) {
                     viewEvent = new ViewEvent(transactionItemId, serverTimeStamp, sectionCount, mainAssetId, userId, anonymousUserId);
                     eventsManager = new EventsManagerImpl(viewEvent, availabilityType, batchEventURL, cumulativeDurationURL);
                     eventsManager.addUserEvent(userEvent);
@@ -188,7 +188,7 @@ public class BatchEventService extends ProxyElement {
         var newSectionCount:int;
             /// SMILResource should only have one asset in the event of liverail or auditude and we ALWAYS presume there is a preRoll
             // ELSE this rule will fail..
-             if(value && sectionCount == 1){
+             if(value == 1 && sectionCount == 1){
                 newSectionCount =  value + sectionCount;
              }else{
                newSectionCount = value*2;

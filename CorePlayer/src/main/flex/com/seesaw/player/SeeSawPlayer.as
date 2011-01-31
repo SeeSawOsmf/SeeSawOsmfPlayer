@@ -22,6 +22,7 @@
 
 package com.seesaw.player {
 import com.auditude.ads.AuditudePlugin;
+import com.auditude.ads.event.AdPluginEvent;
 import com.auditude.ads.osmf.IAuditudeMediaElement;
 import com.auditude.ads.osmf.constants.AuditudeOSMFConstants;
 import com.seesaw.player.ads.AdMetadata;
@@ -111,6 +112,7 @@ public class SeeSawPlayer extends Sprite {
     private var playerInit:XML;
     private var videoInfo:XML;
     private var adMode:String;
+    private var _auditude:AuditudePlugin;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
@@ -232,11 +234,15 @@ public class SeeSawPlayer extends Sprite {
 
     private function onPluginLoaded(event:MediaFactoryEvent):void {
         logger.debug("Loaded plugin " + event.resource);
-
+         factory.addEventListener(AdPluginEvent.INIT_COMPLETE, onAudLoadComplete);
         if (--pluginsToLoad <= 0) {
             logger.debug("All plugins loaded");
             loadPlugins();
         }
+    }
+
+    private function onAudLoadComplete(event:AdPluginEvent):void {
+       logger.debug("Auditude has loaded");
     }
 
     private function loadPlugins():void {
@@ -331,8 +337,7 @@ public class SeeSawPlayer extends Sprite {
         createSubtitleElement();
 
         if (contentElement is IAuditudeMediaElement) {
-            var _auditude:AuditudePlugin = IAuditudeMediaElement(contentElement).plugin;
-
+            _auditude = IAuditudeMediaElement(contentElement).plugin;
             // We set this in the metadata so the auditude AdProxy can pick up the plugin
             var metadata:Metadata = config.resource.getMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) as Metadata;
             metadata.addValue(AuditudeConstants.PLUGIN_INSTANCE, _auditude);
@@ -342,6 +347,7 @@ public class SeeSawPlayer extends Sprite {
 
         mainElement.addChild(contentElement);
     }
+
 
     private function createControlBarElement():void {
         logger.debug("adding control bar media element to container");
