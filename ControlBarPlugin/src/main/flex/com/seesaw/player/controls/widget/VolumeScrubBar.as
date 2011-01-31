@@ -189,7 +189,7 @@ public class VolumeScrubBar extends Widget implements IWidget {
 
         audible.volume = Math.min(percentage, percentage);
 
-        this.volumeDisplay = Math.round(audible.volume * 10);
+        this.volumeDisplay = Math.round(audible.volume * 12);
 
     }
 
