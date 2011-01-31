@@ -28,6 +28,7 @@ import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.ads.AuditudeConstants;
 import com.seesaw.player.ads.auditude.AdProxyPluginInfo;
 import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
+import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.batchEventService.BatchEventServicePlugin;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.controls.ControlBarMetadata;
@@ -247,9 +248,9 @@ public class SeeSawPlayer extends Sprite {
         factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
         factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadFailed);
 
+        factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo(new SeeSawSMILLoader())));
         factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
-        // factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
         if (adMode == AdMetadata.LR_AD_TYPE)
             factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.liverail.AdProxyPluginInfo()));
@@ -508,15 +509,18 @@ public class SeeSawPlayer extends Sprite {
     private function onMediaElementCreate(event:MediaFactoryEvent):void {
         var mediaElement:MediaElement = event.mediaElement;
 
-        mediaElement.addEventListener(MediaElementEvent.METADATA_ADD, function(mediaElementEvent:MediaElementEvent):void {
-            if (mediaElementEvent.namespaceURL == SMILConstants.SMIL_METADATA_NS) {
-                configureSmilElement(mediaElement);
-            }
-        });
+        var metadata:Metadata = mediaElement.resource.getMetadataValue(SMILConstants.SMIL_CONTENT_NS) as Metadata;
+        if(metadata) {
+            mediaElement.metadata.addEventListener(MetadataEvent.VALUE_ADD, function(event:MetadataEvent) {
+                if(event.key == SMILConstants.SMIL_CONTENT_NS) {
+                    configureSmilElement(mediaElement);
+                }
+            });
+        }
     }
 
     private function configureSmilElement(element:MediaElement):void {
-        var smilMetadata:Metadata = element.getMetadata(SMILConstants.SMIL_METADATA_NS) as Metadata;
+        var smilMetadata:Metadata = element.getMetadata(SMILConstants.SMIL_CONTENT_NS) as Metadata;
 
         if (smilMetadata == null) {
             return;
@@ -524,6 +528,8 @@ public class SeeSawPlayer extends Sprite {
 
         var contentType:String = smilMetadata.getValue(PlayerConstants.CONTENT_TYPE);
         var layout:LayoutMetadata = new LayoutMetadata();
+
+        logger.debug("setting layout for: " + contentType);
 
         switch (contentType) {
             case PlayerConstants.DOG_CONTENT_ID:

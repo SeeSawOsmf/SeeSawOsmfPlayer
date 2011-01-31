@@ -21,6 +21,8 @@
  */
 
 package com.seesaw.player.autoresume {
+import com.seesaw.player.PlayerConstants;
+
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.media.MediaElement;
@@ -28,6 +30,8 @@ import org.osmf.media.MediaFactoryItem;
 import org.osmf.media.MediaFactoryItemType;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfo;
+import org.osmf.metadata.Metadata;
+import org.osmf.smil.SMILConstants;
 
 public class AutoResumeProxyPluginInfo extends PluginInfo {
 
@@ -49,8 +53,8 @@ public class AutoResumeProxyPluginInfo extends PluginInfo {
     }
 
     private static function canHandleResourceFunction(resource:MediaResourceBase):Boolean {
-        logger.debug("can handle this resource: " + resource);
-        return resource && resource.getMetadataValue(AutoResumeConstants.SETTINGS_NAMESPACE) != null;
+        var metadata:Metadata = resource.getMetadataValue(SMILConstants.SMIL_CONTENT_NS) as Metadata;
+        return metadata != null && metadata.getValue(PlayerConstants.CONTENT_TYPE) == PlayerConstants.MAIN_CONTENT_ID;
     }
 
     private static function mediaElementCreationFunction():MediaElement {

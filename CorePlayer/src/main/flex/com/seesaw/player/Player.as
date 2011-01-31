@@ -482,7 +482,7 @@ public class Player extends Sprite {
         logger.debug("failed to retrieve programme data");
 
         // TODO: request a test file but this should be removed eventually
-        var request:ServiceRequest = new ServiceRequest("../src/test/resources/videoInfo.xml", onSuccessFromVideoInfo, null);
+        var request:ServiceRequest = new ServiceRequest("../src/test/resources/videoInfo.c4ad.xml", onSuccessFromVideoInfo, null);
         request.submit();
     }
 

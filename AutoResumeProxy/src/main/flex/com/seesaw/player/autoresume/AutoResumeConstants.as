@@ -22,6 +22,6 @@
 
 package com.seesaw.player.autoresume {
 public class AutoResumeConstants {
-    public static const SETTINGS_NAMESPACE:String = "http://www.seesaw.com/player/plugins/liverail/settings";
+    public static const SETTINGS_NAMESPACE:String = "http://www.seesaw.com/player/plugins/autoresume";
 }
 }
