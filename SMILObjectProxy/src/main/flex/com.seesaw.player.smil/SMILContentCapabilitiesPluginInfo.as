@@ -43,8 +43,12 @@ public class SMILContentCapabilitiesPluginInfo extends PluginInfo {
     public function SMILContentCapabilitiesPluginInfo() {
         var items:Vector.<MediaFactoryItem> = new Vector.<MediaFactoryItem>();
 
-        var item:MediaFactoryItem = new MediaFactoryItem("com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo",
-                canHandleAdContent, createSMILAdHandlerProxy, MediaFactoryItemType.PROXY);
+        var item:MediaFactoryItem = new MediaFactoryItem("com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo.AdHandlerProxy",
+                canHandleAdContent, createAdHandlerProxy, MediaFactoryItemType.PROXY);
+        items.push(item);
+
+        item = new MediaFactoryItem("com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo.StingHandlerProxy",
+                canHandleStingContent, createStingHandlerProxy, MediaFactoryItemType.PROXY);
         items.push(item);
 
         super(items);
@@ -52,12 +56,20 @@ public class SMILContentCapabilitiesPluginInfo extends PluginInfo {
 
     private function canHandleAdContent(resource:MediaResourceBase):Boolean {
         var metadata:Metadata = resource.getMetadataValue(SMILConstants.SMIL_CONTENT_NS) as Metadata;
-        return metadata != null && (metadata.getValue(PlayerConstants.CONTENT_TYPE) == PlayerConstants.AD_CONTENT_ID
-                || metadata.getValue(PlayerConstants.CONTENT_TYPE) == PlayerConstants.STING_CONTENT_ID);
+        return metadata != null && metadata.getValue(PlayerConstants.CONTENT_TYPE) == PlayerConstants.AD_CONTENT_ID;
     }
 
-    private function createSMILAdHandlerProxy():MediaElement {
-        return new SMILAdHandlerProxy();
+    private function canHandleStingContent(resource:MediaResourceBase):Boolean {
+        var metadata:Metadata = resource.getMetadataValue(SMILConstants.SMIL_CONTENT_NS) as Metadata;
+        return metadata != null && metadata.getValue(PlayerConstants.CONTENT_TYPE) == PlayerConstants.STING_CONTENT_ID;
+    }
+
+    private function createAdHandlerProxy():MediaElement {
+        return new AdHandlerProxy();
+    }
+
+    private function createStingHandlerProxy():MediaElement {
+        return new StingHandlerProxy();
     }
 }
 }
