@@ -142,6 +142,7 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
     private function onAddedToStage(event:Event) {
         stage.addChild(this.toolTip);
         if (ExternalInterface.available) {
+            this.setupExternalInterface();
             this.visible = true;
         }
     }
