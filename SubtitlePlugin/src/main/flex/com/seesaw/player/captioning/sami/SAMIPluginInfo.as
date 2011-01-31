@@ -37,8 +37,6 @@ import org.osmf.utils.URL;
 
 public class SAMIPluginInfo extends PluginInfo {
 
-    public static const METADATA_NAMESPACE:String = "http://www.seesaw.com/sami/1.0";
-    public static const METADATA_KEY_URI:String = "uri";
     public static const NS_TARGET_ELEMENT:String = "http://www.seesaw.com/sami/1.0/target";
 
     private static var loggerSetup:* = (LoggerFactory.loggerFactory = new TraceAndArthropodLoggerFactory());
@@ -79,10 +77,12 @@ public class SAMIPluginInfo extends PluginInfo {
         return samiElement;
     }
 
-    private function mediaElementCreationNotificationCallback(target:MediaElement):void {
-        var targetMetadata:Metadata = target.getMetadata(NS_TARGET_ELEMENT);
+    private function mediaElementCreationNotificationCallback(element:MediaElement):void {
+        logger.debug("mediaElementCreationNotificationCallback: " + element);
+
+        var targetMetadata:Metadata = element.getMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT);
         if (targetMetadata) {
-            targetElement = target;
+            targetElement = element;
             updateMediaTarget();
         }
     }

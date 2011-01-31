@@ -28,7 +28,6 @@ import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.ads.AuditudeConstants;
 import com.seesaw.player.ads.auditude.AdProxyPluginInfo;
 import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
-import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.batchEventService.BatchEventServicePlugin;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.controls.ControlBarMetadata;
@@ -37,9 +36,11 @@ import com.seesaw.player.external.ExternalInterfaceMetadata;
 import com.seesaw.player.external.PlayerExternalInterface;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.namespaces.contentinfo;
+import com.seesaw.player.namespaces.smil;
 import com.seesaw.player.netstatus.NetStatusMetadata;
 import com.seesaw.player.panels.BufferingPanel;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
+import com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo;
 import com.seesaw.player.smil.SeeSawSMILLoader;
 
 import flash.display.Sprite;
@@ -101,7 +102,7 @@ public class SeeSawPlayer extends Sprite {
     private var bufferingPanel:BufferingPanel;
 
     private var xi:PlayerExternalInterface;
-    
+
     // This is so we wait on Auditude loading before setting up the rest of the plugins and player
     private var pluginsToLoad:int = 1;
 
@@ -140,8 +141,8 @@ public class SeeSawPlayer extends Sprite {
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
     }
 
-    private function playerMetaChange(event:MetadataEvent):void { 
-        if (event.key == PlayerConstants.DESTROY) { 
+    private function playerMetaChange(event:MetadataEvent):void {
+        if (event.key == PlayerConstants.DESTROY) {
             if (event.value) {
                 // wipe out the objects from memory and off the displayList
                 // removeChild seems to throw errors when trying to removeChild( container ) etc..
@@ -154,7 +155,7 @@ public class SeeSawPlayer extends Sprite {
                 player = null;
                 container = null;
 
-                dispatchEvent(new Event(PlayerConstants.DESTROY)); 
+                dispatchEvent(new Event(PlayerConstants.DESTROY));
             }
         }
     }
@@ -228,12 +229,12 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onPluginLoaded(event:MediaFactoryEvent):void {
-      logger.debug("Loaded plugin " + event.resource);
+        logger.debug("Loaded plugin " + event.resource);
 
-      if (--pluginsToLoad <= 0) {
-          logger.debug("All plugins loaded");
-          loadPlugins();
-      }
+        if (--pluginsToLoad <= 0) {
+            logger.debug("All plugins loaded");
+            loadPlugins();
+        }
     }
 
     private function loadPlugins():void {
@@ -241,21 +242,23 @@ public class SeeSawPlayer extends Sprite {
 
         factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
         factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadFailed);
+
         factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo(new SeeSawSMILLoader())));
         factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
-        factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
+        // factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
-        if(adMode == AdMetadata.LR_AD_TYPE)
-        factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.liverail.AdProxyPluginInfo()));
-        if(adMode == AdMetadata.AUDITUDE_AD_TYPE)
-        factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.auditude.AdProxyPluginInfo()));
+        if (adMode == AdMetadata.LR_AD_TYPE)
+            factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.liverail.AdProxyPluginInfo()));
+        if (adMode == AdMetadata.AUDITUDE_AD_TYPE)
+            factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.auditude.AdProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
-        
+        factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
+
         createVideoElement();
-    }    
+    }
 
     private function onPluginLoadFailed(event:MediaFactoryEvent):void {
-      logger.debug("PROBLEM LOADING " + event.toString());
+        logger.debug("PROBLEM LOADING " + event.toString());
     }
 
     private function createBufferingPanel():void {
@@ -268,27 +271,47 @@ public class SeeSawPlayer extends Sprite {
         (event.buffering) ? bufferingPanel.show() : bufferingPanel.hide();
     }
 
-    private function createSubtitleElement(captionUrl:String, targetElement:MediaElement):void {
-        logger.debug("creating captions: " + captionUrl);
+    private function createSubtitleElement():void {
+        // The subtitle location is actually in the smil document so we have to search for it
+        var subtitleLocation:String = getSmilHeadMetaValue(PlayerConstants.SUBTITLE_LOCATION);
 
-        var targetMetadata:Metadata = new Metadata();
-        targetMetadata.addValue(PlayerConstants.CONTENT_ID, PlayerConstants.MAIN_CONTENT_ID);
-        targetElement.addMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT, targetMetadata);
+        if (subtitleLocation) {
+            logger.debug("creating captions: " + subtitleLocation);
 
-        factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
-        subtitleElement = factory.createMediaElement(new URLResource(captionUrl));
+            var targetMetadata:Metadata = new Metadata();
+            targetMetadata.addValue(PlayerConstants.CONTENT_ID, PlayerConstants.MAIN_CONTENT_ID);
+            contentElement.addMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT, targetMetadata);
 
-        var layout:LayoutMetadata = new LayoutMetadata();
-        subtitleElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+            logger.debug("loading subtitle plugin");
+            factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
 
-        layout.percentWidth = 100;
-        layout.height = 50;
-        layout.bottom = 100;
-        layout.horizontalAlign = HorizontalAlign.CENTER;
-        layout.verticalAlign = VerticalAlign.BOTTOM;
-        layout.index = 10;
+            subtitleElement = factory.createMediaElement(new URLResource(subtitleLocation));
 
-        mainElement.addChild(subtitleElement);
+            var layout:LayoutMetadata = new LayoutMetadata();
+            subtitleElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+
+            layout.percentWidth = 100;
+            layout.height = 50;
+            layout.bottom = 100;
+            layout.horizontalAlign = HorizontalAlign.CENTER;
+            layout.verticalAlign = VerticalAlign.BOTTOM;
+            layout.index = 10;
+
+            // The subtitle element needs to check and set visibility every time it sets a new display object
+            subtitleElement.addEventListener(MediaElementEvent.TRAIT_ADD, function(event:MediaElementEvent) {
+                if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
+                    var metadata:Metadata = contentElement.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+                    if (metadata) {
+                        var visible:Boolean = metadata.getValue(ControlBarMetadata.SUBTITLES_VISIBLE) as Boolean;
+                        var displayObjectTrait:DisplayObjectTrait =
+                                subtitleElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
+                        displayObjectTrait.displayObject.visible = visible == null ? false : visible;
+                    }
+                }
+            });
+
+            mainElement.addChild(subtitleElement);
+        }
     }
 
     private function createVideoElement():void {
@@ -303,13 +326,14 @@ public class SeeSawPlayer extends Sprite {
 
         createBufferingPanel();
         createControlBarElement();
+        createSubtitleElement();
 
         if (contentElement is IAuditudeMediaElement) {
-          var _auditude:AuditudePlugin = IAuditudeMediaElement(contentElement).plugin;
+            var _auditude:AuditudePlugin = IAuditudeMediaElement(contentElement).plugin;
 
-          // We set this in the metadata so the auditude AdProxy can pick up the plugin
-          var metadata:Metadata = config.resource.getMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) as Metadata;
-          metadata.addValue(AuditudeConstants.PLUGIN_INSTANCE, _auditude);
+            // We set this in the metadata so the auditude AdProxy can pick up the plugin
+            var metadata:Metadata = config.resource.getMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) as Metadata;
+            metadata.addValue(AuditudeConstants.PLUGIN_INSTANCE, _auditude);
         }
 
         setContainerSize(contentWidth, contentHeight);
@@ -418,7 +442,7 @@ public class SeeSawPlayer extends Sprite {
                 contentElement.addMetadata(NetStatusMetadata.NET_STATUS_METADATA, metadata);
             }
 
-                metadata.addValue(NetStatusMetadata.STATUS, event.info);
+            metadata.addValue(NetStatusMetadata.STATUS, event.info);
         }
     }
 
@@ -503,14 +527,6 @@ public class SeeSawPlayer extends Sprite {
                 layout.index = 5;
                 break;
             case PlayerConstants.MAIN_CONTENT_ID:
-                // Tell the subtitle plugin to target this element and make sure it only does this once
-                var subtitleLocation:String = smilMetadata.getValue(PlayerConstants.SUBTITLE_LOCATION);
-                if (subtitleLocation && !subtitleElement) {
-                    var subtitleMetadata:Metadata = new Metadata();
-                    subtitleMetadata.addValue(SAMIPluginInfo.METADATA_KEY_URI, subtitleLocation);
-                    element.resource.addMetadataValue(SAMIPluginInfo.METADATA_NAMESPACE, subtitleMetadata);
-                    createSubtitleElement(subtitleLocation, element);
-                }
             case PlayerConstants.STING_CONTENT_ID:
             case PlayerConstants.AD_CONTENT_ID:
                 // This layout applies to main content, stings and ads (notice there is no break above - this is
@@ -542,6 +558,19 @@ public class SeeSawPlayer extends Sprite {
 
     public function mediaPlayer():MediaPlayer {
         return player;
+    }
+
+    private function getSmilHeadMetaValue(key:String):String {
+        use namespace smil;
+
+        var value:String = null;
+        for each (var meta:XML in videoInfo.smil.head..meta) {
+            if (meta.@name == key) {
+                value = meta.@content;
+                break;
+            }
+        }
+        return value;
     }
 }
 }
