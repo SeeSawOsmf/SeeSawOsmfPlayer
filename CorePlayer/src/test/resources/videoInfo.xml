@@ -24,16 +24,25 @@
                     <ns2:switch>
                         <ns2:video
                                 src="mp4:e4/test/ccp/p/HIGH_RES/00000418/41803.mp4?s=1296224433&amp;e=1296225183&amp;h=3974f965ca15cc27c724f00a93ad1089"
-                                system-bitrate="1581000" dur="852"/>
+                                system-bitrate="1581000" dur="852">
+                            <ns2:metadata>
+                                <ns2:meta content="mainContent" name="contentType"/>
+                            </ns2:metadata>
+                        </ns2:video>
                         <ns2:video
                                 src="mp4:e4/test/ccp/p/LOW_RES/00000418/41804.mp4?s=1296224433&amp;e=1296225183&amp;h=30b0cb8a1af14fcdc3288a8f51b756d1"
-                                system-bitrate="500000" dur="852"/>
+                                system-bitrate="500000" dur="852">
+                            <ns2:metadata>
+                                <ns2:meta content="mainContent" name="contentType"/>
+                            </ns2:metadata>
+                        </ns2:video>
                         <ns2:video
                                 src="mp4:e4/test/ccp/p/STD_RES/00000418/41805.mp4?s=1296224433&amp;e=1296225183&amp;h=a61d40407278eaa0528fbeb2939b8aaa"
-                                system-bitrate="844000" dur="852"/>
-                        <ns2:metadata>
-                            <ns2:meta content="mainContent" name="contentType"/>
-                        </ns2:metadata>
+                                system-bitrate="844000" dur="852">
+                            <ns2:metadata>
+                                <ns2:meta content="mainContent" name="contentType"/>
+                            </ns2:metadata>
+                        </ns2:video>
                     </ns2:switch>
                     <ns2:img
                             src="http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png">

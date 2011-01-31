@@ -189,7 +189,7 @@ public class VolumeScrubBar extends Widget implements IWidget {
 
         audible.volume = Math.min(percentage, percentage);
 
-        this.volumeDisplay = Math.round(audible.volume * 10);
+        this.volumeDisplay = Math.round(audible.volume * 12);
 
     }
 
@@ -211,7 +211,7 @@ public class VolumeScrubBar extends Widget implements IWidget {
 
     protected function onVolumeChange(event:AudioEvent = null):void {
         scrubber.x = audible.volume * scrubBarWidth - scrubber.width / 2;
-        this.volumeDisplay = Math.round(audible.volume * 10);
+        this.volumeDisplay = Math.round(audible.volume * 12);
         this.toolTip.updateToolTip("Volume: " + this.volumeDisplay);
     }
 

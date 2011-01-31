@@ -24,7 +24,7 @@
 
     <assets baseURL="com.seesaw.player.controls.ControlBarElement_">
         <asset id="defaultFont" type="embeddedFont" url="DEFAULT_FONT" fontSize="8"/>
-        <asset id="backdrop" type="embeddedBitmap" url="BACKDROP" scale9="15,15,290,18"/>
+        <asset id="backdrop" type="embeddedBitmap" url="BACKDROP" scale9="0,0,290,18"/>
         <asset id="pauseDisabled" type="embeddedBitmap" url="PAUSE_DISABLED"/>
         <asset id="pauseUp" type="embeddedBitmap" url="PAUSE_UP"/>
         <asset id="pauseDown" type="embeddedBitmap" url="PAUSE_DOWN"/>

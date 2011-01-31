@@ -114,6 +114,8 @@ public class SeeSawPlayer extends Sprite {
     private var adMode:String;
     private var _auditude:AuditudePlugin;
 
+    private var playlistElements:Vector.<MediaElement> = new Vector.<MediaElement>();
+
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
 
@@ -450,13 +452,11 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function netStatusChanged(event:NetStatusEvent):void {
-
         if (event.info == "NetConnection.Connect.NetworkChange") {
 
             factory.removeEventListener(NetStatusEvent.NET_STATUS, netStatusChanged);
 
             var metadata:Metadata = contentElement.getMetadata(NetStatusMetadata.NET_STATUS_METADATA);
-
             if (metadata == null) {
                 metadata = new Metadata();
                 contentElement.addMetadata(NetStatusMetadata.NET_STATUS_METADATA, metadata);
@@ -466,10 +466,16 @@ public class SeeSawPlayer extends Sprite {
         }
     }
 
-
     private function onFullscreen(event:FullScreenEvent):void {
         logger.debug("onFullscreen: " + event.fullScreen);
         setContainerSize(contentWidth, contentHeight);
+
+        // Apply the new resolution to all the playlist media elements. Ideally we'd like to set the size of these
+        // elements to be relative to the container size but that does not seem to work with dynamic stream switching
+        // at the moment.
+        for each (var element:MediaElement in playlistElements) {
+            setMediaLayout(element);
+        }
     }
 
     private function setContainerSize(width:int, height:int) {
@@ -551,15 +557,37 @@ public class SeeSawPlayer extends Sprite {
             case PlayerConstants.AD_CONTENT_ID:
                 // This layout applies to main content, stings and ads (notice there is no break above - this is
                 // intentional).
-                layout.width = contentWidth;
-                layout.height = contentHeight;
-                layout.verticalAlign = VerticalAlign.MIDDLE;
-                layout.horizontalAlign = HorizontalAlign.CENTER;
-                layout.scaleMode = ScaleMode.LETTERBOX;
+                setMediaLayout(element);
+
+                // For some reason dynamic stream changes reset the current layout metadata (bug?) in the playlist
+                // so this is a workaround to always set the right value.
+                element.addEventListener(MediaElementEvent.TRAIT_ADD, function(event:MediaElementEvent) {
+                    if (event.traitType == MediaTraitType.DYNAMIC_STREAM) {
+                        var dynamicStreamTrait:DynamicStreamTrait = element.getTrait(MediaTraitType.DYNAMIC_STREAM) as DynamicStreamTrait;
+                        dynamicStreamTrait.addEventListener(DynamicStreamEvent.SWITCHING_CHANGE, function(event:DynamicStreamEvent) {
+                            setMediaLayout(element);
+                        });
+                    }
+                });
+
+                // This is another workaround for the above bug - when full screen is set the full screen resolution
+                // needs to be applied to all the video elements.
+                playlistElements.push(element);
                 break;
         }
 
         element.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+    }
+
+    private function setMediaLayout(element:MediaElement) {
+        var layout:LayoutMetadata = element.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
+        if (layout) {
+            layout.width = contentWidth;
+            layout.height = contentHeight;
+            layout.verticalAlign = VerticalAlign.MIDDLE;
+            layout.horizontalAlign = HorizontalAlign.CENTER;
+            layout.scaleMode = ScaleMode.LETTERBOX;
+        }
     }
 
     public function get contentWidth():int {
