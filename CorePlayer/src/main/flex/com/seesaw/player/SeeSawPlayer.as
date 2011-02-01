@@ -316,7 +316,7 @@ public class SeeSawPlayer extends Sprite {
                     if (metadata) {
                         var visible:Boolean = metadata.getValue(ControlBarMetadata.SUBTITLES_VISIBLE) as Boolean;
                         var displayObjectTrait:DisplayObjectTrait =
-                                subtitleElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
+                                MediaElement(event.target).getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
                         displayObjectTrait.displayObject.visible = visible == null ? false : visible;
                     }
                 }
