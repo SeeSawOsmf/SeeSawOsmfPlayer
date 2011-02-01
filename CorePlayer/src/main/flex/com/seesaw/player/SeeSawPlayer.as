@@ -56,11 +56,10 @@ import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
 import org.osmf.events.BufferEvent;
 import org.osmf.events.DynamicStreamEvent;
-import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MediaFactoryEvent;
+import org.osmf.events.MediaPlayerStateChangeEvent;
 import org.osmf.events.MetadataEvent;
-import org.osmf.events.PlayEvent;
 import org.osmf.layout.HorizontalAlign;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.layout.ScaleMode;
@@ -68,6 +67,7 @@ import org.osmf.layout.VerticalAlign;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaPlayer;
+import org.osmf.media.MediaPlayerState;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
 import org.osmf.media.URLResource;
@@ -78,6 +78,7 @@ import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.DynamicStreamTrait;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
+import org.osmf.traits.PlayTrait;
 import org.osmf.traits.TimeTrait;
 
 import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
@@ -220,13 +221,42 @@ public class SeeSawPlayer extends Sprite {
 
         mainContainer.addMediaElement(mainElement);
 
-        player.media = mainElement;
-
         //handler to show and hide the buffering panel
         player.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
+        player.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onMediaPlayerStateChange);
+
+        player.media = mainElement;
 
         logger.debug("adding media container to stage");
         addChild(container);
+    }
+
+    private function onMediaPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
+        switch (event.state) {
+            case MediaPlayerState.PLAYBACK_ERROR:
+                logger.error("MediaPlayerStateChange: PLAYBACK_ERROR");
+                break;
+            case MediaPlayerState.BUFFERING:
+                logger.debug("MediaPlayerStateChange: BUFFERING");
+                break;
+            case MediaPlayerState.LOADING:
+                logger.debug("MediaPlayerStateChange: LOADING");
+                break;
+            case MediaPlayerState.READY:
+                logger.debug("MediaPlayerStateChange: READY");
+                break;
+            case MediaPlayerState.PLAYING:
+                logger.debug("MediaPlayerStateChange: PLAYING");
+                toggleLights();
+                break;
+            case MediaPlayerState.PAUSED:
+                logger.debug("MediaPlayerStateChange: PAUSED");
+                toggleLights();
+                break;
+            case MediaPlayerState.UNINITIALIZED:
+                logger.debug("MediaPlayerStateChange: UNINITIALIZED");
+                break;
+        }
     }
 
     private function loadAuditude():void {
@@ -326,9 +356,6 @@ public class SeeSawPlayer extends Sprite {
         contentElement.addEventListener(MediaElementEvent.METADATA_ADD, onContentMetadataAdd);
         contentElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onContentMetadataRemove);
 
-        contentElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
-        contentElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
-
         createBufferingPanel();
         createControlBarElement();
         createSubtitleElement();
@@ -371,67 +398,6 @@ public class SeeSawPlayer extends Sprite {
         }
 
         controlbarContainer.addMediaElement(controlBarElement);
-    }
-
-    private function updateTraitListeners(element:MediaElement, traitType:String, add:Boolean):void {
-        switch (traitType) {
-            case MediaTraitType.PLAY:
-                changeListeners(element, add, traitType, PlayEvent.PLAY_STATE_CHANGE, onPlayStateChanged);
-                break;
-            case MediaTraitType.LOAD:
-                changeListeners(element, add, traitType, LoadEvent.LOAD_STATE_CHANGE, onLoadStateChanged);
-                break;
-        }
-    }
-
-    private function onLoadStateChanged(event:LoadEvent):void {
-        trace(event.loadState);
-    }
-
-    private function onTraitAdd(event:MediaElementEvent):void {
-        var target = event.target as MediaElement;
-        updateTraitListeners(target, event.traitType, true);
-    }
-
-    private function onTraitRemove(event:MediaElementEvent):void {
-        var target = event.target as MediaElement;
-        updateTraitListeners(target, event.traitType, false);
-    }
-
-    private function changeListeners(element:MediaElement, add:Boolean, traitType:String, event:String, listener:Function):void {
-        if (add) {
-            element.getTrait(traitType).addEventListener(event, listener);
-        }
-        else if (element.hasTrait(traitType)) {
-            element.getTrait(traitType).removeEventListener(event, listener);
-        }
-    }
-
-    private function onPlayStateChanged(event:PlayEvent):void {
-        var lightsDown:Boolean = false;
-
-        var metadata:Metadata = contentElement.getMetadata(ExternalInterfaceMetadata.EXTERNAL_INTERFACE_METADATA);
-
-        if (metadata == null) {
-            metadata = new Metadata();
-            contentElement.addMetadata(ExternalInterfaceMetadata.EXTERNAL_INTERFACE_METADATA, metadata);
-        }
-
-        lightsDown = metadata.getValue(ExternalInterfaceMetadata.LIGHTS_DOWN);
-
-        var timeTrait:TimeTrait = contentElement.getTrait(MediaTraitType.TIME) as TimeTrait;
-        if (event.playState == PlayState.PLAYING && !lightsDown) {
-            if (xi.available) {
-                xi.callLightsDown();
-                metadata.addValue(ExternalInterfaceMetadata.LIGHTS_DOWN, true);
-            }
-        }
-        if (event.playState == PlayState.PAUSED && timeTrait && (timeTrait.currentTime != timeTrait.duration)) {
-            if (xi.available) {
-                xi.callLightsUp();
-                metadata.addValue(ExternalInterfaceMetadata.LIGHTS_DOWN, false);
-            }
-        }
     }
 
     private function netStatusChanged(event:NetStatusEvent):void {
@@ -510,9 +476,9 @@ public class SeeSawPlayer extends Sprite {
         var mediaElement:MediaElement = event.mediaElement;
 
         var metadata:Metadata = mediaElement.resource.getMetadataValue(SMILConstants.SMIL_CONTENT_NS) as Metadata;
-        if(metadata) {
+        if (metadata) {
             mediaElement.metadata.addEventListener(MetadataEvent.VALUE_ADD, function(event:MetadataEvent) {
-                if(event.key == SMILConstants.SMIL_CONTENT_NS) {
+                if (event.key == SMILConstants.SMIL_CONTENT_NS) {
                     configureSmilElement(mediaElement);
                 }
             });
@@ -551,8 +517,10 @@ public class SeeSawPlayer extends Sprite {
                 // so this is a workaround to always set the right value.
                 element.addEventListener(MediaElementEvent.TRAIT_ADD, function(event:MediaElementEvent) {
                     if (event.traitType == MediaTraitType.DYNAMIC_STREAM) {
-                        var dynamicStreamTrait:DynamicStreamTrait = element.getTrait(MediaTraitType.DYNAMIC_STREAM) as DynamicStreamTrait;
-                        dynamicStreamTrait.addEventListener(DynamicStreamEvent.SWITCHING_CHANGE, function(event:DynamicStreamEvent) {
+                        var dynamicStreamTrait:DynamicStreamTrait =
+                                element.getTrait(MediaTraitType.DYNAMIC_STREAM) as DynamicStreamTrait;
+                        dynamicStreamTrait.addEventListener(
+                                DynamicStreamEvent.SWITCHING_CHANGE, function(event:DynamicStreamEvent) {
                             setMediaLayout(element);
                         });
                     }
@@ -575,6 +543,37 @@ public class SeeSawPlayer extends Sprite {
             layout.verticalAlign = VerticalAlign.MIDDLE;
             layout.horizontalAlign = HorizontalAlign.CENTER;
             layout.scaleMode = ScaleMode.LETTERBOX;
+        }
+    }
+
+    private function toggleLights():void {
+        var lightsDown:Boolean = false;
+
+        var metadata:Metadata = player.media.getMetadata(ExternalInterfaceMetadata.EXTERNAL_INTERFACE_METADATA);
+
+        if (metadata == null) {
+            metadata = new Metadata();
+            player.media.addMetadata(ExternalInterfaceMetadata.EXTERNAL_INTERFACE_METADATA, metadata);
+        }
+
+        lightsDown = metadata.getValue(ExternalInterfaceMetadata.LIGHTS_DOWN);
+
+        var playTrait:PlayTrait = player.media.getTrait(MediaTraitType.PLAY) as PlayTrait;
+        var timeTrait:TimeTrait = player.media.getTrait(MediaTraitType.TIME) as TimeTrait;
+
+        if (playTrait.playState == PlayState.PLAYING && !lightsDown) {
+            if (xi.available) {
+                logger.debug("calling lights down");
+                xi.callLightsDown();
+                metadata.addValue(ExternalInterfaceMetadata.LIGHTS_DOWN, true);
+            }
+        }
+        else if (playTrait.playState == PlayState.PAUSED && timeTrait && (timeTrait.currentTime != timeTrait.duration)) {
+            if (xi.available) {
+                logger.debug("calling lights up");
+                xi.callLightsUp();
+                metadata.addValue(ExternalInterfaceMetadata.LIGHTS_DOWN, false);
+            }
         }
     }
 

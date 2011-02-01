@@ -56,7 +56,9 @@ import flash.net.URLVariables;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
+import org.osmf.events.MediaErrorEvent;
 import org.osmf.logging.Log;
+import org.osmf.media.MediaPlayerState;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.metadata.Metadata;
 import org.osmf.smil.SMILConstants;
@@ -108,7 +110,7 @@ public class Player extends Sprite {
 
         // If no flashVar, use a default for testing
         // TODO: remove this altogether
-        loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://localhost/player/initinfo/29053";
+        loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://localhost:8080/player/initinfo/33535";
         /// loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player/initinfo/13602";
 
         stage.scaleMode = StageScaleMode.NO_SCALE;
@@ -395,6 +397,7 @@ public class Player extends Sprite {
         config = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, content);
         videoPlayer = new SeeSawPlayer(config);
         videoPlayer.addEventListener(PlayerConstants.DESTROY, reBuildPlayer);
+
         // Since we have autoPlay to false for liverail, we need to manually call play for C4:
         if (playerInit.adMode != AdMetadata.LR_AD_TYPE) {
             videoPlayer.mediaPlayer().autoPlay = true;
