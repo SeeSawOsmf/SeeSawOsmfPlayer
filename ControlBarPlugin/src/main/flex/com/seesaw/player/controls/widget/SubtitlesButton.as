@@ -28,7 +28,6 @@ import com.seesaw.player.ui.StyledTextField;
 import controls.seesaw.widget.interfaces.IWidget;
 
 import flash.events.Event;
-import flash.events.FullScreenEvent;
 import flash.events.MouseEvent;
 import flash.text.TextField;
 import flash.text.TextFormat;
@@ -40,7 +39,6 @@ import org.osmf.events.MediaElementEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.metadata.CuePoint;
 import org.osmf.metadata.Metadata;
-import org.osmf.metadata.TimelineMetadata;
 import org.osmf.traits.MediaTraitType;
 
 public class SubtitlesButton extends ButtonWidget implements IWidget {
@@ -64,15 +62,29 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
 
     private var metadata:Metadata;
 
-    override public function set media(value:MediaElement):void {
+    public function SubtitlesButton() {
+        logger.debug("Subtitles Constructor");
+        subtitlesLabel = new StyledTextField();
+        subtitlesLabel.text = "Subtitles are off";
+        subtitlesLabel.width = 90;
+        this.addEventListener(MouseEvent.MOUSE_OVER, onMouseOver);
+        this.addEventListener(MouseEvent.MOUSE_OUT, onMouseOut);
+        this.toolTip = new PlayerToolTip(this, "Subtitles are off");
 
-        if(media) {
-            media.removeEventListener(MediaElementEvent.METADATA_ADD, onMetadataAdd);
-            media.removeEventListener(MediaElementEvent.METADATA_REMOVE, onMetadataRemove);
+        this.formatLabelFont();
+
+        this.addEventListener(Event.ADDED_TO_STAGE, this.onAddedToStage);
+
+        addChild(subtitlesLabel);
+
+        visible = false;
+    }
+
+    override protected function processMediaElementChange(oldMediaElement:MediaElement):void {
+        if (oldMediaElement) {
+            oldMediaElement.removeEventListener(MediaElementEvent.METADATA_ADD, onMetadataAdd);
+            oldMediaElement.removeEventListener(MediaElementEvent.METADATA_REMOVE, onMetadataRemove);
         }
-
-        super.media = value;
-
         if (media) {
             metadata = media.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
             if (metadata == null) {
@@ -81,16 +93,8 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
             }
 
             // Show the button if there is timeline metadata or after timeline metadata is added
-            var timelineMetadata:TimelineMetadata = media.getMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) as TimelineMetadata;
-            if (timelineMetadata == null) {
-                media.addEventListener(MediaElementEvent.METADATA_ADD, onMetadataAdd);
-            }
-            else {
-                visible = true;
-            }
-
+            media.addEventListener(MediaElementEvent.METADATA_ADD, onMetadataAdd);
             media.addEventListener(MediaElementEvent.METADATA_REMOVE, onMetadataRemove);
-
             metadata.addValue(ControlBarMetadata.SUBTITLES_VISIBLE, false);
         }
     }
@@ -107,30 +111,14 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
         }
     }
 
-    public function SubtitlesButton() {
-        logger.debug("Subtitles Constructor");
-        subtitlesLabel = new StyledTextField();
-        subtitlesLabel.text = "Subtitles are off";
-        subtitlesLabel.width = 90;
-        this.addEventListener(MouseEvent.MOUSE_OVER, onMouseOver);
-        this.addEventListener(MouseEvent.MOUSE_OUT, onMouseOut);
-        this.toolTip = new PlayerToolTip(this, "Subtitles are off");
-        
-        this.formatLabelFont();
-
-        this.addEventListener(Event.ADDED_TO_STAGE, this.onAddedToStage);
-
-        addChild(subtitlesLabel);
-    }
-
-    private function onMouseOver (event:MouseEvent):void {
+    private function onMouseOver(event:MouseEvent):void {
         if (this.mouseOverLabel == false) {
             this.mouseOverLabel = true;
             formatLabelHoverFont();
         }
     }
 
-    private function onMouseOut (event:MouseEvent):void {
+    private function onMouseOut(event:MouseEvent):void {
         if (this.mouseOverLabel == true) {
             this.mouseOverLabel = false;
             formatLabelFont();
@@ -155,7 +143,6 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
         textFormat.color = 0xFFFFFF;
         this.subtitlesLabel.setTextFormat(textFormat);
     }
-
 
     override protected function get requiredTraits():Vector.<String> {
         return _requiredTraits;
