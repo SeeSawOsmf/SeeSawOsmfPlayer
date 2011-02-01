@@ -108,14 +108,13 @@ public class Player extends Sprite {
 
         loaderParams = LoaderInfo(this.root.loaderInfo).parameters;
 
-
+        ///Todo remove this completely, this is just for player proxy checking....
         var my_menu:ContextMenu = new ContextMenu();
-            my_menu.hideBuiltInItems();
-           var getDate:Date = new Date();
-            var my_notice = new ContextMenuItem("tuesday 01 11:55");
-         my_menu.customItems.push(my_notice);
-
-contextMenu = my_menu;
+        my_menu.hideBuiltInItems();
+        var getDate:Date = new Date();
+        var my_notice = new ContextMenuItem("tuesday 01 11:55");
+        my_menu.customItems.push(my_notice);
+        contextMenu = my_menu;
         // If no flashVar, use a default for testing
         // TODO: remove this altogether
         loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://localhost:8080/player/initinfo/33535";
