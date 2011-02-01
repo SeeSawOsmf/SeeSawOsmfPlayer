@@ -1,4 +1,25 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?> 
+<!--
+  ~ Copyright 2011 ioko365 Ltd.  All Rights Reserved.
+  ~
+  ~ The contents of this file are subject to the Mozilla Public License
+  ~ Version 1.1 (the "License"); you may not use this file except in
+  ~ compliance with the License. You may obtain a copy of the
+  ~ License athttp://www.mozilla.org/MPL/
+  ~
+  ~ Software distributed under the License is distributed on an "AS IS"
+  ~ basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+  ~ License for the specific language governing rights and limitations
+  ~ under the License.
+  ~
+  ~ The Initial Developer of the Original Code is ioko365 Ltd.
+  ~ Portions created by ioko365 Ltd are Copyright (C) 2011 ioko365 Ltd
+  ~ Incorporated. All Rights Reserved.
+  ~
+  ~ The Initial Developer of the Original Code is ioko365 Ltd.
+  ~ Portions created by ioko365 Ltd are Copyright (C) 2011 ioko365 Ltd
+  ~ Incorporated. All Rights Reserved.
+  -->
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <contentInfo xmlns:ns2="http://www.w3.org/ns/SMIL" xmlns="http://www.seesaw.com/api/contentinfo/v1.0">
     <primaryGenre>TV:DRAMA:SCI-FI_AND_FANTASY</primaryGenre>
     <sourceId>CHANNEL4</sourceId>
@@ -16,8 +37,8 @@
             <data>PRE:x01,x02,x60,x61,x90,x91</data>
         </break>
         <break>
-            <breakOffset>00:08:00.00</breakOffset>
-            <resumeOffset>00:08:00.00</resumeOffset>
+            <breakOffset>00:01:00.00</breakOffset>
+            <resumeOffset>00:01:00.00</resumeOffset>
             <data>CEN:x01,x02,x92,x80,x81,x93</data>
         </break>
     </loggingSheet>
@@ -35,16 +56,13 @@
     </parentalControls>
     <unavailablePageUrl>http://localhost:8080/unavailable</unavailablePageUrl>
     <videoInfoUrl>http://localhost:8080/player/videoinitinfo/33535</videoInfoUrl>
-    <batchEventService>http://localhost:8080/player.videoplayer:registerbatchevent?t:ac=TV:COMEDY/b/8542/Nathan-Barley</batchEventService>
-    <cumulativeDurationService>http://localhost:8080/player.videoplayer:playIntervalEvent?t:ac=TV:COMEDY/b/8542/Nathan-Barley</cumulativeDurationService>
+    <batchEventService>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player.videoplayer:registerbatchevent?t:ac=TV:COMEDY/b/8542/Nathan-Barley</batchEventService>
+    <cumulativeDurationService>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player.videoplayer:playIntervalEvent?t:ac=TV:COMEDY/b/8542/Nathan-Barley</cumulativeDurationService>
     <largeImageUrl>http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/E4_LARGE.png</largeImageUrl>
-    <liverail>
-        <version>4.1</version>
-        <publisherId>1373</publisherId>
-    </liverail>
-    <adMode>liverail</adMode>
+    <adMode>none</adMode>
     <dogImage>http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png</dogImage>
     <programme>33535</programme>
-    <userId>911112222</userId>
+    <userId>1234</userId>
     <anonymousUserId>0000</anonymousUserId>
 </contentInfo>
+

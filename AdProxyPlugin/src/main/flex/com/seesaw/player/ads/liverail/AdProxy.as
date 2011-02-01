@@ -197,17 +197,11 @@ public class AdProxy extends ProxyElement {
         logger.debug("onInitComplete");
 
 
-
         var adMap:Object = ev.data.adMap;
         var adBreaks:Array = adMap.adBreaks;
 
 
-        playerMetadata.addValue("sectionCount", adBreaks.length);
-
-
-        adManager.onContentStart();
-
-        var metadataAdBreaks:Vector.<AdBreak> = new Vector.<AdBreak>(adBreaks.length, true);
+        var metadataAdBreaks:Vector.<AdBreak> = new Vector.<AdBreak>();
 
         for (var i:uint = 0; i < adBreaks.length; i++) {
             var adBreak:Object = adBreaks[i];
@@ -239,9 +233,14 @@ public class AdProxy extends ProxyElement {
             metadataAdBreak.startTime = startTimeValue;
             metadataAdBreak.startTimeIsPercent = startTimeIsPercent;
 
-            metadataAdBreaks[i] = metadataAdBreak;
+            ////Dont add the break if it has no ads, eg no content to play, so we don't want a blip for this item
+            if (hasAds)
+                metadataAdBreaks[i] = metadataAdBreak;
         }
 
+        //// section count need to occur before we start the adContent. as this is required for the first view to be registered.
+        playerMetadata.addValue(AdMetadata.SECTION_COUNT, metadataAdBreaks.length);
+        adManager.onContentStart();
         adMetadata.adBreaks = metadataAdBreaks;
     }
 
@@ -263,15 +262,31 @@ public class AdProxy extends ProxyElement {
 
     private function onAdStart(event:Object):void {
         logger.debug("onAdStart");
-        trace(event.data.ad.linear.url);
+
+        var dataObject:Object = new Object();
+        dataObject["state"] = AdState.STARTED;
+        dataObject["contentUrl"] = event.data.ad.linear.url;
+        dataObject["campaignId"] = event.data.ad.campaignID;
+        dataObject["creativeId"] = event.data.ad.creativeID;
+
+        adMetadata.adState = dataObject;
         /*     event.data.ad.clickThruUrl
-         event.data.ad.campaignID
+
          event.data.ad.creativeID*/
         play();
     }
 
-    private function onAdEnd(event:Event):void {
+    private function onAdEnd(event:Object):void {
         logger.debug("onAdEnd");
+
+        var dataObject:Object = new Object();
+        dataObject["state"] = AdState.STOPPED;
+        dataObject["contentUrl"] = event.data.ad.linear.url;
+        dataObject["campaignId"] = event.data.ad.campaignID;
+        dataObject["creativeId"] = event.data.ad.creativeID;
+
+        adMetadata.adState = dataObject;
+
         adTimeTrait.adDuration = 0;
         adTimeTrait.adTime = 0;
     }

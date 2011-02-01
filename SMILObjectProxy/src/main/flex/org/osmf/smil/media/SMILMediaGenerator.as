@@ -26,7 +26,6 @@ import org.osmf.elements.ParallelElement;
 import org.osmf.elements.ProxyElement;
 import org.osmf.elements.SerialElement;
 import org.osmf.elements.VideoElement;
-import org.osmf.events.MediaErrorEvent;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.events.SerialElementEvent;
 import org.osmf.media.MediaElement;
@@ -112,9 +111,9 @@ CONFIG::LOGGING
                         var index:int = serialElement.getChildIndex(event.currentChild) - 1;
                         if(index >= 0) {
                             var childElem:MediaElement = serialElement.getChildAt(index);
-                            var metadata:Metadata = childElem.getMetadata(SMILConstants.SMIL_METADATA_NS);
-                            if(metadata && metadata.getValue("contentType") == "advert" ||
-                                    metadata.getValue("contentType") == "sting") {
+                            var metadata:Metadata = childElem.getMetadata(SMILConstants.SMIL_CONTENT_NS);
+                            if(metadata && (metadata.getValue("contentType") == "advert" ||
+                                    metadata.getValue("contentType") == "sting")) {
                                 serialElement.removeChild(childElem);
                             }
                         }
@@ -127,7 +126,6 @@ CONFIG::LOGGING
                     populateResourceMetadataFromSMIL(resource, smilElement);
 
 					var videoElement:MediaElement = factory.createMediaElement(resource);
-
                     populateMetadataFromSMIL(videoElement, smilElement);
 
 					var smilVideoElement:SMILMediaElement = smilElement as SMILMediaElement;
@@ -147,6 +145,7 @@ CONFIG::LOGGING
 				case SMILElementType.IMAGE:
 					var imageResource:URLResource = new URLResource((smilElement as SMILMediaElement).src);
 					imageResource.mediaType = MediaType.IMAGE;
+                    populateResourceMetadataFromSMIL(imageResource, smilElement);
 
 					var imageElement:MediaElement = factory.createMediaElement(imageResource);
 
@@ -261,12 +260,7 @@ CONFIG::LOGGING
 
         private function populateResourceMetadataFromSMIL(media:MediaResourceBase, smilElement:SMILElement):void
         {
-            var metadata:Metadata = media.getMetadataValue(SMILConstants.SMIL_CONTENT_NS) as Metadata;
-            if(metadata == null)
-            {
-                metadata = new Metadata();
-                media.addMetadataValue(SMILConstants.SMIL_CONTENT_NS, metadata);
-            }
+            var metadata:Metadata = new Metadata();
 
             for(var i:uint = 0; i < smilElement.numChildren; i++)
             {
@@ -280,6 +274,8 @@ CONFIG::LOGGING
                     }
                 }
             }
+
+            media.addMetadataValue(SMILConstants.SMIL_CONTENT_NS, metadata);
         }
 
         private function populateMetadataFromSMIL(media:MediaElement, smilElement:SMILElement):void
@@ -299,7 +295,7 @@ CONFIG::LOGGING
                 }
             }
 
-            media.addMetadata(SMILConstants.SMIL_METADATA_NS, metadata);
+            media.addMetadata(SMILConstants.SMIL_CONTENT_NS, metadata);
         }
 
 		private function createDynamicStreamingResource(switchElement:SMILElement, smilDocument:SMILDocument):MediaResourceBase

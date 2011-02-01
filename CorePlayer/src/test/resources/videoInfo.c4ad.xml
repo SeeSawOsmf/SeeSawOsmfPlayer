@@ -1,44 +1,70 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:videoInfo xmlns:ns2="http://www.seesaw.com/api/contentinfo/v1.0" xmlns="http://www.w3.org/ns/SMIL">
+<videoInfo xmlns:ns2="http://www.seesaw.com/api/contentinfo/v1.0" xmlns="http://www.w3.org/ns/SMIL">
     <smil>
         <head>
             <meta base="rtmpe://cdn-flash-blue-dev.vodco.co.uk/a2703"/>
+            <meta content="http://kgd-blue-test-zxtm01.dev.vodco.co.uk/s/ccp/00000002/298.smi"
+                  name="subtitleLocation"/>
         </head>
         <body>
             <seq>
-                <video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/eng-izor002-020-SD.mp4">
-                    <metadata>
-                        <meta content="advert" name="contentType"/>
-                        <meta content="http://seesaw.stage.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/channel4/tv/comedy/alternative/35925/35925/001/L64/11583353263/x12/4OD/UNIVERSAL_MUSIC_011111_13647_2/2701060/553249624b3079475550554142667248" name="trackback"/>
-                        <meta content="http://realmedia.channel4.com/5c/kprod.channel4.com/channel4/channel4/tv/comedy/alternative/35925/35925/001/L64/1583353263/x60/4OD/UNIVERSAL_MUSIC_011111_13647_2/UNIVERSAL_MUSIC_011111_13647_1.html/553249624b3079475550554142667248" name="popupAdvertisingUrl"/>
-                    </metadata>
-                </video>
-                <switch>
-                    <video src="mp4:e4/test/ccp/p/LOW_RES/testing/big_buck_bunny_1080p_h264.mp4?s=1295271383&amp;e=1295272133&amp;h=e706a9d60b58adfee7342933849b62bf" dur="1349" system-bitrate="500000" clipEnd="30" clipBegin="0"/>
-                    <metadata>
-                        <meta content="mainContent" name="contentType"/>
-                    </metadata>
-                </switch>
                 <video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Seesaw_Recycling.mp4">
                     <metadata>
                         <meta content="advert" name="contentType"/>
-                        <meta content="http://seesaw.stage.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/channel4/tv/comedy/alternative/35925/35925/001/L18/12116635505/x13/4OD/SS_IDENT_Feb10_x90/2362406/553249624b3079475550554142667248" name="trackback"/>
+                        <meta content="http://seesaw.stage.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/channel4/tv/comedy/alternative/35925/35925/001/L18/12116635505/x13/4OD/SS_IDENT_Feb10_x90/2362406/553249624b3079475550554142667248"
+                              name="trackback"/>
                     </metadata>
                 </video>
-                <switch>
-                    <video src="mp4:e4/test/ccp/p/LOW_RES/testing/big_buck_bunny_1080p_h264.mp4?s=1295271383&amp;e=1295272133&amp;h=e706a9d60b58adfee7342933849b62bf" dur="1349" system-bitrate="500000" clipEnd="1349" clipBegin="30"/>
+
+                <par>
+                    <video
+                            src="rtmpe://cdn-flash-blue-dev.vodco.co.uk/a2703/mp4:e4/test/ccp/p/STD_RES/00000418/41805.mp4?s=1296224433&amp;e=1296225183&amp;h=a61d40407278eaa0528fbeb2939b8aaa"
+                            system-bitrate="844000" dur="852" clipEnd="30" clipBegin="0">
+                        <metadata>
+                            <meta content="mainContent" name="contentType"/>
+                        </metadata>
+                    </video>
+                    <img
+                            src="http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png">
+                        <metadata>
+                            <meta content="dogImage" name="contentType"/>
+                        </metadata>
+                    </img>
+                </par>
+
+                <video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/eng-izor002-020-SD.mp4">
                     <metadata>
-                        <meta content="mainContent" name="contentType"/>
+                        <meta content="advert" name="contentType"/>
+                        <meta content="http://seesaw.stage.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/channel4/tv/comedy/alternative/35925/35925/001/L64/11583353263/x12/4OD/UNIVERSAL_MUSIC_011111_13647_2/2701060/553249624b3079475550554142667248"
+                              name="trackback"/>
+                        <meta content="http://realmedia.channel4.com/5c/kprod.channel4.com/channel4/channel4/tv/comedy/alternative/35925/35925/001/L64/1583353263/x60/4OD/UNIVERSAL_MUSIC_011111_13647_2/UNIVERSAL_MUSIC_011111_13647_1.html/553249624b3079475550554142667248"
+                              name="popupAdvertisingUrl"/>
                     </metadata>
-                </switch>
+                </video>
+
+                <par>
+                    <video
+                            src="rtmpe://cdn-flash-blue-dev.vodco.co.uk/a2703/mp4:e4/test/ccp/p/STD_RES/00000418/41805.mp4?s=1296224433&amp;e=1296225183&amp;h=a61d40407278eaa0528fbeb2939b8aaa"
+                            system-bitrate="844000" dur="852" clipEnd="852" clipBegin="30">
+                        <metadata>
+                            <meta content="mainContent" name="contentType"/>
+                        </metadata>
+                    </video>
+                    <img
+                            src="http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png">
+                        <metadata>
+                            <meta content="dogImage" name="contentType"/>
+                        </metadata>
+                    </img>
+                </par>
             </seq>
         </body>
     </smil>
-    <ns2:validTransaction>false</ns2:validTransaction>
-    <ns2:geoblocked>false</ns2:geoblocked>
-    <ns2:exceededDrmRule>false</ns2:exceededDrmRule>
-    <ns2:avod>true</ns2:avod>
-    <ns2:tvodPlayable>false</ns2:tvodPlayable>
-    <ns2:svodPlayable>false</ns2:svodPlayable>
-</ns2:videoInfo>
+    <validTransaction>false</validTransaction>
+    <geoblocked>false</geoblocked>
+    <exceededDrmRule>false</exceededDrmRule>
+    <avod>true</avod>
+    <tvodPlayable>false</tvodPlayable>
+    <svodPlayable>false</svodPlayable>
+</videoInfo>
 	
