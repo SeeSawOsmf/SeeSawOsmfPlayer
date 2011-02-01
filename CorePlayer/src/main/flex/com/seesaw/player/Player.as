@@ -112,7 +112,7 @@ public class Player extends Sprite {
         var my_menu:ContextMenu = new ContextMenu();
             my_menu.hideBuiltInItems();
            var getDate:Date = new Date();
-            var my_notice = new ContextMenuItem("Monday 31: 1800");
+            var my_notice = new ContextMenuItem("tuesday 01 10:46");
          my_menu.customItems.push(my_notice);
 
 contextMenu = my_menu;
