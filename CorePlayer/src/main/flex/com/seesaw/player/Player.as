@@ -88,12 +88,15 @@ public class Player extends Sprite {
     private var preloader:Preloader;
     private var xi:PlayerExternalInterface;
 
+    private var userInit:XML;
     private var playerInit:XML;
     private var videoInfo:XML;
 
     private var ASX_data:String;
 
     private var config:PlayerConfiguration;
+
+    private var playButtonMode:String;
 
     var testApi:TestApi;
 
@@ -117,6 +120,8 @@ public class Player extends Sprite {
         contextMenu = my_menu;
         // If no flashVar, use a default for testing
         // TODO: remove this altogether
+        loaderParams.userInitUrl = loaderParams.userInitUrl || "http://localhost:8080/player/userinitinfo/33535";
+        /// loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player/userinitinfo/13602";
         loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://localhost:8080/player/initinfo/33535";
         /// loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player/initinfo/13602";
 
@@ -135,6 +140,8 @@ public class Player extends Sprite {
 
         preloader = new Preloader();
         addChild(preloader);
+
+        requestUserInitData(loaderParams.userInitUrl);
 
         requestPlayerInitData(loaderParams.playerInitUrl);
     }
@@ -211,12 +218,16 @@ public class Player extends Sprite {
     }
 
     private function showPlayPanel():void {
-        var mode:String = getResumePosition() > 0 ? PlayStartButton.RESUME : PlayStartButton.PLAY;
-        var playButton:PlayStartButton = new PlayStartButton(mode);
-        playButton.addEventListener(PlayStartButton.PROCEED, function(event:Event) {
-            nextInitialisationStage();
-        });
-        addChild(playButton);
+        // if playButtonMode is null, this indicates that the user has no entitlement to play the video
+        if (playButtonMode != null) {
+            // assume the resume overrides other play button modes
+            var mode:String = getResumePosition() > 0 ? PlayStartButton.RESUME : playButtonMode;
+            var playButton:PlayStartButton = new PlayStartButton(mode);
+            playButton.addEventListener(PlayStartButton.PROCEED, function(event:Event) {
+                nextInitialisationStage();
+            });
+            addChild(playButton);
+        }
     }
 
     private function showOverUsePanel(errorType:String):void {
@@ -319,8 +330,50 @@ public class Player extends Sprite {
         }
     }
 
+    private function requestUserInitData(userInitUrl:String):void {
+        logger.debug("requesting user init data from: " + userInitUrl);
+
+        var request:ServiceRequest = new ServiceRequest(userInitUrl, onSuccessFromUserInit, onFailFromUserInit);
+        request.submit();
+    }
+
+    private function onSuccessFromUserInit(response:Object):void {
+        logger.debug("received user init data");
+
+        var xmlDoc:XML = new XML(response);
+        xmlDoc.ignoreWhitespace = true;
+
+        userInit = xmlDoc;
+
+        if (userInit.preview == "true") {
+            playButtonMode = PlayStartButton.PREVIEW;
+            return;
+        }
+
+        var availability = userInit.availability;
+        if (availability.svodPlayable == "true") {
+            playButtonMode = PlayStartButton.PLAY_SUBSCRIBED;
+            return;
+        }
+        if (availability.tvodPlayable == "true") {
+            playButtonMode = PlayStartButton.PLAY;
+            return;
+        }
+        if (availability.availabilityType == "AVOD") {
+            playButtonMode = PlayStartButton.PLAY;
+            return;
+        }
+
+        // note that if none of the conditions above are met, we should not show the play button at all
+    }
+
+    private function showPlayButton(buttonType:String):void {
+        // TODO: this needs to do something
+        logger.debug("show play button: " + buttonType);
+    }
+
     private function requestPlayerInitData(playerInitUrl:String):void {
-        logger.debug("requesting programme data from: " + playerInitUrl);
+        logger.debug("requesting programme init data from: " + playerInitUrl);
 
         var request:ServiceRequest = new ServiceRequest(playerInitUrl, onSuccessFromPlayerInit, onFailFromPlayerInit);
         request.submit();
@@ -345,7 +398,7 @@ public class Player extends Sprite {
     }
 
     private function requestProgrammeData(videoInfoUrl:String):void {
-        logger.debug("requesting programme data: " + videoInfoUrl);
+        logger.debug("requesting video info data: " + videoInfoUrl);
         var request:ServiceRequest = new ServiceRequest(videoInfoUrl, onSuccessFromVideoInfo, onFailFromVideoInfo);
         // For C4 ads we POST the ASX we receive from the ad script. For liverail and auditude, there's no need
         if (playerInit.adMode != AdMetadata.CHANNEL_4_AD_TYPE) {
@@ -358,7 +411,7 @@ public class Player extends Sprite {
     }
 
     private function onSuccessFromVideoInfo(response:Object):void {
-        logger.debug("received programme data");
+        logger.debug("received video info data");
 
         var xmlDoc:XML = new XML(response);
         xmlDoc.ignoreWhitespace = true;
@@ -371,17 +424,16 @@ public class Player extends Sprite {
             return;
         }
 
-        if (videoInfo.exceededDrmRule == "true" && videoInfo.noAdsPlayable == "true") {
+        var availability = videoInfo.availability;
+        if (availability.exceededDrmRule == "true" && availability.noAdsPlayable == "false" && availability.availabilityType == "AVOD") {
             this.showOverUsePanel("NO_ADS");
             return;
         }
-
-        if (videoInfo.exceededDrmRule == "true" && videoInfo.svodPlayable == "true") {
+        if (availability.exceededDrmRule == "true" && availability.svodPlayable == "false" && availability.availabilityType == "SVOD") {
             this.showOverUsePanel("SVOD");
             return;
         }
-
-        if (videoInfo.exceededDrmRule == "true" && videoInfo.tvodPlayable == "true") {
+        if (availability.exceededDrmRule == "true" && availability.tvodPlayable == "false" && availability.availabilityType == "TVOD") {
             this.showOverUsePanel("TVOD");
             return;
         }
@@ -478,8 +530,18 @@ public class Player extends Sprite {
         return resource;
     }
 
+    private function onFailFromUserInit():void {
+        logger.debug("failed to retrieve user init data");
+
+        removePreloader();
+
+        // TODO: request a test file but this should be removed eventually
+        var request:ServiceRequest = new ServiceRequest("../src/test/resources/userInfo.xml", onSuccessFromUserInit, null);
+        request.submit();
+    }
+
     private function onFailFromPlayerInit():void {
-        logger.debug("failed to retrieve init data");
+        logger.debug("failed to retrieve player init data");
 
         removePreloader();
 
@@ -489,7 +551,7 @@ public class Player extends Sprite {
     }
 
     private function onFailFromVideoInfo():void {
-        logger.debug("failed to retrieve programme data");
+        logger.debug("failed to retrieve video info data");
 
         // TODO: request a test file but this should be removed eventually
         var request:ServiceRequest = new ServiceRequest("../src/test/resources/videoInfo.xml", onSuccessFromVideoInfo, null);
