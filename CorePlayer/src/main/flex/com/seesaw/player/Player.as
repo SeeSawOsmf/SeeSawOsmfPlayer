@@ -112,13 +112,13 @@ public class Player extends Sprite {
         var my_menu:ContextMenu = new ContextMenu();
             my_menu.hideBuiltInItems();
            var getDate:Date = new Date();
-            var my_notice = new ContextMenuItem("tuesday 01 10:46");
+            var my_notice = new ContextMenuItem("tuesday 01 11:55");
          my_menu.customItems.push(my_notice);
 
 contextMenu = my_menu;
         // If no flashVar, use a default for testing
         // TODO: remove this altogether
-        loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://localhost/player/initinfo/29053";
+        loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://localhost:8080/player/initinfo/33535";
         /// loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player/initinfo/13602";
 
         stage.scaleMode = StageScaleMode.NO_SCALE;
@@ -405,6 +405,7 @@ contextMenu = my_menu;
         config = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, content);
         videoPlayer = new SeeSawPlayer(config);
         videoPlayer.addEventListener(PlayerConstants.DESTROY, reBuildPlayer);
+
         // Since we have autoPlay to false for liverail, we need to manually call play for C4:
         if (playerInit.adMode != AdMetadata.LR_AD_TYPE) {
             videoPlayer.mediaPlayer().autoPlay = true;
@@ -484,7 +485,7 @@ contextMenu = my_menu;
         removePreloader();
 
         // TODO: request a test file but this should be removed eventually
-        var request:ServiceRequest = new ServiceRequest("../src/test/resources/contentInfo.noad.xml", onSuccessFromPlayerInit, null);
+        var request:ServiceRequest = new ServiceRequest("../src/test/resources/contentInfo.xml", onSuccessFromPlayerInit, null);
         request.submit();
     }
 
@@ -492,7 +493,7 @@ contextMenu = my_menu;
         logger.debug("failed to retrieve programme data");
 
         // TODO: request a test file but this should be removed eventually
-        var request:ServiceRequest = new ServiceRequest("../src/test/resources/videoInfo.c4ad.xml", onSuccessFromVideoInfo, null);
+        var request:ServiceRequest = new ServiceRequest("../src/test/resources/videoInfo.xml", onSuccessFromVideoInfo, null);
         request.submit();
     }
 

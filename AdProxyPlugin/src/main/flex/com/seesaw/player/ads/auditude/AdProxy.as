@@ -228,7 +228,7 @@ public class AdProxy extends ProxyElement {
         logger.debug("AD BREAK BEGIN");
 
         if(adBreakCount == 0){
-           playerMetadata.addValue(AdMetadata.SECTION_COUNT, 1);
+           playerMetadata.addValue(AdMetadata.SECTION_COUNT, event);
         }
         adBreakCount++;
         // Perhaps this is needed for mid-rolls
@@ -248,6 +248,7 @@ public class AdProxy extends ProxyElement {
     private function onLinearAdBegin(event:LinearAdEvent):void {
         logger.debug("AD BEGIN");
       processAdStateMeta(AdState.STARTED, event);
+
     }
 
     private function onLinearAdEnd(event:LinearAdEvent):void {
@@ -266,16 +267,16 @@ public class AdProxy extends ProxyElement {
     }
 
     private function onAdClickThrough(event:AdClickThroughEvent):void {
-        adMetadata.clickThru = event.data.ad.clickThruUrl;
+        adMetadata.clickThru = event.click.url;
         pause();
     }
 
     private function processAdStateMeta(state:String, event:*):void {
         var dataObject:Object = new Object();
         dataObject["state"] = state;
-        dataObject["contentUrl"] = event.data.ad.linear.url;
-        dataObject["campaignId"] = event.data.ad.campaignID;
-        dataObject["creativeId"] = event.data.ad.creativeID;
+        dataObject["contentUrl"] = event.asset.url;
+        dataObject["campaignId"] = event.asset.customData.campaign_id;
+        dataObject["creativeId"] = event.asset.creativeType;
         adMetadata.adState = dataObject;
     }
 
