@@ -231,34 +231,6 @@ public class SeeSawPlayer extends Sprite {
         addChild(container);
     }
 
-    private function onMediaPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
-        switch (event.state) {
-            case MediaPlayerState.PLAYBACK_ERROR:
-                logger.error("MediaPlayerStateChange: PLAYBACK_ERROR");
-                break;
-            case MediaPlayerState.BUFFERING:
-                logger.debug("MediaPlayerStateChange: BUFFERING");
-                break;
-            case MediaPlayerState.LOADING:
-                logger.debug("MediaPlayerStateChange: LOADING");
-                break;
-            case MediaPlayerState.READY:
-                logger.debug("MediaPlayerStateChange: READY");
-                break;
-            case MediaPlayerState.PLAYING:
-                logger.debug("MediaPlayerStateChange: PLAYING");
-                toggleLights();
-                break;
-            case MediaPlayerState.PAUSED:
-                logger.debug("MediaPlayerStateChange: PAUSED");
-                toggleLights();
-                break;
-            case MediaPlayerState.UNINITIALIZED:
-                logger.debug("MediaPlayerStateChange: UNINITIALIZED");
-                break;
-        }
-    }
-
     private function loadAuditude():void {
         factory.loadPlugin(new URLResource(AUDITUDE_PLUGIN_URL));
     }
@@ -543,6 +515,34 @@ public class SeeSawPlayer extends Sprite {
             layout.verticalAlign = VerticalAlign.MIDDLE;
             layout.horizontalAlign = HorizontalAlign.CENTER;
             layout.scaleMode = ScaleMode.LETTERBOX;
+        }
+    }
+
+    private function onMediaPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
+        switch (event.state) {
+            case MediaPlayerState.PLAYBACK_ERROR:
+                logger.error("MediaPlayerStateChange: PLAYBACK_ERROR");
+                break;
+            case MediaPlayerState.BUFFERING:
+                logger.debug("MediaPlayerStateChange: BUFFERING");
+                break;
+            case MediaPlayerState.LOADING:
+                logger.debug("MediaPlayerStateChange: LOADING");
+                break;
+            case MediaPlayerState.READY:
+                logger.debug("MediaPlayerStateChange: READY");
+                break;
+            case MediaPlayerState.PLAYING:
+                logger.debug("MediaPlayerStateChange: PLAYING");
+                toggleLights();
+                break;
+            case MediaPlayerState.PAUSED:
+                logger.debug("MediaPlayerStateChange: PAUSED");
+                toggleLights();
+                break;
+            case MediaPlayerState.UNINITIALIZED:
+                logger.debug("MediaPlayerStateChange: UNINITIALIZED");
+                break;
         }
     }
 
