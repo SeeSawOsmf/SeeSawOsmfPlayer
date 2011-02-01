@@ -49,6 +49,7 @@ public class GuidancePanel extends Sprite {
     private var age:String;
     private var parentalControlsSetupLink:String;
     private var findOutMoreLink:String;
+    private var termsURL:String;
 
     private var assetWarning:String = "This %TYPE_TOKEN% isn't suitable for younger viewers.<br/><br/>";
     private var ageMessage:String = "Please confirm you are aged %AGE_TOKEN% or older " +
@@ -78,7 +79,7 @@ public class GuidancePanel extends Sprite {
      * Takes: warning:String - the guidance warning that appears at the top of the panel
      *
      */
-    public function GuidancePanel(warning:String, assetType:String, age:String, parentalControlsSetup:String, findOutMore:String) {
+    public function GuidancePanel(warning:String, assetType:String, age:String, parentalControlsSetup:String, findOutMore:String, termsURL:String) {
 
         this.acceptButton.name = PlayerConstants.GUIDANCE_PANEL_ACCEPT_BUTTON_NAME;
         this.cancelButton.name = PlayerConstants.GUIDANCE_PANEL_CANCEL_BUTTON_NAME;
@@ -89,6 +90,7 @@ public class GuidancePanel extends Sprite {
         this.age = age;
         this.parentalControlsSetupLink = parentalControlsSetup;
         this.findOutMoreLink = findOutMore;
+        this.termsURL = termsURL;
 
         Security.allowDomain("*");
         super();
@@ -208,7 +210,7 @@ public class GuidancePanel extends Sprite {
         var confirmationLabel = new StyledTextField();
         confirmationLabel.width = 500;
         confirmationLabel.wordWrap = true;
-        confirmationLabel.htmlText = this.ageMessage.replace("%TYPE_TOKEN%", this.assetType).replace("%AGE_TOKEN%", this.age).replace("%TERMSURL%", "http://www.seesaw.com/help");
+        confirmationLabel.htmlText = this.ageMessage.replace("%TYPE_TOKEN%", this.assetType).replace("%AGE_TOKEN%", this.age).replace("%TERMSURL%", this.termsURL);
         confirmationLabel.y = 66;
         var formattedWarningLabel:TextField = this.applyInfoFormat(confirmationLabel);
 
