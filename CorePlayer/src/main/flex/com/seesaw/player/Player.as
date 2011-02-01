@@ -484,7 +484,7 @@ contextMenu = my_menu;
         removePreloader();
 
         // TODO: request a test file but this should be removed eventually
-        var request:ServiceRequest = new ServiceRequest("../src/test/resources/contentInfo.xml", onSuccessFromPlayerInit, null);
+        var request:ServiceRequest = new ServiceRequest("../src/test/resources/contentInfo.noad.xml", onSuccessFromPlayerInit, null);
         request.submit();
     }
 
@@ -492,7 +492,7 @@ contextMenu = my_menu;
         logger.debug("failed to retrieve programme data");
 
         // TODO: request a test file but this should be removed eventually
-        var request:ServiceRequest = new ServiceRequest("../src/test/resources/videoInfo.xml", onSuccessFromVideoInfo, null);
+        var request:ServiceRequest = new ServiceRequest("../src/test/resources/videoInfo.c4ad.xml", onSuccessFromVideoInfo, null);
         request.submit();
     }
 

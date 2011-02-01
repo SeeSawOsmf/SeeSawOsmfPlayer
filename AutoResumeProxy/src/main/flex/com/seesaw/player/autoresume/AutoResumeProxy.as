@@ -74,12 +74,14 @@ public class AutoResumeProxy extends ProxyElement {
         currentPositionTimer.addEventListener(TimerEvent.TIMER, onTimerTick);
     }
 
-    public override function set proxiedElement(proxiedElement:MediaElement):void {
-        if (proxiedElement) {
-            super.proxiedElement = proxiedElement;
+    public override function set proxiedElement(element:MediaElement):void {
+        if (element) {
+            if(proxiedElement) {
+                proxiedElement.removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
+                proxiedElement.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
+            }
 
-            proxiedElement.removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
-            proxiedElement.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
+            super.proxiedElement = element;
 
             proxiedElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
             proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
