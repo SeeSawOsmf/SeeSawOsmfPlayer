@@ -71,7 +71,9 @@ import org.osmf.media.MediaPlayerState;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
 import org.osmf.media.URLResource;
+import org.osmf.metadata.CuePoint;
 import org.osmf.metadata.Metadata;
+import org.osmf.metadata.TimelineMetadata;
 import org.osmf.smil.SMILConstants;
 import org.osmf.smil.SMILPluginInfo;
 import org.osmf.traits.DisplayObjectTrait;
@@ -278,7 +280,7 @@ public class SeeSawPlayer extends Sprite {
         (event.buffering) ? bufferingPanel.show() : bufferingPanel.hide();
     }
 
-    private function createSubtitleElement(targetElement:MediaElement):void {
+    private function createSubtitleElement():void {
         // The subtitle location is actually in the smil document so we have to search for it
         var subtitleLocation:String = getSmilHeadMetaValue(PlayerConstants.SUBTITLE_LOCATION);
 
@@ -292,7 +294,7 @@ public class SeeSawPlayer extends Sprite {
 
             var targetMetadata:Metadata = new Metadata();
             targetMetadata.addValue(PlayerConstants.CONTENT_ID, PlayerConstants.MAIN_CONTENT_ID);
-            targetElement.addMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT, targetMetadata);
+            contentElement.addMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT, targetMetadata);
 
             logger.debug("loading subtitle plugin");
             factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
@@ -335,6 +337,7 @@ public class SeeSawPlayer extends Sprite {
 
         createBufferingPanel();
         createControlBarElement();
+        createSubtitleElement();
 
         if (contentElement is IAuditudeMediaElement) {
             var _auditude:AuditudePlugin = IAuditudeMediaElement(contentElement).plugin;
@@ -484,11 +487,9 @@ public class SeeSawPlayer extends Sprite {
                 layout.horizontalAlign = HorizontalAlign.LEFT;
                 layout.index = 5;
                 break;
-            case PlayerConstants.MAIN_CONTENT_ID:
-                // The subtitle plugin should target this element so that the timing is correct
-                createSubtitleElement(element);
             case PlayerConstants.STING_CONTENT_ID:
             case PlayerConstants.AD_CONTENT_ID:
+            case PlayerConstants.MAIN_CONTENT_ID:
                 // This layout applies to main content, stings and ads (notice there is no break above - this is
                 // intentional).
                 setMediaLayout(element);
