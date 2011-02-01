@@ -279,7 +279,8 @@ public class Player extends Sprite {
                         assetType,
                         playerInit.guidance.age,
                         playerInit.parentalControls.parentalControlsPageURL,
-                        playerInit.parentalControls.whatsThisLinkURL
+                        playerInit.parentalControls.whatsThisLinkURL,
+                        playerInit.parentalControls.termsAndConditionsLinkURL
                         );
 
                 guidancePanel.addEventListener(GuidancePanel.GUIDANCE_ACCEPTED, function(event:Event) {
