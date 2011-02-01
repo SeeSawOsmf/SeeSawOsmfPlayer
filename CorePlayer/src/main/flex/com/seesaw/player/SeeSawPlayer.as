@@ -278,16 +278,21 @@ public class SeeSawPlayer extends Sprite {
         (event.buffering) ? bufferingPanel.show() : bufferingPanel.hide();
     }
 
-    private function createSubtitleElement():void {
+    private function createSubtitleElement(targetElement:MediaElement):void {
         // The subtitle location is actually in the smil document so we have to search for it
         var subtitleLocation:String = getSmilHeadMetaValue(PlayerConstants.SUBTITLE_LOCATION);
 
         if (subtitleLocation) {
             logger.debug("creating captions: " + subtitleLocation);
 
+            if (subtitleElement) {
+                mainElement.removeChild(subtitleElement);
+                subtitleElement = null;
+            }
+
             var targetMetadata:Metadata = new Metadata();
             targetMetadata.addValue(PlayerConstants.CONTENT_ID, PlayerConstants.MAIN_CONTENT_ID);
-            contentElement.addMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT, targetMetadata);
+            targetElement.addMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT, targetMetadata);
 
             logger.debug("loading subtitle plugin");
             factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
@@ -307,7 +312,7 @@ public class SeeSawPlayer extends Sprite {
             // The subtitle element needs to check and set visibility every time it sets a new display object
             subtitleElement.addEventListener(MediaElementEvent.TRAIT_ADD, function(event:MediaElementEvent) {
                 if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
-                    var metadata:Metadata = contentElement.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+                    var metadata:Metadata = player.media.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
                     if (metadata) {
                         var visible:Boolean = metadata.getValue(ControlBarMetadata.SUBTITLES_VISIBLE) as Boolean;
                         var displayObjectTrait:DisplayObjectTrait =
@@ -330,7 +335,7 @@ public class SeeSawPlayer extends Sprite {
 
         createBufferingPanel();
         createControlBarElement();
-        createSubtitleElement();
+        //createSubtitleElement();
 
         if (contentElement is IAuditudeMediaElement) {
             var _auditude:AuditudePlugin = IAuditudeMediaElement(contentElement).plugin;
@@ -447,13 +452,15 @@ public class SeeSawPlayer extends Sprite {
     private function onMediaElementCreate(event:MediaFactoryEvent):void {
         var mediaElement:MediaElement = event.mediaElement;
 
-        var metadata:Metadata = mediaElement.resource.getMetadataValue(SMILConstants.SMIL_CONTENT_NS) as Metadata;
-        if (metadata) {
-            mediaElement.metadata.addEventListener(MetadataEvent.VALUE_ADD, function(event:MetadataEvent) {
-                if (event.key == SMILConstants.SMIL_CONTENT_NS) {
-                    configureSmilElement(mediaElement);
-                }
-            });
+        if (mediaElement.resource) {
+            var metadata:Metadata = mediaElement.resource.getMetadataValue(SMILConstants.SMIL_CONTENT_NS) as Metadata;
+            if (metadata) {
+                mediaElement.metadata.addEventListener(MetadataEvent.VALUE_ADD, function(event:MetadataEvent) {
+                    if (event.key == SMILConstants.SMIL_CONTENT_NS) {
+                        configureSmilElement(mediaElement);
+                    }
+                });
+            }
         }
     }
 
@@ -479,6 +486,8 @@ public class SeeSawPlayer extends Sprite {
                 layout.index = 5;
                 break;
             case PlayerConstants.MAIN_CONTENT_ID:
+                // The subtitle plugin should target this element so that the timing is correct
+                createSubtitleElement(element);
             case PlayerConstants.STING_CONTENT_ID:
             case PlayerConstants.AD_CONTENT_ID:
                 // This layout applies to main content, stings and ads (notice there is no break above - this is

@@ -21,7 +21,7 @@
                 <par>
                     <video
                             src="rtmpe://cdn-flash-blue-dev.vodco.co.uk/a2703/mp4:e4/test/ccp/p/STD_RES/00000418/41805.mp4?s=1296224433&amp;e=1296225183&amp;h=a61d40407278eaa0528fbeb2939b8aaa"
-                            system-bitrate="844000" dur="852" clipEnd="10" clipBegin="0">
+                            system-bitrate="844000" dur="852" clipEnd="30" clipBegin="0">
                         <metadata>
                             <meta content="mainContent" name="contentType"/>
                         </metadata>
@@ -42,21 +42,21 @@
                     </metadata>
                 </video>
 
-                <par>
-                    <video
-                            src="rtmpe://cdn-flash-blue-dev.vodco.co.uk/a2703/mp4:e4/test/ccp/p/STD_RES/00000418/41805.mp4?s=1296224433&amp;e=1296225183&amp;h=a61d40407278eaa0528fbeb2939b8aaa"
-                            system-bitrate="844000" dur="852" clipEnd="852" clipBegin="10">
-                        <metadata>
-                            <meta content="mainContent" name="contentType"/>
-                        </metadata>
-                    </video>
-                    <img
-                            src="http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png">
-                        <metadata>
-                            <meta content="dogImage" name="contentType"/>
-                        </metadata>
-                    </img>
-                </par>
+                <!--<par>-->
+                    <!--<video-->
+                            <!--src="rtmpe://cdn-flash-blue-dev.vodco.co.uk/a2703/mp4:e4/test/ccp/p/STD_RES/00000418/41805.mp4?s=1296224433&amp;e=1296225183&amp;h=a61d40407278eaa0528fbeb2939b8aaa"-->
+                            <!--system-bitrate="844000" dur="852" clipEnd="852" clipBegin="10">-->
+                        <!--<metadata>-->
+                            <!--<meta content="mainContent" name="contentType"/>-->
+                        <!--</metadata>-->
+                    <!--</video>-->
+                    <!--<img-->
+                            <!--src="http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png">-->
+                        <!--<metadata>-->
+                            <!--<meta content="dogImage" name="contentType"/>-->
+                        <!--</metadata>-->
+                    <!--</img>-->
+                <!--</par>-->
             </seq>
         </body>
     </smil>
