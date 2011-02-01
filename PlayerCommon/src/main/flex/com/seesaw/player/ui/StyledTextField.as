@@ -21,23 +21,28 @@
  */
 
 package com.seesaw.player.ui {
+import flash.text.AntiAliasType;
 import flash.text.TextField;
 import flash.text.TextFieldAutoSize;
 import flash.text.TextFormat;
 
 public class StyledTextField extends TextField {
 
+    [Embed(source="resources/ARIAL.TTF", fontFamily="arialEmbedded", mimeType="application/x-font")]
+    public var bar:String;
+
     public function StyledTextField():void {
+        this.embedFonts = true;
         this.selectable = false;
-        //this.multiline = true;
-        //this.wordWrap = true;
+
         this.autoSize = TextFieldAutoSize.LEFT;
+        this.antiAliasType = AntiAliasType.ADVANCED;
 
         //Instantiate the TextFormat
         var format:TextFormat = new TextFormat();
 
         //Add text styles here...
-        format.font = "Arial";
+        format.font = "arialEmbedded";
         format.color = 0x00A78D;
 
         //apply the styles to the TextField

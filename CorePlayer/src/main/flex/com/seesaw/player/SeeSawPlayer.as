@@ -71,7 +71,9 @@ import org.osmf.media.MediaPlayerState;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
 import org.osmf.media.URLResource;
+import org.osmf.metadata.CuePoint;
 import org.osmf.metadata.Metadata;
+import org.osmf.metadata.TimelineMetadata;
 import org.osmf.smil.SMILConstants;
 import org.osmf.smil.SMILPluginInfo;
 import org.osmf.traits.DisplayObjectTrait;
@@ -113,7 +115,6 @@ public class SeeSawPlayer extends Sprite {
     private var playerInit:XML;
     private var videoInfo:XML;
     private var adMode:String;
-    private var _auditude:AuditudePlugin;
 
     private var playlistElements:Vector.<MediaElement> = new Vector.<MediaElement>();
 
@@ -286,6 +287,11 @@ public class SeeSawPlayer extends Sprite {
         if (subtitleLocation) {
             logger.debug("creating captions: " + subtitleLocation);
 
+            if (subtitleElement) {
+                mainElement.removeChild(subtitleElement);
+                subtitleElement = null;
+            }
+
             var targetMetadata:Metadata = new Metadata();
             targetMetadata.addValue(PlayerConstants.CONTENT_ID, PlayerConstants.MAIN_CONTENT_ID);
             contentElement.addMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT, targetMetadata);
@@ -308,11 +314,11 @@ public class SeeSawPlayer extends Sprite {
             // The subtitle element needs to check and set visibility every time it sets a new display object
             subtitleElement.addEventListener(MediaElementEvent.TRAIT_ADD, function(event:MediaElementEvent) {
                 if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
-                    var metadata:Metadata = contentElement.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+                    var metadata:Metadata = player.media.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
                     if (metadata) {
                         var visible:Boolean = metadata.getValue(ControlBarMetadata.SUBTITLES_VISIBLE) as Boolean;
                         var displayObjectTrait:DisplayObjectTrait =
-                                subtitleElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
+                                MediaElement(event.target).getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
                         displayObjectTrait.displayObject.visible = visible == null ? false : visible;
                     }
                 }
@@ -447,10 +453,9 @@ public class SeeSawPlayer extends Sprite {
 
     private function onMediaElementCreate(event:MediaFactoryEvent):void {
         var mediaElement:MediaElement = event.mediaElement;
-        var mediaElementResource:MediaResourceBase = mediaElement.resource;
-        var metadata:Metadata;
-        if (mediaElementResource) {
-            metadata = mediaElement.resource.getMetadataValue(SMILConstants.SMIL_CONTENT_NS) as Metadata;
+
+        if (mediaElement.resource) {
+            var metadata:Metadata = mediaElement.resource.getMetadataValue(SMILConstants.SMIL_CONTENT_NS) as Metadata;
             if (metadata) {
                 mediaElement.metadata.addEventListener(MetadataEvent.VALUE_ADD, function(event:MetadataEvent) {
                     if (event.key == SMILConstants.SMIL_CONTENT_NS) {
@@ -482,9 +487,9 @@ public class SeeSawPlayer extends Sprite {
                 layout.horizontalAlign = HorizontalAlign.LEFT;
                 layout.index = 5;
                 break;
-            case PlayerConstants.MAIN_CONTENT_ID:
             case PlayerConstants.STING_CONTENT_ID:
             case PlayerConstants.AD_CONTENT_ID:
+            case PlayerConstants.MAIN_CONTENT_ID:
                 // This layout applies to main content, stings and ads (notice there is no break above - this is
                 // intentional).
                 setMediaLayout(element);

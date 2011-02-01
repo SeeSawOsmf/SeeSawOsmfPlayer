@@ -290,7 +290,8 @@ public class Player extends Sprite {
                         assetType,
                         playerInit.guidance.age,
                         playerInit.parentalControls.parentalControlsPageURL,
-                        playerInit.parentalControls.whatsThisLinkURL
+                        playerInit.parentalControls.whatsThisLinkURL,
+                        playerInit.parentalControls.termsAndConditionsLinkURL
                         );
 
                 guidancePanel.addEventListener(GuidancePanel.GUIDANCE_ACCEPTED, function(event:Event) {
@@ -546,7 +547,7 @@ public class Player extends Sprite {
         removePreloader();
 
         // TODO: request a test file but this should be removed eventually
-        var request:ServiceRequest = new ServiceRequest("../src/test/resources/contentInfo.xml", onSuccessFromPlayerInit, null);
+        var request:ServiceRequest = new ServiceRequest("../src/test/resources/contentInfo.noad.xml", onSuccessFromPlayerInit, null);
         request.submit();
     }
 
@@ -554,7 +555,7 @@ public class Player extends Sprite {
         logger.debug("failed to retrieve video info data");
 
         // TODO: request a test file but this should be removed eventually
-        var request:ServiceRequest = new ServiceRequest("../src/test/resources/videoInfo.xml", onSuccessFromVideoInfo, null);
+        var request:ServiceRequest = new ServiceRequest("../src/test/resources/videoInfo.c4ad.xml", onSuccessFromVideoInfo, null);
         request.submit();
     }
 
