@@ -59,7 +59,7 @@ public class ScrubPreventionProxyPluginInfo extends PluginInfo {
 
     private static function mediaElementCreationFunction():MediaElement {
         logger.debug("constructing proxy element");
-        return new SimpleScrubPrevention();
+        return new ScrubPreventionProxy();
     }
 }
 }

@@ -30,7 +30,7 @@ public class ViewEvent {
         return mainAssetId;
     }
 
-    public function get getTransactionItemId():Number {
+    public function get getTransactionItemId():int {
         return transactionItemId;
     }
 

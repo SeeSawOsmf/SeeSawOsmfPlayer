@@ -16,8 +16,8 @@
             <data>PRE:x01,x02,x60,x61,x90,x91</data>
         </break>
         <break>
-            <breakOffset>00:01:00.00</breakOffset>
-            <resumeOffset>00:01:00.00</resumeOffset>
+            <breakOffset>00:08:00.00</breakOffset>
+            <resumeOffset>00:08:00.00</resumeOffset>
             <data>CEN:x01,x02,x92,x80,x81,x93</data>
         </break>
     </loggingSheet>
@@ -35,16 +35,16 @@
     </parentalControls>
     <unavailablePageUrl>http://localhost:8080/unavailable</unavailablePageUrl>
     <videoInfoUrl>http://localhost:8080/player/videoinitinfo/33535</videoInfoUrl>
-    <batchEventService>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player.videoplayer:registerbatchevent?t:ac=TV:COMEDY/b/8542/Nathan-Barley</batchEventService>
-    <cumulativeDurationService>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player.videoplayer:playIntervalEvent?t:ac=TV:COMEDY/b/8542/Nathan-Barley</cumulativeDurationService>
+    <batchEventService>http://localhost:8080/player.videoplayer:registerbatchevent?t:ac=TV:COMEDY/b/8542/Nathan-Barley</batchEventService>
+    <cumulativeDurationService>http://localhost:8080/player.videoplayer:playIntervalEvent?t:ac=TV:COMEDY/b/8542/Nathan-Barley</cumulativeDurationService>
     <largeImageUrl>http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/E4_LARGE.png</largeImageUrl>
     <liverail>
         <version>4.1</version>
-        <publisherId>1332</publisherId>
+        <publisherId>1373</publisherId>
     </liverail>
     <adMode>liverail</adMode>
     <dogImage>http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png</dogImage>
     <programme>33535</programme>
-    <userId>1234</userId>
+    <userId>911112222</userId>
     <anonymousUserId>0000</anonymousUserId>
 </contentInfo>

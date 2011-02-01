@@ -53,12 +53,12 @@ import flash.display.StageScaleMode;
 import flash.events.Event;
 import flash.external.ExternalInterface;
 import flash.net.URLVariables;
+import flash.ui.ContextMenu;
+import flash.ui.ContextMenuItem;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
-import org.osmf.events.MediaErrorEvent;
 import org.osmf.logging.Log;
-import org.osmf.media.MediaPlayerState;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.metadata.Metadata;
 import org.osmf.smil.SMILConstants;
@@ -108,6 +108,13 @@ public class Player extends Sprite {
 
         loaderParams = LoaderInfo(this.root.loaderInfo).parameters;
 
+        ///Todo remove this completely, this is just for player proxy checking....
+        var my_menu:ContextMenu = new ContextMenu();
+        my_menu.hideBuiltInItems();
+        var getDate:Date = new Date();
+        var my_notice = new ContextMenuItem("tuesday 01 11:55");
+        my_menu.customItems.push(my_notice);
+        contextMenu = my_menu;
         // If no flashVar, use a default for testing
         // TODO: remove this altogether
         loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://localhost:8080/player/initinfo/33535";
@@ -477,7 +484,7 @@ public class Player extends Sprite {
         removePreloader();
 
         // TODO: request a test file but this should be removed eventually
-        var request:ServiceRequest = new ServiceRequest("../src/test/resources/contentInfo.noad.xml", onSuccessFromPlayerInit, null);
+        var request:ServiceRequest = new ServiceRequest("../src/test/resources/contentInfo.xml", onSuccessFromPlayerInit, null);
         request.submit();
     }
 
@@ -485,7 +492,7 @@ public class Player extends Sprite {
         logger.debug("failed to retrieve programme data");
 
         // TODO: request a test file but this should be removed eventually
-        var request:ServiceRequest = new ServiceRequest("../src/test/resources/videoInfo.c4ad.xml", onSuccessFromVideoInfo, null);
+        var request:ServiceRequest = new ServiceRequest("../src/test/resources/videoInfo.xml", onSuccessFromVideoInfo, null);
         request.submit();
     }
 

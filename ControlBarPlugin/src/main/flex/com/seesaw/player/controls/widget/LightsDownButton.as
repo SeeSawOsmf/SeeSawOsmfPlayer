@@ -103,7 +103,9 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
         }
     }
 
-    private function updateLightsStatus ():void {
+    private function updateLightsStatus(value:Boolean):void {
+        return
+        /// TODO this get into a loop and causes the lights to go off and on in a retarded fashion...
         if (lightsDownOn) {
             this.turnLightsUp();
         } else {

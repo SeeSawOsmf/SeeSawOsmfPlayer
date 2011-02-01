@@ -26,7 +26,6 @@ import org.osmf.elements.ParallelElement;
 import org.osmf.elements.ProxyElement;
 import org.osmf.elements.SerialElement;
 import org.osmf.elements.VideoElement;
-import org.osmf.events.MediaErrorEvent;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.events.SerialElementEvent;
 import org.osmf.media.MediaElement;
