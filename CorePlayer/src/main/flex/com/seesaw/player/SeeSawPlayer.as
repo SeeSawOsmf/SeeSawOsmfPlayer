@@ -22,7 +22,6 @@
 
 package com.seesaw.player {
 import com.auditude.ads.AuditudePlugin;
-import com.auditude.ads.event.AdPluginEvent;
 import com.auditude.ads.osmf.IAuditudeMediaElement;
 import com.auditude.ads.osmf.constants.AuditudeOSMFConstants;
 import com.seesaw.player.ads.AdMetadata;
@@ -236,15 +235,11 @@ public class SeeSawPlayer extends Sprite {
 
     private function onPluginLoaded(event:MediaFactoryEvent):void {
         logger.debug("Loaded plugin " + event.resource);
-         factory.addEventListener(AdPluginEvent.INIT_COMPLETE, onAudLoadComplete);
+
         if (--pluginsToLoad <= 0) {
             logger.debug("All plugins loaded");
             loadPlugins();
         }
-    }
-
-    private function onAudLoadComplete(event:AdPluginEvent):void {
-       logger.debug("Auditude has loaded");
     }
 
     private function loadPlugins():void {
@@ -340,6 +335,7 @@ public class SeeSawPlayer extends Sprite {
 
         if (contentElement is IAuditudeMediaElement) {
             _auditude = IAuditudeMediaElement(contentElement).plugin;
+        ///    _auditude.addEventListener(AdPluginEvent.INIT_COMPLETE, onAudLoadComplete);
             // We set this in the metadata so the auditude AdProxy can pick up the plugin
             var metadata:Metadata = config.resource.getMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) as Metadata;
             metadata.addValue(AuditudeConstants.PLUGIN_INSTANCE, _auditude);

@@ -53,6 +53,8 @@ import flash.display.StageScaleMode;
 import flash.events.Event;
 import flash.external.ExternalInterface;
 import flash.net.URLVariables;
+import flash.ui.ContextMenu;
+import flash.ui.ContextMenuItem;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -106,6 +108,14 @@ public class Player extends Sprite {
 
         loaderParams = LoaderInfo(this.root.loaderInfo).parameters;
 
+
+        var my_menu:ContextMenu = new ContextMenu();
+            my_menu.hideBuiltInItems();
+           var getDate:Date = new Date();
+            var my_notice = new ContextMenuItem("Monday 31: 1800");
+         my_menu.customItems.push(my_notice);
+
+contextMenu = my_menu;
         // If no flashVar, use a default for testing
         // TODO: remove this altogether
         loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://localhost/player/initinfo/29053";

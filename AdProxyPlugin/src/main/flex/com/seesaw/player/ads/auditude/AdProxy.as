@@ -56,6 +56,7 @@ public class AdProxy extends ProxyElement {
     private var resumePosition:int;
     private var adTimeTrait:AdTimeTrait;
     private var playerMetadata:Metadata;
+    private var adBreakCount:int;
 
     public function AdProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -225,34 +226,58 @@ public class AdProxy extends ProxyElement {
 
     private function onBreakBegin(event:AdPluginEvent):void {
         logger.debug("AD BREAK BEGIN");
+
+        if(adBreakCount == 0){
+           playerMetadata.addValue(AdMetadata.SECTION_COUNT, 1);
+        }
+        adBreakCount++;
+        // Perhaps this is needed for mid-rolls
+        //pause();
+
+        // mask the existing play trait so we get the play state changes here
         adMetadata.adState = AdState.AD_BREAK_START;
+        setTraitsToBlock(MediaTraitType.SEEK);
     }
 
     private function onBreakEnd(event:AdPluginEvent):void {
         logger.debug("AD BREAK END");
         adMetadata.adState = AdState.AD_BREAK_COMPLETE;
+        setTraitsToBlock();
     }
 
     private function onLinearAdBegin(event:LinearAdEvent):void {
         logger.debug("AD BEGIN");
+      processAdStateMeta(AdState.STARTED, event);
     }
 
     private function onLinearAdEnd(event:LinearAdEvent):void {
         logger.debug("AD END");
+        processAdStateMeta(AdState.STOPPED, event);
     }
 
     private function onNonLinearAdBegin(event:NonLinearAdEvent):void {
         logger.debug("AD BEGIN");
+           processAdStateMeta(AdState.STARTED, event);
     }
 
     private function onNonLinearAdEnd(event:NonLinearAdEvent):void {
         logger.debug("AD END");
+           processAdStateMeta(AdState.STOPPED, event);
     }
 
     private function onAdClickThrough(event:AdClickThroughEvent):void {
+        adMetadata.clickThru = event.data.ad.clickThruUrl;
         pause();
     }
 
+    private function processAdStateMeta(state:String, event:*):void {
+        var dataObject:Object = new Object();
+        dataObject["state"] = state;
+        dataObject["contentUrl"] = event.data.ad.linear.url;
+        dataObject["campaignId"] = event.data.ad.campaignID;
+        dataObject["creativeId"] = event.data.ad.creativeID;
+        adMetadata.adState = dataObject;
+    }
 
 }
 }
