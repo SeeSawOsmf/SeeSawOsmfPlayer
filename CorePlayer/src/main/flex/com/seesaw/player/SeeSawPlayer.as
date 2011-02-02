@@ -40,8 +40,6 @@ import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.namespaces.smil;
 import com.seesaw.player.netstatus.NetStatusMetadata;
 import com.seesaw.player.panels.BufferingPanel;
-import com.seesaw.player.panels.NotAvailablePanel;
-import com.seesaw.player.panels.PosterFrame;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
 import com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo;
 import com.seesaw.player.smil.SeeSawSMILLoader;
@@ -540,29 +538,13 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onMediaPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
+        logger.debug("MediaPlayerStateChange: " + event.state);
         switch (event.state) {
-            case MediaPlayerState.PLAYBACK_ERROR:
-                logger.error("MediaPlayerStateChange: PLAYBACK_ERROR");
-                break;
-            case MediaPlayerState.BUFFERING:
-                logger.debug("MediaPlayerStateChange: BUFFERING");
-                break;
-            case MediaPlayerState.LOADING:
-                logger.debug("MediaPlayerStateChange: LOADING");
-                break;
-            case MediaPlayerState.READY:
-                logger.debug("MediaPlayerStateChange: READY");
-                break;
             case MediaPlayerState.PLAYING:
-                logger.debug("MediaPlayerStateChange: PLAYING");
                 toggleLights();
                 break;
             case MediaPlayerState.PAUSED:
-                logger.debug("MediaPlayerStateChange: PAUSED");
                 toggleLights();
-                break;
-            case MediaPlayerState.UNINITIALIZED:
-                logger.debug("MediaPlayerStateChange: UNINITIALIZED");
                 break;
         }
     }
