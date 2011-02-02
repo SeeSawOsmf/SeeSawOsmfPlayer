@@ -76,7 +76,12 @@
                         disabledFace="playDisabled"
                         />
             </widget>
-
+            <widget
+                    id="com.seesaw.player.controls.widget.AdInfoLink"
+                    type="com.seesaw.player.controls.widget.AdInfoLink"
+                    left="80"
+                    top="27"
+                    />
             <widget
                     id="com.seesaw.player.controls.widget.ScrubBar"
                     type="com.seesaw.player.controls.widget.ScrubBar"
