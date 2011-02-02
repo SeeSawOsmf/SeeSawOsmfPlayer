@@ -67,9 +67,11 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
     private static const _requiredTraits:Vector.<String> = new Vector.<String>;
     _requiredTraits[0] = MediaTraitType.PLAY;
 
-    public function AdInfoLink(interactiveAdvertisingUrl:String, interactiveAdvertisingCaption:String = null) {
+    public function AdInfoLink() {
 
-        this.interactiveAdvertisingUrl = interactiveAdvertisingUrl;
+        var interactiveAdvertisingCaption:String = "Click here to visit Google";
+
+        this.interactiveAdvertisingUrl = "http://www.google.com";
 
         adInfoLabel = new StyledTextField();
 
@@ -107,12 +109,12 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
                 media.addMetadata(ExternalInterfaceMetadata.EXTERNAL_INTERFACE_METADATA, metadata);
             }
 
-            metadata.addEventListener(MetadataEvent.VALUE_CHANGE, lightsDownMetadataChange);
-            metadata.addEventListener(MetadataEvent.VALUE_ADD, lightsDownMetadataChange);
+            metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdInfoMetadataChange);
+            metadata.addEventListener(MetadataEvent.VALUE_ADD, onAdInfoMetadataChange);
         }
     }
 
-    private function lightsDownMetadataChange(event:MetadataEvent) {
+    private function onAdInfoMetadataChange(event:MetadataEvent) {
         if (event.key == ExternalInterfaceMetadata.LIGHTS_DOWN) {
            var value:Boolean = event.value as Boolean;
            if (value == true) {
@@ -124,10 +126,10 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
         }
     }
 
-    private function onParentalControlClick(event:Event):void {
+    override protected function onMouseClick(event:MouseEvent):void {
         var request:URLRequest = new URLRequest(this.interactiveAdvertisingUrl);
         try {
-            navigateToURL(request, "_self");
+            navigateToURL(request);
         } catch (e:Error) {
             trace("Error occurred!");
         }
@@ -148,10 +150,6 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
 
     override protected function get requiredTraits():Vector.<String> {
         return _requiredTraits;
-    }
-
-    override protected function onMouseClick(event:MouseEvent):void {
-
     }
 
     public function get classDefinition():String {
