@@ -28,7 +28,6 @@ import com.seesaw.player.traits.captioning.CaptionLoadTrait;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.events.MediaElementEvent;
-import org.osmf.events.PlayEvent;
 import org.osmf.events.TimelineMetadataEvent;
 import org.osmf.media.LoadableElementBase;
 import org.osmf.media.MediaElement;
@@ -41,8 +40,6 @@ import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.LoadTrait;
 import org.osmf.traits.LoaderBase;
 import org.osmf.traits.MediaTraitType;
-import org.osmf.traits.PlayState;
-import org.osmf.traits.PlayTrait;
 
 public class SAMIElement extends LoadableElementBase {
 
@@ -76,7 +73,6 @@ public class SAMIElement extends LoadableElementBase {
 
         if (target) {
             var timelineMetadata:TimelineMetadata = target.getMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) as TimelineMetadata;
-
             if (timelineMetadata == null) {
                 timelineMetadata = new TimelineMetadata(target);
                 target.addMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE, timelineMetadata);
@@ -93,43 +89,24 @@ public class SAMIElement extends LoadableElementBase {
     }
 
     private function onMediaTraitsChange(event:MediaElementEvent):void {
-        // link the caption display trait to that of the video
-        if (event.type == MediaElementEvent.TRAIT_ADD) {
-            if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
-                addDisplayTrait();
-            }
-            else if (event.traitType == MediaTraitType.PLAY) {
-                var playTrait:PlayTrait = target.getTrait(MediaTraitType.PLAY) as PlayTrait;
-                playTrait.addEventListener(PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
-            }
-        } else {
-            if (event.traitType == MediaTraitType.DISPLAY_OBJECT || event.traitType == MediaTraitType.PLAY) {
-                removeDisplayTrait();
-            }
-        }
+        checkDisplayState();
     }
 
-    private function onPlayStateChange(event:PlayEvent):void {
-        if(event.playState == PlayState.STOPPED) {
-            removeDisplayTrait();
-        }
-    }
-
-    private function addDisplayTrait():void {
-        if (!hasTrait(MediaTraitType.DISPLAY_OBJECT)) {
-            logger.debug("adding display object trait for sami captions");
+    private function checkDisplayState():void {
+        if (!hasTrait(MediaTraitType.DISPLAY_OBJECT) &&
+                target.hasTrait(MediaTraitType.PLAY) && target.hasTrait(MediaTraitType.TIME)) {
+            logger.debug("adding display object trait");
             var captionDisplayObject:CaptionDisplayObject = new CaptionDisplayObject();
             // Captions are invisible by default. Obtain the DisplayObjectTrait to make visible
             captionDisplayObject.visible = false;
             displayTrait = new DisplayObjectTrait(captionDisplayObject);
             addTrait(MediaTraitType.DISPLAY_OBJECT, displayTrait);
         }
-    }
-
-    private function removeDisplayTrait():void {
-        logger.debug("removing display object trait for sami captions");
-        removeTrait(MediaTraitType.DISPLAY_OBJECT);
-        displayTrait = null;
+        else if (hasTrait(MediaTraitType.DISPLAY_OBJECT) && !target.hasTrait(MediaTraitType.TIME)) {
+            logger.debug("removing display object trait");
+            removeTrait(MediaTraitType.DISPLAY_OBJECT);
+            displayTrait = null;
+        }
     }
 
     private function onCuePoint(event:TimelineMetadataEvent):void {
