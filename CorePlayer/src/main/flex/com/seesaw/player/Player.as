@@ -82,22 +82,17 @@ public class Player extends Sprite {
     private var _videoPlayer:SeeSawPlayer;
 
     private var loaderParams:Object;
-    private var preInitStages:Vector.<Function>;
+    private var initStages:Vector.<Function>;
     private var posterFrame:PosterFrame;
     private var guidanceBar:Sprite;
     private var preloader:Preloader;
     private var xi:PlayerExternalInterface;
-
     private var userInit:XML;
     private var playerInit:XML;
     private var videoInfo:XML;
-
     private var ASX_data:String;
-
     private var config:PlayerConfiguration;
-
     private var playButtonMode:String;
-
     var testApi:TestApi;
 
     public function Player() {
@@ -182,14 +177,14 @@ public class Player extends Sprite {
     }
 
     private function resetInitialisationStages() {
-        logger.debug("reseting pre-initialisation stages");
+        logger.debug("resetting initialisation stages");
         // sets the order of stuff to evaluate during initialisation
-        preInitStages = new Vector.<Function>();
-        preInitStages[0] = showPosterFrame;
-        preInitStages[1] = showPlayPanel;
-        preInitStages[2] = showGuidancePanel;
-        preInitStages[3] = checkEntitlements;
-        preInitStages[4] = attemptPlaybackStart;
+        initStages = new Vector.<Function>();
+        initStages[0] = showPosterFrame;
+        initStages[1] = showPlayPanel;
+        initStages[2] = showGuidancePanel;
+        initStages[3] = checkEntitlements;
+        initStages[4] = attemptPlaybackStart;
     }
 
     private function checkEntitlements():void {
@@ -571,9 +566,9 @@ public class Player extends Sprite {
 
     private function nextInitialisationStage():void {
         // remove the next initialisation step and evaluate it
-        var initialisationStage:Function = preInitStages.shift();
+        var initialisationStage:Function = initStages.shift();
         if (initialisationStage) {
-            logger.debug("evaluating pre-initialisation stage");
+            logger.debug("evaluating initialisation stage");
             initialisationStage.call(this);
         }
     }
