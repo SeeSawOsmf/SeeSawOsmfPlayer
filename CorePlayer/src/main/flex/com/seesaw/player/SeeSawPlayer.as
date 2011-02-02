@@ -40,6 +40,8 @@ import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.namespaces.smil;
 import com.seesaw.player.netstatus.NetStatusMetadata;
 import com.seesaw.player.panels.BufferingPanel;
+import com.seesaw.player.panels.NotAvailablePanel;
+import com.seesaw.player.panels.PosterFrame;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
 import com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo;
 import com.seesaw.player.smil.SeeSawSMILLoader;
@@ -56,6 +58,8 @@ import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
 import org.osmf.events.BufferEvent;
 import org.osmf.events.DynamicStreamEvent;
+import org.osmf.events.LoadEvent;
+import org.osmf.events.LoaderEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.events.MediaPlayerStateChangeEvent;
@@ -71,13 +75,13 @@ import org.osmf.media.MediaPlayerState;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
 import org.osmf.media.URLResource;
-import org.osmf.metadata.CuePoint;
 import org.osmf.metadata.Metadata;
-import org.osmf.metadata.TimelineMetadata;
 import org.osmf.smil.SMILConstants;
 import org.osmf.smil.SMILPluginInfo;
 import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.DynamicStreamTrait;
+import org.osmf.traits.LoadState;
+import org.osmf.traits.LoadTrait;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.PlayTrait;
@@ -206,7 +210,7 @@ public class SeeSawPlayer extends Sprite {
         controlbarContainer.y = 0;
         controlbarContainer.x = 0;
         controlbarContainer.layoutMetadata.percentWidth = 100;
-        controlbarContainer.layoutMetadata.height = 100;
+        controlbarContainer.layoutMetadata.percentHeight = 100;
         controlbarContainer.layoutMetadata.verticalAlign = VerticalAlign.BOTTOM;
         addChild(controlbarContainer);
 
@@ -324,6 +328,14 @@ public class SeeSawPlayer extends Sprite {
                 }
             });
 
+            var loadTrait:LoadTrait = subtitleElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
+            loadTrait.addEventListener(LoaderEvent.LOAD_STATE_CHANGE, function(event:LoadEvent) {
+                if (event.loadState == LoadState.LOAD_ERROR) {
+                    // if the subtitles fail to load remove the element to allow the rest of the media to load correctly
+                    mainElement.removeChild(subtitleElement);
+                    subtitleElement = null;
+                }
+            });
             mainElement.addChild(subtitleElement);
         }
     }
@@ -600,7 +612,7 @@ public class SeeSawPlayer extends Sprite {
         return stage.displayState == StageDisplayState.FULL_SCREEN ? stage.fullScreenHeight : config.height;
     }
 
-    public function mediaPlayer():MediaPlayer {
+    public function get mediaPlayer():MediaPlayer {
         return player;
     }
 

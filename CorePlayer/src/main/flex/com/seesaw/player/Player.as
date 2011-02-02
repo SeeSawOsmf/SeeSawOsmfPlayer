@@ -59,7 +59,9 @@ import flash.ui.ContextMenuItem;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
+import org.osmf.events.MediaPlayerStateChangeEvent;
 import org.osmf.logging.Log;
+import org.osmf.media.MediaPlayerState;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.metadata.Metadata;
 import org.osmf.smil.SMILConstants;
@@ -83,23 +85,19 @@ public class Player extends Sprite {
     private var _videoPlayer:SeeSawPlayer;
 
     private var loaderParams:Object;
-    private var preInitStages:Vector.<Function>;
+    private var initStages:Vector.<Function>;
     private var posterFrame:PosterFrame;
     private var guidanceBar:Sprite;
     private var preloader:Preloader;
     private var xi:PlayerExternalInterface;
-
     private var userInit:XML;
     private var playerInit:XML;
     private var videoInfo:XML;
-
     private var ASX_data:String;
-
     private var config:PlayerConfiguration;
-
     private var playButtonMode:String;
-
     var testApi:TestApi;
+    private var errorPanel:NotAvailablePanel;
 
     public function Player() {
         super();
@@ -139,13 +137,14 @@ public class Player extends Sprite {
         logger.debug("added to stage");
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 
+        initialisePlayer();
+    }
+
+    private function initialisePlayer():void {
         preloader = new Preloader();
         addChild(preloader);
 
         requestUserInitData(loaderParams.userInitUrl);
-
-        // this is now called from onSuccessFromUserInit
-        // requestPlayerInitData(loaderParams.playerInitUrl);
     }
 
     private function setupExternalInterface():void {
@@ -183,14 +182,14 @@ public class Player extends Sprite {
     }
 
     private function resetInitialisationStages() {
-        logger.debug("reseting pre-initialisation stages");
+        logger.debug("resetting initialisation stages");
         // sets the order of stuff to evaluate during initialisation
-        preInitStages = new Vector.<Function>();
-        preInitStages[0] = showPosterFrame;
-        preInitStages[1] = showPlayPanel;
-        preInitStages[2] = showGuidancePanel;
-        preInitStages[3] = checkEntitlements;
-        preInitStages[4] = attemptPlaybackStart;
+        initStages = new Vector.<Function>();
+        initStages[0] = showPosterFrame;
+        initStages[1] = showPlayPanel;
+        initStages[2] = showGuidancePanel;
+        initStages[3] = checkEntitlements;
+        initStages[4] = attemptPlaybackStart;
     }
 
     private function checkEntitlements():void {
@@ -457,13 +456,14 @@ public class Player extends Sprite {
         config = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, content);
         videoPlayer = new SeeSawPlayer(config);
         videoPlayer.addEventListener(PlayerConstants.DESTROY, reBuildPlayer);
+        videoPlayer.mediaPlayer.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onMediaPlayerStateChange);
 
         // Since we have autoPlay to false for liverail, we need to manually call play for C4:
         if (playerInit.adMode != AdMetadata.LR_AD_TYPE) {
-            videoPlayer.mediaPlayer().autoPlay = true;
+            videoPlayer.mediaPlayer.autoPlay = true;
             if (playerInit.adMode == AdMetadata.AUDITUDE_AD_TYPE) {
                 var metadata:Metadata = content.getMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) as Metadata;
-                metadata.addValue(AuditudeOSMFConstants.PLAYER_INSTANCE, videoPlayer.mediaPlayer());
+                metadata.addValue(AuditudeOSMFConstants.PLAYER_INSTANCE, videoPlayer.mediaPlayer);
             }
         }
 
@@ -473,6 +473,24 @@ public class Player extends Sprite {
 
         videoPlayer.init();
     }
+
+     private function onMediaPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
+        if(event.state == MediaPlayerState.PLAYBACK_ERROR) {
+            videoPlayer.mediaPlayer.removeEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onMediaPlayerStateChange);
+            removeChild(videoPlayer);
+            videoPlayer = null;
+
+            if (posterFrame == null) {
+                posterFrame = new PosterFrame(playerInit.largeImageUrl);
+                addChild(posterFrame);
+            }
+
+            if (errorPanel == null) {
+                errorPanel = new NotAvailablePanel();
+                addChild(errorPanel);
+            }
+        }
+     }
 
     private function reBuildPlayer(event:Event):void {
         onAddedToStage(event);
@@ -572,9 +590,9 @@ public class Player extends Sprite {
 
     private function nextInitialisationStage():void {
         // remove the next initialisation step and evaluate it
-        var initialisationStage:Function = preInitStages.shift();
+        var initialisationStage:Function = initStages.shift();
         if (initialisationStage) {
-            logger.debug("evaluating pre-initialisation stage");
+            logger.debug("evaluating initialisation stage");
             initialisationStage.call(this);
         }
     }
