@@ -77,12 +77,10 @@ public class BatchEventService extends ProxyElement {
 
     private var playingMainContent:Boolean;
 
-    // TODO these values are hardcoded - waiting on ads to be fully implemented
     private var isPopupInteractive:Boolean = false;
     private var isOverlayInteractive:Boolean = false;
     private var campaignId:int;
     private var contentUrl:String;
-    private var contentDuration:int = 5;
 
     private var eventsManager:EventsManager;
     private var tooSlowTimer:Timer;
@@ -273,8 +271,10 @@ public class BatchEventService extends ProxyElement {
     private function onAdsMetaDataAdd(event:MetadataEvent):void {
         if (event.key == AdMetadata.AD_STATE) {
             AdMetaEvaluation(event.value);
-        } else {
-            AdMetaEvaluation(event.key);
+        } else  if (event.key == AdMetadata.AD_BREAKS)  {
+           //// AdMetaEvaluation(event.key);  ///todo se if we need anything related to the adBreaks changing...
+        }else{
+              AdMetaEvaluation(event.key);
         }
     }
 
