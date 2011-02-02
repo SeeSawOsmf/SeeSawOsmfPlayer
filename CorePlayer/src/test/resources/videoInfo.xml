@@ -58,10 +58,28 @@
     <serverTimestamp>1295949842789</serverTimestamp>
     <anonymousUserId>231266723204534</anonymousUserId>
     <transactionItemId>38281717</transactionItemId>
-    <availabilityType>AVOD</availabilityType>
-    <noAdsPlayable>false</noAdsPlayable>
-    <tvodPlayable>false</tvodPlayable>
-    <svodPlayable>false</svodPlayable>
-    <exceededDrmRule>false</exceededDrmRule>
-    <sectionCount>1</sectionCount>
+    <sectionCount>2</sectionCount>
+    <availability>
+      <availabilityType>AVOD</availabilityType>
+      <noAdsPlayable>false</noAdsPlayable>
+      <tvodPlayable>false</tvodPlayable>
+      <svodPlayable>false</svodPlayable>
+      <exceededDrmRule>false</exceededDrmRule>
+    </availability>
+    <!-- TVOD DRM EXCEEDED -->
+    <!--<availability>
+      <availabilityType>TVOD</availabilityType>
+      <noAdsPlayable>false</noAdsPlayable>
+      <tvodPlayable>false</tvodPlayable>
+      <svodPlayable>false</svodPlayable>
+      <exceededDrmRule>true</exceededDrmRule>
+    </availability>-->
+    <!-- SVOD DRM EXCEEDED -->
+    <!--<availability>
+      <availabilityType>SVOD</availabilityType>
+      <noAdsPlayable>false</noAdsPlayable>
+      <tvodPlayable>false</tvodPlayable>
+      <svodPlayable>false</svodPlayable>
+      <exceededDrmRule>true</exceededDrmRule>
+    </availability>-->
 </videoInfo>
