@@ -40,6 +40,8 @@ import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.namespaces.smil;
 import com.seesaw.player.netstatus.NetStatusMetadata;
 import com.seesaw.player.panels.BufferingPanel;
+import com.seesaw.player.panels.NotAvailablePanel;
+import com.seesaw.player.panels.PosterFrame;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
 import com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo;
 import com.seesaw.player.smil.SeeSawSMILLoader;
@@ -56,6 +58,8 @@ import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
 import org.osmf.events.BufferEvent;
 import org.osmf.events.DynamicStreamEvent;
+import org.osmf.events.LoadEvent;
+import org.osmf.events.LoaderEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.events.MediaPlayerStateChangeEvent;
@@ -76,6 +80,8 @@ import org.osmf.smil.SMILConstants;
 import org.osmf.smil.SMILPluginInfo;
 import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.DynamicStreamTrait;
+import org.osmf.traits.LoadState;
+import org.osmf.traits.LoadTrait;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.PlayTrait;
@@ -113,7 +119,6 @@ public class SeeSawPlayer extends Sprite {
     private var playerInit:XML;
     private var videoInfo:XML;
     private var adMode:String;
-    private var _auditude:AuditudePlugin;
 
     private var playlistElements:Vector.<MediaElement> = new Vector.<MediaElement>();
 
@@ -205,7 +210,7 @@ public class SeeSawPlayer extends Sprite {
         controlbarContainer.y = 0;
         controlbarContainer.x = 0;
         controlbarContainer.layoutMetadata.percentWidth = 100;
-        controlbarContainer.layoutMetadata.height = 100;
+        controlbarContainer.layoutMetadata.percentHeight = 100;
         controlbarContainer.layoutMetadata.verticalAlign = VerticalAlign.BOTTOM;
         addChild(controlbarContainer);
 
@@ -286,6 +291,11 @@ public class SeeSawPlayer extends Sprite {
         if (subtitleLocation) {
             logger.debug("creating captions: " + subtitleLocation);
 
+            if (subtitleElement) {
+                mainElement.removeChild(subtitleElement);
+                subtitleElement = null;
+            }
+
             var targetMetadata:Metadata = new Metadata();
             targetMetadata.addValue(PlayerConstants.CONTENT_ID, PlayerConstants.MAIN_CONTENT_ID);
             contentElement.addMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT, targetMetadata);
@@ -308,16 +318,24 @@ public class SeeSawPlayer extends Sprite {
             // The subtitle element needs to check and set visibility every time it sets a new display object
             subtitleElement.addEventListener(MediaElementEvent.TRAIT_ADD, function(event:MediaElementEvent) {
                 if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
-                    var metadata:Metadata = contentElement.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+                    var metadata:Metadata = player.media.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
                     if (metadata) {
                         var visible:Boolean = metadata.getValue(ControlBarMetadata.SUBTITLES_VISIBLE) as Boolean;
                         var displayObjectTrait:DisplayObjectTrait =
-                                subtitleElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
+                                MediaElement(event.target).getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
                         displayObjectTrait.displayObject.visible = visible == null ? false : visible;
                     }
                 }
             });
 
+            var loadTrait:LoadTrait = subtitleElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
+            loadTrait.addEventListener(LoaderEvent.LOAD_STATE_CHANGE, function(event:LoadEvent) {
+                if (event.loadState == LoadState.LOAD_ERROR) {
+                    // if the subtitles fail to load remove the element to allow the rest of the media to load correctly
+                    mainElement.removeChild(subtitleElement);
+                    subtitleElement = null;
+                }
+            });
             mainElement.addChild(subtitleElement);
         }
     }
@@ -447,10 +465,9 @@ public class SeeSawPlayer extends Sprite {
 
     private function onMediaElementCreate(event:MediaFactoryEvent):void {
         var mediaElement:MediaElement = event.mediaElement;
-        var mediaElementResource:MediaResourceBase = mediaElement.resource;
-        var metadata:Metadata;
-        if (mediaElementResource) {
-            metadata = mediaElement.resource.getMetadataValue(SMILConstants.SMIL_CONTENT_NS) as Metadata;
+
+        if (mediaElement.resource) {
+            var metadata:Metadata = mediaElement.resource.getMetadataValue(SMILConstants.SMIL_CONTENT_NS) as Metadata;
             if (metadata) {
                 mediaElement.metadata.addEventListener(MetadataEvent.VALUE_ADD, function(event:MetadataEvent) {
                     if (event.key == SMILConstants.SMIL_CONTENT_NS) {
@@ -482,9 +499,9 @@ public class SeeSawPlayer extends Sprite {
                 layout.horizontalAlign = HorizontalAlign.LEFT;
                 layout.index = 5;
                 break;
-            case PlayerConstants.MAIN_CONTENT_ID:
             case PlayerConstants.STING_CONTENT_ID:
             case PlayerConstants.AD_CONTENT_ID:
+            case PlayerConstants.MAIN_CONTENT_ID:
                 // This layout applies to main content, stings and ads (notice there is no break above - this is
                 // intentional).
                 setMediaLayout(element);
@@ -595,7 +612,7 @@ public class SeeSawPlayer extends Sprite {
         return stage.displayState == StageDisplayState.FULL_SCREEN ? stage.fullScreenHeight : config.height;
     }
 
-    public function mediaPlayer():MediaPlayer {
+    public function get mediaPlayer():MediaPlayer {
         return player;
     }
 

@@ -3,7 +3,6 @@ import com.seesaw.player.controls.ControlBarMetadata;
 
 import flash.events.Event;
 import flash.events.MouseEvent;
-
 import flash.events.TimerEvent;
 import flash.ui.Mouse;
 import flash.utils.Timer;
@@ -18,7 +17,7 @@ public class ControlBar extends Widget {
     private var logger:ILogger = LoggerFactory.getClassLogger(ControlBar);
 
     //Timer for the auto hide of the control bar
-    private var controlsTimer:Timer=new Timer(2500, 1);
+    private var controlsTimer:Timer = new Timer(2500, 1);
 
     //mouseOnStage - true if the mouse is over the stage
     private var mouseOnStage:Boolean = false;
@@ -50,17 +49,13 @@ public class ControlBar extends Widget {
         controlsTimer.start();
     }
 
-    override public function set media(value:MediaElement):void {
-        super.media = value;
-
-        if(media){
-            var metadata:Metadata = media.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
-            if (metadata == null) {
-                metadata = new Metadata();
-                media.addMetadata(ControlBarMetadata.CONTROL_BAR_METADATA, metadata);
-            }
-            metadata.addValue(ControlBarMetadata.CONTROL_BAR_HIDDEN, visible);
+    override protected function processMediaElementChange(oldMediaElement:MediaElement):void {
+        var metadata:Metadata = media.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+        if (metadata == null) {
+            metadata = new Metadata();
+            media.addMetadata(ControlBarMetadata.CONTROL_BAR_METADATA, metadata);
         }
+        metadata.addValue(ControlBarMetadata.CONTROL_BAR_HIDDEN, visible);
     }
 
     private function mouseOverControls(event:MouseEvent):void {
@@ -68,7 +63,7 @@ public class ControlBar extends Widget {
     }
 
     private function mouseLeaveControls(event:MouseEvent):void {
-        this.overControls = false;    
+        this.overControls = false;
     }
 
     private function showControlsListener(event:MouseEvent):void {
@@ -80,7 +75,7 @@ public class ControlBar extends Widget {
         Mouse.show();
         //resent the timer and start it again
         this.controlsTimer.reset();
-		this.controlsTimer.start();
+        this.controlsTimer.start();
     }
 
     private function moveShowControlsListener(event:MouseEvent):void {
@@ -92,11 +87,11 @@ public class ControlBar extends Widget {
             Mouse.show();
             //Restart the timer and start it again
             this.controlsTimer.reset();
-		    this.controlsTimer.start();
+            this.controlsTimer.start();
         }
     }
 
-    private function hideControls(evt:TimerEvent=null):void {
+    private function hideControls(evt:TimerEvent = null):void {
         //Check that the mouse is not over the control bar
         if (this.overControls == false) {
             //Hide the control bar
@@ -110,8 +105,8 @@ public class ControlBar extends Widget {
         //set mouseOnStage to false when leaving the stage
         this.mouseOnStage = false;
         //hide the control bar
-		this.hideControls(null);
-	}
+        this.hideControls(null);
+    }
 
     private function updateMetadata():void {
         var metadata:Metadata = media.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
@@ -122,7 +117,7 @@ public class ControlBar extends Widget {
 
     protected override function setSuperVisible(value:Boolean):void {
         super.setSuperVisible(value);
-        if(value != _superVisible) {
+        if (value != _superVisible) {
             logger.debug("updating metadata: visibility = " + value);
             updateMetadata();
             _superVisible = value;

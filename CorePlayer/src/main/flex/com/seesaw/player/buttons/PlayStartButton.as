@@ -42,6 +42,7 @@ public class PlayStartButton extends Sprite {
     public static const PREVIEW:String = "preview";
     public static const RESUME:String = "resume";
 
+
     // Requested button type - play, resume or preview
     private var buttonType:String;
 

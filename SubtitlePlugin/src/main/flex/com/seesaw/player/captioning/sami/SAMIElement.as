@@ -73,7 +73,6 @@ public class SAMIElement extends LoadableElementBase {
 
         if (target) {
             var timelineMetadata:TimelineMetadata = target.getMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) as TimelineMetadata;
-
             if (timelineMetadata == null) {
                 timelineMetadata = new TimelineMetadata(target);
                 target.addMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE, timelineMetadata);
@@ -90,24 +89,23 @@ public class SAMIElement extends LoadableElementBase {
     }
 
     private function onMediaTraitsChange(event:MediaElementEvent):void {
-        // link the caption display trait to that of the video
-        if (event.type == MediaElementEvent.TRAIT_ADD) {
-            if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
-                logger.debug("adding display object trait for sami captions");
-                if (!hasTrait(MediaTraitType.DISPLAY_OBJECT)) {
-                    var captionDisplayObject:CaptionDisplayObject = new CaptionDisplayObject();
-                    // Captions are invisible by default. Obtain the DisplayObjectTrait to make visible
-                    captionDisplayObject.visible = false;
-                    displayTrait = new DisplayObjectTrait(captionDisplayObject);
-                    addTrait(MediaTraitType.DISPLAY_OBJECT, displayTrait);
-                }
-            }
-        } else {
-            if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
-                logger.debug("removing display object trait for sami captions");
-                removeTrait(MediaTraitType.DISPLAY_OBJECT);
-                displayTrait = null;
-            }
+        checkDisplayState();
+    }
+
+    private function checkDisplayState():void {
+        if (!hasTrait(MediaTraitType.DISPLAY_OBJECT) &&
+                target.hasTrait(MediaTraitType.PLAY) && target.hasTrait(MediaTraitType.TIME)) {
+            logger.debug("adding display object trait");
+            var captionDisplayObject:CaptionDisplayObject = new CaptionDisplayObject();
+            // Captions are invisible by default. Obtain the DisplayObjectTrait to make visible
+            captionDisplayObject.visible = false;
+            displayTrait = new DisplayObjectTrait(captionDisplayObject);
+            addTrait(MediaTraitType.DISPLAY_OBJECT, displayTrait);
+        }
+        else if (hasTrait(MediaTraitType.DISPLAY_OBJECT) && !target.hasTrait(MediaTraitType.TIME)) {
+            logger.debug("removing display object trait");
+            removeTrait(MediaTraitType.DISPLAY_OBJECT);
+            displayTrait = null;
         }
     }
 
@@ -122,10 +120,12 @@ public class SAMIElement extends LoadableElementBase {
     }
 
     public function set target(value:MediaElement):void {
-        _target = value;
         if (_target) {
             _target.removeEventListener(MediaElementEvent.TRAIT_ADD, onMediaTraitsChange);
             _target.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onMediaTraitsChange);
+        }
+        _target = value;
+        if (_target) {
             _target.addEventListener(MediaElementEvent.TRAIT_ADD, onMediaTraitsChange);
             _target.addEventListener(MediaElementEvent.TRAIT_REMOVE, onMediaTraitsChange);
         }

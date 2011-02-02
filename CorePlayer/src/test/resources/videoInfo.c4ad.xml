@@ -4,10 +4,34 @@
         <head>
             <meta base="rtmpe://cdn-flash-blue-dev.vodco.co.uk/a2703"/>
             <meta content="http://kgd-blue-test-zxtm01.dev.vodco.co.uk/s/ccp/00000002/298.smi"
-                      name="subtitleLocation"/>
+                  name="subtitleLocation"/>
         </head>
         <body>
             <seq>
+                <video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Seesaw_Recycling.mp4">
+                    <metadata>
+                        <meta content="advert" name="contentType"/>
+                        <meta content="http://seesaw.stage.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/channel4/tv/comedy/alternative/35925/35925/001/L18/12116635505/x13/4OD/SS_IDENT_Feb10_x90/2362406/553249624b3079475550554142667248"
+                              name="trackback"/>
+                    </metadata>
+                </video>
+
+                <par>
+                    <video
+                            src="rtmpe://cdn-flash-blue-dev.vodco.co.uk/a2703/mp4:e4/test/ccp/p/STD_RES/00000418/41805.mp4?s=1296224433&amp;e=1296225183&amp;h=a61d40407278eaa0528fbeb2939b8aaa"
+                            system-bitrate="844000" dur="852" clipEnd="30" clipBegin="0">
+                        <metadata>
+                            <meta content="mainContent" name="contentType"/>
+                        </metadata>
+                    </video>
+                    <img
+                            src="http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png">
+                        <metadata>
+                            <meta content="dogImage" name="contentType"/>
+                        </metadata>
+                    </img>
+                </par>
+
                 <video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/eng-izor002-020-SD.mp4">
                     <metadata>
                         <meta content="advert" name="contentType"/>
@@ -21,31 +45,7 @@
                 <par>
                     <video
                             src="rtmpe://cdn-flash-blue-dev.vodco.co.uk/a2703/mp4:e4/test/ccp/p/STD_RES/00000418/41805.mp4?s=1296224433&amp;e=1296225183&amp;h=a61d40407278eaa0528fbeb2939b8aaa"
-                            system-bitrate="844000" dur="852" clipEnd="10" clipBegin="0">
-                        <metadata>
-                            <meta content="mainContent" name="contentType"/>
-                        </metadata>
-                    </video>
-                    <img
-                            src="http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png">
-                        <metadata>
-                            <meta content="dogImage" name="contentType"/>
-                        </metadata>
-                    </img>
-                </par>
-
-                <video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Seesaw_Recycling.mp4">
-                    <metadata>
-                        <meta content="advert" name="contentType"/>
-                        <meta content="http://seesaw.stage.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/channel4/tv/comedy/alternative/35925/35925/001/L18/12116635505/x13/4OD/SS_IDENT_Feb10_x90/2362406/553249624b3079475550554142667248"
-                              name="trackback"/>
-                    </metadata>
-                </video>
-
-                <par>
-                    <video
-                            src="rtmpe://cdn-flash-blue-dev.vodco.co.uk/a2703/mp4:e4/test/ccp/p/STD_RES/00000418/41805.mp4?s=1296224433&amp;e=1296225183&amp;h=a61d40407278eaa0528fbeb2939b8aaa"
-                            system-bitrate="844000" dur="852" clipEnd="852" clipBegin="10">
+                            system-bitrate="844000" dur="852" clipEnd="852" clipBegin="30">
                         <metadata>
                             <meta content="mainContent" name="contentType"/>
                         </metadata>
