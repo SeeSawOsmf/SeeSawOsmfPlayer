@@ -111,7 +111,7 @@ public class Player extends Sprite {
 
         loaderParams = LoaderInfo(this.root.loaderInfo).parameters;
 
-        ///Todo remove this completely, this is just for player proxy checking....
+        /// TODO: remove this completely, this is just for player proxy checking....
         var my_menu:ContextMenu = new ContextMenu();
         my_menu.hideBuiltInItems();
         var getDate:Date = new Date();
@@ -120,9 +120,9 @@ public class Player extends Sprite {
         contextMenu = my_menu;
         // If no flashVar, use a default for testing
         // TODO: remove this altogether
-        loaderParams.userInitUrl = loaderParams.userInitUrl || "http://localhost:8080/player/userinitinfo/33535";
+        loaderParams.userInitUrl = loaderParams.userInitUrl || "http://localhost:8080/player/userinitinfo/13602";
         /// loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player/userinitinfo/13602";
-        loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://localhost:8080/player/initinfo/33535";
+        loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://localhost:8080/player/initinfo/13602";
         /// loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player/initinfo/13602";
 
         stage.scaleMode = StageScaleMode.NO_SCALE;
@@ -143,7 +143,8 @@ public class Player extends Sprite {
 
         requestUserInitData(loaderParams.userInitUrl);
 
-        requestPlayerInitData(loaderParams.playerInitUrl);
+        // this is now called from onSuccessFromUserInit
+        // requestPlayerInitData(loaderParams.playerInitUrl);
     }
 
     private function setupExternalInterface():void {
@@ -231,7 +232,6 @@ public class Player extends Sprite {
     }
 
     private function showOverUsePanel(errorType:String):void {
-
         //over use panel checks if the error is "NO_ADS", if it is it show no ads messaging, otherwise it shows pack messaging.
         //var errorType:String = "NO_ADS";
         var overUsePanel = new OverUsePanel(errorType, playerInit.parentalControls.termsAndConditionsLinkURL);
@@ -348,24 +348,23 @@ public class Player extends Sprite {
 
         if (userInit.preview == "true") {
             playButtonMode = PlayStartButton.PREVIEW;
-            return;
         }
+        else {
+            var availability = userInit.availability;
+            if (availability.svodPlayable == "true") {
+                playButtonMode = PlayStartButton.PLAY_SUBSCRIBED;
+            }
+            else if (availability.tvodPlayable == "true") {
+                playButtonMode = PlayStartButton.PLAY;
+            }
+            else if (availability.availabilityType == "AVOD") {
+                playButtonMode = PlayStartButton.PLAY;
+            }
+        }
+        // Note that if none of the conditions above are met, we should not show
+        // the play button at all.  Leave playButtonMode as null in this case.
 
-        var availability = userInit.availability;
-        if (availability.svodPlayable == "true") {
-            playButtonMode = PlayStartButton.PLAY_SUBSCRIBED;
-            return;
-        }
-        if (availability.tvodPlayable == "true") {
-            playButtonMode = PlayStartButton.PLAY;
-            return;
-        }
-        if (availability.availabilityType == "AVOD") {
-            playButtonMode = PlayStartButton.PLAY;
-            return;
-        }
-
-        // note that if none of the conditions above are met, we should not show the play button at all
+        requestPlayerInitData(loaderParams.playerInitUrl);
     }
 
     private function showPlayButton(buttonType:String):void {
