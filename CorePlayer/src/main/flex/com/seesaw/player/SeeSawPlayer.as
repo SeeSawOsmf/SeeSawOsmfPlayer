@@ -210,7 +210,7 @@ public class SeeSawPlayer extends Sprite {
         controlbarContainer.y = 0;
         controlbarContainer.x = 0;
         controlbarContainer.layoutMetadata.percentWidth = 100;
-        controlbarContainer.layoutMetadata.height = 100;
+        controlbarContainer.layoutMetadata.percentHeight = 100;
         controlbarContainer.layoutMetadata.verticalAlign = VerticalAlign.BOTTOM;
         addChild(controlbarContainer);
 
