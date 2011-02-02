@@ -56,6 +56,8 @@ import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
 import org.osmf.events.BufferEvent;
 import org.osmf.events.DynamicStreamEvent;
+import org.osmf.events.LoadEvent;
+import org.osmf.events.LoaderEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.events.MediaPlayerStateChangeEvent;
@@ -78,6 +80,8 @@ import org.osmf.smil.SMILConstants;
 import org.osmf.smil.SMILPluginInfo;
 import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.DynamicStreamTrait;
+import org.osmf.traits.LoadState;
+import org.osmf.traits.LoadTrait;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.PlayTrait;
@@ -324,6 +328,14 @@ public class SeeSawPlayer extends Sprite {
                 }
             });
 
+            var loadTrait:LoadTrait = subtitleElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
+            loadTrait.addEventListener(LoaderEvent.LOAD_STATE_CHANGE, function(event:LoadEvent) {
+                if(event.loadState == LoadState.LOAD_ERROR) {
+                    // if the subtitles fail to load remove the element to allow the rest of the media to load correctly
+                    mainElement.removeChild(subtitleElement);
+                    subtitleElement = null;
+                }
+            });
             mainElement.addChild(subtitleElement);
         }
     }
