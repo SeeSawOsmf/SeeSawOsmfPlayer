@@ -40,6 +40,8 @@ import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.namespaces.smil;
 import com.seesaw.player.netstatus.NetStatusMetadata;
 import com.seesaw.player.panels.BufferingPanel;
+import com.seesaw.player.panels.NotAvailablePanel;
+import com.seesaw.player.panels.PosterFrame;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
 import com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo;
 import com.seesaw.player.smil.SeeSawSMILLoader;
@@ -73,9 +75,7 @@ import org.osmf.media.MediaPlayerState;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
 import org.osmf.media.URLResource;
-import org.osmf.metadata.CuePoint;
 import org.osmf.metadata.Metadata;
-import org.osmf.metadata.TimelineMetadata;
 import org.osmf.smil.SMILConstants;
 import org.osmf.smil.SMILPluginInfo;
 import org.osmf.traits.DisplayObjectTrait;
@@ -330,7 +330,7 @@ public class SeeSawPlayer extends Sprite {
 
             var loadTrait:LoadTrait = subtitleElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
             loadTrait.addEventListener(LoaderEvent.LOAD_STATE_CHANGE, function(event:LoadEvent) {
-                if(event.loadState == LoadState.LOAD_ERROR) {
+                if (event.loadState == LoadState.LOAD_ERROR) {
                     // if the subtitles fail to load remove the element to allow the rest of the media to load correctly
                     mainElement.removeChild(subtitleElement);
                     subtitleElement = null;
@@ -612,7 +612,7 @@ public class SeeSawPlayer extends Sprite {
         return stage.displayState == StageDisplayState.FULL_SCREEN ? stage.fullScreenHeight : config.height;
     }
 
-    public function mediaPlayer():MediaPlayer {
+    public function get mediaPlayer():MediaPlayer {
         return player;
     }
 
