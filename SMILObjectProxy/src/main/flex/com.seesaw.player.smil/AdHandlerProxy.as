@@ -38,7 +38,7 @@ public class AdHandlerProxy extends ProxyElement {
         super(proxiedElement);
         var traitsToBlock:Vector.<String> = new Vector.<String>();
         traitsToBlock[0] = MediaTraitType.TIME;
-        traitsToBlock[0] = MediaTraitType.SEEK;
+        traitsToBlock[1] = MediaTraitType.SEEK;
         blockedTraits = traitsToBlock;
     }
 
