@@ -359,13 +359,6 @@ public class SeeSawPlayer extends Sprite {
             metadata.addValue(AuditudeConstants.PLUGIN_INSTANCE, _auditude);
         }
 
-
-            var adMetadata:AdMetadata =  config.resource.getMetadataValue(AdMetadata.AD_NAMESPACE) as AdMetadata;
-        if (adMetadata == null) {
-            adMetadata = new AdMetadata();
-            contentElement.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
-        }
-
         setContainerSize(contentWidth, contentHeight);
 
         mainElement.addChild(contentElement);
