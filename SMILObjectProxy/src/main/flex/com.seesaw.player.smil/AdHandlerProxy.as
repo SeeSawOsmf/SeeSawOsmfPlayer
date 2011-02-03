@@ -33,7 +33,6 @@ import com.seesaw.player.ads.AdMetadata;
 import org.osmf.elements.ProxyElement;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.media.MediaElement;
-import org.osmf.metadata.Metadata;
 import org.osmf.smil.SMILConstants;
 import org.osmf.traits.MediaTraitType;
 
@@ -61,7 +60,7 @@ public class AdHandlerProxy extends ProxyElement {
 
     private function onMetadataAdd(event:MediaElementEvent):void {
         if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
-           trace();
+
         }
     }
 }

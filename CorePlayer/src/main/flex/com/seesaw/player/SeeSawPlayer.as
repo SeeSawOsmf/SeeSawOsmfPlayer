@@ -444,7 +444,7 @@ public class SeeSawPlayer extends Sprite {
                     var layoutMetadata:LayoutMetadata =
                             subtitleElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
                     if (layoutMetadata) {
-                        layoutMetadata.bottom = event.value ? 20 : 100;
+                        layoutMetadata.bottom = event.value ? 20 : 110;
                     }
                 }
                 break;

@@ -27,7 +27,6 @@ import org.osmf.elements.ProxyElement;
 import org.osmf.elements.SerialElement;
 import org.osmf.elements.VideoElement;
 import org.osmf.events.MediaFactoryEvent;
-import org.osmf.events.SerialElementEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaResourceBase;
@@ -106,18 +105,6 @@ CONFIG::LOGGING
 					break;
 				case SMILElementType.SEQUENCE:
 					var serialElement:SerialElement = new SerialElement();
-                    serialElement.addEventListener(SerialElementEvent.CURRENT_CHILD_CHANGE, function(event:SerialElementEvent) {
-                        var serialElement:SerialElement = event.currentTarget as SerialElement;
-                        var index:int = serialElement.getChildIndex(event.currentChild) - 1;
-                        if(index >= 0) {
-                            var childElem:MediaElement = serialElement.getChildAt(index);
-                            var metadata:Metadata = childElem.getMetadata(SMILConstants.SMIL_CONTENT_NS);
-                            if(metadata && (metadata.getValue("contentType") == "advert" ||
-                                    metadata.getValue("contentType") == "sting")) {
-                                serialElement.removeChild(childElem);
-                            }
-                        }
-                     });
                     mediaElement = serialElement;
 					break;
 				case SMILElementType.VIDEO:
