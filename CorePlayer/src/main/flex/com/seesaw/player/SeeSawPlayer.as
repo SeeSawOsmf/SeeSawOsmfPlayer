@@ -264,8 +264,8 @@ public class SeeSawPlayer extends Sprite {
             factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.liverail.AdProxyPluginInfo()));
         if (adMode == AdMetadata.AUDITUDE_AD_TYPE)
             factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.auditude.AdProxyPluginInfo()));
-            factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
-            factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
+        factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
 
         createVideoElement();
     }
@@ -357,13 +357,6 @@ public class SeeSawPlayer extends Sprite {
             // We set this in the metadata so the auditude AdProxy can pick up the plugin
             var metadata:Metadata = config.resource.getMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) as Metadata;
             metadata.addValue(AuditudeConstants.PLUGIN_INSTANCE, _auditude);
-        }
-
-
-            var adMetadata:AdMetadata =  config.resource.getMetadataValue(AdMetadata.AD_NAMESPACE) as AdMetadata;
-        if (adMetadata == null) {
-            adMetadata = new AdMetadata();
-            contentElement.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
         }
 
         setContainerSize(contentWidth, contentHeight);
@@ -508,11 +501,7 @@ public class SeeSawPlayer extends Sprite {
             case PlayerConstants.AD_CONTENT_ID:
                 var adMetadata:AdMetadata = new AdMetadata();
                 adMetadata.adMode = AdMode.AD;
-
-                // CompositeMetadata fails unless ad metadata is added to all the video elements for some reason
-                // so even though add metadata is not applicable to main content it has to be added.
                 element.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
-
                 processSmilMediaElement(element);
                 break;
             case PlayerConstants.STING_CONTENT_ID:
@@ -645,9 +634,9 @@ public class SeeSawPlayer extends Sprite {
 
         var adBreaks:Vector.<AdBreak> = new Vector.<AdBreak>();
         for each (var video:XML in videoInfo.smil.body..video) {
-            if(video.@clipBegin) {
+            if (video.@clipBegin) {
                 var clipStart:int = parseInt(video.@clipBegin);
-                if(clipStart > 0) {
+                if (clipStart > 0) {
                     var adBreak:AdBreak = new AdBreak();
                     adBreak.startTime = clipStart;
                     adBreaks.push(adBreak);

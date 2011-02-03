@@ -18,7 +18,7 @@
                 <par>
                     <video
                             src="rtmpe://cdn-flash-blue-dev.vodco.co.uk/a2703/mp4:e4/test/ccp/p/STD_RES/00000418/41805.mp4?s=1296224433&amp;e=1296225183&amp;h=a61d40407278eaa0528fbeb2939b8aaa"
-                            system-bitrate="844000" dur="852" clipEnd="10" clipBegin="0">
+                            system-bitrate="844000" dur="852" clipEnd="30" clipBegin="0">
                         <metadata>
                             <meta content="mainContent" name="contentType"/>
                         </metadata>
@@ -44,7 +44,33 @@
                 <par>
                     <video
                             src="rtmpe://cdn-flash-blue-dev.vodco.co.uk/a2703/mp4:e4/test/ccp/p/STD_RES/00000418/41805.mp4?s=1296224433&amp;e=1296225183&amp;h=a61d40407278eaa0528fbeb2939b8aaa"
-                            system-bitrate="844000" dur="852" clipEnd="852" clipBegin="10">
+                            system-bitrate="844000" dur="852" clipEnd="120" clipBegin="30">
+                        <metadata>
+                            <meta content="mainContent" name="contentType"/>
+                        </metadata>
+                    </video>
+                    <img
+                            src="http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png">
+                        <metadata>
+                            <meta content="dogImage" name="contentType"/>
+                        </metadata>
+                    </img>
+                </par>
+
+                <video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/eng-izor002-020-SD.mp4">
+                    <metadata>
+                        <meta content="advert" name="contentType"/>
+                        <meta content="http://seesaw.stage.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/channel4/tv/comedy/alternative/35925/35925/001/L64/11583353263/x12/4OD/UNIVERSAL_MUSIC_011111_13647_2/2701060/553249624b3079475550554142667248"
+                              name="trackback"/>
+                        <meta content="http://realmedia.channel4.com/5c/kprod.channel4.com/channel4/channel4/tv/comedy/alternative/35925/35925/001/L64/1583353263/x60/4OD/UNIVERSAL_MUSIC_011111_13647_2/UNIVERSAL_MUSIC_011111_13647_1.html/553249624b3079475550554142667248"
+                              name="popupAdvertisingUrl"/>
+                    </metadata>
+                </video>
+
+                <par>
+                    <video
+                            src="rtmpe://cdn-flash-blue-dev.vodco.co.uk/a2703/mp4:e4/test/ccp/p/STD_RES/00000418/41805.mp4?s=1296224433&amp;e=1296225183&amp;h=a61d40407278eaa0528fbeb2939b8aaa"
+                            system-bitrate="844000" dur="852" clipEnd="852" clipBegin="120">
                         <metadata>
                             <meta content="mainContent" name="contentType"/>
                         </metadata>

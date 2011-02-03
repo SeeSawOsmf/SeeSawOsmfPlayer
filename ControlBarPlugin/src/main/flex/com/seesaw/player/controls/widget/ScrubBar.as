@@ -24,6 +24,7 @@ package
 com.seesaw.player.controls.widget {
 import com.seesaw.player.ads.AdBreak;
 import com.seesaw.player.ads.AdMetadata;
+import com.seesaw.player.ads.AdMode;
 import com.seesaw.player.ads.AdState;
 import com.seesaw.player.traits.ads.AdTraitType;
 import com.seesaw.player.ui.StyledTextField;
@@ -210,25 +211,11 @@ public class ScrubBar extends Widget implements IWidget {
 
     override protected function processMediaElementChange(oldMediaElement:MediaElement):void {
         if (oldMediaElement) {
-            oldMediaElement.removeEventListener(MediaElementEvent.METADATA_ADD, onMediaMetadataRemove);
-            oldMediaElement.removeEventListener(MediaElementEvent.METADATA_REMOVE, onMediaMetadataRemove);
+            oldMediaElement.metadata.removeEventListener(MetadataEvent.VALUE_ADD, onAdStateMetadataChanged);
+            oldMediaElement.metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onAdStateMetadataChanged);
         }
-        media.addEventListener(MediaElementEvent.METADATA_ADD, onMediaMetadataAdd);
-        media.addEventListener(MediaElementEvent.METADATA_REMOVE, onMediaMetadataRemove);
-    }
-
-    private function onMediaMetadataAdd(event:MediaElementEvent):void {
-        if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
-            event.metadata.addEventListener(MetadataEvent.VALUE_ADD, onAdStateMetadataChanged);
-            event.metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdStateMetadataChanged);
-        }
-    }
-
-    private function onMediaMetadataRemove(event:MediaElementEvent):void {
-        if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
-            event.metadata.removeEventListener(MetadataEvent.VALUE_ADD, onAdStateMetadataChanged);
-            event.metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onAdStateMetadataChanged);
-        }
+        media.metadata.addEventListener(MetadataEvent.VALUE_ADD, onAdStateMetadataChanged);
+        media.metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdStateMetadataChanged);
     }
 
     private function onDurationChange(event:TimeEvent):void {
@@ -243,14 +230,6 @@ public class ScrubBar extends Widget implements IWidget {
 
     private function updateState():void {
         visible = scrubber.enabled = media ? media.hasTrait(MediaTraitType.SEEK) : false;
-        if (adMetadata) {
-            if (adMetadata.hasEventListener(MetadataEvent.VALUE_ADD) && adMetadata.hasEventListener(MetadataEvent.VALUE_CHANGE)) {
-                adMetadata.removeEventListener(MetadataEvent.VALUE_ADD, onAdStateMetadataChanged);
-                adMetadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onAdStateMetadataChanged);
-            }
-            adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdStateMetadataChanged);
-            adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdStateMetadataChanged);
-        }
         updateTimerState();
     }
 
@@ -259,19 +238,31 @@ public class ScrubBar extends Widget implements IWidget {
     }
 
     private function onAdStateMetadataChanged(event:MetadataEvent):void {
-        if ((event.key == AdMetadata.AD_STATE && event.value == AdState.AD_BREAK_COMPLETE)) {
+        if (event.key == AdMetadata.AD_NAMESPACE && adMetadata.adMode == AdMode.MAIN_CONTENT) {
             logger.debug("ad markers changed");
             adHasCompleted = true;
             createAdMarkers();
         }
     }
 
+    private function removeCompletedMarkers():void {
+        var adBreaks:Vector.<AdBreak> = adMetadata ? adMetadata.adBreaks : null;
+        var timeTrait:TimeTrait = media.getTrait(MediaTraitType.TIME) as TimeTrait;
+        if(timeTrait && adBreaks) {
+            for (var i:int = 0; i < adBreaks.length; i++) {
+                if(adBreaks[i].startTime <= timeTrait.currentTime) {
+                    adBreaks.splice(i, 1);
+                }
+            }
+        }
+    }
+
     private function createAdMarkers():void {
         var adBreaks:Vector.<AdBreak> = adMetadata ? adMetadata.adBreaks : null;
 
-
         if (adBreaks && adBreaks.length > 0) {
             removeAllChildren(markerContainer);
+            removeCompletedMarkers();
 
             for each (var value:AdBreak in adBreaks) {
                 if (value.startTime > 0) {
