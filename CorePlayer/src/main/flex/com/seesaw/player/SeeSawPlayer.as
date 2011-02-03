@@ -24,6 +24,7 @@ package com.seesaw.player {
 import com.auditude.ads.AuditudePlugin;
 import com.auditude.ads.osmf.IAuditudeMediaElement;
 import com.auditude.ads.osmf.constants.AuditudeOSMFConstants;
+import com.seesaw.player.ads.AdBreak;
 import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.ads.AdMode;
 import com.seesaw.player.ads.AuditudeConstants;
@@ -263,8 +264,8 @@ public class SeeSawPlayer extends Sprite {
             factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.liverail.AdProxyPluginInfo()));
         if (adMode == AdMetadata.AUDITUDE_AD_TYPE)
             factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.auditude.AdProxyPluginInfo()));
-            factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
-            factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
+        factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
 
         createVideoElement();
     }
@@ -359,12 +360,12 @@ public class SeeSawPlayer extends Sprite {
         }
 
 
- /*           var adMetadata:AdMetadata =  config.resource.getMetadataValue(AdMetadata.AD_NAMESPACE) as AdMetadata;
+     var adMetadata:AdMetadata =  config.resource.getMetadataValue(AdMetadata.AD_NAMESPACE) as AdMetadata;
         if (adMetadata == null) {
             adMetadata = new AdMetadata();
            contentElement.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
         }
-*/
+
         setContainerSize(contentWidth, contentHeight);
 
         mainElement.addChild(contentElement);
@@ -507,11 +508,7 @@ public class SeeSawPlayer extends Sprite {
             case PlayerConstants.AD_CONTENT_ID:
                 var adMetadata:AdMetadata = new AdMetadata();
                 adMetadata.adMode = AdMode.AD;
-
-                // CompositeMetadata fails unless ad metadata is added to all the video elements for some reason
-                // so even though add metadata is not applicable to main content it has to be added.
                 element.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
-
                 processSmilMediaElement(element);
                 break;
             case PlayerConstants.STING_CONTENT_ID:
@@ -523,6 +520,8 @@ public class SeeSawPlayer extends Sprite {
             case PlayerConstants.MAIN_CONTENT_ID:
                 var adMetadata:AdMetadata = new AdMetadata();
                 adMetadata.adMode = AdMode.MAIN_CONTENT;
+                adMetadata.adBreaks = generateAdBreaksFromSmil();
+                pushAdMetaDataToContentELement();
                 element.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
                 processSmilMediaElement(element);
                 break;
@@ -531,10 +530,17 @@ public class SeeSawPlayer extends Sprite {
         element.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
     }
 
+    private function pushAdMetaDataToContentELement():void {
+         var adMetadata:AdMetadata = contentElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+        if(!adMetadata.adBreaks){
+            adMetadata.adBreaks = generateAdBreaksFromSmil();
+        }
+    }
+
     private function processSmilMediaElement(element:MediaElement):void {
         // This layout applies to main content, stings and ads
         setMediaLayout(element);
-
+            element.getTrait(MediaTraitType.LOAD).addEventListener(LoadEvent.LOAD_STATE_CHANGE, proceesMediaLoad)
         // For some reason dynamic stream changes reset the current layout metadata (bug?) in the playlist
         // so this is a workaround to always set the right value.
         element.addEventListener(MediaElementEvent.TRAIT_ADD, function(event:MediaElementEvent) {
@@ -546,33 +552,26 @@ public class SeeSawPlayer extends Sprite {
                     setMediaLayout(element);
                 });
 
-            } /*else if (event.traitType == MediaTraitType.PLAY) {
-                var playTrait:PlayTrait =
-                        element.getTrait(MediaTraitType.PLAY) as PlayTrait;
-                playTrait.addEventListener(
-                        PlayEvent.PLAY_STATE_CHANGE, function (event:PlayEvent):void {
-                       switch (event.playState) {
-
-                case PlayState.PLAYING:
-                   var  adMetadata:AdMetadata = element.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
-                        if(adMetadata.adMode == AdMode.AD){
-                        adMetadata.adState = AdState.STARTED;
-                       }else if(adMetadata.adMode == AdMode.MAIN_CONTENT){
-                           adMetadata.adState = AdState.AD_BREAK_COMPLETE;
-                       }
-
-                    break;
-                case PlayState.STOPPED:
-                    break;
-                       }
-                });
-            }*/
+            }
         });
 
         // This is another workaround for the above bug - when full screen is set the full screen resolution
         // needs to be applied to all the video elements.
         playlistElements.push(element);
     }
+
+
+
+    private function proceesMediaLoad(event:LoadEvent):void {
+                         trace(event.target);
+         var metadata:Metadata = event.target.resource.getMetadataValue(SMILConstants.SMIL_CONTENT_NS);
+         var adMetadata:Metadata = contentElement.getMetadata(AdMetadata.AD_NAMESPACE);
+                        if(metadata) {
+                          adMetadata.addValue(AdMetadata.AD_STATE, metadata.getValue("contentType")) ;
+                        }
+    }
+
+
 
 
     private function setMediaLayout(element:MediaElement) {
@@ -658,6 +657,23 @@ public class SeeSawPlayer extends Sprite {
             }
         }
         return value;
+    }
+
+    private function generateAdBreaksFromSmil():Vector.<AdBreak> {
+        use namespace smil;
+
+        var adBreaks:Vector.<AdBreak> = new Vector.<AdBreak>();
+        for each (var video:XML in videoInfo.smil.body..video) {
+            if (video.@clipBegin) {
+                var clipStart:int = parseInt(video.@clipBegin);
+                if (clipStart > 0) {
+                    var adBreak:AdBreak = new AdBreak();
+                    adBreak.startTime = clipStart;
+                    adBreaks.push(adBreak);
+                }
+            }
+        }
+        return adBreaks;
     }
 }
 }

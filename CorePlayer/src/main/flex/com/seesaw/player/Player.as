@@ -36,6 +36,7 @@ import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.namespaces.smil;
+import com.seesaw.player.panels.GeoBlockPanel;
 import com.seesaw.player.panels.GuidanceBar;
 import com.seesaw.player.panels.GuidancePanel;
 import com.seesaw.player.panels.NotAvailablePanel;
@@ -420,6 +421,8 @@ public class Player extends Sprite {
         playerInit.adMode[0] = adModulePlayableEvaluation();
 
         if (videoInfo.geoblocked == "true") {
+            var geoBlockPanel = new GeoBlockPanel();
+            addChild(geoBlockPanel);
             return;
         }
 
@@ -564,7 +567,7 @@ public class Player extends Sprite {
         removePreloader();
 
         // TODO: request a test file but this should be removed eventually
-        var request:ServiceRequest = new ServiceRequest("../src/test/resources/contentInfo.noad.xml", onSuccessFromPlayerInit, null);
+        var request:ServiceRequest = new ServiceRequest("../src/test/resources/contentInfo.xml", onSuccessFromPlayerInit, null);
         request.submit();
     }
 
@@ -572,7 +575,7 @@ public class Player extends Sprite {
         logger.debug("failed to retrieve video info data");
 
         // TODO: request a test file but this should be removed eventually
-        var request:ServiceRequest = new ServiceRequest("../src/test/resources/videoInfo.c4ad.xml", onSuccessFromVideoInfo, null);
+        var request:ServiceRequest = new ServiceRequest("../src/test/resources/videoInfo.xml", onSuccessFromVideoInfo, null);
         request.submit();
     }
 

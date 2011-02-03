@@ -21,14 +21,11 @@
  */
 package org.osmf.smil.media
 {
-import com.seesaw.player.ads.AdMetadata;
-
 import org.osmf.elements.CompositeElement;
 import org.osmf.elements.ParallelElement;
 import org.osmf.elements.ProxyElement;
 import org.osmf.elements.SerialElement;
 import org.osmf.elements.VideoElement;
-import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
@@ -46,7 +43,6 @@ import org.osmf.smil.model.SMILElement;
 import org.osmf.smil.model.SMILElementType;
 import org.osmf.smil.model.SMILMediaElement;
 import org.osmf.smil.model.SMILMetaElement;
-import org.osmf.traits.MediaTraitType;
 
 CONFIG::LOGGING
 	{
@@ -59,7 +55,6 @@ CONFIG::LOGGING
 	 */
 	public class SMILMediaGenerator
 	{
-        private var serialElement:SerialElement;
 		/**
 		 * Creates the relevant MediaElement from the SMILDocument.
 		 *
@@ -109,7 +104,7 @@ CONFIG::LOGGING
 					mediaElement = parallelElement;
 					break;
 				case SMILElementType.SEQUENCE:
-					serialElement = new SerialElement();
+					var serialElement:SerialElement = new SerialElement();
                     mediaElement = serialElement;
 					break;
 				case SMILElementType.VIDEO:
@@ -119,7 +114,6 @@ CONFIG::LOGGING
 
 					var videoElement:MediaElement = factory.createMediaElement(resource);
                     populateMetadataFromSMIL(videoElement, smilElement);
-                    videoElement.getTrait(MediaTraitType.LOAD).addEventListener(LoadEvent.LOAD_STATE_CHANGE, proceesMediaLoad)
 
 					var smilVideoElement:SMILMediaElement = smilElement as SMILMediaElement;
 
@@ -215,24 +209,6 @@ CONFIG::LOGGING
 			return mediaElement;
 		}
 
-
-
-        private function proceesMediaLoad(event:LoadEvent):void {
-                             trace(event.target);
-             var metadata:Metadata = event.target.resource.getMetadataValue(SMILConstants.SMIL_CONTENT_NS);
-                            if(metadata) {
-                                adMetadata.adState =  metadata.getValue("contentType");
-                            }
-        }
-
-        private function get adMetadata():AdMetadata {
-        var adMetadata:AdMetadata = serialElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
-        if (adMetadata == null) {
-            adMetadata = new AdMetadata();
-            serialElement.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
-        }
-        return adMetadata;
-    }
 
 
         private function setVideoDuration(duration:Number, videoElement:MediaElement):void
