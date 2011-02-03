@@ -27,6 +27,7 @@ import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactoryItem;
 import org.osmf.media.MediaFactoryItemType;
 import org.osmf.media.MediaResourceBase;
+import org.osmf.media.MediaType;
 import org.osmf.media.PluginInfo;
 
 public class DebugPluginInfo extends PluginInfo {
@@ -48,7 +49,7 @@ public class DebugPluginInfo extends PluginInfo {
 
     private static function canHandleResourceFunction(resource:MediaResourceBase):Boolean {
         logger.debug("Debug Plugin can handle this resource");
-        return true;
+        return resource.mediaType == MediaType.VIDEO;
     }
 
     private static function mediaElementCreationFunction():MediaElement {

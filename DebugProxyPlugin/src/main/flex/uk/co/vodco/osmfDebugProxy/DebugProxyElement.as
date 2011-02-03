@@ -55,34 +55,30 @@ public class DebugProxyElement extends ProxyElement {
     }
 
     override public function set proxiedElement(value:MediaElement):void {
-        super.proxiedElement = value;
-
         var traitType:String
 
-        if (value != null) {
+        if (proxiedElement) {
             // Clear our old listeners.
-            value.removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
-            value.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
+            proxiedElement.removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
+            proxiedElement.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
 
             for each (traitType in value.traitTypes) {
                 processTrait(traitType, false);
             }
         }
 
+        super.proxiedElement = value;
 
-        if (value != null) {
+        if (proxiedElement) {
             // Listen for traits being added and removed.
-            value.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
-            value.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
+            proxiedElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
+            proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
 
             for each (traitType in value.traitTypes) {
                 processTrait(traitType, true);
             }
         }
-
-
     }
-
 
     // Internals
     //

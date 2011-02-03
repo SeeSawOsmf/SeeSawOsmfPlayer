@@ -60,7 +60,6 @@ import org.osmf.traits.TimeTrait;
 
 public class AdProxy extends ProxyElement {
 
-
     use namespace contentinfo;
 
     private var logger:ILogger = LoggerFactory.getClassLogger(AdProxy);
@@ -70,9 +69,7 @@ public class AdProxy extends ProxyElement {
     private var adManager:*;
     private var config:Configuration;
     private var resumePosition:int;
-
     private var timer:Timer;
-
     private var adTimeTrait:AdTimeTrait;
     private var playerMetadata:Metadata;
 
@@ -196,10 +193,8 @@ public class AdProxy extends ProxyElement {
     private function onInitComplete(ev:Object):void {
         logger.debug("onInitComplete");
 
-
         var adMap:Object = ev.data.adMap;
         var adBreaks:Array = adMap.adBreaks;
-
 
         var metadataAdBreaks:Vector.<AdBreak> = new Vector.<AdBreak>();
 
@@ -233,12 +228,12 @@ public class AdProxy extends ProxyElement {
             metadataAdBreak.startTime = startTimeValue;
             metadataAdBreak.startTimeIsPercent = startTimeIsPercent;
 
-            ////Dont add the break if it has no ads, eg no content to play, so we don't want a blip for this item
+            // Dont add the break if it has no ads, eg no content to play, so we don't want a blip for this item
             if (hasAds)
                 metadataAdBreaks[i] = metadataAdBreak;
         }
 
-        //// section count need to occur before we start the adContent. as this is required for the first view to be registered.
+        // section count need to occur before we start the adContent. as this is required for the first view to be registered.
         playerMetadata.addValue(AdMetadata.SECTION_COUNT, metadataAdBreaks.length);
         adManager.onContentStart();
         adMetadata.adBreaks = metadataAdBreaks;
@@ -403,7 +398,6 @@ public class AdProxy extends ProxyElement {
     }
 
     private function updateTraitListeners(element:MediaElement, traitType:String, add:Boolean):void {
-        logger.debug("updateTraitListeners: element = {0}, type = {1}, add = {2}", element, traitType, add);
         switch (traitType) {
             case MediaTraitType.PLAY:
                 changeListeners(element, add, traitType, PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
@@ -435,6 +429,5 @@ public class AdProxy extends ProxyElement {
         }
         return adMetadata;
     }
-
 }
 }

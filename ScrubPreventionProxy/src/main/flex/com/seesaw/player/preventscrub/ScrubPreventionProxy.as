@@ -74,7 +74,6 @@ public class ScrubPreventionProxy extends ProxyElement {
     }
 
     override protected function setupTraits():void {
-        logger.debug("setupTraits");
 
         super.setupTraits();
 

@@ -28,19 +28,13 @@ import controls.seesaw.widget.interfaces.IWidget;
 import flash.events.Event;
 import flash.events.MouseEvent;
 
-import org.as3commons.logging.ILogger;
-import org.as3commons.logging.LoggerFactory;
-
 public class PauseButton extends PlayPauseButtonBase implements IWidget {
-
-    private var logger:ILogger = LoggerFactory.getClassLogger(PauseButton);
 
     private var toolTip:PlayerToolTip;
 
     private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.PauseButton";
 
     public function PauseButton() {
-        logger.debug("PauseButton()");
         this.toolTip = new PlayerToolTip(this, "Pause");
         this.addEventListener(Event.ADDED_TO_STAGE, this.onAddedToStage);
     }

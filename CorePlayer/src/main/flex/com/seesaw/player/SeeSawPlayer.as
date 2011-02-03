@@ -439,14 +439,13 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onControlBarMetadataChange(event:MetadataEvent):void {
-        logger.debug("control bar metadata change: key = {0}, value = {1}", event.key, event.value);
         switch (event.key) {
             case ControlBarMetadata.CONTROL_BAR_HIDDEN:
                 if (subtitleElement) {
                     var layoutMetadata:LayoutMetadata =
                             subtitleElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
                     if (layoutMetadata) {
-                        layoutMetadata.bottom = event.value ? 20 : 100;
+                        layoutMetadata.bottom = event.value ? 20 : 110;
                     }
                 }
                 break;
@@ -487,8 +486,6 @@ public class SeeSawPlayer extends Sprite {
         var contentType:String = smilMetadata.getValue(PlayerConstants.CONTENT_TYPE);
         var layout:LayoutMetadata = new LayoutMetadata();
 
-        var adMetadata:AdMetadata = new AdMetadata();
-
         logger.debug("setting layout for: " + contentType);
 
         switch (contentType) {
@@ -501,45 +498,52 @@ public class SeeSawPlayer extends Sprite {
                 layout.index = 5;
                 break;
             case PlayerConstants.AD_CONTENT_ID:
-                // In the case of ads we can include the relevant data here. Ideally this would be done by AdHandlerProxy
-                // but this does not work because there is a error in CompositeMetadata (TODO: add jira no.).
-                var trackBack:String = smilMetadata.getValue(AdMetadata.TRACK_BACK) as String;
-                if (trackBack) {
-                    adMetadata.clickThru = trackBack;
-                }
+                var adMetadata:AdMetadata = new AdMetadata();
                 adMetadata.adMode = AdMode.AD;
-            case PlayerConstants.STING_CONTENT_ID:
-            case PlayerConstants.MAIN_CONTENT_ID:
-                adMetadata.adMode = AdMode.MAIN_CONTENT;
+
                 // CompositeMetadata fails unless ad metadata is added to all the video elements for some reason
                 // so even though add metadata is not applicable to main content it has to be added.
                 element.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
 
-                // This layout applies to main content, stings and ads (notice there is no break above - this is
-                // intentional).
-                setMediaLayout(element);
-
-                // For some reason dynamic stream changes reset the current layout metadata (bug?) in the playlist
-                // so this is a workaround to always set the right value.
-                element.addEventListener(MediaElementEvent.TRAIT_ADD, function(event:MediaElementEvent) {
-                    if (event.traitType == MediaTraitType.DYNAMIC_STREAM) {
-                        var dynamicStreamTrait:DynamicStreamTrait =
-                                element.getTrait(MediaTraitType.DYNAMIC_STREAM) as DynamicStreamTrait;
-                        dynamicStreamTrait.addEventListener(
-                                DynamicStreamEvent.SWITCHING_CHANGE, function(event:DynamicStreamEvent) {
-                            setMediaLayout(element);
-                        });
-                    }
-                });
-
-                // This is another workaround for the above bug - when full screen is set the full screen resolution
-                // needs to be applied to all the video elements.
-                playlistElements.push(element);
+                processSmilMediaElement(element);
+                break;
+            case PlayerConstants.STING_CONTENT_ID:
+                var adMetadata:AdMetadata = new AdMetadata();
+                adMetadata.adMode = AdMode.MAIN_CONTENT;
+                element.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
+                processSmilMediaElement(element);
+                break;
+            case PlayerConstants.MAIN_CONTENT_ID:
+                var adMetadata:AdMetadata = new AdMetadata();
+                adMetadata.adMode = AdMode.MAIN_CONTENT;
+                element.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
+                processSmilMediaElement(element);
                 break;
         }
 
-
         element.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+    }
+
+    private function processSmilMediaElement(element:MediaElement):void {
+        // This layout applies to main content, stings and ads
+        setMediaLayout(element);
+
+        // For some reason dynamic stream changes reset the current layout metadata (bug?) in the playlist
+        // so this is a workaround to always set the right value.
+        element.addEventListener(MediaElementEvent.TRAIT_ADD, function(event:MediaElementEvent) {
+            if (event.traitType == MediaTraitType.DYNAMIC_STREAM) {
+                var dynamicStreamTrait:DynamicStreamTrait =
+                        element.getTrait(MediaTraitType.DYNAMIC_STREAM) as DynamicStreamTrait;
+                dynamicStreamTrait.addEventListener(
+                        DynamicStreamEvent.SWITCHING_CHANGE, function(event:DynamicStreamEvent) {
+                    setMediaLayout(element);
+                });
+            }
+        });
+
+        // This is another workaround for the above bug - when full screen is set the full screen resolution
+        // needs to be applied to all the video elements.
+        playlistElements.push(element);
     }
 
     private function setMediaLayout(element:MediaElement) {

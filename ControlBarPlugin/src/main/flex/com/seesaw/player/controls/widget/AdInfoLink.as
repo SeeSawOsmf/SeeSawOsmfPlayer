@@ -22,6 +22,7 @@
 
 package com.seesaw.player.controls.widget {
 import com.seesaw.player.ads.AdMetadata;
+import com.seesaw.player.ads.AdMode;
 import com.seesaw.player.external.PlayerExternalInterface;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.ui.PlayerToolTip;
@@ -115,7 +116,7 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
 
     private function updateFromAdMetadata():void {
         var adMetadata:AdMetadata = media.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
-        if (adMetadata) {
+        if (adMetadata && adMetadata.adMode == AdMode.AD) {
             interactiveAdvertisingUrl = adMetadata.clickThru;
             visible = interactiveAdvertisingUrl != null;
         }
