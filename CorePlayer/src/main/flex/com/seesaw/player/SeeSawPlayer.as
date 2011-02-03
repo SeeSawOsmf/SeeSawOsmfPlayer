@@ -359,6 +359,13 @@ public class SeeSawPlayer extends Sprite {
             metadata.addValue(AuditudeConstants.PLUGIN_INSTANCE, _auditude);
         }
 
+
+            var adMetadata:AdMetadata =  config.resource.getMetadataValue(AdMetadata.AD_NAMESPACE) as AdMetadata;
+        if (adMetadata == null) {
+            adMetadata = new AdMetadata();
+            contentElement.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
+        }
+
         setContainerSize(contentWidth, contentHeight);
 
         mainElement.addChild(contentElement);
@@ -635,6 +642,7 @@ public class SeeSawPlayer extends Sprite {
 
     private function generateAdBreaksFromSmil():Vector.<AdBreak> {
         use namespace smil;
+
         var adBreaks:Vector.<AdBreak> = new Vector.<AdBreak>();
         for each (var video:XML in videoInfo.smil.body..video) {
             if(video.@clipBegin) {
@@ -646,7 +654,6 @@ public class SeeSawPlayer extends Sprite {
                 }
             }
         }
-
         return adBreaks;
     }
 }
