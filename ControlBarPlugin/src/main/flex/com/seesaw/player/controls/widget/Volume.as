@@ -65,6 +65,7 @@ public class Volume extends ButtonWidget implements IWidget {
     }
 
     override protected function onMouseClick(event:MouseEvent):void {
+        logger.debug("audible.volume = " + audible.volume);
         if (audible.volume != 0) {
             storedVolume = audible.volume;
             audible.volume = Math.min(0, 0);
@@ -88,7 +89,7 @@ public class Volume extends ButtonWidget implements IWidget {
 
     protected function onVolumeChange(event:AudioEvent = null):void {
         ///	enabled = audible ? audible.volume != 0 : false;
-        if (audible.volume == 0) {
+        if (audible.volume < 0.05) {
             enabled = false;
         } else {
             enabled = true;
