@@ -36,11 +36,11 @@ public class AdMetadata extends Metadata {
     public static const CHANNEL_4_AD_TYPE:String = "channel4";
     public static const TRACK_BACK:String = "trackback";
 
-    public function get adState():String {
+    public function get adState():* {
         return getValue(AdMetadata.AD_STATE);
     }
 
-    public function set adState(adState:String):void {
+    public function set adState(adState:*):void {
         addValue(AdMetadata.AD_STATE, adState);
     }
 

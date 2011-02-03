@@ -77,8 +77,6 @@ public class ControlBarPlugin extends Sprite {
     private var controlBarElement:ControlBarElement;
     private var targetElement:MediaElement;
 
-    private var controlsUpdated:Boolean;
-
     private function canHandleResourceCallback(resource:MediaResourceBase):Boolean {
         var result:Boolean;
 
@@ -88,14 +86,14 @@ public class ControlBarPlugin extends Sprite {
             result = settings != null;
         }
 
-        logger.debug("canHandleResourceCallback: " + result);
+        if (result) {
+            logger.debug("handling resource: {0}", resource);
+        }
 
         return result;
     }
 
     private function mediaElementCreationCallback():MediaElement {
-        logger.debug("mediaElementCreationCallback");
-
         controlBarElement = new ControlBarElement();
 
         updateControls();
@@ -104,8 +102,6 @@ public class ControlBarPlugin extends Sprite {
     }
 
     private function mediaElementCreationNotificationCallback(target:MediaElement):void {
-        logger.debug("mediaElementCreationNotificationCallback: " + target);
-
         var targetMetadata:Metadata = target.getMetadata(ControlBarPlugin.NS_TARGET);
         if (targetMetadata) {
             this.targetElement = target;

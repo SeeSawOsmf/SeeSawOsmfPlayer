@@ -186,8 +186,6 @@ public class ControlBarElement extends MediaElement {
     }
 
     override protected function setupTraits():void {
-        logger.debug("setupTraits");
-
         // Setup a control bar using the ChromeLibrary:
         setupControlBar();
 

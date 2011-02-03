@@ -38,8 +38,6 @@ public class AdProxyPluginInfo extends PluginInfo {
     public static const ID:String = "com.seesaw.player.ads.Liverail";
 
     public function AdProxyPluginInfo() {
-        logger.debug("AdProxyPluginInfo()");
-
         var item:MediaFactoryItem = new MediaFactoryItem(
                 ID,
                 canHandleResourceFunction,
@@ -54,7 +52,9 @@ public class AdProxyPluginInfo extends PluginInfo {
 
     private static function canHandleResourceFunction(resource:MediaResourceBase):Boolean {
         var canHandle:Boolean = resource && resource.getMetadataValue(LiverailConstants.SETTINGS_NAMESPACE) != null;
-        logger.debug("can handle this resource: {0} = {1}", resource, canHandle);
+        if(canHandle) {
+            logger.debug("handling resource: {0}", resource);
+        }
         return canHandle;
     }
 

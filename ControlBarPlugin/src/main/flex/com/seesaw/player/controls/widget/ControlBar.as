@@ -7,15 +7,11 @@ import flash.events.TimerEvent;
 import flash.ui.Mouse;
 import flash.utils.Timer;
 
-import org.as3commons.logging.ILogger;
-import org.as3commons.logging.LoggerFactory;
 import org.osmf.chrome.widgets.Widget;
 import org.osmf.media.MediaElement;
 import org.osmf.metadata.Metadata;
 
 public class ControlBar extends Widget {
-    private var logger:ILogger = LoggerFactory.getClassLogger(ControlBar);
-
     //Timer for the auto hide of the control bar
     private var controlsTimer:Timer = new Timer(2500, 1);
 
@@ -118,7 +114,6 @@ public class ControlBar extends Widget {
     protected override function setSuperVisible(value:Boolean):void {
         super.setSuperVisible(value);
         if (value != _superVisible) {
-            logger.debug("updating metadata: visibility = " + value);
             updateMetadata();
             _superVisible = value;
         }
