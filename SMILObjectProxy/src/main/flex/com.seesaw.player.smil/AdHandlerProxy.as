@@ -28,7 +28,6 @@
  * To change this template use File | Settings | File Templates.
  */
 package com.seesaw.player.smil {
-import com.seesaw.player.ads.AdBreak;
 import com.seesaw.player.ads.AdMetadata;
 
 import org.osmf.elements.ProxyElement;
@@ -44,7 +43,7 @@ public class AdHandlerProxy extends ProxyElement {
         super(proxiedElement);
         var traitsToBlock:Vector.<String> = new Vector.<String>();
         traitsToBlock[0] = MediaTraitType.TIME;
-        traitsToBlock[0] = MediaTraitType.SEEK;
+        traitsToBlock[1] = MediaTraitType.SEEK;
         blockedTraits = traitsToBlock;
     }
 
@@ -67,14 +66,8 @@ public class AdHandlerProxy extends ProxyElement {
                 var trackBack:String = metadata.getValue(AdMetadata.TRACK_BACK) as String;
                 var adMetadata:AdMetadata = event.metadata as AdMetadata;
                 adMetadata.clickThru = trackBack;
-                adMetadata.adBreaks = generateAdBreaksFromSmil();
             }
         }
-    }
-
-    private function generateAdBreaksFromSmil():Vector.<AdBreak> {
-        var adBreaks:Vector.<AdBreak> = new Vector.<AdBreak>();
-        return adBreaks;
     }
 }
 }
