@@ -25,6 +25,7 @@ import com.auditude.ads.AuditudePlugin;
 import com.auditude.ads.osmf.IAuditudeMediaElement;
 import com.auditude.ads.osmf.constants.AuditudeOSMFConstants;
 import com.seesaw.player.ads.AdMetadata;
+import com.seesaw.player.ads.AdMode;
 import com.seesaw.player.ads.AdState;
 import com.seesaw.player.ads.AuditudeConstants;
 import com.seesaw.player.ads.auditude.AdProxyPluginInfo;
@@ -506,8 +507,10 @@ public class SeeSawPlayer extends Sprite {
                 if (trackBack) {
                     adMetadata.clickThru = trackBack;
                 }
+                adMetadata.adMode = AdMode.AD;
             case PlayerConstants.STING_CONTENT_ID:
             case PlayerConstants.MAIN_CONTENT_ID:
+                adMetadata.adMode = AdMode.MAIN_CONTENT;
                 // CompositeMetadata fails unless ad metadata is added to all the video elements for some reason
                 // so even though add metadata is not applicable to main content it has to be added.
                 element.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
