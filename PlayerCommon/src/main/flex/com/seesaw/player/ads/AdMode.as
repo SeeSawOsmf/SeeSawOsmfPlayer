@@ -23,23 +23,14 @@
 /**
  * Created by IntelliJ IDEA.
  * User: ibhana
- * Date: 27/01/11
- * Time: 13:37
+ * Date: 03/02/11
+ * Time: 11:27
  * To change this template use File | Settings | File Templates.
  */
-package com.seesaw.player.smil {
-import org.osmf.elements.ProxyElement;
-import org.osmf.media.MediaElement;
-import org.osmf.traits.MediaTraitType;
-
-public class AdHandlerProxy extends ProxyElement {
-
-    public function AdHandlerProxy(proxiedElement:MediaElement = null) {
-        super(proxiedElement);
-        var traitsToBlock:Vector.<String> = new Vector.<String>();
-        traitsToBlock[0] = MediaTraitType.TIME;
-        traitsToBlock[0] = MediaTraitType.SEEK;
-        blockedTraits = traitsToBlock;
-    }
+package com.seesaw.player.ads {
+public class AdMode {
+    public static const AD:String = "ad";
+    public static const MID_ROLL:String = "midRoll";
+    public static const MAIN_CONTENT:String = "mainContent";
 }
 }
