@@ -24,6 +24,7 @@ import com.seesaw.player.controls.widget.AdInfoLink;
 import com.seesaw.player.controls.widget.ControlBar;
 import com.seesaw.player.controls.widget.FullScreen;
 import com.seesaw.player.controls.widget.LightsDownButton;
+import com.seesaw.player.controls.widget.Padding;
 import com.seesaw.player.controls.widget.PauseButton;
 import com.seesaw.player.controls.widget.PlayButton;
 import com.seesaw.player.controls.widget.ScrubBar;
@@ -234,6 +235,7 @@ public class ControlBarElement extends MediaElement {
         customWidgetList["com.seesaw.player.controls.widget.adinfolink"] = AdInfoLink;
         customWidgetList["com.seesaw.player.controls.widget.lightsdownbutton"] = LightsDownButton;
         customWidgetList["com.seesaw.player.controls.widget.subtitlesbutton"] = SubtitlesButton;
+        customWidgetList["com.seesaw.player.controls.widget.padding"] = Padding;
         customWidgetList["com.seesaw.player.controls.widget.fullscreen"] = FullScreen;
         customWidgetList["com.seesaw.player.controls.widget.volume"] = Volume;
         customWidgetList["com.seesaw.player.controls.widget.volumescrubbar"] = VolumeScrubBar;

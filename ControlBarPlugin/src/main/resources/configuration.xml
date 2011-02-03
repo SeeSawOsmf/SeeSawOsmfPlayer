@@ -107,23 +107,34 @@
                     top="24"
                     />
             <widget
-                    id="com.seesaw.player.controls.widget.LightsDownButton"
-                    type="com.seesaw.player.controls.widget.LightsDownButton"
-                    right="247"
+                    layoutMode="horizontal"
+                    horizontalAlign="right"
                     top="70"
-                    />
-            <widget
-                    id="com.seesaw.player.controls.widget.SubtitlesButton"
-                    type="com.seesaw.player.controls.widget.SubtitlesButton"
-                    right="110"
-                    top="70"
-                    />
-            <widget
-                    id="com.seesaw.player.controls.widget.FullScreen"
-                    type="com.seesaw.player.controls.widget.FullScreen"
-                    right="28"
-                    top="70"
-                    />
+                    right="20"
+                    >
+                <widget
+                        id="com.seesaw.player.controls.widget.LightsDownButton"
+                        type="com.seesaw.player.controls.widget.LightsDownButton"
+                        />
+                <widget
+                        id="com.seesaw.player.controls.widget.Padding"
+                        type="com.seesaw.player.controls.widget.Padding"
+                        width="25"
+                        />
+                <widget
+                        id="com.seesaw.player.controls.widget.SubtitlesButton"
+                        type="com.seesaw.player.controls.widget.SubtitlesButton"
+                        />
+                <widget
+                        id="com.seesaw.player.controls.widget.Padding"
+                        type="com.seesaw.player.controls.widget.Padding"
+                        width="25"
+                        />
+                <widget
+                        id="com.seesaw.player.controls.widget.FullScreen"
+                        type="com.seesaw.player.controls.widget.FullScreen"
+                        />
+            </widget>
             <widget
                     id="com.seesaw.player.controls.widget.VolumeScrubBar"
                     type="com.seesaw.player.controls.widget.VolumeScrubBar"

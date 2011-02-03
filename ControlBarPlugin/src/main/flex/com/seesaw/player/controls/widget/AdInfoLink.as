@@ -57,6 +57,7 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
     private var toolTip:PlayerToolTip;
 
     private var interactiveAdvertisingUrl:String;
+    private var interactiveAdvertisingCaption:String;
 
     /* static */
     private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.AdInfoLink";
@@ -66,7 +67,8 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
 
     public function AdInfoLink() {
 
-        var interactiveAdvertisingCaption:String = "Click here to visit";
+        //SET THE STRING BELOW TO THE INTERACTIVE AD CAPTION...
+        this.interactiveAdvertisingCaption = null;
 
         adInfoLabel = new StyledTextField();
 
