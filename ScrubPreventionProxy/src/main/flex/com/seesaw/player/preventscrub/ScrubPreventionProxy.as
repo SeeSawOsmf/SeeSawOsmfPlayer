@@ -46,6 +46,8 @@ public class ScrubPreventionProxy extends ProxyElement {
     private var finalSeekPoint:Number;
     private var blockedSeekable:BlockableSeekTrait;
     private var temporaryAdMarkers:Vector.<AdBreak>;
+    private var forceSeek:Boolean;
+    private var adjustedSeekPoint:Number;
 
 
     public function ScrubPreventionProxy() {
@@ -138,22 +140,28 @@ public class ScrubPreventionProxy extends ProxyElement {
     }
 
     private function onSeekingChange(event:SeekEvent):void {
-        var adjustedSeekPoint:Number;
-        var forceSeek:Boolean;
+        if (!forceSeek) {
+            for each (var breakItem:AdBreak in adMarkers) {
 
-        for each (var breakItem:AdBreak in adMarkers) {
+                if (breakItem.startTime > 0) {
 
-            if (breakItem.startTime > 0) {
+                    if (event.time > (breakItem.startTime)) {
 
-            if (event.time > (breakItem.startTime)) {
-                forceSeek = true;
-                adjustedSeekPoint = breakItem.startTime;
+                        forceSeek = true;
+                        adjustedSeekPoint = breakItem.startTime;
+
+                        if(breakItem.hasSeen){
+                             forceSeek = false;
+                        }
+                    }
+                }
             }
-
+        }
         if (forceSeek) {
 
             finalSeekPoint = event.time;
             blockedSeekable.blocking = true;
+            seekable.removeEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
             seekable.seek((adjustedSeekPoint - offset));
 
             if (adMarkers) {
@@ -162,18 +170,16 @@ public class ScrubPreventionProxy extends ProxyElement {
                     var index:int = value.startTime;
                     if (index == (adjustedSeekPoint)) {
                         /// adMarkers[value];
-                        adMarkers.splice(indexCount, 1);
+                        value.hasSeen = true;
                     }
                     indexCount++
                 }
             }
 
             temporaryAdMarkers = adMarkers;
-           //// adMarkers = null;
-            forceSeek = false;
-          }
+            //// adMarkers = null;
+
         }
-             }
     }
 
 
@@ -182,11 +188,18 @@ public class ScrubPreventionProxy extends ProxyElement {
             if (finalSeekPoint > 0) {
                 seekable.seek((finalSeekPoint));
                 blockedSeekable.blocking = false;
+                forceSeek = false;
+                seekable.addEventListener(SeekEvent.SEEKING_CHANGE, reinstateSeek);
             }
-          ///  adMetadata.adBreaks = temporaryAdMarkers;
+            ///  adMetadata.adBreaks = temporaryAdMarkers;
         }
     }
-
+    private function reinstateSeek(event:SeekEvent):void {
+        if (!event.seeking) {
+            seekable.removeEventListener(SeekEvent.SEEKING_CHANGE, reinstateSeek);
+            seekable.addEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
+        }
+    }
     private function onTraitAdd(event:MediaElementEvent):void {
         processTrait(event.traitType, true);
     }

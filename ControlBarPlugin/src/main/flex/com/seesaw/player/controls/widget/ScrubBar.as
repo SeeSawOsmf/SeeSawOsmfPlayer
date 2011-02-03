@@ -68,6 +68,7 @@ public class ScrubBar extends Widget implements IWidget {
 
     private var duration:Number;
     private var _temporalTime:TimeTrait;
+    private var adHasCompleted:Boolean;
 
     public function ScrubBar() {
         currentTime = new StyledTextField();
@@ -233,7 +234,8 @@ public class ScrubBar extends Widget implements IWidget {
     private function onDurationChange(event:TimeEvent):void {
         var timeTrait:TimeTrait = event.target as TimeTrait;
         duration = timeTrait.duration;
-        createAdMarkers();
+        if(adHasCompleted)
+            createAdMarkers();
     }
 
     // Internals
@@ -257,8 +259,9 @@ public class ScrubBar extends Widget implements IWidget {
     }
 
     private function onAdStateMetadataChanged(event:MetadataEvent):void {
-        if (event.key == AdMetadata.AD_BREAKS || (event.key == AdMetadata.AD_STATE && event.value == AdState.AD_BREAK_COMPLETE)) {
+        if ((event.key == AdMetadata.AD_STATE && event.value == AdState.AD_BREAK_COMPLETE)) {
             logger.debug("ad markers changed");
+            adHasCompleted = true;
             createAdMarkers();
         }
     }

@@ -106,6 +106,7 @@ CONFIG::LOGGING
 					break;
 				case SMILElementType.SEQUENCE:
 					var serialElement:SerialElement = new SerialElement();
+
                     serialElement.addEventListener(SerialElementEvent.CURRENT_CHILD_CHANGE, function(event:SerialElementEvent) {
                         var serialElement:SerialElement = event.currentTarget as SerialElement;
                         var index:int = serialElement.getChildIndex(event.currentChild) - 1;
@@ -139,7 +140,6 @@ CONFIG::LOGGING
 
 					var duration:Number = (smilElement as SMILMediaElement).duration;
 					setVideoDuration(duration, videoElement);
-
 					(parentMediaElement as CompositeElement).addChild(videoElement);
 					break;
 				case SMILElementType.IMAGE:

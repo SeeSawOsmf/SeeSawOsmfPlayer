@@ -105,7 +105,7 @@ public class BatchEventService extends ProxyElement {
                throw ArgumentError("no resume service implementation provided");
            }
            if (ExternalInterface.available) {
-               ExternalInterface.addCallback("exitPlayerWindow", exitEvent);  // fire the exit event hooked into the widow.onUnLoad we currently use...
+               ExternalInterface.addCallback("exitPlayerWindow", exitEvent);  // fire the exit event hooked into the window.onUnLoad we currently use...
            }
        }
 
@@ -184,7 +184,7 @@ public class BatchEventService extends ProxyElement {
 
     private function evaluateNewSectionCount(value:int):int {
         var newSectionCount:int;
-            /// SMILResource should only have one asset in the event of liverail or auditude and we ALWAYS presume there is a preRoll
+            /// SMILResource should only have one video resource in the event of liverail or auditude and we ALWAYS presume there is a preRoll
             // ELSE this rule will fail..
              if(value == 1 && sectionCount == 1){
                 newSectionCount =  value + sectionCount;
@@ -224,9 +224,11 @@ public class BatchEventService extends ProxyElement {
             adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
             adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
 
-        } else if (event.namespaceURL == PlayerConstants.SMIL_METADATA_NS) {
-            SMILMetadata = event.target.getMetadata(PlayerConstants.SMIL_METADATA_NS);
+        } else if (event.namespaceURL == "http://www.w3.org/ns/SMIL/content") {
+            SMILMetadata = event.target.getMetadata("http://www.w3.org/ns/SMIL/content");
             var contentType:String = SMILMetadata.getValue(PlayerConstants.CONTENT_TYPE);
+            SMILMetadata.addEventListener(MetadataEvent.VALUE_ADD, onSMIMetaDataChange);
+            SMILMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onSMIMetaDataChange);
             switch (contentType) {
                 case PlayerConstants.MAIN_CONTENT_ID :
                     playingMainContent = true;
@@ -250,6 +252,10 @@ public class BatchEventService extends ProxyElement {
             metadata.addEventListener(MetadataEvent.VALUE_ADD, onLayoutMetadataChange);
 
         }
+    }
+
+    private function onSMIMetaDataChange(event:MetadataEvent):void {
+         trace(event);
     }
 
     private function onLayoutMetadataChange(event:MetadataEvent):void {
@@ -413,6 +419,12 @@ public class BatchEventService extends ProxyElement {
 
     private function toggleLoadListeners(added:Boolean):void {
         loadable = proxiedElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
+         SMILMetadata = proxiedElement.getMetadata("http://www.w3.org/ns/SMIL/content");
+        if(SMILMetadata){
+            var contentType:String = SMILMetadata.getValue(PlayerConstants.CONTENT_TYPE);
+            SMILMetadata.addEventListener(MetadataEvent.VALUE_ADD, onSMIMetaDataChange);
+            SMILMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onSMIMetaDataChange);
+        }
     }
 
     private function onAutoSwitchChange(event:DynamicStreamEvent):void {
