@@ -485,8 +485,6 @@ public class SeeSawPlayer extends Sprite {
         var contentType:String = smilMetadata.getValue(PlayerConstants.CONTENT_TYPE);
         var layout:LayoutMetadata = new LayoutMetadata();
 
-        var adMetadata:AdMetadata = new AdMetadata();
-
         logger.debug("setting layout for: " + contentType);
 
         switch (contentType) {
@@ -499,10 +497,7 @@ public class SeeSawPlayer extends Sprite {
                 layout.index = 5;
                 break;
             case PlayerConstants.AD_CONTENT_ID:
-                // In the case of ads we can include the relevant data here. Ideally this would be done by AdHandlerProxy
-                // but this does not work because there is a error in CompositeMetadata (TODO: add jira no.).
-                var trackBack:String = smilMetadata.getValue(AdMetadata.TRACK_BACK) as String;
-                adMetadata.clickThru = trackBack;
+                var adMetadata:AdMetadata = new AdMetadata();
                 adMetadata.adMode = AdMode.AD;
 
                 // CompositeMetadata fails unless ad metadata is added to all the video elements for some reason
@@ -512,11 +507,13 @@ public class SeeSawPlayer extends Sprite {
                 processSmilMediaElement(element);
                 break;
             case PlayerConstants.STING_CONTENT_ID:
+                var adMetadata:AdMetadata = new AdMetadata();
                 adMetadata.adMode = AdMode.MAIN_CONTENT;
                 element.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
                 processSmilMediaElement(element);
                 break;
             case PlayerConstants.MAIN_CONTENT_ID:
+                var adMetadata:AdMetadata = new AdMetadata();
                 adMetadata.adMode = AdMode.MAIN_CONTENT;
                 element.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
                 processSmilMediaElement(element);
