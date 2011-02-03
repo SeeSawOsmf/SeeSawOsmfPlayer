@@ -25,11 +25,11 @@ import com.auditude.ads.AuditudePlugin;
 import com.auditude.ads.osmf.IAuditudeMediaElement;
 import com.auditude.ads.osmf.constants.AuditudeOSMFConstants;
 import com.seesaw.player.ads.AdMetadata;
+import com.seesaw.player.ads.AdState;
 import com.seesaw.player.ads.AuditudeConstants;
 import com.seesaw.player.ads.auditude.AdProxyPluginInfo;
 import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
-import com.seesaw.player.batchEventService.BatchEventServicePlugin;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.controls.ControlBarMetadata;
 import com.seesaw.player.controls.ControlBarPlugin;
@@ -262,7 +262,7 @@ public class SeeSawPlayer extends Sprite {
             factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.liverail.AdProxyPluginInfo()));
         if (adMode == AdMetadata.AUDITUDE_AD_TYPE)
             factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.auditude.AdProxyPluginInfo()));
-        factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
+        // factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
         factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
 
         createVideoElement();
@@ -486,6 +486,8 @@ public class SeeSawPlayer extends Sprite {
         var contentType:String = smilMetadata.getValue(PlayerConstants.CONTENT_TYPE);
         var layout:LayoutMetadata = new LayoutMetadata();
 
+        var adMetadata:AdMetadata = new AdMetadata();
+
         logger.debug("setting layout for: " + contentType);
 
         switch (contentType) {
@@ -497,9 +499,19 @@ public class SeeSawPlayer extends Sprite {
                 layout.horizontalAlign = HorizontalAlign.LEFT;
                 layout.index = 5;
                 break;
-            case PlayerConstants.STING_CONTENT_ID:
             case PlayerConstants.AD_CONTENT_ID:
+                // In the case of ads we can include the relevant data here. Ideally this would be done by AdHandlerProxy
+                // but this does not work because there is a error in CompositeMetadata (TODO: add jira no.).
+                var trackBack:String = smilMetadata.getValue(AdMetadata.TRACK_BACK) as String;
+                if (trackBack) {
+                    adMetadata.clickThru = trackBack;
+                }
+            case PlayerConstants.STING_CONTENT_ID:
             case PlayerConstants.MAIN_CONTENT_ID:
+                // CompositeMetadata fails unless ad metadata is added to all the video elements for some reason
+                // so even though add metadata is not applicable to main content it has to be added.
+                element.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
+
                 // This layout applies to main content, stings and ads (notice there is no break above - this is
                 // intentional).
                 setMediaLayout(element);
@@ -522,6 +534,7 @@ public class SeeSawPlayer extends Sprite {
                 playlistElements.push(element);
                 break;
         }
+
 
         element.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
     }

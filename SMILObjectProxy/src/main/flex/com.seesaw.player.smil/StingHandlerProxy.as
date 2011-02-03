@@ -41,11 +41,5 @@ public class StingHandlerProxy extends ProxyElement {
         traitsToBlock[1] = MediaTraitType.SEEK;
         blockedTraits = traitsToBlock;
     }
-
-    override public function set proxiedElement(value:MediaElement):void {
-        if (value) {
-            super.proxiedElement = value;
-        }
-    }
 }
 }

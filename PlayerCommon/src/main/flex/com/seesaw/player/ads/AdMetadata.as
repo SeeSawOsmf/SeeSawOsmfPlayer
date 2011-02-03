@@ -33,7 +33,7 @@ public class AdMetadata extends Metadata {
     public static const SECTION_COUNT:String = "sectionCount";
     public static const AUDITUDE_AD_TYPE:String = "auditude";
     public static const CHANNEL_4_AD_TYPE:String = "channel4";
-    public static const NONE_AD_TYPE:String = "none";
+    public static const TRACK_BACK:String = "trackback";
 
     public function get adState():* {
         return getValue(AdMetadata.AD_STATE);
@@ -51,7 +51,7 @@ public class AdMetadata extends Metadata {
         addValue(AdMetadata.AD_BREAKS, adBreaks);
     }
 
-        public function get clickThru():String {
+    public function get clickThru():String {
         return getValue(AdMetadata.CLICK_THRU);
     }
 
