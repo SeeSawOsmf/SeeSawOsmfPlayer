@@ -66,7 +66,8 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
 
     public function AdInfoLink() {
 
-        var interactiveAdvertisingCaption:String = "Click here to visit";
+        //SET THE STRING BELOW TO THE INTERACTIVE AD CAPTION...
+        var interactiveAdvertisingCaption:String;
 
         adInfoLabel = new StyledTextField();
 
