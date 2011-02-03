@@ -359,12 +359,12 @@ public class SeeSawPlayer extends Sprite {
         }
 
 
-            var adMetadata:AdMetadata =  config.resource.getMetadataValue(AdMetadata.AD_NAMESPACE) as AdMetadata;
+ /*           var adMetadata:AdMetadata =  config.resource.getMetadataValue(AdMetadata.AD_NAMESPACE) as AdMetadata;
         if (adMetadata == null) {
             adMetadata = new AdMetadata();
-            contentElement.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
+           contentElement.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
         }
-
+*/
         setContainerSize(contentWidth, contentHeight);
 
         mainElement.addChild(contentElement);
@@ -545,13 +545,35 @@ public class SeeSawPlayer extends Sprite {
                         DynamicStreamEvent.SWITCHING_CHANGE, function(event:DynamicStreamEvent) {
                     setMediaLayout(element);
                 });
-            }
+
+            } /*else if (event.traitType == MediaTraitType.PLAY) {
+                var playTrait:PlayTrait =
+                        element.getTrait(MediaTraitType.PLAY) as PlayTrait;
+                playTrait.addEventListener(
+                        PlayEvent.PLAY_STATE_CHANGE, function (event:PlayEvent):void {
+                       switch (event.playState) {
+
+                case PlayState.PLAYING:
+                   var  adMetadata:AdMetadata = element.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+                        if(adMetadata.adMode == AdMode.AD){
+                        adMetadata.adState = AdState.STARTED;
+                       }else if(adMetadata.adMode == AdMode.MAIN_CONTENT){
+                           adMetadata.adState = AdState.AD_BREAK_COMPLETE;
+                       }
+
+                    break;
+                case PlayState.STOPPED:
+                    break;
+                       }
+                });
+            }*/
         });
 
         // This is another workaround for the above bug - when full screen is set the full screen resolution
         // needs to be applied to all the video elements.
         playlistElements.push(element);
     }
+
 
     private function setMediaLayout(element:MediaElement) {
         var layout:LayoutMetadata = element.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;

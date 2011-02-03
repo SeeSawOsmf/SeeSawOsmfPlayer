@@ -87,7 +87,7 @@ public class BatchEventService extends ProxyElement {
     private var mainContentCount:int;
     private var playable:PlayTrait;
     private var loadable:LoadTrait;
-    private var adMetadata:Metadata;
+   /// private var adMetadata:Metadata;
     private var SMILMetadata:Metadata;
     private var playerMetadata:Metadata;
     private var dynamicStream:DynamicStreamTrait;
@@ -98,16 +98,16 @@ public class BatchEventService extends ProxyElement {
     private var adUrlResource:String;
     private var oldUserEventId:int = 0;
 
-       public function BatchEventService(proxiedElement:MediaElement = null) {
-           var provider:ObjectProvider = ObjectProvider.getInstance();
-           resumeService = provider.getObject(ResumeService);
-           if (resumeService == null) {
-               throw ArgumentError("no resume service implementation provided");
-           }
-           if (ExternalInterface.available) {
-               ExternalInterface.addCallback("exitPlayerWindow", exitEvent);  // fire the exit event hooked into the window.onUnLoad we currently use...
-           }
-       }
+    public function BatchEventService(proxiedElement:MediaElement = null) {
+        var provider:ObjectProvider = ObjectProvider.getInstance();
+        resumeService = provider.getObject(ResumeService);
+        if (resumeService == null) {
+            throw ArgumentError("no resume service implementation provided");
+        }
+        if (ExternalInterface.available) {
+            ExternalInterface.addCallback("exitPlayerWindow", exitEvent);  // fire the exit event hooked into the window.onUnLoad we currently use...
+        }
+    }
 
     public override function set proxiedElement(proxiedElement:MediaElement):void {
         if (proxiedElement) {
@@ -152,7 +152,6 @@ public class BatchEventService extends ProxyElement {
                 availabilityType = playerMetadata.getValue("videoInfo").availabilityType;
 
 
-
                 var number:Number = resumeService.getResumeCookie();
                 if (number == 0) {
                     userEvent = buildAndReturnUserEvent(UserEventTypes.AUTO_PLAY);
@@ -165,8 +164,11 @@ public class BatchEventService extends ProxyElement {
                     eventsManager.addUserEvent(userEvent);
                     eventsManager.flushAll();
                 }
+
             }
         }
+        adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
+        adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
     }
 
     private function playerMetaChanged(event:MetadataEvent):void {
@@ -184,14 +186,24 @@ public class BatchEventService extends ProxyElement {
 
     private function evaluateNewSectionCount(value:int):int {
         var newSectionCount:int;
-            /// SMILResource should only have one video resource in the event of liverail or auditude and we ALWAYS presume there is a preRoll
-            // ELSE this rule will fail..
-             if(value == 1 && sectionCount == 1){
-                newSectionCount =  value + sectionCount;
-             }else{
-               newSectionCount = value*2;
-             }
+        /// SMILResource should only have one video resource in the event of liverail or auditude and we ALWAYS presume there is a preRoll
+        // ELSE this rule will fail..
+        if (value == 1 && sectionCount == 1) {
+            newSectionCount = value + sectionCount;
+        } else {
+            newSectionCount = value * 2;
+        }
         return  newSectionCount;
+    }
+
+
+    private function get adMetadata():AdMetadata {
+        var adMetadata:AdMetadata = getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+        if (adMetadata == null) {
+            adMetadata = new AdMetadata();
+            addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
+        }
+        return adMetadata;
     }
 
 
@@ -206,7 +218,6 @@ public class BatchEventService extends ProxyElement {
             metadata.removeEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
 
         } else if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
-            adMetadata = event.target.getMetadata(AdMetadata.AD_NAMESPACE);
             adMetadata.removeEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
             adMetadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
         }
@@ -221,11 +232,14 @@ public class BatchEventService extends ProxyElement {
 
         } else if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
 
-            adMetadata = event.target.getMetadata(AdMetadata.AD_NAMESPACE);
+            if (adMetadata) {
+                adMetadata.removeEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
+                adMetadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
+            }
             adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
             adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
 
-        } else if (event.namespaceURL == "http://www.w3.org/ns/SMIL/content") {
+/*        } else if (event.namespaceURL == "http://www.w3.org/ns/SMIL/content") {
             SMILMetadata = event.target.getMetadata("http://www.w3.org/ns/SMIL/content");
             var contentType:String = SMILMetadata.getValue(PlayerConstants.CONTENT_TYPE);
             switch (contentType) {
@@ -238,7 +252,7 @@ public class BatchEventService extends ProxyElement {
                 case PlayerConstants.AD_CONTENT_ID :
                     playingMainContent = false;
                     break;
-            }
+            }*/
 
         } else if (event.namespaceURL == "http://www.seesaw.com/netstatus/metadata") {
             metadata = event.target.getMetadata("http://www.seesaw.com/netstatus/metadata");
@@ -273,10 +287,10 @@ public class BatchEventService extends ProxyElement {
     private function onAdsMetaDataAdd(event:MetadataEvent):void {
         if (event.key == AdMetadata.AD_STATE) {
             AdMetaEvaluation(event.value);
-        } else  if (event.key == AdMetadata.AD_BREAKS)  {
-           //// AdMetaEvaluation(event.key);  ///todo se if we need anything related to the adBreaks changing...
-        }else{
-              AdMetaEvaluation(event.key);
+        } else if (event.key == AdMetadata.AD_BREAKS) {
+            //// AdMetaEvaluation(event.key);  ///todo se if we need anything related to the adBreaks changing...
+        } else {
+            AdMetaEvaluation(event.key);
         }
     }
 

@@ -234,7 +234,7 @@ public class ScrubBar extends Widget implements IWidget {
     private function onDurationChange(event:TimeEvent):void {
         var timeTrait:TimeTrait = event.target as TimeTrait;
         duration = timeTrait.duration;
-        if(adHasCompleted)
+      ///  if(adHasCompleted)
             createAdMarkers();
     }
 
