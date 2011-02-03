@@ -28,10 +28,6 @@
  * To change this template use File | Settings | File Templates.
  */
 package com.seesaw.player.smil {
-import avmplus.implementsXml;
-
-import com.seesaw.player.ads.AdBreak;
-import com.seesaw.player.ads.AdBreak;
 import com.seesaw.player.ads.AdMetadata;
 
 import org.osmf.elements.ProxyElement;
@@ -70,14 +66,9 @@ public class AdHandlerProxy extends ProxyElement {
                 var trackBack:String = metadata.getValue(AdMetadata.TRACK_BACK) as String;
                 var adMetadata:AdMetadata = event.metadata as AdMetadata;
                 adMetadata.clickThru = trackBack;
-                adMetadata.adBreaks = generateAdBreaksFromSmil();
+                adMetadata.clickThru = trackBack;
             }
         }
-    }
-
-    private function generateAdBreaksFromSmil():Vector.<AdBreak> {
-        var adBreaks:Vector.<AdBreak> = new Vector.<AdBreak>();
-        return adBreaks;
     }
 }
 }

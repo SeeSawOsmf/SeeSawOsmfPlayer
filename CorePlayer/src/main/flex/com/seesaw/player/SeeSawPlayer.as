@@ -24,6 +24,7 @@ package com.seesaw.player {
 import com.auditude.ads.AuditudePlugin;
 import com.auditude.ads.osmf.IAuditudeMediaElement;
 import com.auditude.ads.osmf.constants.AuditudeOSMFConstants;
+import com.seesaw.player.ads.AdBreak;
 import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.ads.AdMode;
 import com.seesaw.player.ads.AuditudeConstants;
@@ -515,6 +516,7 @@ public class SeeSawPlayer extends Sprite {
             case PlayerConstants.MAIN_CONTENT_ID:
                 var adMetadata:AdMetadata = new AdMetadata();
                 adMetadata.adMode = AdMode.MAIN_CONTENT;
+                adMetadata.adBreaks = generateAdBreaksFromSmil();
                 element.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
                 processSmilMediaElement(element);
                 break;
@@ -628,6 +630,23 @@ public class SeeSawPlayer extends Sprite {
             }
         }
         return value;
+    }
+
+    private function generateAdBreaksFromSmil():Vector.<AdBreak> {
+        use namespace smil;
+        var adBreaks:Vector.<AdBreak> = new Vector.<AdBreak>();
+        for each (var video:XML in videoInfo.smil.body..video) {
+            if(video.@clipBegin) {
+                var clipStart:int = parseInt(video.@clipBegin);
+                if(clipStart > 0) {
+                    var adBreak:AdBreak = new AdBreak();
+                    adBreak.startTime = clipStart;
+                    adBreaks.push(adBreak);
+                }
+            }
+        }
+
+        return adBreaks;
     }
 }
 }
