@@ -65,8 +65,7 @@ public class AdMetadata extends Metadata {
     }
 
     public function set adMode(mode:String):void {
-        addValue(AdMetadata.AD_MODE, adState);
+        addValue(AdMetadata.AD_MODE, mode);
     }
-
 }
 }

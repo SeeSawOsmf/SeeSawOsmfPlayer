@@ -28,8 +28,13 @@
  * To change this template use File | Settings | File Templates.
  */
 package com.seesaw.player.smil {
+import com.seesaw.player.ads.AdMetadata;
+
 import org.osmf.elements.ProxyElement;
+import org.osmf.events.MediaElementEvent;
 import org.osmf.media.MediaElement;
+import org.osmf.metadata.Metadata;
+import org.osmf.smil.SMILConstants;
 import org.osmf.traits.MediaTraitType;
 
 public class AdHandlerProxy extends ProxyElement {
@@ -40,6 +45,24 @@ public class AdHandlerProxy extends ProxyElement {
         traitsToBlock[0] = MediaTraitType.TIME;
         traitsToBlock[1] = MediaTraitType.SEEK;
         blockedTraits = traitsToBlock;
+    }
+
+    override public function set proxiedElement(value:MediaElement):void {
+        if (proxiedElement) {
+            proxiedElement.removeEventListener(MediaElementEvent.METADATA_ADD, onMetadataAdd);
+        }
+
+        super.proxiedElement = value;
+
+        if (proxiedElement) {
+            proxiedElement.addEventListener(MediaElementEvent.METADATA_ADD, onMetadataAdd);
+        }
+    }
+
+    private function onMetadataAdd(event:MediaElementEvent):void {
+        if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
+           trace();
+        }
     }
 }
 }
