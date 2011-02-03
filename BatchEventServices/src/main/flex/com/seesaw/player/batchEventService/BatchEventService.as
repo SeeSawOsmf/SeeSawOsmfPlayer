@@ -77,12 +77,10 @@ public class BatchEventService extends ProxyElement {
 
     private var playingMainContent:Boolean;
 
-    // TODO these values are hardcoded - waiting on ads to be fully implemented
     private var isPopupInteractive:Boolean = false;
     private var isOverlayInteractive:Boolean = false;
     private var campaignId:int;
     private var contentUrl:String;
-    private var contentDuration:int = 5;
 
     private var eventsManager:EventsManager;
     private var tooSlowTimer:Timer;
@@ -107,7 +105,7 @@ public class BatchEventService extends ProxyElement {
                throw ArgumentError("no resume service implementation provided");
            }
            if (ExternalInterface.available) {
-               ExternalInterface.addCallback("exitPlayerWindow", exitEvent);  // fire the exit event hooked into the widow.onUnLoad we currently use...
+               ExternalInterface.addCallback("exitPlayerWindow", exitEvent);  // fire the exit event hooked into the window.onUnLoad we currently use...
            }
        }
 
@@ -186,7 +184,7 @@ public class BatchEventService extends ProxyElement {
 
     private function evaluateNewSectionCount(value:int):int {
         var newSectionCount:int;
-            /// SMILResource should only have one asset in the event of liverail or auditude and we ALWAYS presume there is a preRoll
+            /// SMILResource should only have one video resource in the event of liverail or auditude and we ALWAYS presume there is a preRoll
             // ELSE this rule will fail..
              if(value == 1 && sectionCount == 1){
                 newSectionCount =  value + sectionCount;
@@ -222,12 +220,13 @@ public class BatchEventService extends ProxyElement {
             metadata.addEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
 
         } else if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
+
             adMetadata = event.target.getMetadata(AdMetadata.AD_NAMESPACE);
             adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
             adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
 
-        } else if (event.namespaceURL == PlayerConstants.SMIL_METADATA_NS) {
-            SMILMetadata = event.target.getMetadata(PlayerConstants.SMIL_METADATA_NS);
+        } else if (event.namespaceURL == "http://www.w3.org/ns/SMIL/content") {
+            SMILMetadata = event.target.getMetadata("http://www.w3.org/ns/SMIL/content");
             var contentType:String = SMILMetadata.getValue(PlayerConstants.CONTENT_TYPE);
             switch (contentType) {
                 case PlayerConstants.MAIN_CONTENT_ID :
@@ -254,6 +253,7 @@ public class BatchEventService extends ProxyElement {
         }
     }
 
+
     private function onLayoutMetadataChange(event:MetadataEvent):void {
         trace(event);
     }
@@ -273,8 +273,10 @@ public class BatchEventService extends ProxyElement {
     private function onAdsMetaDataAdd(event:MetadataEvent):void {
         if (event.key == AdMetadata.AD_STATE) {
             AdMetaEvaluation(event.value);
-        } else {
-            AdMetaEvaluation(event.key);
+        } else  if (event.key == AdMetadata.AD_BREAKS)  {
+           //// AdMetaEvaluation(event.key);  ///todo se if we need anything related to the adBreaks changing...
+        }else{
+              AdMetaEvaluation(event.key);
         }
     }
 

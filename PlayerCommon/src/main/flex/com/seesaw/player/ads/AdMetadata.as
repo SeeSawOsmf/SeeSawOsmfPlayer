@@ -27,13 +27,14 @@ public class AdMetadata extends Metadata {
 
     public static const AD_NAMESPACE:String = "http://www.seesaw.com/player/ads/1.0";
     public static const AD_STATE:String = "adState";
+    public static const AD_MODE:String = "adMode";
     public static const AD_BREAKS:String = "adBreaks";
     public static const CLICK_THRU:String = "clickThru";
     public static const LR_AD_TYPE:String = "liverail";
     public static const SECTION_COUNT:String = "sectionCount";
     public static const AUDITUDE_AD_TYPE:String = "auditude";
     public static const CHANNEL_4_AD_TYPE:String = "channel4";
-    public static const NONE_AD_TYPE:String = "none";
+    public static const TRACK_BACK:String = "trackback";
 
     public function get adState():* {
         return getValue(AdMetadata.AD_STATE);
@@ -51,7 +52,7 @@ public class AdMetadata extends Metadata {
         addValue(AdMetadata.AD_BREAKS, adBreaks);
     }
 
-        public function get clickThru():String {
+    public function get clickThru():String {
         return getValue(AdMetadata.CLICK_THRU);
     }
 
@@ -59,9 +60,12 @@ public class AdMetadata extends Metadata {
         addValue(AdMetadata.CLICK_THRU, clickThru);
     }
 
+    public function get adMode():String {
+        return getValue(AdMetadata.AD_MODE);
+    }
 
-    public function get adMode():Boolean {
-        return adState != AdState.AD_BREAK_COMPLETE;
+    public function set adMode(mode:String):void {
+        addValue(AdMetadata.AD_MODE, mode);
     }
 }
 }

@@ -182,7 +182,6 @@ public class Player extends Sprite {
     }
 
     private function resetInitialisationStages() {
-        logger.debug("resetting initialisation stages");
         // sets the order of stuff to evaluate during initialisation
         initStages = new Vector.<Function>();
         initStages[0] = showPosterFrame;
@@ -592,7 +591,6 @@ public class Player extends Sprite {
         // remove the next initialisation step and evaluate it
         var initialisationStage:Function = initStages.shift();
         if (initialisationStage) {
-            logger.debug("evaluating initialisation stage");
             initialisationStage.call(this);
         }
     }

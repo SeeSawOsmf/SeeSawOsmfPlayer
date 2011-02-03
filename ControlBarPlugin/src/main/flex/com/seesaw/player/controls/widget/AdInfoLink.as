@@ -21,7 +21,8 @@
  */
 
 package com.seesaw.player.controls.widget {
-import com.seesaw.player.external.ExternalInterfaceMetadata;
+import com.seesaw.player.ads.AdMetadata;
+import com.seesaw.player.ads.AdMode;
 import com.seesaw.player.external.PlayerExternalInterface;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.ui.PlayerToolTip;
@@ -31,7 +32,6 @@ import controls.seesaw.widget.interfaces.IWidget;
 
 import flash.events.Event;
 import flash.events.MouseEvent;
-import flash.external.ExternalInterface;
 import flash.net.URLRequest;
 import flash.net.navigateToURL;
 import flash.text.TextField;
@@ -42,7 +42,6 @@ import org.as3commons.logging.LoggerFactory;
 import org.osmf.chrome.widgets.ButtonWidget;
 import org.osmf.events.MetadataEvent;
 import org.osmf.media.MediaElement;
-import org.osmf.metadata.Metadata;
 import org.osmf.traits.MediaTraitType;
 
 public class AdInfoLink extends ButtonWidget implements IWidget {
@@ -59,8 +58,6 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
 
     private var interactiveAdvertisingUrl:String;
 
-    private var metadata:Metadata;
-
     /* static */
     private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.AdInfoLink";
 
@@ -69,9 +66,7 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
 
     public function AdInfoLink() {
 
-        var interactiveAdvertisingCaption:String = "Click here to visit Google";
-
-        this.interactiveAdvertisingUrl = "http://www.google.com";
+        var interactiveAdvertisingCaption:String = "Click here to visit";
 
         adInfoLabel = new StyledTextField();
 
@@ -98,31 +93,35 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
         addChild(adInfoLabel);
     }
 
-    override public function set media(value:MediaElement):void {
+    override protected function processRequiredTraitsAvailable(element:MediaElement):void {
+        updateFromAdMetadata();
+    }
 
-        super.media = value;
-
-        if (media) {
-            this.metadata = media.getMetadata(ExternalInterfaceMetadata.EXTERNAL_INTERFACE_METADATA);
-            if (metadata == null) {
-                metadata = new Metadata();
-                media.addMetadata(ExternalInterfaceMetadata.EXTERNAL_INTERFACE_METADATA, metadata);
-            }
-
-            metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdInfoMetadataChange);
-            metadata.addEventListener(MetadataEvent.VALUE_ADD, onAdInfoMetadataChange);
+    override protected function processMediaElementChange(oldMediaElement:MediaElement):void {
+        if (oldMediaElement) {
+            oldMediaElement.removeEventListener(MetadataEvent.VALUE_ADD, onAdInfoMetadataChange);
+            oldMediaElement.removeEventListener(MetadataEvent.VALUE_CHANGE, onAdInfoMetadataChange);
+            oldMediaElement.removeEventListener(MetadataEvent.VALUE_REMOVE, onAdInfoMetadataChange);
         }
+        media.metadata.addEventListener(MetadataEvent.VALUE_ADD, onAdInfoMetadataChange);
+        media.metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdInfoMetadataChange);
+        media.metadata.addEventListener(MetadataEvent.VALUE_REMOVE, onAdInfoMetadataChange);
     }
 
     private function onAdInfoMetadataChange(event:MetadataEvent) {
-        if (event.key == ExternalInterfaceMetadata.LIGHTS_DOWN) {
-           var value:Boolean = event.value as Boolean;
-           if (value == true) {
+        if (event.key == AdMetadata.AD_NAMESPACE) {
+            updateFromAdMetadata();
+        }
+    }
 
-           } else {
-
-           }
-           logger.debug("METADATA SAYS ADS ARE: " + value);
+    private function updateFromAdMetadata():void {
+        var adMetadata:AdMetadata = media.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+        if (adMetadata && adMetadata.adMode == AdMode.AD) {
+            interactiveAdvertisingUrl = adMetadata.clickThru;
+            visible = interactiveAdvertisingUrl != null;
+        }
+        else {
+            visible = false;
         }
     }
 
@@ -133,7 +132,6 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
         } catch (e:Error) {
             trace("Error occurred!");
         }
-
     }
 
     private function onAddedToStage(event:Event) {

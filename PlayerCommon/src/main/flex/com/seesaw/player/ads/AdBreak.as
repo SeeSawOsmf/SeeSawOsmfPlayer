@@ -34,6 +34,7 @@ public class AdBreak {
 
     //specifies whether the startTimeValue is Percent (true) or  seconds (false)
     private var _startTimeIsPercent:Boolean;
+    private var _hasSeen:Boolean;
 
     public function AdBreak() {
     }
@@ -69,6 +70,17 @@ public class AdBreak {
     public function set startTimeIsPercent(value:Boolean):void {
         _startTimeIsPercent = value;
     }
+
+
+
+    public function get hasSeen():Boolean {
+        return _hasSeen;
+    }
+
+    public function set hasSeen(value:Boolean):void {
+        _hasSeen = value;
+    }
+
 
     public function get hasAds():Boolean {
         return queueAdsTotal > 0;

@@ -36,7 +36,6 @@ public class Volume extends ButtonWidget implements IWidget {
     private var logger:ILogger = LoggerFactory.getClassLogger(Volume);
 
     public function Volume() {
-        logger.debug("Volume constructor");
     }
 
     // Overrides

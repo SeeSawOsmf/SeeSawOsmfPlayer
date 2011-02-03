@@ -25,6 +25,7 @@ import com.auditude.ads.AuditudePlugin;
 import com.auditude.ads.osmf.IAuditudeMediaElement;
 import com.auditude.ads.osmf.constants.AuditudeOSMFConstants;
 import com.seesaw.player.ads.AdMetadata;
+import com.seesaw.player.ads.AdMode;
 import com.seesaw.player.ads.AuditudeConstants;
 import com.seesaw.player.ads.auditude.AdProxyPluginInfo;
 import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
@@ -40,8 +41,6 @@ import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.namespaces.smil;
 import com.seesaw.player.netstatus.NetStatusMetadata;
 import com.seesaw.player.panels.BufferingPanel;
-import com.seesaw.player.panels.NotAvailablePanel;
-import com.seesaw.player.panels.PosterFrame;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
 import com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo;
 import com.seesaw.player.smil.SeeSawSMILLoader;
@@ -264,8 +263,8 @@ public class SeeSawPlayer extends Sprite {
             factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.liverail.AdProxyPluginInfo()));
         if (adMode == AdMetadata.AUDITUDE_AD_TYPE)
             factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.auditude.AdProxyPluginInfo()));
-        factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
-        factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
+            factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
+            factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
 
         createVideoElement();
     }
@@ -440,14 +439,13 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onControlBarMetadataChange(event:MetadataEvent):void {
-        logger.debug("control bar metadata change: key = {0}, value = {1}", event.key, event.value);
         switch (event.key) {
             case ControlBarMetadata.CONTROL_BAR_HIDDEN:
                 if (subtitleElement) {
                     var layoutMetadata:LayoutMetadata =
                             subtitleElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
                     if (layoutMetadata) {
-                        layoutMetadata.bottom = event.value ? 20 : 100;
+                        layoutMetadata.bottom = event.value ? 20 : 110;
                     }
                 }
                 break;
@@ -499,33 +497,53 @@ public class SeeSawPlayer extends Sprite {
                 layout.horizontalAlign = HorizontalAlign.LEFT;
                 layout.index = 5;
                 break;
-            case PlayerConstants.STING_CONTENT_ID:
             case PlayerConstants.AD_CONTENT_ID:
+                var adMetadata:AdMetadata = new AdMetadata();
+                adMetadata.adMode = AdMode.AD;
+
+                // CompositeMetadata fails unless ad metadata is added to all the video elements for some reason
+                // so even though add metadata is not applicable to main content it has to be added.
+                element.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
+
+                processSmilMediaElement(element);
+                break;
+            case PlayerConstants.STING_CONTENT_ID:
+                var adMetadata:AdMetadata = new AdMetadata();
+                adMetadata.adMode = AdMode.MAIN_CONTENT;
+                element.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
+                processSmilMediaElement(element);
+                break;
             case PlayerConstants.MAIN_CONTENT_ID:
-                // This layout applies to main content, stings and ads (notice there is no break above - this is
-                // intentional).
-                setMediaLayout(element);
-
-                // For some reason dynamic stream changes reset the current layout metadata (bug?) in the playlist
-                // so this is a workaround to always set the right value.
-                element.addEventListener(MediaElementEvent.TRAIT_ADD, function(event:MediaElementEvent) {
-                    if (event.traitType == MediaTraitType.DYNAMIC_STREAM) {
-                        var dynamicStreamTrait:DynamicStreamTrait =
-                                element.getTrait(MediaTraitType.DYNAMIC_STREAM) as DynamicStreamTrait;
-                        dynamicStreamTrait.addEventListener(
-                                DynamicStreamEvent.SWITCHING_CHANGE, function(event:DynamicStreamEvent) {
-                            setMediaLayout(element);
-                        });
-                    }
-                });
-
-                // This is another workaround for the above bug - when full screen is set the full screen resolution
-                // needs to be applied to all the video elements.
-                playlistElements.push(element);
+                var adMetadata:AdMetadata = new AdMetadata();
+                adMetadata.adMode = AdMode.MAIN_CONTENT;
+                element.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
+                processSmilMediaElement(element);
                 break;
         }
 
         element.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+    }
+
+    private function processSmilMediaElement(element:MediaElement):void {
+        // This layout applies to main content, stings and ads
+        setMediaLayout(element);
+
+        // For some reason dynamic stream changes reset the current layout metadata (bug?) in the playlist
+        // so this is a workaround to always set the right value.
+        element.addEventListener(MediaElementEvent.TRAIT_ADD, function(event:MediaElementEvent) {
+            if (event.traitType == MediaTraitType.DYNAMIC_STREAM) {
+                var dynamicStreamTrait:DynamicStreamTrait =
+                        element.getTrait(MediaTraitType.DYNAMIC_STREAM) as DynamicStreamTrait;
+                dynamicStreamTrait.addEventListener(
+                        DynamicStreamEvent.SWITCHING_CHANGE, function(event:DynamicStreamEvent) {
+                    setMediaLayout(element);
+                });
+            }
+        });
+
+        // This is another workaround for the above bug - when full screen is set the full screen resolution
+        // needs to be applied to all the video elements.
+        playlistElements.push(element);
     }
 
     private function setMediaLayout(element:MediaElement) {
@@ -540,29 +558,13 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onMediaPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
+        logger.debug("MediaPlayerStateChange: " + event.state);
         switch (event.state) {
-            case MediaPlayerState.PLAYBACK_ERROR:
-                logger.error("MediaPlayerStateChange: PLAYBACK_ERROR");
-                break;
-            case MediaPlayerState.BUFFERING:
-                logger.debug("MediaPlayerStateChange: BUFFERING");
-                break;
-            case MediaPlayerState.LOADING:
-                logger.debug("MediaPlayerStateChange: LOADING");
-                break;
-            case MediaPlayerState.READY:
-                logger.debug("MediaPlayerStateChange: READY");
-                break;
             case MediaPlayerState.PLAYING:
-                logger.debug("MediaPlayerStateChange: PLAYING");
                 toggleLights();
                 break;
             case MediaPlayerState.PAUSED:
-                logger.debug("MediaPlayerStateChange: PAUSED");
                 toggleLights();
-                break;
-            case MediaPlayerState.UNINITIALIZED:
-                logger.debug("MediaPlayerStateChange: UNINITIALIZED");
                 break;
         }
     }

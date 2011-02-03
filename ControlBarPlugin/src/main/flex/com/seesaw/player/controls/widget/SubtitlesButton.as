@@ -63,7 +63,6 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
     private var metadata:Metadata;
 
     public function SubtitlesButton() {
-        logger.debug("Subtitles Constructor");
         subtitlesLabel = new StyledTextField();
         subtitlesLabel.text = "Subtitles are off";
         subtitlesLabel.width = 90;

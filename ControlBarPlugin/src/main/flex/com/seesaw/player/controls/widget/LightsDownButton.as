@@ -65,7 +65,6 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
     _requiredTraits[0] = MediaTraitType.PLAY;
 
     public function LightsDownButton() {
-        logger.debug("Lights Down Constructor");
         lightsDownLabel = new StyledTextField();
         lightsDownLabel.text = "Turn lights up";
         this.addEventListener(MouseEvent.MOUSE_OVER, onMouseOver);

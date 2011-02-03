@@ -21,7 +21,6 @@
  */
 
 package com.seesaw.player.controls.widget {
-
 import com.seesaw.player.controls.ControlBarMetadata;
 import com.seesaw.player.ui.PlayerToolTip;
 import com.seesaw.player.ui.StyledTextField;
@@ -37,10 +36,6 @@ import flash.text.TextField;
 import flash.text.TextFormat;
 import flash.ui.Keyboard;
 
-import flash.ui.Mouse;
-
-import org.as3commons.logging.ILogger;
-import org.as3commons.logging.LoggerFactory;
 import org.osmf.chrome.widgets.ButtonWidget;
 import org.osmf.media.MediaElement;
 import org.osmf.metadata.Metadata;
@@ -52,7 +47,6 @@ public class FullScreen extends ButtonWidget implements IWidget {
     private static const FULLSCREEN_LABEL:String = "Full Screen";
     private static const EXIT_FULLSCREEN_LABEL:String = "Exit Full Screen";
 
-    private var logger:ILogger = LoggerFactory.getClassLogger(FullScreen);
     private var fullScreenLabel:TextField;
     private var toolTip:PlayerToolTip;
     private var _requiredTraits:Vector.<String> = new Vector.<String>;
@@ -60,7 +54,6 @@ public class FullScreen extends ButtonWidget implements IWidget {
     private var metadata:Metadata;
 
     public function FullScreen() {
-        logger.debug("FullScreen()");
         _requiredTraits[0] = MediaTraitType.DISPLAY_OBJECT;
 
         fullScreenLabel = new StyledTextField();
@@ -93,11 +86,11 @@ public class FullScreen extends ButtonWidget implements IWidget {
         stage.addEventListener(FullScreenEvent.FULL_SCREEN, onFullScreen);
     }
 
-    private function onMouseOver (event:MouseEvent):void {
+    private function onMouseOver(event:MouseEvent):void {
         formatLabelHoverFont();
     }
 
-    private function onMouseOut (event:MouseEvent):void {
+    private function onMouseOut(event:MouseEvent):void {
         formatLabelFont();
     }
 
@@ -112,7 +105,6 @@ public class FullScreen extends ButtonWidget implements IWidget {
 
     override protected function processRequiredTraitsUnavailable(element:MediaElement):void {
         removeEventListener(KeyboardEvent.KEY_DOWN, KeyPressed);
-       // visible = false;
     }
 
     override protected function onMouseClick(event:MouseEvent):void {
