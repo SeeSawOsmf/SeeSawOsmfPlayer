@@ -220,6 +220,7 @@ public class BatchEventService extends ProxyElement {
             metadata.addEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
 
         } else if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
+
             adMetadata = event.target.getMetadata(AdMetadata.AD_NAMESPACE);
             adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
             adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
@@ -227,8 +228,6 @@ public class BatchEventService extends ProxyElement {
         } else if (event.namespaceURL == "http://www.w3.org/ns/SMIL/content") {
             SMILMetadata = event.target.getMetadata("http://www.w3.org/ns/SMIL/content");
             var contentType:String = SMILMetadata.getValue(PlayerConstants.CONTENT_TYPE);
-            SMILMetadata.addEventListener(MetadataEvent.VALUE_ADD, onSMIMetaDataChange);
-            SMILMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onSMIMetaDataChange);
             switch (contentType) {
                 case PlayerConstants.MAIN_CONTENT_ID :
                     playingMainContent = true;
@@ -254,9 +253,6 @@ public class BatchEventService extends ProxyElement {
         }
     }
 
-    private function onSMIMetaDataChange(event:MetadataEvent):void {
-         trace(event);
-    }
 
     private function onLayoutMetadataChange(event:MetadataEvent):void {
         trace(event);
@@ -419,12 +415,6 @@ public class BatchEventService extends ProxyElement {
 
     private function toggleLoadListeners(added:Boolean):void {
         loadable = proxiedElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
-         SMILMetadata = proxiedElement.getMetadata("http://www.w3.org/ns/SMIL/content");
-        if(SMILMetadata){
-            var contentType:String = SMILMetadata.getValue(PlayerConstants.CONTENT_TYPE);
-            SMILMetadata.addEventListener(MetadataEvent.VALUE_ADD, onSMIMetaDataChange);
-            SMILMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onSMIMetaDataChange);
-        }
     }
 
     private function onAutoSwitchChange(event:DynamicStreamEvent):void {
