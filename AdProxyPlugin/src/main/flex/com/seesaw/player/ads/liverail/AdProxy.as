@@ -294,12 +294,13 @@ public class AdProxy extends ProxyElement {
 
     private function adbreakStart(event:Object):void {
         logger.debug("adbreakStart");
-
+        trace(event);
         adMetadata.adState = AdState.AD_BREAK_START;
 
         setTraitsToBlock(MediaTraitType.SEEK);
         // Perhaps this is needed for mid-rolls
-        //pause();
+         if(event.data.breakTime > 0)   /// not to pause for preROll...
+          pause();
 
         // mask the existing play trait so we get the play state changes here
         var adPlayTrait:AdPlayTrait = new AdPlayTrait();

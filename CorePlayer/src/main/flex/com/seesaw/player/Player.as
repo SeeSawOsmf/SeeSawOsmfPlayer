@@ -57,8 +57,6 @@ import flash.net.URLVariables;
 import flash.ui.ContextMenu;
 import flash.ui.ContextMenuItem;
 
-import flash.utils.Dictionary;
-
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.events.MediaPlayerStateChangeEvent;

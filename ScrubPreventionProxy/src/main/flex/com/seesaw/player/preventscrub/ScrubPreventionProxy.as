@@ -21,19 +21,17 @@
  */
 
 package com.seesaw.player.preventscrub {
+import com.seesaw.player.ads.AdBreak;
+import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.ads.AdState;
-import com.seesaw.player.events.AdEvent;
-import com.seesaw.player.traits.ads.AdTrait;
-import com.seesaw.player.traits.ads.AdTraitType;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ProxyElement;
-import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
+import org.osmf.events.MetadataEvent;
 import org.osmf.events.SeekEvent;
 import org.osmf.media.MediaElement;
-import org.osmf.traits.LoadTrait;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.SeekTrait;
 import org.osmf.traits.TimeTrait;
@@ -41,14 +39,15 @@ import org.osmf.traits.TimeTrait;
 public class ScrubPreventionProxy extends ProxyElement {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(ScrubPreventionProxy);
-    private var _adTrait:AdTrait;
     private var time:TimeTrait;
-    private var adMarkers:Array;
+    private var adMarkers:Vector.<AdBreak>;
     private var seekable:SeekTrait;
     private var offset:Number = 0.5;
     private var finalSeekPoint:Number;
     private var blockedSeekable:BlockableSeekTrait;
-    private var temporaryAdMarkers:Array;
+    private var temporaryAdMarkers:Vector.<AdBreak>;
+    private var forceSeek:Boolean;
+    private var adjustedSeekPoint:Number;
 
 
     public function ScrubPreventionProxy() {
@@ -65,6 +64,12 @@ public class ScrubPreventionProxy extends ProxyElement {
             proxiedElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
             proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
 
+            if (adMetadata) {
+                adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataChange);
+                adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
+            }
+
+
         }
     }
 
@@ -75,12 +80,31 @@ public class ScrubPreventionProxy extends ProxyElement {
     }
 
 
+    private function get adMetadata():AdMetadata {
+        var adMetadata:AdMetadata = getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+        if (adMetadata == null) {
+            adMetadata = new AdMetadata();
+            addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
+        }
+        return adMetadata;
+    }
+
+    private function onAdsMetaDataChange(event:MetadataEvent):void {
+        if (event.key == AdMetadata.AD_BREAKS) {
+            temporaryAdMarkers = null;
+
+            adMarkers = event.value;
+            //// AdMetaEvaluation(event.key);  ///todo se if we need anything related to the adBreaks changing...
+        }
+        if (event.key == AdMetadata.AD_STATE && event.value == AdState.AD_BREAK_COMPLETE) {
+            finalSeek();
+        }
+    }
+
     private function processTrait(traitType:String, added:Boolean):void {
 
         switch (traitType) {
-            case MediaTraitType.LOAD:
-                toggleLoadListeners(added);
-                break;
+
             case MediaTraitType.SEEK:
                 toggleSeekListeners(added);
                 break;
@@ -115,91 +139,66 @@ public class ScrubPreventionProxy extends ProxyElement {
     }
 
     private function onSeekingChange(event:SeekEvent):void {
-        var adjustedSeekPoint:Number;
-        var forceSeek:Boolean;
-        for each (var value:Number in adMarkers) {
-            if (event.time > (value * time.duration)) {
-                forceSeek = true;
-                adjustedSeekPoint = value * time.duration;
+        if (!forceSeek) {
+            for each (var breakItem:AdBreak in adMarkers) {
+
+                if (breakItem.startTime > 0) {
+
+                    if (event.time > (breakItem.startTime)) {
+
+                        forceSeek = true;
+                        adjustedSeekPoint = breakItem.startTime;
+
+                        if(breakItem.hasSeen){
+                             forceSeek = false;
+                        }
+                    }
+                }
             }
         }
         if (forceSeek) {
 
             finalSeekPoint = event.time;
             blockedSeekable.blocking = true;
+            seekable.removeEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
             seekable.seek((adjustedSeekPoint - offset));
 
             if (adMarkers) {
-                for (var i:Number = 0; i < adMarkers.length; i++) {
-                    var index:Number = adMarkers[i];
-                    if (index == (adjustedSeekPoint / time.duration)) {
-                        adMarkers.splice(i, 1);
+                var indexCount:int;
+                for each (var value:AdBreak in adMarkers) {
+                    var index:int = value.startTime;
+                    if (index == (adjustedSeekPoint)) {
+                        /// adMarkers[value];
+                        value.hasSeen = true;
                     }
+                    indexCount++
                 }
             }
+
             temporaryAdMarkers = adMarkers;
-            adMarkers = null;
-
-
-            forceSeek = false;
+            //// adMarkers = null;
 
         }
     }
 
-    private function toggleLoadListeners(added:Boolean):void {
-        var loadable:LoadTrait = proxiedElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
-        if (loadable) {
-            if (added) {
-                loadable.addEventListener(LoadEvent.LOAD_STATE_CHANGE, onLoadableStateChange);
 
+    private function finalSeek():void {
+        if (finalSeekPoint) {
+            if (finalSeekPoint > 0) {
+                seekable.seek((finalSeekPoint));
+                blockedSeekable.blocking = false;
+                forceSeek = false;
+                seekable.addEventListener(SeekEvent.SEEKING_CHANGE, reinstateSeek);
             }
-            else {
-                loadable.removeEventListener(LoadEvent.LOAD_STATE_CHANGE, onLoadableStateChange);
-            }
+            ///  adMetadata.adBreaks = temporaryAdMarkers;
         }
     }
-
-    private function onLoadableStateChange(event:LoadEvent):void {
-        _adTrait = proxiedElement ? proxiedElement.getTrait(AdTraitType.AD_PLAY) as AdTrait : null;
-
-        if (_adTrait) {
-            _adTrait.addEventListener(AdEvent.AD_MARKERS, adMarkerEvent);
-            _adTrait.addEventListener(AdEvent.AD_STATE_CHANGE, finalSeek);
-        }
-    }
-
-    private function createNewMarkers():void {
-
-        _adTrait.createMarkers(temporaryAdMarkers);
-    }
-
     private function reinstateSeek(event:SeekEvent):void {
         if (!event.seeking) {
             seekable.removeEventListener(SeekEvent.SEEKING_CHANGE, reinstateSeek);
-
+            seekable.addEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
         }
     }
-
-    private function adMarkerEvent(event:AdEvent):void {
-        temporaryAdMarkers = null;
-        adMarkers = event.markers;
-    }
-
-    private function finalSeek(event:AdEvent):void {
-
-        if (_adTrait.adState == AdState.AD_BREAK_COMPLETE) {
-            if (finalSeekPoint > 0) {
-
-
-                seekable.seek((finalSeekPoint));
-                createNewMarkers();
-                blockedSeekable.blocking = false;
-
-
-            }
-        }
-    }
-
     private function onTraitAdd(event:MediaElementEvent):void {
         processTrait(event.traitType, true);
     }

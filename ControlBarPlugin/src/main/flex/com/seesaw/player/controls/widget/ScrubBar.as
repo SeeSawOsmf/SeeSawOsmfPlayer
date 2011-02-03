@@ -67,6 +67,8 @@ public class ScrubBar extends Widget implements IWidget {
     private var currentTimeInSeconds:Number = 0;
 
     private var duration:Number;
+    private var _temporalTime:TimeTrait;
+    private var adHasCompleted:Boolean;
 
     public function ScrubBar() {
         currentTime = new StyledTextField();
@@ -190,6 +192,7 @@ public class ScrubBar extends Widget implements IWidget {
     override protected function onMediaElementTraitAdd(event:MediaElementEvent):void {
         if (event.traitType == MediaTraitType.TIME) {
             var timeTrait:TimeTrait = media.getTrait(MediaTraitType.TIME) as TimeTrait;
+            _temporalTime = media ? media.getTrait(MediaTraitType.TIME) as TimeTrait : null;
             logger.debug("adding time trait: " + timeTrait);
             timeTrait.addEventListener(TimeEvent.DURATION_CHANGE, onDurationChange);
         }
@@ -231,7 +234,8 @@ public class ScrubBar extends Widget implements IWidget {
     private function onDurationChange(event:TimeEvent):void {
         var timeTrait:TimeTrait = event.target as TimeTrait;
         duration = timeTrait.duration;
-        createAdMarkers();
+        if(adHasCompleted)
+            createAdMarkers();
     }
 
     // Internals
@@ -239,7 +243,14 @@ public class ScrubBar extends Widget implements IWidget {
 
     private function updateState():void {
         visible = scrubber.enabled = media ? media.hasTrait(MediaTraitType.SEEK) : false;
-
+        if (adMetadata) {
+            if (adMetadata.hasEventListener(MetadataEvent.VALUE_ADD) && adMetadata.hasEventListener(MetadataEvent.VALUE_CHANGE)) {
+                adMetadata.removeEventListener(MetadataEvent.VALUE_ADD, onAdStateMetadataChanged);
+                adMetadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onAdStateMetadataChanged);
+            }
+            adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdStateMetadataChanged);
+            adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdStateMetadataChanged);
+        }
         updateTimerState();
     }
 
@@ -248,8 +259,9 @@ public class ScrubBar extends Widget implements IWidget {
     }
 
     private function onAdStateMetadataChanged(event:MetadataEvent):void {
-        if (event.key == AdMetadata.AD_STATE && event.value == AdState.AD_BREAK_COMPLETE) {
+        if ((event.key == AdMetadata.AD_STATE && event.value == AdState.AD_BREAK_COMPLETE)) {
             logger.debug("ad markers changed");
+            adHasCompleted = true;
             createAdMarkers();
         }
     }
@@ -257,19 +269,20 @@ public class ScrubBar extends Widget implements IWidget {
     private function createAdMarkers():void {
         var adBreaks:Vector.<AdBreak> = adMetadata ? adMetadata.adBreaks : null;
 
+
         if (adBreaks && adBreaks.length > 0) {
             removeAllChildren(markerContainer);
 
             for each (var value:AdBreak in adBreaks) {
-                if (value.startTime <= currentTimeInSeconds) continue;
-
-                var sprite:Sprite = new Sprite();
-                sprite.graphics.beginFill(0xffffff);
-                sprite.graphics.drawRect(0, 0, 6, 4);
-                sprite.x = scrubBarTrack.x + getPositionOnScrubBar(value.startTime) - 3;
-                sprite.y = scrubBarTrack.y - 0.5;
-                sprite.graphics.endFill();
-                markerContainer.addChild(sprite);
+                if (value.startTime > 0) {
+                    var sprite:Sprite = new Sprite();
+                    sprite.graphics.beginFill(0xffffff);
+                    sprite.graphics.drawRect(0, 0, 7, 5);
+                    sprite.x = scrubBarTrack.x + getPositionOnScrubBar(value.startTime) - 3;
+                    sprite.y = scrubBarTrack.y - 0.5;
+                    sprite.graphics.endFill();
+                    markerContainer.addChild(sprite);
+                }
             }
         }
     }
@@ -316,7 +329,7 @@ public class ScrubBar extends Widget implements IWidget {
     }
 
     private function getPositionOnScrubBar(position:Number):Number {
-        return ((position / duration) * (scrubberEnd - scrubberStart)) || 0; // default value if calc. returns NaN.
+        return ((position / _temporalTime.duration) * (scrubberEnd - scrubberStart)) || 0; // default value if calc. returns NaN.
     }
 
     private function prettyPrintSeconds(seconds:Number):String {
@@ -372,7 +385,7 @@ public class ScrubBar extends Widget implements IWidget {
             onTimerTick();
         } else {
             //redraw the blips, as we should now be past a break point
-            createAdMarkers();
+            ///createAdMarkers();
         }
     }
 

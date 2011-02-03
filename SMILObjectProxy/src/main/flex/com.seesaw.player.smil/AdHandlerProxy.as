@@ -66,7 +66,6 @@ public class AdHandlerProxy extends ProxyElement {
                 var trackBack:String = metadata.getValue(AdMetadata.TRACK_BACK) as String;
                 var adMetadata:AdMetadata = event.metadata as AdMetadata;
                 adMetadata.clickThru = trackBack;
-                adMetadata.clickThru = trackBack;
             }
         }
     }

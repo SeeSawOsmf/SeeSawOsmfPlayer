@@ -16,6 +16,11 @@
             <data>PRE:x01,x02,x60,x61,x90,x91</data>
         </break>
         <break>
+            <breakOffset>00:05:00.00</breakOffset>
+            <resumeOffset>00:05:00.00</resumeOffset>
+            <data>CEN:x01,x02,x92,x80,x81,x93</data>
+        </break>
+         <break>
             <breakOffset>00:08:00.00</breakOffset>
             <resumeOffset>00:08:00.00</resumeOffset>
             <data>CEN:x01,x02,x92,x80,x81,x93</data>

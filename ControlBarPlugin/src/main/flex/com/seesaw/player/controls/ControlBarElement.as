@@ -38,7 +38,6 @@ import org.as3commons.logging.LoggerFactory;
 import org.osmf.chrome.assets.AssetsManager;
 import org.osmf.chrome.configuration.LayoutAttributesParser;
 import org.osmf.chrome.configuration.WidgetsParser;
-import org.osmf.chrome.metadata.ChromeMetadata;
 import org.osmf.chrome.widgets.Widget;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.layout.LayoutMetadata;

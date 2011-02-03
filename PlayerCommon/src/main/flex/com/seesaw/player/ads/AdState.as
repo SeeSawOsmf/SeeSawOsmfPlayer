@@ -27,5 +27,7 @@ public final class AdState {
     public static const STARTED:String = "started";
     public static const AD_BREAK_START:String = "adBreakStarted";
     public static const AD_BREAK_COMPLETE:String = "adBreakStopped";
+    public static const SMIL_AD_BREAK_START:String = "SmilAdBreakStarted";
+    public static const SMIL_MAIN_CONENT_START:String = "SmilContentStarted";
 }
 }
