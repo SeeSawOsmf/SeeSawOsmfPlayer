@@ -36,6 +36,7 @@ import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.namespaces.smil;
+import com.seesaw.player.panels.GeoBlockPanel;
 import com.seesaw.player.panels.GuidanceBar;
 import com.seesaw.player.panels.GuidancePanel;
 import com.seesaw.player.panels.NotAvailablePanel;
@@ -420,6 +421,8 @@ public class Player extends Sprite {
         playerInit.adMode[0] = adModulePlayableEvaluation();
 
         if (videoInfo.geoblocked == "true") {
+            var geoBlockPanel = new GeoBlockPanel();
+            addChild(geoBlockPanel);
             return;
         }
 
