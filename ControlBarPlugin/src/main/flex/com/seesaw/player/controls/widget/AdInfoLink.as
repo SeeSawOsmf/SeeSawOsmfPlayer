@@ -43,6 +43,7 @@ import org.osmf.chrome.widgets.ButtonWidget;
 import org.osmf.events.MetadataEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.traits.MediaTraitType;
+import org.osmf.traits.PlayTrait;
 
 public class AdInfoLink extends ButtonWidget implements IWidget {
 
@@ -131,8 +132,16 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
         var request:URLRequest = new URLRequest(this.interactiveAdvertisingUrl);
         try {
             navigateToURL(request);
+            pause();
         } catch (e:Error) {
             trace("Error occurred!");
+        }
+    }
+
+    private function pause():void {
+        var playTrait:PlayTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
+        if(playTrait) {
+            playTrait.pause();
         }
     }
 

@@ -359,13 +359,6 @@ public class SeeSawPlayer extends Sprite {
             metadata.addValue(AuditudeConstants.PLUGIN_INSTANCE, _auditude);
         }
 
-
-     var adMetadata:AdMetadata =  config.resource.getMetadataValue(AdMetadata.AD_NAMESPACE) as AdMetadata;
-        if (adMetadata == null) {
-            adMetadata = new AdMetadata();
-           contentElement.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
-        }
-
         setContainerSize(contentWidth, contentHeight);
 
         mainElement.addChild(contentElement);
@@ -521,7 +514,6 @@ public class SeeSawPlayer extends Sprite {
                 var adMetadata:AdMetadata = new AdMetadata();
                 adMetadata.adMode = AdMode.MAIN_CONTENT;
                 adMetadata.adBreaks = generateAdBreaksFromSmil();
-                pushAdMetaDataToContentELement();
                 element.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
                 processSmilMediaElement(element);
                 break;
@@ -530,17 +522,10 @@ public class SeeSawPlayer extends Sprite {
         element.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
     }
 
-    private function pushAdMetaDataToContentELement():void {
-         var adMetadata:AdMetadata = contentElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
-        if(!adMetadata.adBreaks){
-            adMetadata.adBreaks = generateAdBreaksFromSmil();
-        }
-    }
-
     private function processSmilMediaElement(element:MediaElement):void {
         // This layout applies to main content, stings and ads
         setMediaLayout(element);
-            element.getTrait(MediaTraitType.LOAD).addEventListener(LoadEvent.LOAD_STATE_CHANGE, proceesMediaLoad)
+
         // For some reason dynamic stream changes reset the current layout metadata (bug?) in the playlist
         // so this is a workaround to always set the right value.
         element.addEventListener(MediaElementEvent.TRAIT_ADD, function(event:MediaElementEvent) {
@@ -559,20 +544,6 @@ public class SeeSawPlayer extends Sprite {
         // needs to be applied to all the video elements.
         playlistElements.push(element);
     }
-
-
-
-    private function proceesMediaLoad(event:LoadEvent):void {
-                         trace(event.target);
-         var metadata:Metadata = event.target.resource.getMetadataValue(SMILConstants.SMIL_CONTENT_NS);
-         var adMetadata:Metadata = contentElement.getMetadata(AdMetadata.AD_NAMESPACE);
-                        if(metadata) {
-                          adMetadata.addValue(AdMetadata.AD_STATE, metadata.getValue("contentType")) ;
-                        }
-    }
-
-
-
 
     private function setMediaLayout(element:MediaElement) {
         var layout:LayoutMetadata = element.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
