@@ -297,7 +297,7 @@ public class AdProxy extends ProxyElement {
         trace(event);
         adMetadata.adState = AdState.AD_BREAK_START;
 
-        setTraitsToBlock(MediaTraitType.SEEK);
+        setTraitsToBlock(MediaTraitType.SEEK, MediaTraitType.TIME);
         // Perhaps this is needed for mid-rolls
          if(event.data.breakTime > 0)   /// not to pause for preROll...
           pause();

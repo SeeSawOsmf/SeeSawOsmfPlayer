@@ -236,7 +236,7 @@ public class AdProxy extends ProxyElement {
 
         // mask the existing play trait so we get the play state changes here
         adMetadata.adState = AdState.AD_BREAK_START;
-        setTraitsToBlock(MediaTraitType.SEEK);
+        setTraitsToBlock(MediaTraitType.SEEK, MediaTraitType.TIME);
     }
 
     private function onBreakEnd(event:AdPluginEvent):void {

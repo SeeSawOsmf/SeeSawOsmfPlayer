@@ -47,7 +47,7 @@ import org.osmf.traits.PlayTrait;
 
 public class AdInfoLink extends ButtonWidget implements IWidget {
 
-    private var logger:ILogger = LoggerFactory.getClassLogger(LightsDownButton);
+    private var logger:ILogger = LoggerFactory.getClassLogger(AdInfoLink);
 
     private var xi:PlayerExternalInterface;
 
