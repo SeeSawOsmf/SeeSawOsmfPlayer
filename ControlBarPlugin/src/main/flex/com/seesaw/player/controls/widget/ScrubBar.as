@@ -22,6 +22,7 @@
 
 package
 com.seesaw.player.controls.widget {
+import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.ads.AdBreak;
 import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.ads.AdMode;
@@ -53,6 +54,7 @@ import org.osmf.events.MetadataEvent;
 import org.osmf.events.SeekEvent;
 import org.osmf.events.TimeEvent;
 import org.osmf.media.MediaElement;
+import org.osmf.metadata.Metadata;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.PlayTrait;
@@ -85,9 +87,6 @@ public class ScrubBar extends Widget implements IWidget {
 
         super();
     }
-
-    // Overrides
-    //
 
     override public function layout(availableWidth:Number, availableHeight:Number, deep:Boolean = true):void {
         if (lastWidth != availableWidth || lastHeight != availableHeight) {
@@ -129,7 +128,6 @@ public class ScrubBar extends Widget implements IWidget {
             onTimerTick();
         }
     }
-
 
     override public function configure(xml:XML, assetManager:AssetsManager):void {
         super.configure(xml, assetManager);
@@ -218,14 +216,17 @@ public class ScrubBar extends Widget implements IWidget {
     }
 
     private function onDurationChange(event:TimeEvent):void {
-        var timeTrait:TimeTrait = event.target as TimeTrait;
-        duration = timeTrait.duration;
-      ///  if(adHasCompleted)
-            createAdMarkers();
-    }
+        var metadata:Metadata = media.getMetadata(PlayerConstants.METADATA_NAMESPACE);
+        if (metadata) {
+            duration = metadata.getValue(PlayerConstants.MAIN_CONTENT_DURATION) as Number;
+        }
+        else {
+            var timeTrait:TimeTrait = event.target as TimeTrait;
+            duration = timeTrait.duration;
+        }
 
-    // Internals
-    //
+        createAdMarkers();
+    }
 
     private function updateState():void {
         visible = scrubber.enabled = media ? media.hasTrait(MediaTraitType.SEEK) : false;
@@ -247,9 +248,9 @@ public class ScrubBar extends Widget implements IWidget {
     private function removeCompletedMarkers():void {
         var adBreaks:Vector.<AdBreak> = adMetadata ? adMetadata.adBreaks : null;
         var timeTrait:TimeTrait = media.getTrait(MediaTraitType.TIME) as TimeTrait;
-        if(timeTrait && adBreaks) {
+        if (timeTrait && adBreaks) {
             for (var i:int = 0; i < adBreaks.length; i++) {
-                if(adBreaks[i].startTime <= timeTrait.currentTime) {
+                if (adBreaks[i].startTime <= timeTrait.currentTime) {
                     adBreaks.splice(i, 1);
                 }
             }
@@ -295,12 +296,8 @@ public class ScrubBar extends Widget implements IWidget {
     }
 
     private function onTimerTick(event:Event = null):void {
-        // var seekTrait:SeekTrait = media ? media.getTrait(MediaTraitType.SEEK) as SeekTrait : null;
-        // scrubber.visible = scrubBarTrail.visible = scrubBarTrack.visible = seekTrait != null;
-
         var temporal:TimeTrait = media ? media.getTrait(MediaTraitType.TIME) as TimeTrait : null;
         if (temporal != null && !isNaN(temporal.duration) && !isNaN(temporal.currentTime)) {
-            duration = temporal.duration;
             var position:Number = temporal.currentTime;
 
             this.currentTimeInSeconds = position;
