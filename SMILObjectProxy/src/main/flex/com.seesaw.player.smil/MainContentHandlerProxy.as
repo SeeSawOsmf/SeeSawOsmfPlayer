@@ -36,11 +36,8 @@ import org.osmf.events.MediaElementEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.metadata.Metadata;
 import org.osmf.traits.MediaTraitType;
-import org.osmf.traits.TimeTrait;
 
 public class MainContentHandlerProxy extends ProxyElement {
-
-    private var timeTrait:TimeTrait;
 
     public function MainContentHandlerProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
