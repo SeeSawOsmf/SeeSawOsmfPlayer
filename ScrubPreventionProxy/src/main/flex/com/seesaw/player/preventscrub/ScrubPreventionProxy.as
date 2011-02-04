@@ -85,8 +85,6 @@ public class ScrubPreventionProxy extends ProxyElement {
       if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
             adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataChange);
             adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
-            adMarkers = adMetadata.getValue(AdMetadata.AD_BREAKS);
-          trace(adMarkers);
         }
         }
 
