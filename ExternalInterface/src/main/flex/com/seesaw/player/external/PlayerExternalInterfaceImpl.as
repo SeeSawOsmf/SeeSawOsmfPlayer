@@ -75,7 +75,9 @@ public class PlayerExternalInterfaceImpl implements PlayerExternalInterface {
             ExternalInterface.addCallback(name, callback);
         }
     }
-
+    public function baynoteVideoTrack():void{
+          call(ExternalInterfaceConstants.BAYNOTE_VIDEO_TRACKER);
+    }
     private function call(...args) {
         if (available) {
             logger.debug("calling {0}", args[0].toString());

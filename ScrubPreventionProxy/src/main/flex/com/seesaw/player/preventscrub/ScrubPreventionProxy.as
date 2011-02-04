@@ -63,6 +63,7 @@ public class ScrubPreventionProxy extends ProxyElement {
 
             proxiedElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
             proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
+            proxiedElement.addEventListener(MediaElementEvent.METADATA_ADD, onMetaDataAdd);
 
             if (adMetadata) {
                 adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataChange);
@@ -79,6 +80,13 @@ public class ScrubPreventionProxy extends ProxyElement {
 
     }
 
+
+      private function onMetaDataAdd(event:MediaElementEvent):void {
+      if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
+            adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataChange);
+            adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
+        }
+        }
 
     private function get adMetadata():AdMetadata {
         var adMetadata:AdMetadata = getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
@@ -141,7 +149,9 @@ public class ScrubPreventionProxy extends ProxyElement {
     private function onSeekingChange(event:SeekEvent):void {
         if (!forceSeek) {
 
-            if(!adMarkers) adMarkers = adMetadata.adBreaks;
+            if(!adMarkers) {
+                adMarkers = adMetadata.adBreaks;
+            }
 
             for each (var breakItem:AdBreak in adMarkers) {
 

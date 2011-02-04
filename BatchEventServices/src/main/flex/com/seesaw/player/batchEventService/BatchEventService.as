@@ -87,7 +87,7 @@ public class BatchEventService extends ProxyElement {
     private var mainContentCount:int;
     private var playable:PlayTrait;
     private var loadable:LoadTrait;
-   /// private var adMetadata:Metadata;
+    /// private var adMetadata:Metadata;
     private var SMILMetadata:Metadata;
     private var playerMetadata:Metadata;
     private var dynamicStream:DynamicStreamTrait;
@@ -111,7 +111,7 @@ public class BatchEventService extends ProxyElement {
 
     public override function set proxiedElement(value:MediaElement):void {
         if (value) {
-            if(proxiedElement) {
+            if (proxiedElement) {
                 proxiedElement.removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
                 proxiedElement.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
                 proxiedElement.removeEventListener(MediaElementEvent.METADATA_ADD, onMetaDataAdd);
@@ -151,20 +151,24 @@ public class BatchEventService extends ProxyElement {
                 adMode = playerMetadata.getValue("contentInfo").adMode;
                 availabilityType = playerMetadata.getValue("videoInfo").availabilityType;
 
-                var number:Number = resumeService.getResumeCookie();
-                if (number == 0) {
-                    userEvent = buildAndReturnUserEvent(UserEventTypes.AUTO_PLAY);
-                } else {
-                    userEvent = buildAndReturnUserEvent(UserEventTypes.AUTO_RESUME);
-                }
                 if (adMode != AdMetadata.LR_AD_TYPE && adMode != AdMetadata.AUDITUDE_AD_TYPE) {
+
                     viewEvent = new ViewEvent(transactionItemId, serverTimeStamp, sectionCount, mainAssetId, userId, anonymousUserId);
                     eventsManager = new EventsManagerImpl(viewEvent, availabilityType, batchEventURL, cumulativeDurationURL);
+
+                    var number:Number = resumeService.getResumeCookie();
+                    if (number == 0) {
+                        userEvent = buildAndReturnUserEvent(UserEventTypes.AUTO_PLAY);
+                    } else {
+                        userEvent = buildAndReturnUserEvent(UserEventTypes.AUTO_RESUME);
+                    }
                     eventsManager.addUserEvent(userEvent);
                     eventsManager.flushAll();
                 }
             }
         }
+        adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
+        adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
     }
 
     private function playerMetaChanged(event:MetadataEvent):void {
@@ -174,6 +178,12 @@ public class BatchEventService extends ProxyElement {
                 sectionCount = evaluateNewSectionCount(event.value);
                 viewEvent = new ViewEvent(transactionItemId, serverTimeStamp, sectionCount, mainAssetId, userId, anonymousUserId);
                 eventsManager = new EventsManagerImpl(viewEvent, availabilityType, batchEventURL, cumulativeDurationURL);
+                var number:Number = resumeService.getResumeCookie();
+                if (number == 0) {
+                    userEvent = buildAndReturnUserEvent(UserEventTypes.AUTO_PLAY);
+                } else {
+                    userEvent = buildAndReturnUserEvent(UserEventTypes.AUTO_RESUME);
+                }
                 eventsManager.addUserEvent(userEvent);
                 eventsManager.flushAll();
             }
@@ -194,7 +204,12 @@ public class BatchEventService extends ProxyElement {
 
 
     private function get adMetadata():AdMetadata {
-        return getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+        var adMetadata:AdMetadata = getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+        if (adMetadata == null) {
+            adMetadata = new AdMetadata();
+            addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
+        }
+        return adMetadata;
     }
 
 
@@ -222,8 +237,29 @@ public class BatchEventService extends ProxyElement {
             metadata.addEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
 
         } else if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
+
+            if (adMetadata) {
+                adMetadata.removeEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
+                adMetadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
+            }
             adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
             adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
+
+        } else if (event.namespaceURL == "http://www.w3.org/ns/SMIL/content") {
+            SMILMetadata = event.target.getMetadata("http://www.w3.org/ns/SMIL/content");
+            var contentType:String = SMILMetadata.getValue(PlayerConstants.CONTENT_TYPE);
+            switch (contentType) {
+                case PlayerConstants.MAIN_CONTENT_ID :
+                    playingMainContent = true;
+                    break;
+                case PlayerConstants.STING_CONTENT_ID :
+                    playingMainContent = false;
+                    break;
+                case PlayerConstants.AD_CONTENT_ID :
+                    playingMainContent = false;
+                    break;
+            }
+
         } else if (event.namespaceURL == "http://www.seesaw.com/netstatus/metadata") {
             metadata = event.target.getMetadata("http://www.seesaw.com/netstatus/metadata");
             metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onNetstatusMetadataChange);
@@ -257,6 +293,7 @@ public class BatchEventService extends ProxyElement {
         if (event.key == AdMetadata.AD_STATE) {
             AdMetaEvaluation(event.value);
         } else if (event.key == AdMetadata.AD_BREAKS) {
+            trace(event.value);
             //// AdMetaEvaluation(event.key);  ///todo se if we need anything related to the adBreaks changing...
         } else {
             AdMetaEvaluation(event.key);
@@ -572,8 +609,13 @@ public class BatchEventService extends ProxyElement {
     }
 
     private function buildAndReturnUserEvent(userEventType:String):UserEvent {
-        //TODO generateAssociatedContentEvent(); - there need to be an associated contentEvent.
+        generateAssociatedContentEvent();
         return new UserEvent(incrementAndGetUserEventId(), cumulativeDurationCount, userEventType, programmeId);
+    }
+
+    private function generateAssociatedContentEvent():void {
+        /// this is to tie the userEvent to a piece of content..  todo this might give false info due the autoResume. as we set the playingMainContent from the metdata.. which is currently busted...
+        playingMainContent ? eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.MAIN_CONTENT)) : eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.AD_BREAK));
     }
 
     private function buildAndReturnContentEvent(contentType:String):ContentEvent {

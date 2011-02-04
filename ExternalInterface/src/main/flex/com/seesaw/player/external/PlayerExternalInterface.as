@@ -33,5 +33,6 @@ public interface PlayerExternalInterface {
     function addGetCurrentItemTitleCallback(callback:Function):void;
     function addGetCurrentItemDurationCallback(callback:Function):void;
     function addSetPlaylistCallback(callback:Function):void;
+    function baynoteVideoTrack():void;
 }
 }
