@@ -126,6 +126,7 @@ CONFIG::LOGGING
 
 					var duration:Number = (smilElement as SMILMediaElement).duration;
 					setVideoDuration(duration, videoElement);
+
 					(parentMediaElement as CompositeElement).addChild(videoElement);
 					break;
 				case SMILElementType.IMAGE:
@@ -208,8 +209,6 @@ CONFIG::LOGGING
 
 			return mediaElement;
 		}
-
-
 
         private function setVideoDuration(duration:Number, videoElement:MediaElement):void
         {
