@@ -140,6 +140,9 @@ public class ScrubPreventionProxy extends ProxyElement {
 
     private function onSeekingChange(event:SeekEvent):void {
         if (!forceSeek) {
+
+            if(!adMarkers) adMarkers = adMetadata.adBreaks;
+
             for each (var breakItem:AdBreak in adMarkers) {
 
                 if (breakItem.startTime > 0) {

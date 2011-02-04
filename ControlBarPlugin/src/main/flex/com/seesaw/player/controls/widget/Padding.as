@@ -21,31 +21,16 @@
  */
 
 package com.seesaw.player.controls.widget {
-
-import com.seesaw.player.controls.ControlBarMetadata;
-import com.seesaw.player.ui.PlayerToolTip;
 import com.seesaw.player.ui.StyledTextField;
 
 import controls.seesaw.widget.interfaces.IWidget;
 
-import flash.display.Sprite;
-import flash.display.StageDisplayState;
-import flash.events.Event;
-import flash.events.FullScreenEvent;
-import flash.events.KeyboardEvent;
-import flash.events.MouseEvent;
-import flash.text.StyleSheet;
 import flash.text.TextField;
 import flash.text.TextFormat;
-import flash.ui.Keyboard;
-
-import flash.ui.Mouse;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.chrome.widgets.ButtonWidget;
-import org.osmf.media.MediaElement;
-import org.osmf.metadata.Metadata;
 import org.osmf.traits.MediaTraitType;
 
 public class Padding extends ButtonWidget implements IWidget {
