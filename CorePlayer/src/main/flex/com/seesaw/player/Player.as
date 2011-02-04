@@ -153,9 +153,9 @@ public class Player extends Sprite {
             xi.addGetGuidanceCallback(checkGuidance);
             xi.addGetCurrentItemTitleCallback(getCurrentItemTitle);
             xi.addGetCurrentItemDurationCallback(getCurrentItemDuration);
-            xi.addSetPlaylistCallback(setPlaylist);
+            xi.addSetPlaylistCallback(setPlaylist);   /// todo this might not be needed anymore as the playlist is already set...
             // Let JS know we're ready to receive calls (e.g. C4 ad script):
-            xi.callSWFInit();
+            xi.callSWFInit(); /// noAdsCTA will call prematurely in this instance..
         }
     }
 
@@ -474,6 +474,10 @@ public class Player extends Sprite {
         addChild(videoPlayer);
 
         videoPlayer.init();
+
+         if (xi.available) {
+            xi.baynoteVideoTrack(); /// Video is now initailised so we notify baynote..
+        }
     }
 
      private function onMediaPlayerStateChange(event:MediaPlayerStateChangeEvent):void {

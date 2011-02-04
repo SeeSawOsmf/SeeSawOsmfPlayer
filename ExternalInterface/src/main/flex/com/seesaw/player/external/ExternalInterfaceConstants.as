@@ -35,5 +35,7 @@ public class ExternalInterfaceConstants {
     public static const SET_PLAYLIST:String = "setPlaylist";
 
     public static const SET_SWF_INIT:String = "VODCO.ads.player.setSWFInit";
+
+    public static const BAYNOTE_VIDEO_TRACKER:String = "VODCO.ads.player.baynoteVideoTrack";
 }
 }

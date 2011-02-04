@@ -288,6 +288,7 @@ public class BatchEventService extends ProxyElement {
         if (event.key == AdMetadata.AD_STATE) {
             AdMetaEvaluation(event.value);
         } else if (event.key == AdMetadata.AD_BREAKS) {
+           trace(event.value);
             //// AdMetaEvaluation(event.key);  ///todo se if we need anything related to the adBreaks changing...
         } else {
             AdMetaEvaluation(event.key);
