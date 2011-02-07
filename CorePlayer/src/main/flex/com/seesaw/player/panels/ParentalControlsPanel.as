@@ -94,7 +94,7 @@ public class ParentalControlsPanel extends Sprite {
      * Takes: warning:String - the guidance warning that appears at the top of the panel
      *
      */
-    public function ParentalControlsPanel(password:String, warning:String, assetType:String, age:String, moreAboutParentalControlsLink:String, turnOffParentalControlsLink:String) {
+    public function ParentalControlsPanel(password:String, warning:String, assetType:String, age:String, turnOffParentalControlsLink:String, moreAboutParentalControlsLink:String) {
         
         this.hashedPassword = password;
         //set the private variables
