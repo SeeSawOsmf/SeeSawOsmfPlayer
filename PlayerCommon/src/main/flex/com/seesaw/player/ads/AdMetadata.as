@@ -67,5 +67,16 @@ public class AdMetadata extends Metadata {
     public function set adMode(mode:String):void {
         addValue(AdMetadata.AD_MODE, mode);
     }
+
+    public function markNextUnseenAdBreakAsSeen():void {
+        if (adBreaks) {
+            for each (var breakItem:AdBreak in adBreaks) {
+                if (!breakItem.hasSeen) {
+                    breakItem.hasSeen = true;
+                    break;
+                }
+            }
+        }
+    }
 }
 }

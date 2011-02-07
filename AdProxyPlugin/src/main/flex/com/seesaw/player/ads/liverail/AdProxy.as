@@ -26,6 +26,7 @@ package com.seesaw.player.ads.liverail {
 import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.ads.AdBreak;
 import com.seesaw.player.ads.AdMetadata;
+import com.seesaw.player.ads.AdMode;
 import com.seesaw.player.ads.AdState;
 import com.seesaw.player.ads.LiverailConstants;
 import com.seesaw.player.ads.events.LiveRailEvent;
@@ -135,10 +136,16 @@ public class AdProxy extends ProxyElement {
         }
     }
 
-    public override function set proxiedElement(proxiedElement:MediaElement):void {
-        if (proxiedElement) {
-            logger.debug("proxiedElement: " + proxiedElement);
-            super.proxiedElement = proxiedElement;
+    public override function set proxiedElement(value:MediaElement):void {
+        if (value) {
+            logger.debug("proxiedElement: " + value);
+
+            if (proxiedElement) {
+                proxiedElement.removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
+                proxiedElement.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
+            }
+
+            super.proxiedElement = value;
 
             proxiedElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
             proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
@@ -296,11 +303,12 @@ public class AdProxy extends ProxyElement {
         logger.debug("adbreakStart");
         trace(event);
         adMetadata.adState = AdState.AD_BREAK_START;
+        adMetadata.adMode = AdMode.AD;
 
         setTraitsToBlock(MediaTraitType.SEEK, MediaTraitType.TIME);
         // Perhaps this is needed for mid-rolls
-         if(event.data.breakTime > 0)   /// not to pause for preROll...
-          pause();
+        if (event.data.breakTime > 0)   /// not to pause for preROll...
+            pause();
 
         // mask the existing play trait so we get the play state changes here
         var adPlayTrait:AdPlayTrait = new AdPlayTrait();
@@ -322,6 +330,8 @@ public class AdProxy extends ProxyElement {
         adTimeTrait = null;
 
         adMetadata.adState = AdState.AD_BREAK_COMPLETE;
+        adMetadata.adMode = AdMode.MAIN_CONTENT;
+        adMetadata.markNextUnseenAdBreakAsSeen();
 
         setTraitsToBlock();
         play();

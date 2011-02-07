@@ -21,41 +21,42 @@
  */
 
 package com.seesaw.player.preventscrub {
-import org.osmf.events.SeekEvent;
+import com.seesaw.player.ads.AdBreak;
+
 import org.osmf.traits.SeekTrait;
 import org.osmf.traits.TimeTrait;
 
-public class BlockableSeekTrait extends SeekTrait {
-
-    private var _blocking:Boolean;
+public class AdBlockingSeekTrait extends SeekTrait {
 
     private var _seekTrait:SeekTrait;
+    private var _adBreaks:Vector.<AdBreak>;
 
-    public function BlockableSeekTrait(time:TimeTrait, seekTrait:SeekTrait) {
-        _seekTrait = seekTrait;
+    public function AdBlockingSeekTrait(time:TimeTrait, seekTrait:SeekTrait, adBreaks:Vector.<AdBreak>) {
         super(time);
-        addEventListener(SeekEvent.SEEKING_CHANGE, echoSeekChange)
+        _adBreaks = adBreaks;
+        _seekTrait = seekTrait;
     }
 
-    private function echoSeekChange(event:SeekEvent):void {
-        if (!blocking && event.seeking) {
-            //  seekingChangeStart(_seekTrait.seeking, event.time) ;
-            _seekTrait.seek(event.time);
+    override public function canSeekTo(time:Number):Boolean {
+        return _seekTrait.canSeekTo(time);
+    }
+
+    override protected function seekingChangeStart(newSeeking:Boolean, time:Number):void {
+        if (newSeeking) {
+            _seekTrait.seek(getMaxSeekTime(time));
         }
-
     }
 
-    /*	override protected function seekingChangeStart(newSeeking:Boolean, time:Number):void
-     {
-     _seekTrait.seek(time);
-     }
-     */
-    public function get blocking():Boolean {
-        return _blocking;
-    }
-
-    public function set blocking(value:Boolean):void {
-        _blocking = value;
+    private function getMaxSeekTime(time:Number):Number {
+        if (_adBreaks) {
+            for each (var breakItem:AdBreak in _adBreaks) {
+                if (!breakItem.hasSeen && breakItem.startTime <= time) {
+                    // shift the time back slightly so that it it triggers ads
+                    return breakItem.startTime - 0.1;
+                }
+            }
+        }
+        return time;
     }
 }
 }

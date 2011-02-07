@@ -71,8 +71,6 @@ public class AdBreak {
         _startTimeIsPercent = value;
     }
 
-
-
     public function get hasSeen():Boolean {
         return _hasSeen;
     }
@@ -80,7 +78,6 @@ public class AdBreak {
     public function set hasSeen(value:Boolean):void {
         _hasSeen = value;
     }
-
 
     public function get hasAds():Boolean {
         return queueAdsTotal > 0;
