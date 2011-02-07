@@ -84,6 +84,8 @@ public class FullScreen extends ButtonWidget implements IWidget {
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
         stage.addChild(toolTip);
         stage.addEventListener(FullScreenEvent.FULL_SCREEN, onFullScreen);
+        //stage.doubleClickEnabled = true;
+        //stage.addEventListener(MouseEvent.DOUBLE_CLICK, onDoubleClick);
     }
 
     private function onMouseOver(event:MouseEvent):void {
@@ -92,6 +94,12 @@ public class FullScreen extends ButtonWidget implements IWidget {
 
     private function onMouseOut(event:MouseEvent):void {
         formatLabelFont();
+    }
+
+    private function onDoubleClick(event:MouseEvent):void {
+        if (stage) {
+            setFullScreen(stage.displayState == StageDisplayState.NORMAL);
+        }
     }
 
     override protected function get requiredTraits():Vector.<String> {
