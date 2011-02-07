@@ -48,6 +48,7 @@
         <module>IntegrationTests</module>
         <module>ExternalInterface</module>
     <module>BatchEventServices</module>
+    <module>AsyncProxy</module>
   </modules>
 
     <developers>
