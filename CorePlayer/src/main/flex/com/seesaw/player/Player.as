@@ -123,18 +123,7 @@ public class Player extends Sprite {
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 
         if (PLAYER::DEV_MODE) {
-            function loadDevConfig(response:Object):void {
-                devConfig = new XML(response);
-                devConfig.ignoreWhitespace = true;
-                userInitUrl = devConfig.userInitUrl;
-                playerInitUrl = devConfig.playerInitUrl;
-                logger.debug("** USING DEVELOPMENT CONFIGURATION **");
-                initialisePlayer();
-            }
-
-            var request:ServiceRequest = new ServiceRequest("../src/test/resources/dev_config.xml",
-                    loadDevConfig, null);
-            request.submit();
+            loadDevConfiguration();
         }
         else {
             userInitUrl = loaderParams.userInitUrl;
@@ -610,6 +599,21 @@ public class Player extends Sprite {
             errorPanel = new NotAvailablePanel();
             addChild(errorPanel);
         }
+    }
+
+    private function loadDevConfiguration():void {
+        function loadDevConfig(response:Object):void {
+            devConfig = new XML(response);
+            devConfig.ignoreWhitespace = true;
+            userInitUrl = devConfig.userInitUrl;
+            playerInitUrl = devConfig.playerInitUrl;
+            logger.debug("** USING DEVELOPMENT CONFIGURATION **");
+            initialisePlayer();
+        }
+
+        var request:ServiceRequest = new ServiceRequest("../src/test/resources/dev_config.xml",
+                loadDevConfig, null);
+        request.submit();
     }
 
     public function get videoPlayer():SeeSawPlayer {
