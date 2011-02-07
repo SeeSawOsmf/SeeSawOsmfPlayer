@@ -55,8 +55,6 @@ import flash.display.StageScaleMode;
 import flash.events.Event;
 import flash.external.ExternalInterface;
 import flash.net.URLVariables;
-import flash.ui.ContextMenu;
-import flash.ui.ContextMenuItem;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -79,13 +77,13 @@ public class Player extends Sprite {
     private static var loggerSetup:* = (LoggerFactory.loggerFactory = new TraceAndArthropodLoggerFactory());
     private static var osmfLoggerSetup:* = (Log.loggerFactory = new CommonsOsmfLoggerFactory());
 
-    private static const LIVERAIL_PLUGIN_URL:String = "http://vox-static.liverail.com/swf/v4/admanager.swf";
-
     private var logger:ILogger = LoggerFactory.getClassLogger(Player);
 
     private var _videoPlayer:SeeSawPlayer;
 
     private var loaderParams:Object;
+    private var userInitUrl:String;
+    private var playerInitUrl:String;
     private var initStages:Vector.<Function>;
     private var posterFrame:PosterFrame;
     private var guidanceBar:Sprite;
@@ -97,33 +95,19 @@ public class Player extends Sprite {
     private var ASX_data:String;
     private var config:PlayerConfiguration;
     private var playButtonMode:String;
-    var testApi:TestApi;
     private var errorPanel:NotAvailablePanel;
+
+    private var testApi:TestApi;
+    private var devConfig:XML;
 
     public function Player() {
         super();
-
-        logger.debug("created new player");
 
         registerServices();
 
         xi = ObjectProvider.getInstance().getObject(PlayerExternalInterface);
 
-        loaderParams = LoaderInfo(this.root.loaderInfo).parameters;
-
-        /// TODO: remove this completely, this is just for player proxy checking....
-        var my_menu:ContextMenu = new ContextMenu();
-        my_menu.hideBuiltInItems();
-        var getDate:Date = new Date();
-        var my_notice = new ContextMenuItem("tuesday 01 11:55");
-        my_menu.customItems.push(my_notice);
-        contextMenu = my_menu;
-        // If no flashVar, use a default for testing
-        // TODO: remove this altogether
-        loaderParams.userInitUrl = loaderParams.userInitUrl || "http://localhost:8080/player/userinitinfo/13602";
-        /// loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player/userinitinfo/13602";
-        loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://localhost:8080/player/initinfo/13602";
-        /// loaderParams.playerInitUrl = loaderParams.playerInitUrl || "http://kgd-blue-test-zxtm01.dev.vodco.co.uk/player/initinfo/13602";
+        loaderParams = LoaderInfo(root.loaderInfo).parameters;
 
         stage.scaleMode = StageScaleMode.NO_SCALE;
         stage.align = StageAlign.TOP_LEFT;
@@ -138,14 +122,40 @@ public class Player extends Sprite {
         logger.debug("added to stage");
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 
-        initialisePlayer();
+        if (PLAYER::DEV_MODE) {
+            function loadDevConfig(response:Object):void {
+                devConfig = new XML(response);
+                devConfig.ignoreWhitespace = true;
+                userInitUrl = devConfig.userInitUrl;
+                playerInitUrl = devConfig.playerInitUrl;
+                logger.debug("** USING DEVELOPMENT CONFIGURATION **");
+                initialisePlayer();
+            }
+
+            var request:ServiceRequest = new ServiceRequest("../src/test/resources/dev_config.xml",
+                    loadDevConfig, null);
+            request.submit();
+        }
+        else {
+            userInitUrl = loaderParams.userInitUrl;
+            playerInitUrl = loaderParams.playerInitUrl;
+            initialisePlayer();
+        }
     }
 
     private function initialisePlayer():void {
+        if (!userInitUrl) {
+            throw new ArgumentError("userInitUrl is undefined");
+        }
+
+        if (!playerInitUrl) {
+            throw new ArgumentError("playerInitUrl is undefined");
+        }
+
         preloader = new Preloader();
         addChild(preloader);
 
-        requestUserInitData(loaderParams.userInitUrl);
+        requestUserInitData(userInitUrl);
     }
 
     private function setupExternalInterface():void {
@@ -160,11 +170,7 @@ public class Player extends Sprite {
     }
 
     private function checkGuidance():Boolean {
-        if (playerInit.guidance.length() > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return playerInit.guidance.length() > 0;
     }
 
     private function getCurrentItemTitle():String {
@@ -182,7 +188,7 @@ public class Player extends Sprite {
         return 0;
     }
 
-    private function resetInitialisationStages() {
+    private function resetInitialisationStages():void {
         // sets the order of stuff to evaluate during initialisation
         initStages = new Vector.<Function>();
         initStages[0] = showPosterFrame;
@@ -194,13 +200,12 @@ public class Player extends Sprite {
 
     private function checkEntitlements():void {
         requestProgrammeData(playerInit.videoInfoUrl);
-        //nextInitialisationStage();
     }
 
     private function showPosterFrame():void {
         //Play / resume / preview button
         posterFrame = new PosterFrame(playerInit.largeImageUrl);
-        posterFrame.addEventListener(PosterFrame.LOADED, function(event:Event) {
+        posterFrame.addEventListener(PosterFrame.LOADED, function(event:Event):void {
             nextInitialisationStage();
         });
 
@@ -224,9 +229,7 @@ public class Player extends Sprite {
             // assume the resume overrides other play button modes
             var mode:String = getResumePosition() > 0 ? PlayStartButton.RESUME : playButtonMode;
             var playButton:PlayStartButton = new PlayStartButton(mode);
-            playButton.addEventListener(PlayStartButton.PROCEED, function(event:Event) {
-                nextInitialisationStage();
-            });
+            playButton.addEventListener(PlayStartButton.PROCEED, onNextInitialisationState);
             addChild(playButton);
         }
     }
@@ -234,17 +237,11 @@ public class Player extends Sprite {
     private function showOverUsePanel(errorType:String):void {
         //over use panel checks if the error is "NO_ADS", if it is it show no ads messaging, otherwise it shows pack messaging.
         //var errorType:String = "NO_ADS";
-        var overUsePanel = new OverUsePanel(errorType, playerInit.parentalControls.termsAndConditionsLinkURL);
+        var overUsePanel:OverUsePanel = new OverUsePanel(errorType, playerInit.parentalControls.termsAndConditionsLinkURL);
         addChild(overUsePanel);
 
-        overUsePanel.addEventListener(OverUsePanel.OVERUSE_ACCEPTED, function(event:Event) {
-            nextInitialisationStage();
-        });
-
-        overUsePanel.addEventListener(OverUsePanel.OVERUSE_REJECTED, function(event:Event) {
-            resetInitialisationStages(); // sends the user back to stage 0
-            nextInitialisationStage();
-        });
+        overUsePanel.addEventListener(OverUsePanel.OVERUSE_ACCEPTED, onNextInitialisationState);
+        overUsePanel.addEventListener(OverUsePanel.OVERUSE_REJECTED, onResetInitialisationState);
     }
 
     private function showGuidancePanel():void {
@@ -265,7 +262,7 @@ public class Player extends Sprite {
             }
 
             if (hashedPassword) {
-                var parentalControlsPanel = new ParentalControlsPanel(
+                var parentalControlsPanel:ParentalControlsPanel = new ParentalControlsPanel(
                         hashedPassword,
                         playerInit.guidance.message,
                         assetType,
@@ -274,18 +271,12 @@ public class Player extends Sprite {
                         playerInit.parentalControls.whatsThisLinkURL
                         );
 
-                parentalControlsPanel.addEventListener(ParentalControlsPanel.PARENTAL_CHECK_PASSED, function(event:Event) {
-                    nextInitialisationStage();
-                });
-
-                parentalControlsPanel.addEventListener(ParentalControlsPanel.PARENTAL_CHECK_FAILED, function(event:Event) {
-                    resetInitialisationStages(); // sends the user back to stage 0
-                    nextInitialisationStage();
-                });
+                parentalControlsPanel.addEventListener(ParentalControlsPanel.PARENTAL_CHECK_PASSED, onNextInitialisationState);
+                parentalControlsPanel.addEventListener(ParentalControlsPanel.PARENTAL_CHECK_FAILED, onResetInitialisationState);
 
                 addChild(parentalControlsPanel);
             } else {
-                var guidancePanel = new GuidancePanel(
+                var guidancePanel:GuidancePanel = new GuidancePanel(
                         playerInit.guidance.message,
                         assetType,
                         playerInit.guidance.age,
@@ -294,14 +285,8 @@ public class Player extends Sprite {
                         playerInit.parentalControls.termsAndConditionsLinkURL
                         );
 
-                guidancePanel.addEventListener(GuidancePanel.GUIDANCE_ACCEPTED, function(event:Event) {
-                    nextInitialisationStage();
-                });
-
-                guidancePanel.addEventListener(GuidancePanel.GUIDANCE_DECLINED, function(event:Event) {
-                    resetInitialisationStages(); // sends the user back to stage 0
-                    nextInitialisationStage();
-                });
+                guidancePanel.addEventListener(GuidancePanel.GUIDANCE_ACCEPTED, onNextInitialisationState);
+                guidancePanel.addEventListener(GuidancePanel.GUIDANCE_DECLINED, onResetInitialisationState);
 
                 addChild(guidancePanel);
             }
@@ -320,8 +305,7 @@ public class Player extends Sprite {
 
         ASX_data = asx;
 
-        resetInitialisationStages();
-        nextInitialisationStage();
+        onResetInitialisationState();
     }
 
     private function attemptPlaybackStart():void {
@@ -333,7 +317,6 @@ public class Player extends Sprite {
 
     private function requestUserInitData(userInitUrl:String):void {
         logger.debug("requesting user init data from: " + userInitUrl);
-
         var request:ServiceRequest = new ServiceRequest(userInitUrl, onSuccessFromUserInit, onFailFromUserInit);
         request.submit();
     }
@@ -350,7 +333,7 @@ public class Player extends Sprite {
             playButtonMode = PlayStartButton.PREVIEW;
         }
         else {
-            var availability = userInit.availability;
+            var availability:XMLList = userInit.availability;
             if (availability.svodPlayable == "true") {
                 playButtonMode = PlayStartButton.PLAY_SUBSCRIBED;
             }
@@ -364,17 +347,11 @@ public class Player extends Sprite {
         // Note that if none of the conditions above are met, we should not show
         // the play button at all.  Leave playButtonMode as null in this case.
 
-        requestPlayerInitData(loaderParams.playerInitUrl);
-    }
-
-    private function showPlayButton(buttonType:String):void {
-        // TODO: this needs to do something
-        logger.debug("show play button: " + buttonType);
+        requestPlayerInitData(playerInitUrl);
     }
 
     private function requestPlayerInitData(playerInitUrl:String):void {
         logger.debug("requesting programme init data from: " + playerInitUrl);
-
         var request:ServiceRequest = new ServiceRequest(playerInitUrl, onSuccessFromPlayerInit, onFailFromPlayerInit);
         request.submit();
     }
@@ -417,25 +394,30 @@ public class Player extends Sprite {
         xmlDoc.ignoreWhitespace = true;
 
         videoInfo = xmlDoc;
-        /// we need to evaluate if ads are not required for SVOD, TVOD and NO_ADS and adjust the adMode which is then persisted as metaData
+
+        // we need to evaluate if ads are not required for SVOD, TVOD and NO_ADS and adjust the
+        // adMode which is then persisted as metaData
         playerInit.adMode[0] = adModulePlayableEvaluation();
 
         if (videoInfo.geoblocked == "true") {
-            var geoBlockPanel = new GeoBlockPanel();
+            var geoBlockPanel:GeoBlockPanel = new GeoBlockPanel();
             addChild(geoBlockPanel);
             return;
         }
 
-        var availability = videoInfo.availability;
-        if (availability.exceededDrmRule == "true" && availability.noAdsPlayable == "false" && availability.availabilityType == "AVOD") {
+        var availability:XMLList = videoInfo.availability;
+        if (availability.exceededDrmRule == "true" && availability.noAdsPlayable == "false" &&
+                availability.availabilityType == "AVOD") {
             this.showOverUsePanel("NO_ADS");
             return;
         }
-        if (availability.exceededDrmRule == "true" && availability.svodPlayable == "false" && availability.availabilityType == "SVOD") {
+        if (availability.exceededDrmRule == "true" && availability.svodPlayable == "false" &&
+                availability.availabilityType == "SVOD") {
             this.showOverUsePanel("SVOD");
             return;
         }
-        if (availability.exceededDrmRule == "true" && availability.tvodPlayable == "false" && availability.availabilityType == "TVOD") {
+        if (availability.exceededDrmRule == "true" && availability.tvodPlayable == "false" &&
+                availability.availabilityType == "TVOD") {
             this.showOverUsePanel("TVOD");
             return;
         }
@@ -475,13 +457,13 @@ public class Player extends Sprite {
 
         videoPlayer.init();
 
-         if (xi.available) {
+        if (xi.available) {
             xi.baynoteVideoTrack(); /// Video is now initailised so we notify baynote..
         }
     }
 
-     private function onMediaPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
-        if(event.state == MediaPlayerState.PLAYBACK_ERROR) {
+    private function onMediaPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
+        if (event.state == MediaPlayerState.PLAYBACK_ERROR) {
             videoPlayer.mediaPlayer.removeEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onMediaPlayerStateChange);
             removeChild(videoPlayer);
             videoPlayer = null;
@@ -491,12 +473,9 @@ public class Player extends Sprite {
                 addChild(posterFrame);
             }
 
-            if (errorPanel == null) {
-                errorPanel = new NotAvailablePanel();
-                addChild(errorPanel);
-            }
+            showNotAvailablePanel();
         }
-     }
+    }
 
     private function reBuildPlayer(event:Event):void {
         onAddedToStage(event);
@@ -527,7 +506,7 @@ public class Player extends Sprite {
             metadata.addValue(LiverailConstants.PUBLISHER_ID, playerInit.liverail.publisherId);
             metadata.addValue(LiverailConstants.CONFIG_OBJECT, new LiverailConfig(playerInit));
             metadata.addValue(LiverailConstants.RESUME_POSITION, getResumePosition());
-            metadata.addValue(LiverailConstants.ADMANAGER_URL, LIVERAIL_PLUGIN_URL);
+            metadata.addValue(LiverailConstants.ADMANAGER_URL, LiverailConstants.LIVERAIL_PLUGIN_URL);
             resource.addMetadataValue(LiverailConstants.SETTINGS_NAMESPACE, metadata);
         } else if (playerInit && playerInit.adMode == AuditudeConstants.AD_MODE_ID) {
             metadata = new Metadata();
@@ -557,38 +536,26 @@ public class Player extends Sprite {
 
     private function onFailFromUserInit():void {
         logger.debug("failed to retrieve user init data");
-
         removePreloader();
-
-        // TODO: request a test file but this should be removed eventually
-        var request:ServiceRequest = new ServiceRequest("../src/test/resources/userInfo.xml", onSuccessFromUserInit, null);
-        request.submit();
+        showNotAvailablePanel();
     }
 
     private function onFailFromPlayerInit():void {
         logger.debug("failed to retrieve player init data");
-
         removePreloader();
-
-        // TODO: request a test file but this should be removed eventually
-        var request:ServiceRequest = new ServiceRequest("../src/test/resources/contentInfo.noad.xml", onSuccessFromPlayerInit, null);
-        request.submit();
+        showNotAvailablePanel();
     }
 
     private function onFailFromVideoInfo():void {
         logger.debug("failed to retrieve video info data");
-
-        // TODO: request a test file but this should be removed eventually
-        var request:ServiceRequest = new ServiceRequest("../src/test/resources/videoInfo.c4ad.xml", onSuccessFromVideoInfo, null);
-        request.submit();
+        showNotAvailablePanel();
     }
 
     /**
      * Is this the best place for this?
      */
-    private function registerServices() {
+    private function registerServices():void {
         logger.debug("registering services");
-
         var provider:ObjectProvider = ObjectProvider.getInstance();
         provider.register(ResumeService, new ResumeServiceImpl());
         provider.register(PlayerExternalInterface, new PlayerExternalInterfaceImpl());
@@ -605,8 +572,7 @@ public class Player extends Sprite {
     private function getResumePosition():Number {
         var resumeService:ResumeService = ObjectProvider.getInstance().getObject(ResumeService);
         resumeService.programmeId = playerInit.programmeId;
-        var resumeValue:Number = resumeService.getResumeCookie();
-        return resumeValue;
+        return resumeService.getResumeCookie();
     }
 
     private function removePreloader():void {
@@ -628,6 +594,22 @@ public class Player extends Sprite {
             playableType = playerInit.adMode;
         }
         return playableType;
+    }
+
+    private function onNextInitialisationState(event:Event = null):void {
+        nextInitialisationStage();
+    }
+
+    private function onResetInitialisationState(event:Event = null):void {
+        resetInitialisationStages();
+        nextInitialisationStage();
+    }
+
+    private function showNotAvailablePanel():void {
+        if (errorPanel == null) {
+            errorPanel = new NotAvailablePanel();
+            addChild(errorPanel);
+        }
     }
 
     public function get videoPlayer():SeeSawPlayer {

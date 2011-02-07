@@ -78,10 +78,5 @@
             <groupId>com.seesaw</groupId>
             <type>swc</type>
         </dependency>
-        <dependency>
-            <groupId>com.seesaw</groupId>
-            <artifactId>PlayerInitialisation</artifactId>
-            <type>swc</type>
-        </dependency>
     </dependencies>
 </project>

@@ -38,7 +38,6 @@
         <module>DebugProxyPlugin</module>
         <!--<module>LiverailPlugin</module>-->
         <module>PlayerLogging</module>
-        <module>PlayerInitialisation</module>
         <module>AdProxyPlugin</module>
         <module>PlayerCommon</module>
         <module>ScrubPreventionProxy</module>
@@ -125,12 +124,6 @@
             </dependency>
             <dependency>
                 <artifactId>PlayerLogging</artifactId>
-                <groupId>com.seesaw</groupId>
-                <version>${pom.version}</version>
-                <type>swc</type>
-            </dependency>
-            <dependency>
-                <artifactId>PlayerInitialisation</artifactId>
                 <groupId>com.seesaw</groupId>
                 <version>${pom.version}</version>
                 <type>swc</type>

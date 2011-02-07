@@ -21,12 +21,8 @@
  */
 
 package com.seesaw.player.captioning.sami {
-import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
-import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
-
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
-import org.osmf.logging.Log;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactoryItem;
 import org.osmf.media.MediaResourceBase;
@@ -38,9 +34,6 @@ import org.osmf.utils.URL;
 public class SAMIPluginInfo extends PluginInfo {
 
     public static const NS_TARGET_ELEMENT:String = "http://www.seesaw.com/sami/1.0/target";
-
-    private static var loggerSetup:* = (LoggerFactory.loggerFactory = new TraceAndArthropodLoggerFactory());
-    private static var osmfLoggerSetup:* = (Log.loggerFactory = new CommonsOsmfLoggerFactory());
 
     private var logger:ILogger = LoggerFactory.getClassLogger(SAMIPluginInfo);
 

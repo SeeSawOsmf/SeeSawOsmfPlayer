@@ -162,7 +162,7 @@ public class SeeSawPlayer extends Sprite {
                 mainContainer = null;
                 bufferingContainer = null;
                 subtitlesContainer = null;
-                controlbarContainer = null
+                controlbarContainer = null;
                 contentElement = null;
                 player = null;
                 container = null;
@@ -172,7 +172,7 @@ public class SeeSawPlayer extends Sprite {
         }
     }
 
-    private function onAddedToStage(event:Event) {
+    private function onAddedToStage(event:Event):void {
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
         stage.addEventListener(FullScreenEvent.FULL_SCREEN, onFullscreen);
     }
@@ -316,7 +316,7 @@ public class SeeSawPlayer extends Sprite {
             layout.index = 10;
 
             // The subtitle element needs to check and set visibility every time it sets a new display object
-            subtitleElement.addEventListener(MediaElementEvent.TRAIT_ADD, function(event:MediaElementEvent) {
+            subtitleElement.addEventListener(MediaElementEvent.TRAIT_ADD, function(event:MediaElementEvent):void {
                 if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
                     var metadata:Metadata = player.media.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
                     if (metadata) {
@@ -329,7 +329,7 @@ public class SeeSawPlayer extends Sprite {
             });
 
             var loadTrait:LoadTrait = subtitleElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
-            loadTrait.addEventListener(LoaderEvent.LOAD_STATE_CHANGE, function(event:LoadEvent) {
+            loadTrait.addEventListener(LoaderEvent.LOAD_STATE_CHANGE, function(event:LoadEvent):void {
                 if (event.loadState == LoadState.LOAD_ERROR) {
                     // if the subtitles fail to load remove the element to allow the rest of the media to load correctly
                     mainElement.removeChild(subtitleElement);
@@ -418,7 +418,7 @@ public class SeeSawPlayer extends Sprite {
         }
     }
 
-    private function setContainerSize(width:int, height:int) {
+    private function setContainerSize(width:int, height:int):void {
         container.width = width;
         container.height = height;
     }
@@ -468,7 +468,7 @@ public class SeeSawPlayer extends Sprite {
         if (mediaElement.resource) {
             var metadata:Metadata = mediaElement.resource.getMetadataValue(SMILConstants.SMIL_CONTENT_NS) as Metadata;
             if (metadata) {
-                mediaElement.metadata.addEventListener(MetadataEvent.VALUE_ADD, function(event:MetadataEvent) {
+                mediaElement.metadata.addEventListener(MetadataEvent.VALUE_ADD, function(event:MetadataEvent):void {
                     if (event.key == SMILConstants.SMIL_CONTENT_NS) {
                         configureSmilElement(mediaElement);
                     }
@@ -528,12 +528,12 @@ public class SeeSawPlayer extends Sprite {
 
         // For some reason dynamic stream changes reset the current layout metadata (bug?) in the playlist
         // so this is a workaround to always set the right value.
-        element.addEventListener(MediaElementEvent.TRAIT_ADD, function(event:MediaElementEvent) {
+        element.addEventListener(MediaElementEvent.TRAIT_ADD, function(event:MediaElementEvent):void {
             if (event.traitType == MediaTraitType.DYNAMIC_STREAM) {
                 var dynamicStreamTrait:DynamicStreamTrait =
                         element.getTrait(MediaTraitType.DYNAMIC_STREAM) as DynamicStreamTrait;
                 dynamicStreamTrait.addEventListener(
-                        DynamicStreamEvent.SWITCHING_CHANGE, function(event:DynamicStreamEvent) {
+                        DynamicStreamEvent.SWITCHING_CHANGE, function(event:DynamicStreamEvent):void {
                     setMediaLayout(element);
                 });
 
@@ -545,7 +545,7 @@ public class SeeSawPlayer extends Sprite {
         playlistElements.push(element);
     }
 
-    private function setMediaLayout(element:MediaElement) {
+    private function setMediaLayout(element:MediaElement):void {
         var layout:LayoutMetadata = element.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
         if (layout) {
             layout.width = contentWidth;

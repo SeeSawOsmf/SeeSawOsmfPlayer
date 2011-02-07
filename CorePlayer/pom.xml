@@ -58,6 +58,10 @@
                             <name>PLAYER::V</name>
                             <value>'${pom.version}'</value>
                         </property>
+                        <property>
+                            <name>PLAYER::DEV_MODE</name>
+                            <value>${player.dev_mode}</value>
+                        </property>
                     </definesDeclaration>
                     <templateURI>folder:${basedir}/src/main/html-template</templateURI>
                 </configuration>
@@ -79,6 +83,35 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>dev build</id>
+            <activation>
+                <property>
+                    <name>dev-build</name>
+                    <value>true</value>
+                </property>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <player.dev_mode>true</player.dev_mode>
+            </properties>
+        </profile>
+        <profile>
+            <id>std build</id>
+            <activation>
+                <property>
+                    <name>dev-build</name>
+                    <value>false</value>
+                </property>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <player.dev_mode>false</player.dev_mode>
+            </properties>
+        </profile>
+    </profiles>
 
     <dependencies>
         <dependency>
@@ -108,11 +141,6 @@
         <dependency>
             <groupId>com.seesaw</groupId>
             <artifactId>DebugProxyPlugin</artifactId>
-            <type>swc</type>
-        </dependency>
-        <dependency>
-            <groupId>com.seesaw</groupId>
-            <artifactId>PlayerInitialisation</artifactId>
             <type>swc</type>
         </dependency>
         <dependency>
@@ -155,7 +183,7 @@
             <groupId>com.seesaw</groupId>
             <type>swc</type>
         </dependency>
-          <dependency>
+        <dependency>
             <artifactId>BatchEventServices</artifactId>
             <groupId>com.seesaw</groupId>
             <type>swc</type>

@@ -29,5 +29,6 @@ public class LiverailConstants {
     public static const CONFIG_OBJECT:String = "config";
     public static const RESUME_POSITION:String = "resume";
     public static const ADMANAGER_URL = "swfLocation";
+    public static const LIVERAIL_PLUGIN_URL:String = "http://vox-static.liverail.com/swf/v4/admanager.swf";
 }
 }

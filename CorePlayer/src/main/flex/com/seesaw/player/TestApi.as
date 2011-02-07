@@ -32,88 +32,88 @@ import flash.external.ExternalInterface;
 
 public class TestApi {
 
-        use namespace contentinfo;
-        use namespace smil;
+    use namespace contentinfo;
+    use namespace smil;
 
-        var player:Player;
+    var player:Player;
 
-        public function TestApi ( player:Player  ) {
-            this.player = player;
-            if(ExternalInterface.available){
-            ExternalInterface.addCallback( "proceed" , proceed);
-            ExternalInterface.addCallback( "guidancePanelAccept" , guidancePanelAccept);
-            ExternalInterface.addCallback( "guidancePanelDecline" , guidancePanelDecline);
-            ExternalInterface.addCallback( "playState" , playState);
-            ExternalInterface.addCallback( "getElementByName" , getElementByName);
-            ExternalInterface.addCallback( "getElementsByName" , getElementsByName);
-            ExternalInterface.addCallback( "getAllStageElements" , getAllStageElements);
-            ExternalInterface.addCallback( "getStageElements" , getStageElements);
-            }
-            }
+    public function TestApi(player:Player) {
+        this.player = player;
+        if (ExternalInterface.available) {
+            ExternalInterface.addCallback("proceed", proceed);
+            ExternalInterface.addCallback("guidancePanelAccept", guidancePanelAccept);
+            ExternalInterface.addCallback("guidancePanelDecline", guidancePanelDecline);
+            ExternalInterface.addCallback("playState", playState);
+            ExternalInterface.addCallback("getElementByName", getElementByName);
+            ExternalInterface.addCallback("getElementsByName", getElementsByName);
+            ExternalInterface.addCallback("getAllStageElements", getAllStageElements);
+            ExternalInterface.addCallback("getStageElements", getStageElements);
+        }
+    }
 
-        public function playState():String {
-            if ( player.videoPlayer == null ) return "NOT_STARTED";
-            if ( player.videoPlayer.mediaPlayer().playing ) return "PLAYING";
-            if ( player.videoPlayer.mediaPlayer().paused) return "PAUSED";
-            if ( player.videoPlayer.mediaPlayer().seeking ) return "SEEKING";
-            return "UNKNOWN";
+    public function playState():String {
+        if (player.videoPlayer == null) return "NOT_STARTED";
+        if (player.videoPlayer.mediaPlayer.playing) return "PLAYING";
+        if (player.videoPlayer.mediaPlayer.paused) return "PAUSED";
+        if (player.videoPlayer.mediaPlayer.seeking) return "SEEKING";
+        return "UNKNOWN";
+    }
+
+    public function guidancePanelAccept():void {
+        var button:DisplayObject = getElementByName(PlayerConstants.GUIDANCE_PANEL_ACCEPT_BUTTON_NAME);
+        button.dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+    }
+
+    public function guidancePanelDecline():void {
+        var button:DisplayObject = getElementByName(PlayerConstants.GUIDANCE_PANEL_CANCEL_BUTTON_NAME);
+        button.dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+    }
+
+    public function proceed():void {
+        var playButton:DisplayObject = getElementByName(PlayerConstants.PROCEED_BUTTON_NAME);
+        playButton.dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+    }
+
+    public function getElementByName(name:String):DisplayObject {
+        var result:Array = new Array();
+        getElementsByName(player.stage, name, result);
+        if (result.length != 1) {
+            throw new IllegalStateError("There should only be one element on the stage with name: [" + name + "], but " + result.length + " were found.");
+        }
+        return result.pop();
+    }
+
+    public function getElementsByName(object:DisplayObject, name:String, result:Array):void {
+
+        if (object.name == name) {
+            result.push(object);
+            return;
         }
 
-        public function guidancePanelAccept():void {
-            var button:DisplayObject = getElementByName( PlayerConstants.GUIDANCE_PANEL_ACCEPT_BUTTON_NAME );
-            button.dispatchEvent( new MouseEvent( MouseEvent.CLICK ));
-        }
-
-        public function guidancePanelDecline():void {
-             var button:DisplayObject = getElementByName( PlayerConstants.GUIDANCE_PANEL_CANCEL_BUTTON_NAME );
-             button.dispatchEvent( new MouseEvent( MouseEvent.CLICK ));
-        }
-
-        public function proceed():void {
-            var playButton:DisplayObject = getElementByName(PlayerConstants.PROCEED_BUTTON_NAME);
-            playButton.dispatchEvent( new MouseEvent( MouseEvent.CLICK ) );
-        }
-
-        public function getElementByName( name:String ):DisplayObject {
-            var result:Array = new Array();
-            getElementsByName ( player.stage , name, result  );
-            if ( result.length != 1 ) {
-                throw new IllegalStateError("There should only be one element on the stage with name: ["+name+"], but "+result.length+" were found.");
-            }
-            return result.pop();
-        }
-
-        public function getElementsByName (  object:DisplayObject, name:String, result:Array ): void {
-
-            if ( object.name == name ) {
-                result.push(object);
-                return;
-            }
-
-            if ( object instanceof DisplayObjectContainer ) {
-                var container:DisplayObjectContainer = DisplayObjectContainer(object);
-                for ( var index:Number = 0; index < container.numChildren ; index += 1 ){
-                    getElementsByName( container.getChildAt( index ), name,result );
-                }
-            }
-        }
-
-
-        // useful debug function
-        public function getAllStageElements():Array {
-            var result:Array = new Array();
-            getStageElements( player.stage, result );
-            return result;
-        }
-
-        public function getStageElements ( object:DisplayObject, result:Array  ):void {
-            result.push( object.name );
-            if ( object instanceof DisplayObjectContainer ) {
-                var container:DisplayObjectContainer = DisplayObjectContainer(object);
-                for ( var index:Number = 0; index < container.numChildren ; index += 1 ){
-                    getStageElements( container.getChildAt( index ), result  );
-                }
+        if (object instanceof DisplayObjectContainer) {
+            var container:DisplayObjectContainer = DisplayObjectContainer(object);
+            for (var index:Number = 0; index < container.numChildren; index += 1) {
+                getElementsByName(container.getChildAt(index), name, result);
             }
         }
     }
+
+
+    // useful debug function
+    public function getAllStageElements():Array {
+        var result:Array = new Array();
+        getStageElements(player.stage, result);
+        return result;
+    }
+
+    public function getStageElements(object:DisplayObject, result:Array):void {
+        result.push(object.name);
+        if (object instanceof DisplayObjectContainer) {
+            var container:DisplayObjectContainer = DisplayObjectContainer(object);
+            for (var index:Number = 0; index < container.numChildren; index += 1) {
+                getStageElements(container.getChildAt(index), result);
+            }
+        }
+    }
+}
 }
