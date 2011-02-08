@@ -6,6 +6,8 @@
  * To change this template use File | Settings | File Templates.
  */
 package com.seesaw.player.asyncproxy {
+import com.seesaw.player.asyncproxy.seeking.PreloadSeek;
+
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.media.MediaElement;
@@ -45,7 +47,7 @@ public class AsyncProxyPluginInfo extends PluginInfo {
 
     private static function mediaElementCreationFunction():MediaElement {
         logger.debug("constructing proxy element");
-        return new AsyncProxy();
+        return new PreloadSeek();
     }
 }
 }

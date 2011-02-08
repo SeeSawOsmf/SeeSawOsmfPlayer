@@ -22,6 +22,11 @@
     </plugins>
   </build>
   <dependencies>
+        <dependency>
+            <artifactId>PlayerCommon</artifactId>
+            <groupId>com.seesaw</groupId>
+            <type>swc</type>
+        </dependency>
     <dependency>
       <groupId>com.adobe.flex.framework</groupId>
       <artifactId>flex-framework</artifactId>

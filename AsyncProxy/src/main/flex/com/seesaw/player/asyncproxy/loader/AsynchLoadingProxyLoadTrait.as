@@ -19,7 +19,7 @@
 *  Incorporated. All Rights Reserved.
 *
 *****************************************************/
-package com.seesaw.player.asyncproxy {
+package com.seesaw.player.asyncproxy.loader {
 import flash.events.Event;
 import flash.events.TimerEvent;
 import flash.utils.Timer;
