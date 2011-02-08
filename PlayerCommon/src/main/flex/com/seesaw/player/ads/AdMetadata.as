@@ -68,15 +68,17 @@ public class AdMetadata extends Metadata {
         addValue(AdMetadata.AD_MODE, mode);
     }
 
-    public function markNextUnseenAdBreakAsSeen():void {
-        if (adBreaks) {
+    public function getAdBreakWithTime(time:Number):AdBreak {
+        var result:AdBreak = null;
+        if(adBreaks && !isNaN(time)) {
             for each (var breakItem:AdBreak in adBreaks) {
-                if (!breakItem.hasSeen) {
-                    breakItem.hasSeen = true;
+                if(breakItem.startTime == time) {
+                    result = breakItem;
                     break;
                 }
             }
         }
+        return result;
     }
 }
 }

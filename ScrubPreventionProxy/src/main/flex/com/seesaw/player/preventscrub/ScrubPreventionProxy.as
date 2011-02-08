@@ -38,7 +38,7 @@ public class ScrubPreventionProxy extends ProxyElement {
     private var logger:ILogger = LoggerFactory.getClassLogger(ScrubPreventionProxy);
 
     private var time:TimeTrait;
-    private var adBlockingSeekTrait:AdBlockingSeekTrait;
+    private var adBlockingSeekTrait:AdBreakTriggeringSeekTrait;
 
     public function ScrubPreventionProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -101,12 +101,13 @@ public class ScrubPreventionProxy extends ProxyElement {
     }
 
     private function addBlockingSeekTrait():void {
+        var timeTrait:TimeTrait = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
         var seekTrait:SeekTrait = proxiedElement.getTrait(MediaTraitType.SEEK) as SeekTrait;
         if (seekTrait) {
             var adMetadata:AdMetadata = proxiedElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
             if (adMetadata && adMetadata.adBreaks) {
                 logger.debug("adding blocking seek trait for {0} ad breaks", adMetadata.adBreaks.length);
-                adBlockingSeekTrait = new AdBlockingSeekTrait(time, seekTrait, adMetadata.adBreaks);
+                adBlockingSeekTrait = new AdBreakTriggeringSeekTrait(timeTrait, seekTrait, adMetadata.adBreaks);
                 addTrait(MediaTraitType.SEEK, adBlockingSeekTrait);
             }
         }

@@ -22,16 +22,17 @@
 
 package com.seesaw.player.preventscrub {
 import com.seesaw.player.ads.AdBreak;
+import com.seesaw.player.ads.AdBreakEvent;
 
 import org.osmf.traits.SeekTrait;
 import org.osmf.traits.TimeTrait;
 
-public class AdBlockingSeekTrait extends SeekTrait {
+public class AdBreakTriggeringSeekTrait extends SeekTrait {
 
     private var _seekTrait:SeekTrait;
     private var _adBreaks:Vector.<AdBreak>;
 
-    public function AdBlockingSeekTrait(time:TimeTrait, seekTrait:SeekTrait, adBreaks:Vector.<AdBreak>) {
+    public function AdBreakTriggeringSeekTrait(time:TimeTrait, seekTrait:SeekTrait, adBreaks:Vector.<AdBreak>) {
         super(time);
         _adBreaks = adBreaks;
         _seekTrait = seekTrait;
@@ -42,21 +43,41 @@ public class AdBlockingSeekTrait extends SeekTrait {
     }
 
     override protected function seekingChangeStart(newSeeking:Boolean, time:Number):void {
-        if (newSeeking) {
-            _seekTrait.seek(getMaxSeekTime(time));
+        if (!_seekTrait.seeking) {
+            triggerLastAdBreakBeforeSeekPosition(time);
         }
     }
 
-    private function getMaxSeekTime(time:Number):Number {
+    private function triggerLastAdBreakBeforeSeekPosition(time:Number):void {
+        var adActivated:Boolean = false;
+
         if (_adBreaks) {
+            var nextBreak:AdBreak = null;
+
             for each (var breakItem:AdBreak in _adBreaks) {
-                if (!breakItem.hasSeen && breakItem.startTime <= time) {
-                    // shift the time back slightly so that it it triggers ads
-                    return breakItem.startTime - 0.1;
+                if (!breakItem.complete && timeTrait.currentTime < breakItem.startTime && time > breakItem.startTime) {
+                    nextBreak = breakItem;
                 }
             }
+
+            if (nextBreak && ! nextBreak.activated) {
+                nextBreak.addEventListener(AdBreakEvent.AD_BREAK_COMPLETED, onAdBreakCompleted);
+                nextBreak.seekPointAfterAdBreak = time;
+                adActivated = true;
+                // liverail won't trigger exactly on the start time so seek one second back
+                _seekTrait.seek(nextBreak.startTime - 1);
+            }
         }
-        return time;
+
+        if (!adActivated) {
+            // seek normally if no ad break was triggered
+            _seekTrait.seek(time);
+        }
+    }
+
+    private function onAdBreakCompleted(event:AdBreakEvent):void {
+        event.adBreak.removeEventListener(AdBreakEvent.AD_BREAK_COMPLETED, onAdBreakCompleted);
+        _seekTrait.seek(event.adBreak.seekPointAfterAdBreak);
     }
 }
 }

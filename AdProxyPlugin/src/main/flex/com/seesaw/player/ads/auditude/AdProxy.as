@@ -245,7 +245,7 @@ public class AdProxy extends ProxyElement {
         logger.debug("AD BREAK END");
         adMetadata.adState = AdState.AD_BREAK_COMPLETE;
         adMetadata.adMode = AdMode.MAIN_CONTENT;
-        adMetadata.markNextUnseenAdBreakAsSeen();
+//        adMetadata.markNextUnseenAdBreakAsSeen();
         setTraitsToBlock();
     }
 

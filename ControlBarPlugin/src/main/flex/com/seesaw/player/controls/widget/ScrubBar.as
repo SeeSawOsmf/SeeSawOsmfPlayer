@@ -250,7 +250,7 @@ public class ScrubBar extends Widget implements IWidget {
             removeAllChildren(markerContainer);
 
             for each (var value:AdBreak in adBreaks) {
-                if (!value.hasSeen && value.startTime > 0) {
+                if (!value.complete && value.startTime > 0) {
                     var sprite:Sprite = new Sprite();
                     sprite.graphics.beginFill(0xffffff);
                     sprite.graphics.drawRect(0, 0, 7, 5);

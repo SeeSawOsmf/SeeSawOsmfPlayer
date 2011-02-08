@@ -25,6 +25,7 @@ package com.seesaw.player.ads.liverail {
 
 import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.ads.AdBreak;
+import com.seesaw.player.ads.AdBreakEvent;
 import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.ads.AdMode;
 import com.seesaw.player.ads.AdState;
@@ -73,6 +74,7 @@ public class AdProxy extends ProxyElement {
     private var timer:Timer;
     private var adTimeTrait:AdTimeTrait;
     private var playerMetadata:Metadata;
+    private var currentAdBreak:AdBreak;
 
     public function AdProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -236,14 +238,15 @@ public class AdProxy extends ProxyElement {
             metadataAdBreak.startTimeIsPercent = startTimeIsPercent;
 
             // Dont add the break if it has no ads, eg no content to play, so we don't want a blip for this item
-            if (hasAds)
+            if (hasAds) {
                 metadataAdBreaks[i] = metadataAdBreak;
+            }
         }
+        adMetadata.adBreaks = metadataAdBreaks;
 
         // section count need to occur before we start the adContent. as this is required for the first view to be registered.
         playerMetadata.addValue(AdMetadata.SECTION_COUNT, metadataAdBreaks.length);
         adManager.onContentStart();
-        adMetadata.adBreaks = metadataAdBreaks;
     }
 
     private function onInitError(ev:Object):void {
@@ -301,9 +304,9 @@ public class AdProxy extends ProxyElement {
 
     private function adbreakStart(event:Object):void {
         logger.debug("adbreakStart");
-        trace(event);
         adMetadata.adState = AdState.AD_BREAK_START;
         adMetadata.adMode = AdMode.AD;
+        currentAdBreak = adMetadata.getAdBreakWithTime(event.data.breakTime);
 
         setTraitsToBlock(MediaTraitType.SEEK, MediaTraitType.TIME);
         // Perhaps this is needed for mid-rolls
@@ -331,7 +334,10 @@ public class AdProxy extends ProxyElement {
 
         adMetadata.adState = AdState.AD_BREAK_COMPLETE;
         adMetadata.adMode = AdMode.MAIN_CONTENT;
-        adMetadata.markNextUnseenAdBreakAsSeen();
+
+        if (currentAdBreak) {
+            currentAdBreak.complete = true;
+        }
 
         setTraitsToBlock();
         play();
