@@ -266,7 +266,6 @@ public class SeeSawPlayer extends Sprite {
             factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.auditude.AdProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
         factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
-        ///factory.loadPlugin(new PluginInfoResource(new AsyncProxyPluginInfo()));
 
         createVideoElement();
     }

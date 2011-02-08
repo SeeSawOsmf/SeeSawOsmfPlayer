@@ -48,7 +48,6 @@
         <module>IntegrationTests</module>
         <module>ExternalInterface</module>
     <module>BatchEventServices</module>
-    <module>AsyncProxy</module>
   </modules>
 
     <developers>
@@ -173,12 +172,6 @@
             </dependency>
              <dependency>
              <artifactId>BatchEventServices</artifactId>
-             <groupId>com.seesaw</groupId>
-            <version>${pom.version}</version>
-            <type>swc</type>
-        </dependency>
-        <dependency>
-             <artifactId>AsyncProxy</artifactId>
              <groupId>com.seesaw</groupId>
             <version>${pom.version}</version>
             <type>swc</type>
