@@ -317,7 +317,6 @@ public class ParentalControlsPanel extends Sprite {
     private function buildPasswordEntryErrorBG():Sprite {
 
         with (this.passwordEntryErrorBG.graphics) {
-            lineStyle(2, 0xFF0000);
             beginFill(0xFFFFFF);
             drawRoundRect(0, 0, 100, 20, 6);
             endFill();
@@ -479,8 +478,8 @@ public class ParentalControlsPanel extends Sprite {
         //position the button
         acceptButton.x = -5;
         acceptButton.y = 199;
-        acceptButton.height = 40;
-        acceptButton.width = 100;
+        acceptButton.height = 48;
+        acceptButton.width = 108;
 
         return acceptButton;
     }
