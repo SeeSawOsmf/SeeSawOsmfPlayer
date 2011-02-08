@@ -26,6 +26,7 @@ package com.seesaw.player.ads.liverail {
 import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.ads.AdBreak;
 import com.seesaw.player.ads.AdMetadata;
+import com.seesaw.player.ads.AdMode;
 import com.seesaw.player.ads.AdState;
 import com.seesaw.player.ads.LiverailConstants;
 import com.seesaw.player.ads.events.LiveRailEvent;
@@ -72,6 +73,7 @@ public class AdProxy extends ProxyElement {
     private var timer:Timer;
     private var adTimeTrait:AdTimeTrait;
     private var playerMetadata:Metadata;
+    private var currentAdBreak:AdBreak;
 
     public function AdProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -135,10 +137,16 @@ public class AdProxy extends ProxyElement {
         }
     }
 
-    public override function set proxiedElement(proxiedElement:MediaElement):void {
-        if (proxiedElement) {
-            logger.debug("proxiedElement: " + proxiedElement);
-            super.proxiedElement = proxiedElement;
+    public override function set proxiedElement(value:MediaElement):void {
+        if (value) {
+            logger.debug("proxiedElement: " + value);
+
+            if (proxiedElement) {
+                proxiedElement.removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
+                proxiedElement.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
+            }
+
+            super.proxiedElement = value;
 
             proxiedElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
             proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
@@ -229,14 +237,15 @@ public class AdProxy extends ProxyElement {
             metadataAdBreak.startTimeIsPercent = startTimeIsPercent;
 
             // Dont add the break if it has no ads, eg no content to play, so we don't want a blip for this item
-            if (hasAds)
+            if (hasAds) {
                 metadataAdBreaks[i] = metadataAdBreak;
+            }
         }
+        adMetadata.adBreaks = metadataAdBreaks;
 
         // section count need to occur before we start the adContent. as this is required for the first view to be registered.
         playerMetadata.addValue(AdMetadata.SECTION_COUNT, metadataAdBreaks.length);
         adManager.onContentStart();
-        adMetadata.adBreaks = metadataAdBreaks;
     }
 
     private function onInitError(ev:Object):void {
@@ -265,9 +274,6 @@ public class AdProxy extends ProxyElement {
         dataObject["creativeId"] = event.data.ad.creativeID;
 
         adMetadata.adState = dataObject;
-        /*     event.data.ad.clickThruUrl
-
-         event.data.ad.creativeID*/
         play();
     }
 
@@ -289,18 +295,18 @@ public class AdProxy extends ProxyElement {
     private function onPrerollComplete(event:Event):void {
         logger.debug("onPrerollComplete");
         setTraitsToBlock();
-        //play(); //adbreakComplete will handle this
     }
 
     private function adbreakStart(event:Object):void {
         logger.debug("adbreakStart");
-        trace(event);
         adMetadata.adState = AdState.AD_BREAK_START;
+        adMetadata.adMode = AdMode.AD;
+        currentAdBreak = adMetadata.getAdBreakWithTime(event.data.breakTime);
 
         setTraitsToBlock(MediaTraitType.SEEK, MediaTraitType.TIME);
         // Perhaps this is needed for mid-rolls
-         if(event.data.breakTime > 0)   /// not to pause for preROll...
-          pause();
+        if (event.data.breakTime > 0)   /// not to pause for preROll...
+            pause();
 
         // mask the existing play trait so we get the play state changes here
         var adPlayTrait:AdPlayTrait = new AdPlayTrait();
@@ -322,13 +328,15 @@ public class AdProxy extends ProxyElement {
         adTimeTrait = null;
 
         adMetadata.adState = AdState.AD_BREAK_COMPLETE;
+        adMetadata.adMode = AdMode.MAIN_CONTENT;
+
+        if (currentAdBreak) {
+            // This dispatches an event that seeks to the user's final seek point
+            currentAdBreak.complete = true;
+        }
 
         setTraitsToBlock();
         play();
-    }
-
-    private function volume(vol:Number):void {
-        adManager.setVolume(vol);
     }
 
     private function onContentUpdate(time:Number, duration:Number):void {

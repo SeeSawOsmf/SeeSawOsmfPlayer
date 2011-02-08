@@ -30,6 +30,7 @@ import com.auditude.ads.osmf.constants.AuditudeOSMFConstants;
 import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.ads.AdBreak;
 import com.seesaw.player.ads.AdMetadata;
+import com.seesaw.player.ads.AdMode;
 import com.seesaw.player.ads.AdState;
 import com.seesaw.player.ads.AuditudeConstants;
 import com.seesaw.player.traits.ads.AdTimeTrait;
@@ -236,12 +237,15 @@ public class AdProxy extends ProxyElement {
 
         // mask the existing play trait so we get the play state changes here
         adMetadata.adState = AdState.AD_BREAK_START;
+        adMetadata.adMode = AdMode.AD;
         setTraitsToBlock(MediaTraitType.SEEK, MediaTraitType.TIME);
     }
 
     private function onBreakEnd(event:AdPluginEvent):void {
         logger.debug("AD BREAK END");
         adMetadata.adState = AdState.AD_BREAK_COMPLETE;
+        adMetadata.adMode = AdMode.MAIN_CONTENT;
+//        adMetadata.markNextUnseenAdBreakAsSeen();
         setTraitsToBlock();
     }
 
