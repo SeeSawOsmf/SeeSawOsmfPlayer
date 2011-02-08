@@ -39,8 +39,6 @@ public class AdBreak extends EventDispatcher {
 
     private var _complete:Boolean;
 
-    private var _activated:Boolean;
-
     private var _seekPointAfterAdBreak:Number;
 
     public function AdBreak() {
@@ -85,17 +83,12 @@ public class AdBreak extends EventDispatcher {
     public function set complete(value:Boolean):void {
         _complete = value;
         if (value) {
-            _activated = false;
             dispatchEvent(new AdBreakEvent(AdBreakEvent.AD_BREAK_COMPLETED, false, false, this));
         }
     }
 
     public function get hasAds():Boolean {
         return queueAdsTotal > 0;
-    }
-
-    public function get activated():Boolean {
-        return _activated;
     }
 
     public function get seekPointAfterAdBreak():Number {

@@ -25,7 +25,6 @@ package com.seesaw.player.ads.liverail {
 
 import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.ads.AdBreak;
-import com.seesaw.player.ads.AdBreakEvent;
 import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.ads.AdMode;
 import com.seesaw.player.ads.AdState;
@@ -275,9 +274,6 @@ public class AdProxy extends ProxyElement {
         dataObject["creativeId"] = event.data.ad.creativeID;
 
         adMetadata.adState = dataObject;
-        /*     event.data.ad.clickThruUrl
-
-         event.data.ad.creativeID*/
         play();
     }
 
@@ -299,7 +295,6 @@ public class AdProxy extends ProxyElement {
     private function onPrerollComplete(event:Event):void {
         logger.debug("onPrerollComplete");
         setTraitsToBlock();
-        //play(); //adbreakComplete will handle this
     }
 
     private function adbreakStart(event:Object):void {
@@ -336,15 +331,12 @@ public class AdProxy extends ProxyElement {
         adMetadata.adMode = AdMode.MAIN_CONTENT;
 
         if (currentAdBreak) {
+            // This dispatches an event that seeks to the user's final seek point
             currentAdBreak.complete = true;
         }
 
         setTraitsToBlock();
         play();
-    }
-
-    private function volume(vol:Number):void {
-        adManager.setVolume(vol);
     }
 
     private function onContentUpdate(time:Number, duration:Number):void {

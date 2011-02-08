@@ -43,9 +43,7 @@ public class AdBreakTriggeringSeekTrait extends SeekTrait {
     }
 
     override protected function seekingChangeStart(newSeeking:Boolean, time:Number):void {
-        if (!_seekTrait.seeking) {
-            triggerLastAdBreakBeforeSeekPosition(time);
-        }
+        triggerLastAdBreakBeforeSeekPosition(time);
     }
 
     private function triggerLastAdBreakBeforeSeekPosition(time:Number):void {
@@ -55,12 +53,12 @@ public class AdBreakTriggeringSeekTrait extends SeekTrait {
             var nextBreak:AdBreak = null;
 
             for each (var breakItem:AdBreak in _adBreaks) {
-                if (!breakItem.complete && timeTrait.currentTime < breakItem.startTime && time > breakItem.startTime) {
+                if (!breakItem.complete && timeTrait.currentTime <= breakItem.startTime && time >= breakItem.startTime) {
                     nextBreak = breakItem;
                 }
             }
 
-            if (nextBreak && ! nextBreak.activated) {
+            if (nextBreak) {
                 nextBreak.addEventListener(AdBreakEvent.AD_BREAK_COMPLETED, onAdBreakCompleted);
                 nextBreak.seekPointAfterAdBreak = time;
                 adActivated = true;
