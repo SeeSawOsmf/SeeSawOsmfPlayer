@@ -26,7 +26,9 @@ import com.seesaw.player.ui.PlayerToolTip;
 import controls.seesaw.widget.interfaces.IWidget;
 
 import flash.events.Event;
+import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
+import flash.ui.Keyboard;
 
 public class PlayButton extends PlayPauseButtonBase implements IWidget {
 
@@ -40,6 +42,7 @@ public class PlayButton extends PlayPauseButtonBase implements IWidget {
 
     private function onAddedToStage(event:Event) {
         stage.addChild(this.toolTip);
+        stage.addEventListener(KeyboardEvent.KEY_UP, this.onKeyPress);
     }
 
     override protected function updateVisibility():void {
@@ -50,6 +53,18 @@ public class PlayButton extends PlayPauseButtonBase implements IWidget {
         playTrait.play();
         updateMetadata();
 
+    }
+
+    protected function onKeyPress(event:KeyboardEvent):void {
+        if (event.keyCode == Keyboard.SPACE) {
+            if (visible) {
+                playTrait.play();
+                updateMetadata();
+            } else {
+                playTrait.pause();
+                updateMetadata();
+            }
+        }
     }
 
     public function get classDefinition():String {

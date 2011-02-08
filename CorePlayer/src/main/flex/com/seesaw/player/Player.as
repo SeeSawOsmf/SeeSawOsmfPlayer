@@ -193,17 +193,21 @@ public class Player extends Sprite {
 
     private function showPosterFrame():void {
         //Play / resume / preview button
-        posterFrame = new PosterFrame(playerInit.largeImageUrl);
-        posterFrame.addEventListener(PosterFrame.LOADED, function(event:Event):void {
-            nextInitialisationStage();
-        });
+        if (posterFrame == null) {
+            posterFrame = new PosterFrame(playerInit.largeImageUrl);
+            posterFrame.addEventListener(PosterFrame.LOADED, function(event:Event):void {
+                nextInitialisationStage();
+            });
 
-        //if there is guidance, show the guidance bar
-        if (playerInit.guidance.length() > 0) {
-            guidanceBar = new GuidanceBar(playerInit.guidance.message);
-            posterFrame.addChild(guidanceBar);
+            //if there is guidance, show the guidance bar
+            if (playerInit.guidance.length() > 0) {
+                guidanceBar = new GuidanceBar(playerInit.guidance.message);
+                posterFrame.addChild(guidanceBar);
+            }
+            addChild(posterFrame);
+        } else {
+            nextInitialisationStage();            
         }
-        addChild(posterFrame);
     }
 
     private function removePosterFrame():void {

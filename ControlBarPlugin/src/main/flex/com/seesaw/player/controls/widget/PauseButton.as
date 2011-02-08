@@ -26,7 +26,9 @@ import com.seesaw.player.ui.PlayerToolTip;
 import controls.seesaw.widget.interfaces.IWidget;
 
 import flash.events.Event;
+import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
+import flash.ui.Keyboard;
 
 public class PauseButton extends PlayPauseButtonBase implements IWidget {
 
