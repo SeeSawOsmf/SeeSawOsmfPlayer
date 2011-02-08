@@ -25,6 +25,7 @@ import flash.display.Bitmap;
 import flash.display.Loader;
 import flash.display.Sprite;
 import flash.events.Event;
+import flash.events.IOErrorEvent;
 import flash.net.URLRequest;
 import flash.system.LoaderContext;
 import flash.system.Security;
@@ -56,6 +57,7 @@ public class PosterFrame extends Sprite {
         addChild(this.loadedImage);
 
         this.loadedImage.contentLoaderInfo.addEventListener(Event.COMPLETE, this.sizePosterFrame);
+        this.loadedImage.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, this.imageNotFound);
         this.name = getQualifiedClassName(this);
     }
 
@@ -90,6 +92,12 @@ public class PosterFrame extends Sprite {
         image.width = stage.stageWidth;
         image.height = stage.stageHeight;
         image.smoothing = true;
+        this.dispatchEvent(new Event(LOADED));
+
+    }
+
+    private function imageNotFound(event:Event):void {
+
         this.dispatchEvent(new Event(LOADED));
 
     }
