@@ -30,6 +30,7 @@ import com.seesaw.player.ui.StyledTextField;
 import controls.seesaw.widget.interfaces.IWidget;
 
 import flash.events.Event;
+import flash.events.FullScreenEvent;
 import flash.events.MouseEvent;
 import flash.external.ExternalInterface;
 import flash.text.TextField;
@@ -146,6 +147,28 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
             this.setupExternalInterface();
             this.visible = true;
         }
+        stage.addEventListener(FullScreenEvent.FULL_SCREEN, onFullScreen);
+    }
+
+    private function onFullScreen(event:FullScreenEvent):void {
+        if (event.fullScreen) {
+            lightsDownLabel.text = "";
+        }
+        else {
+            if (lightsDownOn) {
+                lightsDownLabel.text = "Turn lights up";
+                this.formatLabelFont();
+                if (this.mouseOverLabel == true) {
+                    this.formatLabelHoverFont();
+                }
+            } else {
+                lightsDownLabel.text = "Turn lights down";
+                this.formatLabelFont();
+                if (this.mouseOverLabel == true) {
+                    this.formatLabelHoverFont();
+                }
+            }
+        }
     }
 
     private function formatLabelFont():void {
@@ -160,6 +183,7 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
         var textFormat:TextFormat = new TextFormat();
         textFormat.size = 11;
         textFormat.color = 0xFFFFFF;
+        textFormat.align = "right";
         this.lightsDownLabel.setTextFormat(textFormat);
     }
 
