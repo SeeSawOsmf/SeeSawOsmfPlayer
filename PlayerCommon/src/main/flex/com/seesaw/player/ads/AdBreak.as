@@ -41,7 +41,8 @@ public class AdBreak extends EventDispatcher {
 
     private var _seekPointAfterAdBreak:Number;
 
-    public function AdBreak() {
+    public function AdBreak(startTime:Number = NaN) {
+        _startTime = startTime;
     }
 
     public function get queueAdsTotal():uint {

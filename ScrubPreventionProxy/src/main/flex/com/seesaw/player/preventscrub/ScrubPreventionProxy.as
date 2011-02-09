@@ -37,7 +37,6 @@ public class ScrubPreventionProxy extends ProxyElement {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(ScrubPreventionProxy);
 
-    private var time:TimeTrait;
     private var adBlockingSeekTrait:AdBreakTriggeringSeekTrait;
 
     public function ScrubPreventionProxy(proxiedElement:MediaElement = null) {
@@ -50,6 +49,7 @@ public class ScrubPreventionProxy extends ProxyElement {
                 proxiedElement.removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
                 proxiedElement.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
                 proxiedElement.removeEventListener(MediaElementEvent.METADATA_ADD, onMetaDataAdd);
+                proxiedElement.removeEventListener(MediaElementEvent.METADATA_REMOVE, onMetaDataRemove);
             }
 
             super.proxiedElement = value;
@@ -57,11 +57,14 @@ public class ScrubPreventionProxy extends ProxyElement {
             proxiedElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
             proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
             proxiedElement.addEventListener(MediaElementEvent.METADATA_ADD, onMetaDataAdd);
+            proxiedElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onMetaDataRemove);
 
             var adMetadata:AdMetadata = proxiedElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
             if (adMetadata) {
-                adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataChange);
+                adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
                 adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
+                adMetadata.addEventListener(MetadataEvent.VALUE_REMOVE, onAdsMetaDataRemove);
+                addBlockingSeekTrait();
             }
         }
     }
@@ -69,8 +72,22 @@ public class ScrubPreventionProxy extends ProxyElement {
     private function onMetaDataAdd(event:MediaElementEvent):void {
         if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
             var adMetadata:AdMetadata = proxiedElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
-            adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataChange);
+            adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
             adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
+            adMetadata.addEventListener(MetadataEvent.VALUE_REMOVE, onAdsMetaDataRemove);
+            addBlockingSeekTrait();
+        }
+    }
+
+    private function onMetaDataRemove(event:MediaElementEvent):void {
+        if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
+            removeBlockingSeekTrait();
+        }
+    }
+
+    private function onAdsMetaDataAdd(event:MetadataEvent):void {
+        if (event.key == AdMetadata.AD_BREAKS) {
+            addBlockingSeekTrait();
         }
     }
 
@@ -81,8 +98,10 @@ public class ScrubPreventionProxy extends ProxyElement {
         }
     }
 
-    private function toggleTimeListeners(added:Boolean):void {
-        time = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
+    private function onAdsMetaDataRemove(event:MetadataEvent):void {
+        if (event.key == AdMetadata.AD_BREAKS) {
+            removeBlockingSeekTrait();
+        }
     }
 
     private function toggleSeekListeners(added:Boolean):void {
@@ -101,14 +120,16 @@ public class ScrubPreventionProxy extends ProxyElement {
     }
 
     private function addBlockingSeekTrait():void {
-        var timeTrait:TimeTrait = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
-        var seekTrait:SeekTrait = proxiedElement.getTrait(MediaTraitType.SEEK) as SeekTrait;
-        if (seekTrait) {
-            var adMetadata:AdMetadata = proxiedElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
-            if (adMetadata && adMetadata.adBreaks) {
-                logger.debug("adding blocking seek trait for {0} ad breaks", adMetadata.adBreaks.length);
-                adBlockingSeekTrait = new AdBreakTriggeringSeekTrait(timeTrait, seekTrait, adMetadata.adBreaks);
-                addTrait(MediaTraitType.SEEK, adBlockingSeekTrait);
+        if (!adBlockingSeekTrait) {
+            var timeTrait:TimeTrait = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
+            var seekTrait:SeekTrait = proxiedElement.getTrait(MediaTraitType.SEEK) as SeekTrait;
+            if (seekTrait && timeTrait) {
+                var adMetadata:AdMetadata = proxiedElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+                if (adMetadata && adMetadata.adBreaks) {
+                    logger.debug("adding blocking seek trait for {0} ad breaks", adMetadata.adBreaks.length);
+                    adBlockingSeekTrait = new AdBreakTriggeringSeekTrait(timeTrait, seekTrait, adMetadata.adBreaks);
+                    addTrait(MediaTraitType.SEEK, adBlockingSeekTrait);
+                }
             }
         }
     }
@@ -125,9 +146,6 @@ public class ScrubPreventionProxy extends ProxyElement {
         switch (traitType) {
             case MediaTraitType.SEEK:
                 toggleSeekListeners(added);
-                break;
-            case MediaTraitType.TIME:
-                toggleTimeListeners(added);
                 break;
         }
     }
