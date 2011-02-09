@@ -120,7 +120,7 @@ public class AdProxy extends ProxyElement {
             resumePosition = getSetting(LiverailConstants.RESUME_POSITION) as int;
 
             // block these until the liverail events kick in
-            setTraitsToBlock(MediaTraitType.PLAY, MediaTraitType.TIME);
+            setTraitsToBlock(MediaTraitType.PLAY, MediaTraitType.TIME, MediaTraitType.DISPLAY_OBJECT);
 
             // After calling initAds(config), the main video player’s controls should be disabled and any requests to
             // play a movie should be cancelled or delayed until the initComplete (or the initError) event is received
