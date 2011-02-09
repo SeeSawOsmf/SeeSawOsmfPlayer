@@ -28,21 +28,24 @@ import org.flexunit.assertThat;
 import org.hamcrest.object.equalTo;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.SeekTrait;
+import org.osmf.traits.TimeTrait;
 
 public class ScrubPreventionProxyTest {
 
+    private var timeTrait:TimeTrait;
     private var media:MockMediaElement;
-    private var mockTimeTrait:MockTimeTrait;
-    private var mockSeekTrait:SeekTrait;
     private var adMetadata:AdMetadata;
-
+    private var seekTrait:SeekTrait;
     private var scrubPrevention:ScrubPreventionProxy;
 
     [Before]
-    public function init():void {
+    public function runBeforeEveryTest():void {
         media = new MockMediaElement();
-        mockTimeTrait = new MockTimeTrait(0, 100);
-        mockSeekTrait = new SeekTrait(mockTimeTrait);
+        timeTrait = new TimeTrait(100);
+        seekTrait = new SeekTrait(timeTrait);
+
+        media.addMockTrait(seekTrait);
+        media.addMockTrait(timeTrait);
 
         adMetadata = new AdMetadata();
         adMetadata.adBreaks = new Vector.<AdBreak>();
@@ -50,10 +53,7 @@ public class ScrubPreventionProxyTest {
     }
 
     [Test]
-    public function proxiesSeekTraitWhenAdMetadataAlreadyAdded() {
-        media.addMockTrait(mockTimeTrait);
-        media.addMockTrait(mockSeekTrait);
-
+    public function proxiesSeekTraitWhenAdMetadataAlreadyAdded():void {
         media.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
 
         scrubPrevention = new ScrubPreventionProxy(media);
@@ -63,9 +63,6 @@ public class ScrubPreventionProxyTest {
 
     [Test]
     public function proxiesSeekTraitAfterAdMetadataAdded():void {
-        media.addMockTrait(mockTimeTrait);
-        media.addMockTrait(mockSeekTrait);
-
         scrubPrevention = new ScrubPreventionProxy(media);
 
         // No ad metadata set so seek trait is not proxied
@@ -78,9 +75,6 @@ public class ScrubPreventionProxyTest {
 
     [Test]
     public function unProxiesSeekTraitWhenAdMetadataRemoved():void {
-        media.addMockTrait(mockTimeTrait);
-        media.addMockTrait(mockSeekTrait);
-
         scrubPrevention = new ScrubPreventionProxy(media);
         media.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
 
@@ -93,9 +87,6 @@ public class ScrubPreventionProxyTest {
 
     [Test]
     public function unProxiesSeekTraitWhenAdBreaksRemoved():void {
-        media.addMockTrait(mockTimeTrait);
-        media.addMockTrait(mockSeekTrait);
-
         scrubPrevention = new ScrubPreventionProxy(media);
         media.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
 
@@ -108,9 +99,6 @@ public class ScrubPreventionProxyTest {
 
     [Test]
     public function proxiesSeekTraitWhenAdBreaksAdded():void {
-        media.addMockTrait(mockTimeTrait);
-        media.addMockTrait(mockSeekTrait);
-
         scrubPrevention = new ScrubPreventionProxy(media);
         adMetadata.adBreaks = null;
         media.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
@@ -126,9 +114,6 @@ public class ScrubPreventionProxyTest {
 
     [Test]
     public function proxiesSeekTraitWhenTraitRemovedAndReAdded():void {
-        media.addMockTrait(mockTimeTrait);
-        media.addMockTrait(mockSeekTrait);
-
         scrubPrevention = new ScrubPreventionProxy(media);
         media.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
 
@@ -138,7 +123,7 @@ public class ScrubPreventionProxyTest {
 
         assertThat(scrubPrevention.getTrait(MediaTraitType.SEEK), equalTo(null));
 
-        media.addMockTrait(mockSeekTrait);
+        media.addMockTrait(seekTrait);
 
         assertThat(scrubPrevention.getTrait(MediaTraitType.SEEK) is AdBreakTriggeringSeekTrait, equalTo(true));
     }

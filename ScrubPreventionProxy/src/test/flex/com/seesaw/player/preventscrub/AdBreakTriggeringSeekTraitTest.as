@@ -41,7 +41,7 @@ public class AdBreakTriggeringSeekTraitTest {
     private var seekTrait:AdBreakTriggeringSeekTrait;
 
     [Before]
-    public function init():void {
+    public function runBeforeEveryTest():void {
         timeTrait = new MockTimeTrait(0, 100);
         innerSeekTrait = new MockSeekTrait(timeTrait);
         adBreaks = createAdBreaks(25, 50, 75);
@@ -50,9 +50,6 @@ public class AdBreakTriggeringSeekTraitTest {
 
     [Test]
     public function canSeekAsNormal():void {
-        timeTrait.mockCurrentTime = 0;
-        timeTrait.mockDuration = 100;
-
         assertThat(seekTrait.canSeekTo(0), equalTo(true));
         assertThat(seekTrait.canSeekTo(25), equalTo(true));
         assertThat(seekTrait.canSeekTo(50), equalTo(true));
