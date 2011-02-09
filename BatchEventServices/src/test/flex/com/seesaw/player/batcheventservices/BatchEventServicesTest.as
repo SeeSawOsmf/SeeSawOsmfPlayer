@@ -6,23 +6,33 @@
  * To change this template use File | Settings | File Templates.
  */
 package com.seesaw.player.batcheventservices{
+import org.flexunit.assertThat;
+import org.hamcrest.object.notNullValue;
 import org.osmf.media.MediaElement;
 
-public class BatchEventServicesTest extends BatchEventServices {
+public class BatchEventServicesTest {
 
-    private var testMediaElement:MediaElement;
+    private var testMediaElement:MediaElement = new MediaElement();
+    private var batchEvent:BatchEventServices;
 
-    [Test(expects="no resume service implementation provided")]
-    public function BatchEventServicesTest() {
-       super();
 
-       proxiedElement =  testMediaElement;
+    [Test (expects="ArgumentError")]
+    public function TestConstructor() {
+       batchEvent =  BatchEventServicesCase();
+       assertThat(batchEvent, notNullValue());
+
+        batchEvent.proxiedElement =  testMediaElement;
     }
 
-     [Test]
-     public override function set proxiedElement(value:MediaElement):void{
-
+    private function BatchEventServicesCase():BatchEventServices {
+        return new  BatchEventServices();
     }
+
+    [After]
+   public function TestProxy():void {
+     /////  assertThat(batchEvent.proxiedElement, notNullValue());     Wait to add a mockMediaElement..
+    }
+
 }
 
 }
