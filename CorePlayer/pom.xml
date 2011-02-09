@@ -91,7 +91,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <player.dev_mode>true</player.dev_mode>
+                <player.dev_mode>false</player.dev_mode>
             </properties>
         </profile>
         <profile>
