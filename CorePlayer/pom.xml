@@ -86,12 +86,8 @@
 
     <profiles>
         <profile>
-            <id>dev build</id>
+            <id>development</id>
             <activation>
-                <property>
-                    <name>dev-build</name>
-                    <value>true</value>
-                </property>
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
@@ -99,12 +95,8 @@
             </properties>
         </profile>
         <profile>
-            <id>std build</id>
+            <id>release</id>
             <activation>
-                <property>
-                    <name>dev-build</name>
-                    <value>false</value>
-                </property>
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>

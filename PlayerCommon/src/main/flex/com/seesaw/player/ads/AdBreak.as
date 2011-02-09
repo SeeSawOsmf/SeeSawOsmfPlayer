@@ -21,7 +21,9 @@
  */
 
 package com.seesaw.player.ads {
-public class AdBreak {
+import flash.events.EventDispatcher;
+
+public class AdBreak extends EventDispatcher {
 
     //total number of ads in this ad-break
     private var _queueAdsTotal:uint;
@@ -34,7 +36,10 @@ public class AdBreak {
 
     //specifies whether the startTimeValue is Percent (true) or  seconds (false)
     private var _startTimeIsPercent:Boolean;
-    private var _hasSeen:Boolean;
+
+    private var _complete:Boolean;
+
+    private var _seekPointAfterAdBreak:Number;
 
     public function AdBreak() {
     }
@@ -71,19 +76,27 @@ public class AdBreak {
         _startTimeIsPercent = value;
     }
 
-
-
-    public function get hasSeen():Boolean {
-        return _hasSeen;
+    public function get complete():Boolean {
+        return _complete;
     }
 
-    public function set hasSeen(value:Boolean):void {
-        _hasSeen = value;
+    public function set complete(value:Boolean):void {
+        _complete = value;
+        if (value) {
+            dispatchEvent(new AdBreakEvent(AdBreakEvent.AD_BREAK_COMPLETED, false, false, this));
+        }
     }
-
 
     public function get hasAds():Boolean {
         return queueAdsTotal > 0;
+    }
+
+    public function get seekPointAfterAdBreak():Number {
+        return _seekPointAfterAdBreak;
+    }
+
+    public function set seekPointAfterAdBreak(value:Number):void {
+        _seekPointAfterAdBreak = value;
     }
 }
 }

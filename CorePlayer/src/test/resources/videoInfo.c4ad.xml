@@ -18,7 +18,7 @@
                 <par>
                     <video
                             src="rtmpe://cdn-flash-blue-dev.vodco.co.uk/a2703/mp4:e4/test/ccp/p/STD_RES/00000418/41805.mp4?s=1296224433&amp;e=1296225183&amp;h=a61d40407278eaa0528fbeb2939b8aaa"
-                            system-bitrate="844000" dur="852" clipEnd="30" clipBegin="0">
+                            system-bitrate="844000" dur="852" clipEnd="300" clipBegin="0">
                         <metadata>
                             <meta content="mainContent" name="contentType"/>
                         </metadata>
@@ -44,7 +44,7 @@
                 <par>
                     <video
                             src="rtmpe://cdn-flash-blue-dev.vodco.co.uk/a2703/mp4:e4/test/ccp/p/STD_RES/00000418/41805.mp4?s=1296224433&amp;e=1296225183&amp;h=a61d40407278eaa0528fbeb2939b8aaa"
-                            system-bitrate="844000" dur="852" clipEnd="120" clipBegin="30">
+                            system-bitrate="844000" dur="852" clipEnd="600" clipBegin="300">
                         <metadata>
                             <meta content="mainContent" name="contentType"/>
                         </metadata>
@@ -70,7 +70,7 @@
                 <par>
                     <video
                             src="rtmpe://cdn-flash-blue-dev.vodco.co.uk/a2703/mp4:e4/test/ccp/p/STD_RES/00000418/41805.mp4?s=1296224433&amp;e=1296225183&amp;h=a61d40407278eaa0528fbeb2939b8aaa"
-                            system-bitrate="844000" dur="852" clipEnd="852" clipBegin="120">
+                            system-bitrate="844000" dur="852" clipEnd="852" clipBegin="600">
                         <metadata>
                             <meta content="mainContent" name="contentType"/>
                         </metadata>

@@ -21,16 +21,13 @@
  */
 
 package com.seesaw.player.preventscrub {
-import com.seesaw.player.ads.AdBreak;
 import com.seesaw.player.ads.AdMetadata;
-import com.seesaw.player.ads.AdState;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ProxyElement;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MetadataEvent;
-import org.osmf.events.SeekEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.SeekTrait;
@@ -39,179 +36,83 @@ import org.osmf.traits.TimeTrait;
 public class ScrubPreventionProxy extends ProxyElement {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(ScrubPreventionProxy);
+
     private var time:TimeTrait;
-    private var adMarkers:Vector.<AdBreak>;
-    private var seekable:SeekTrait;
-    private var offset:Number = 0.5;
-    private var finalSeekPoint:Number;
-    private var blockedSeekable:BlockableSeekTrait;
-    private var temporaryAdMarkers:Vector.<AdBreak>;
-    private var forceSeek:Boolean;
-    private var adjustedSeekPoint:Number;
+    private var adBlockingSeekTrait:AdBreakTriggeringSeekTrait;
 
-
-    public function ScrubPreventionProxy() {
-
+    public function ScrubPreventionProxy(proxiedElement:MediaElement = null) {
+        super(proxiedElement);
     }
 
-    public override function set proxiedElement(proxiedElement:MediaElement):void {
-        if (proxiedElement) {
-            super.proxiedElement = proxiedElement;
+    public override function set proxiedElement(value:MediaElement):void {
+        if (value) {
+            if (proxiedElement) {
+                proxiedElement.removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
+                proxiedElement.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
+                proxiedElement.removeEventListener(MediaElementEvent.METADATA_ADD, onMetaDataAdd);
+            }
 
-            proxiedElement.removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
-            proxiedElement.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
+            super.proxiedElement = value;
 
             proxiedElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
             proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
             proxiedElement.addEventListener(MediaElementEvent.METADATA_ADD, onMetaDataAdd);
 
+            var adMetadata:AdMetadata = proxiedElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
             if (adMetadata) {
                 adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataChange);
                 adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
             }
-
-
         }
     }
 
-    override protected function setupTraits():void {
-
-        super.setupTraits();
-
-    }
-
-
-      private function onMetaDataAdd(event:MediaElementEvent):void {
-      if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
+    private function onMetaDataAdd(event:MediaElementEvent):void {
+        if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
+            var adMetadata:AdMetadata = proxiedElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
             adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataChange);
             adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
         }
-        }
-
-    private function get adMetadata():AdMetadata {
-        var adMetadata:AdMetadata = getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
-        if (adMetadata == null) {
-            adMetadata = new AdMetadata();
-            addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
-        }
-        return adMetadata;
     }
 
     private function onAdsMetaDataChange(event:MetadataEvent):void {
         if (event.key == AdMetadata.AD_BREAKS) {
-            temporaryAdMarkers = null;
-
-            adMarkers = event.value;
-            //// AdMetaEvaluation(event.key);  ///todo se if we need anything related to the adBreaks changing...
-        }
-        if (event.key == AdMetadata.AD_STATE && event.value == AdState.AD_BREAK_COMPLETE) {
-            finalSeek();
-        }
-    }
-
-    private function processTrait(traitType:String, added:Boolean):void {
-
-        switch (traitType) {
-
-            case MediaTraitType.SEEK:
-                toggleSeekListeners(added);
-                break;
-            case MediaTraitType.TIME:
-                toggleTimeListeners(added);
-                break;
+            removeBlockingSeekTrait();
+            addBlockingSeekTrait();
         }
     }
 
     private function toggleTimeListeners(added:Boolean):void {
         time = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
-
     }
-
 
     private function toggleSeekListeners(added:Boolean):void {
-        seekable = proxiedElement.getTrait(MediaTraitType.SEEK) as SeekTrait;
-        if (seekable) {
-            if (added) {
-                seekable.addEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
-
-                blockedSeekable = new BlockableSeekTrait(time, seekable);
-                addTrait(MediaTraitType.SEEK, blockedSeekable);
-            } else {
-                seekable.removeEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
-                removeTrait(MediaTraitType.SEEK);
-            }
-
-
-        }
-
-    }
-
-    private function onSeekingChange(event:SeekEvent):void {
-        if (!forceSeek) {
-
-            if(!adMarkers) {
-                adMarkers = adMetadata.adBreaks;
-            }
-
-            for each (var breakItem:AdBreak in adMarkers) {
-
-                if (breakItem.startTime > 0) {
-
-                    if (event.time > (breakItem.startTime)) {
-
-                        forceSeek = true;
-                        adjustedSeekPoint = breakItem.startTime;
-
-                        if(breakItem.hasSeen){
-                             forceSeek = false;
-                        }
-                    }
-                }
-            }
-        }
-        if (forceSeek) {
-
-            finalSeekPoint = event.time;
-            blockedSeekable.blocking = true;
-            seekable.removeEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
-            seekable.seek((adjustedSeekPoint - offset));
-
-            if (adMarkers) {
-                var indexCount:int;
-                for each (var value:AdBreak in adMarkers) {
-                    var index:int = value.startTime;
-                    if (index == (adjustedSeekPoint)) {
-                        /// adMarkers[value];
-                        value.hasSeen = true;
-                    }
-                    indexCount++
-                }
-            }
-
-            temporaryAdMarkers = adMarkers;
-            //// adMarkers = null;
-
+        if (added) {
+            addBlockingSeekTrait();
+        } else {
+            removeBlockingSeekTrait();
         }
     }
 
+    private function removeBlockingSeekTrait():void {
+        if (adBlockingSeekTrait) {
+            logger.debug("removing blocking seek trait for ad breaks");
+            removeTrait(MediaTraitType.SEEK);
+        }
+    }
 
-    private function finalSeek():void {
-        if (finalSeekPoint) {
-            if (finalSeekPoint > 0) {
-                seekable.seek((finalSeekPoint));
-                blockedSeekable.blocking = false;
-                forceSeek = false;
-                seekable.addEventListener(SeekEvent.SEEKING_CHANGE, reinstateSeek);
+    private function addBlockingSeekTrait():void {
+        var timeTrait:TimeTrait = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
+        var seekTrait:SeekTrait = proxiedElement.getTrait(MediaTraitType.SEEK) as SeekTrait;
+        if (seekTrait) {
+            var adMetadata:AdMetadata = proxiedElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+            if (adMetadata && adMetadata.adBreaks) {
+                logger.debug("adding blocking seek trait for {0} ad breaks", adMetadata.adBreaks.length);
+                adBlockingSeekTrait = new AdBreakTriggeringSeekTrait(timeTrait, seekTrait, adMetadata.adBreaks);
+                addTrait(MediaTraitType.SEEK, adBlockingSeekTrait);
             }
-            ///  adMetadata.adBreaks = temporaryAdMarkers;
         }
     }
-    private function reinstateSeek(event:SeekEvent):void {
-        if (!event.seeking) {
-            seekable.removeEventListener(SeekEvent.SEEKING_CHANGE, reinstateSeek);
-            seekable.addEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
-        }
-    }
+
     private function onTraitAdd(event:MediaElementEvent):void {
         processTrait(event.traitType, true);
     }
@@ -220,5 +121,15 @@ public class ScrubPreventionProxy extends ProxyElement {
         processTrait(event.traitType, false);
     }
 
+    private function processTrait(traitType:String, added:Boolean):void {
+        switch (traitType) {
+            case MediaTraitType.SEEK:
+                toggleSeekListeners(added);
+                break;
+            case MediaTraitType.TIME:
+                toggleTimeListeners(added);
+                break;
+        }
+    }
 }
 }

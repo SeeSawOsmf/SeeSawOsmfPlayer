@@ -67,5 +67,18 @@ public class AdMetadata extends Metadata {
     public function set adMode(mode:String):void {
         addValue(AdMetadata.AD_MODE, mode);
     }
+
+    public function getAdBreakWithTime(time:Number):AdBreak {
+        var result:AdBreak = null;
+        if(adBreaks && !isNaN(time)) {
+            for each (var breakItem:AdBreak in adBreaks) {
+                if(breakItem.startTime == time) {
+                    result = breakItem;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
 }
 }

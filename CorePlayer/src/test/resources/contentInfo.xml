@@ -39,7 +39,7 @@
         <whatsThisLinkURL>http://localhost:8080/watchingtv/aboutparentalcontrols</whatsThisLinkURL>
     </parentalControls>
     <unavailablePageUrl>http://localhost:8080/unavailable</unavailablePageUrl>
-    <videoInfoUrl>http://localhost:8080/player/videoinitinfo/33535</videoInfoUrl>
+    <videoInfoUrl>../src/test/resources/videoInfo.xml</videoInfoUrl>
     <batchEventService>http://localhost:8080/player.videoplayer:registerbatchevent?t:ac=TV:COMEDY/b/8542/Nathan-Barley</batchEventService>
     <cumulativeDurationService>http://localhost:8080/player.videoplayer:playIntervalEvent?t:ac=TV:COMEDY/b/8542/Nathan-Barley</cumulativeDurationService>
     <largeImageUrl>http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/E4_LARGE.png</largeImageUrl>

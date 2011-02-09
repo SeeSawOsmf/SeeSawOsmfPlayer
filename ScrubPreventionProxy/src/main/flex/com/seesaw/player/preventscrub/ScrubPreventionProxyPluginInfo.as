@@ -52,8 +52,10 @@ public class ScrubPreventionProxyPluginInfo extends PluginInfo {
     }
 
     private static function canHandleResourceFunction(resource:MediaResourceBase):Boolean {
-        var canHandle:Boolean = resource && resource.mediaType == MediaType.VIDEO;
-        logger.debug("can handle this resource {0} = {1}", resource, canHandle);
+        var canHandle:Boolean = resource && resource.getMetadataValue(ScrubPreventionConstants.SETTINGS_NAMESPACE) != null;
+        if(canHandle) {
+            logger.debug("handling resource: {0}", resource);
+        }
         return canHandle;
     }
 
