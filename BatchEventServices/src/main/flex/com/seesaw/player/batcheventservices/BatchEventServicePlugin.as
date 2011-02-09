@@ -45,7 +45,7 @@ public class BatchEventServicePlugin extends PluginInfo {
 
     private static function mediaElementCreationFunction():MediaElement {
         logger.debug("constructing proxy element");
-        return new BatchEventService();
+        return new BatchEventServices();
     }
 
     private function mediaElementCreationNotificationCallback(target:MediaElement):void {

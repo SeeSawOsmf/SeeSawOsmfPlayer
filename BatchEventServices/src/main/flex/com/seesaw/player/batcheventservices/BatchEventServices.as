@@ -41,7 +41,7 @@ import org.osmf.traits.PlayTrait;
 import org.osmf.traits.SeekTrait;
 import org.osmf.traits.TimeTrait;
 
-public class BatchEventService extends ProxyElement {
+public class BatchEventServices extends ProxyElement {
 
     use namespace contentinfo;
 
@@ -51,7 +51,7 @@ public class BatchEventService extends ProxyElement {
     private var userEventId:int = 0;
     private var contentEventId:int = 0;
 
-    private var logger:ILogger = LoggerFactory.getClassLogger(BatchEventService);
+    private var logger:ILogger = LoggerFactory.getClassLogger(BatchEventServices);
 
     public var resumeService:ResumeService;
 
@@ -98,7 +98,7 @@ public class BatchEventService extends ProxyElement {
     private var adUrlResource:String;
     private var oldUserEventId:int = 0;
 
-    public function BatchEventService(proxiedElement:MediaElement = null) {
+    public function BatchEventServices(proxiedElement:MediaElement = null) {
         var provider:ObjectProvider = ObjectProvider.getInstance();
         resumeService = provider.getObject(ResumeService);
         if (resumeService == null) {
