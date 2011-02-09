@@ -5,7 +5,7 @@
  * Time: 11:27
  * To change this template use File | Settings | File Templates.
  */
-package com.seesaw.player.batchEventService.events {
+package com.seesaw.player.batcheventservices.events {
 public class CumulativeDurationEvent {
 
     private var _programmeId:int;

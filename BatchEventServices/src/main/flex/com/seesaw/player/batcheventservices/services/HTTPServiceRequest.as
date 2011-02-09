@@ -1,4 +1,4 @@
-package com.seesaw.player.batchEventService.services {
+package com.seesaw.player.batcheventservices.services {
 import com.adobe.serialization.json.JSON;
 
 import mx.rpc.events.FaultEvent;

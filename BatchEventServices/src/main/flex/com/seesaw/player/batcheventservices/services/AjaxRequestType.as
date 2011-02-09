@@ -1,4 +1,4 @@
-package com.seesaw.player.batchEventService.services {
+package com.seesaw.player.batcheventservices.services {
 public class AjaxRequestType
 	{
 		private var item:String;

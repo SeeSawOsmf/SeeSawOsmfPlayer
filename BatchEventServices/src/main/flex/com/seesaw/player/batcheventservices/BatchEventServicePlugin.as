@@ -1,17 +1,8 @@
-package com.seesaw.player.batchEventService {
+package com.seesaw.player.batcheventservices {
 import com.seesaw.player.PlayerConstants;
-
-import flash.display.Stage;
-
-import flash.events.Event;
-
-import flash.events.FullScreenEvent;
-
-import mx.containers.ControlBar;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
-import org.osmf.elements.VideoElement;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactoryItem;
 import org.osmf.media.MediaFactoryItemType;
@@ -23,10 +14,10 @@ public class BatchEventServicePlugin extends PluginInfo {
 
     private static var logger:ILogger = LoggerFactory.getClassLogger(BatchEventServicePlugin);
 
-    public static const ID:String = "com.seesaw.player.batchEventService";
+    public static const ID:String = "com.seesaw.player.batcheventservices";
 
       public function BatchEventServicePlugin() {
-        logger.debug("com.seesaw.player.batchEventService -- initialise");
+        logger.debug("com.seesaw.player.batcheventservices -- initialise");
 
         var item:MediaFactoryItem = new MediaFactoryItem(
                 ID,

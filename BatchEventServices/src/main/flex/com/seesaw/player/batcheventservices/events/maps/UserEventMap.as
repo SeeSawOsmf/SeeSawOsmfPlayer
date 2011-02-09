@@ -1,4 +1,4 @@
-package com.seesaw.player.batchEventService.events.maps {
+package com.seesaw.player.batcheventservices.events.maps {
 public class UserEventMap {
 
 	private var culmulativeViewDuration:int;
