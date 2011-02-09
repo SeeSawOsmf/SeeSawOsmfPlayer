@@ -159,12 +159,6 @@
                 <type>swc</type>
             </dependency>
             <dependency>
-                <artifactId>PlaylistPlugin</artifactId>
-                <groupId>com.seesaw</groupId>
-                <version>${pom.version}</version>
-                <type>swc</type>
-            </dependency>
-            <dependency>
                 <artifactId>SMILObjectProxy</artifactId>
                 <groupId>com.seesaw</groupId>
                 <version>${pom.version}</version>

@@ -343,7 +343,6 @@ public class ScrubBar extends Widget implements IWidget {
                 seekToTime = time;
                 seekable.seek(time);
             }
-
         }
     }
 

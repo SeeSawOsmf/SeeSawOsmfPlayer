@@ -162,6 +162,7 @@ public class LiverailConfig extends Configuration {
             "LR_BUMPER_PREROLL_PRE_HIGH" :    "default"   ,
             "LR_BUMPER_PREROLL_PRE_LOW" :    "default"    ,
             "LR_BUMPER_PREROLL_PRE_MED" :    "default"   ,
+            "LR_ALLOWDUPLICATES"        :    true,
             "LR_LAYOUT_LINEAR_PAUSEONCLICKTHRU" :    false  ,
             "LR_LAYOUT_SKIN_ID" :    1 ,
             "LR_PARTNERS" :    "SHERBET" ,

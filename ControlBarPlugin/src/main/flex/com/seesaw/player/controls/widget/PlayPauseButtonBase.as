@@ -61,6 +61,7 @@ public class PlayPauseButtonBase extends ButtonWidget {
         logger.debug("PlayPauseButtonBase()");
         _requiredTraits[0] = MediaTraitType.PLAY;
         this.setupExternalInterface();
+        buttonMode = true;
     }
 
     private function setupExternalInterface():void {
@@ -69,7 +70,7 @@ public class PlayPauseButtonBase extends ButtonWidget {
         }
     }
 
-    private function playPause():void {
+    public function playPause():void {
         if(playTrait.playState == PlayState.PLAYING) {
             playTrait.pause();
         }
