@@ -123,5 +123,24 @@ public class ScrubPreventionProxyTest {
 
         assertThat(scrubPrevention.getTrait(MediaTraitType.SEEK) is AdBreakTriggeringSeekTrait, equalTo(true));
     }
+
+    [Test]
+    public function proxiesSeekTraitWhenTraitRemovedAndReAdded():void {
+        media.addMockTrait(mockTimeTrait);
+        media.addMockTrait(mockSeekTrait);
+
+        scrubPrevention = new ScrubPreventionProxy(media);
+        media.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
+
+        assertThat(scrubPrevention.getTrait(MediaTraitType.SEEK) is AdBreakTriggeringSeekTrait, equalTo(true));
+
+        media.mockRemoveTrait(MediaTraitType.SEEK);
+
+        assertThat(scrubPrevention.getTrait(MediaTraitType.SEEK), equalTo(null));
+
+        media.addMockTrait(mockSeekTrait);
+
+        assertThat(scrubPrevention.getTrait(MediaTraitType.SEEK) is AdBreakTriggeringSeekTrait, equalTo(true));
+    }
 }
 }

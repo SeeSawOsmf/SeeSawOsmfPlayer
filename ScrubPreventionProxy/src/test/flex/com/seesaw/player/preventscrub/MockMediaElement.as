@@ -39,5 +39,9 @@ public class MockMediaElement extends MediaElement {
     public function addMockTrait(trait:MediaTraitBase):void {
         addTrait(trait.traitType, trait);
     }
+
+    public function mockRemoveTrait(type:String):void {
+        removeTrait(type);
+    }
 }
 }

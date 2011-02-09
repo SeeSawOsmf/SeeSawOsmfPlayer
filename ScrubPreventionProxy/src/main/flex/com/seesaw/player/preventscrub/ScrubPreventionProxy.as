@@ -116,6 +116,7 @@ public class ScrubPreventionProxy extends ProxyElement {
         if (adBlockingSeekTrait) {
             logger.debug("removing blocking seek trait for ad breaks");
             removeTrait(MediaTraitType.SEEK);
+            adBlockingSeekTrait = null;
         }
     }
 
