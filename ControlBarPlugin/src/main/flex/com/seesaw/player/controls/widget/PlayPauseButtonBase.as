@@ -69,7 +69,7 @@ public class PlayPauseButtonBase extends ButtonWidget {
         }
     }
 
-    private function playPause():void {
+    public function playPause():void {
         if(playTrait.playState == PlayState.PLAYING) {
             playTrait.pause();
         }
