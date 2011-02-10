@@ -19,7 +19,9 @@
   ~    The Initial Developer of the Original Code is ioko365 Ltd.
   ~    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
   ~    Incorporated. All Rights Reserved.
-  --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.seesaw</groupId>
     <artifactId>player</artifactId>
@@ -47,8 +49,8 @@
         <module>SubtitlePlugin</module>
         <module>IntegrationTests</module>
         <module>ExternalInterface</module>
-    <module>BatchEventServices</module>
-  </modules>
+        <module>BatchEventServices</module>
+    </modules>
 
     <developers>
         <developer>
@@ -159,12 +161,6 @@
                 <type>swc</type>
             </dependency>
             <dependency>
-                <artifactId>PlaylistPlugin</artifactId>
-                <groupId>com.seesaw</groupId>
-                <version>${pom.version}</version>
-                <type>swc</type>
-            </dependency>
-            <dependency>
                 <artifactId>SMILObjectProxy</artifactId>
                 <groupId>com.seesaw</groupId>
                 <version>${pom.version}</version>
@@ -176,12 +172,12 @@
                 <version>${pom.version}</version>
                 <type>swc</type>
             </dependency>
-             <dependency>
-             <artifactId>BatchEventServices</artifactId>
-             <groupId>com.seesaw</groupId>
-            <version>${pom.version}</version>
-            <type>swc</type>
-        </dependency>
+            <dependency>
+                <artifactId>BatchEventServices</artifactId>
+                <groupId>com.seesaw</groupId>
+                <version>${pom.version}</version>
+                <type>swc</type>
+            </dependency>
             <!-- 3rd Party Dependencies -->
 
             <dependency>
@@ -245,6 +241,14 @@
                 <artifactId>auditude</artifactId>
                 <version>1.0</version>
                 <type>swc</type>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito</artifactId>
+                <version>1.3</version>
+                <type>swc</type>
+                <scope>test</scope>
             </dependency>
 
         </dependencies>
@@ -338,30 +342,30 @@
             <url>http://repository.sonatype.org/content/groups/flexgroup/</url>
         </repository>
     </repositories>
-    
+
     <pluginRepositories>
-    <pluginRepository>
-      <id>flexpmd.opensource.adobe</id>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <name>FlexPMD repository on opensource.adobe.com</name>
-      <url>http://opensource.adobe.com/svn/opensource/flexpmd/maven-repository/release/</url>   
-    </pluginRepository>
-  </pluginRepositories>
-  
-   <profiles>
+        <pluginRepository>
+            <id>flexpmd.opensource.adobe</id>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <name>FlexPMD repository on opensource.adobe.com</name>
+            <url>http://opensource.adobe.com/svn/opensource/flexpmd/maven-repository/release/</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <profiles>
         <profile>
             <id>sonar</id>
             <activation>
                 <!--<activeByDefault>true</activeByDefault>-->
             </activation>
             <properties>
-            	<sonar.language>flex</sonar.language>
-    			<sonar.dynamicAnalysis>false</sonar.dynamicAnalysis>
+                <sonar.language>flex</sonar.language>
+                <sonar.dynamicAnalysis>false</sonar.dynamicAnalysis>
 
                 <sonar.jdbc.url>
                     jdbc:postgresql://kgd-devtools01.dev.vodco.co.uk/sonar

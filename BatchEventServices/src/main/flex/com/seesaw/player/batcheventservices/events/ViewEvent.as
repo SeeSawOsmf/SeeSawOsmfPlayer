@@ -1,4 +1,4 @@
-package com.seesaw.player.batchEventService.events {
+package com.seesaw.player.batcheventservices.events {
 
 public class ViewEvent {
 

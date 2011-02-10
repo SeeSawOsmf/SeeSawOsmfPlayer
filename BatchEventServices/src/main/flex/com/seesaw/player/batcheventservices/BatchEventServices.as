@@ -1,15 +1,15 @@
-package com.seesaw.player.batchEventService {
+package com.seesaw.player.batcheventservices {
 import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.ads.AdState;
-import com.seesaw.player.batchEventService.events.ContentEvent;
-import com.seesaw.player.batchEventService.events.ContentTypes;
-import com.seesaw.player.batchEventService.events.CumulativeDurationEvent;
-import com.seesaw.player.batchEventService.events.UserEvent;
-import com.seesaw.player.batchEventService.events.UserEventTypes;
-import com.seesaw.player.batchEventService.events.ViewEvent;
-import com.seesaw.player.batchEventService.events.manager.EventsManager;
-import com.seesaw.player.batchEventService.events.manager.EventsManagerImpl;
+import com.seesaw.player.batcheventservices.events.ContentEvent;
+import com.seesaw.player.batcheventservices.events.ContentTypes;
+import com.seesaw.player.batcheventservices.events.CumulativeDurationEvent;
+import com.seesaw.player.batcheventservices.events.UserEvent;
+import com.seesaw.player.batcheventservices.events.UserEventTypes;
+import com.seesaw.player.batcheventservices.events.ViewEvent;
+import com.seesaw.player.batcheventservices.events.manager.EventsManager;
+import com.seesaw.player.batcheventservices.events.manager.EventsManagerImpl;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.services.ResumeService;
@@ -41,7 +41,7 @@ import org.osmf.traits.PlayTrait;
 import org.osmf.traits.SeekTrait;
 import org.osmf.traits.TimeTrait;
 
-public class BatchEventService extends ProxyElement {
+public class BatchEventServices extends ProxyElement {
 
     use namespace contentinfo;
 
@@ -51,9 +51,9 @@ public class BatchEventService extends ProxyElement {
     private var userEventId:int = 0;
     private var contentEventId:int = 0;
 
-    private var logger:ILogger = LoggerFactory.getClassLogger(BatchEventService);
+    private var logger:ILogger = LoggerFactory.getClassLogger(BatchEventServices);
 
-    private var resumeService:ResumeService;
+    public var resumeService:ResumeService;
 
     private var cumulativeDurationFlushTimer:Timer;
     private var cumulativeDurationCount:Number;
@@ -82,7 +82,7 @@ public class BatchEventService extends ProxyElement {
     private var campaignId:int;
     private var contentUrl:String;
 
-    private var eventsManager:EventsManager;
+    public var eventsManager:EventsManager;
     private var tooSlowTimer:Timer;
     private var mainContentCount:int;
     private var playable:PlayTrait;
@@ -98,7 +98,7 @@ public class BatchEventService extends ProxyElement {
     private var adUrlResource:String;
     private var oldUserEventId:int = 0;
 
-    public function BatchEventService(proxiedElement:MediaElement = null) {
+    public function BatchEventServices(proxiedElement:MediaElement = null) {
         var provider:ObjectProvider = ObjectProvider.getInstance();
         resumeService = provider.getObject(ResumeService);
         if (resumeService == null) {

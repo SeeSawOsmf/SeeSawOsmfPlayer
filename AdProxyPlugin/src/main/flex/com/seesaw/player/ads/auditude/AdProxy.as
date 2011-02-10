@@ -129,7 +129,14 @@ public class AdProxy extends ProxyElement {
             _auditude.addEventListener(LinearAdEvent.AD_END, onLinearAdEnd);
             _auditude.addEventListener(NonLinearAdEvent.AD_BEGIN, onNonLinearAdBegin);
             _auditude.addEventListener(NonLinearAdEvent.AD_END, onNonLinearAdEnd);
+
+             _auditude.addEventListener(AdPluginEvent.PAUSE_PLAYBACK, triggerPause);
+             _auditude.addEventListener(AdPluginEvent.RESUME_PLAYBACK, triggerPause)
         }
+    }
+
+    private function triggerPause(event:AdPluginEvent):void {
+        trace("pause)");
     }
 
 

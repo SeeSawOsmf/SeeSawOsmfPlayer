@@ -1,4 +1,4 @@
-package com.seesaw.player.batchEventService.events {
+package com.seesaw.player.batcheventservices.events {
 public class UserEventTypes {
   	    /** Occurs when the play starts the first time. Marks the start of this view */
 	    public static const AUTO_PLAY:String = "AUTO_PLAY";

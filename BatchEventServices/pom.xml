@@ -46,12 +46,6 @@
             <type>swc</type>
         </dependency>
         <dependency>
-            <groupId>com.adobe.flexunit</groupId>
-            <artifactId>flexunit</artifactId>
-            <version>4.0-rc-1</version>
-            <type>swc</type>
-        </dependency>
-        <dependency>
             <artifactId>PlayerCommon</artifactId>
             <groupId>com.seesaw</groupId>
             <type>swc</type>
@@ -62,6 +56,18 @@
             <artifactId>as3corelib</artifactId>
             <version>0.93</version>
             <type>swc</type>
+        </dependency>
+          <dependency>
+            <groupId>com.adobe.flexunit</groupId>
+            <artifactId>flexunit</artifactId>
+            <version>4.0-rc-1</version>
+            <type>swc</type>
+         </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito</artifactId>
+            <type>swc</type>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
