@@ -29,6 +29,7 @@ import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.ads.AdMode;
 import com.seesaw.player.ads.AuditudeConstants;
 import com.seesaw.player.ads.auditude.AdProxyPluginInfo;
+import com.seesaw.player.ads.events.AuditudeEvent;
 import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.batcheventservices.BatchEventServicePlugin;
@@ -239,6 +240,11 @@ public class SeeSawPlayer extends Sprite {
 
     private function loadAuditude():void {
         factory.loadPlugin(new URLResource(AUDITUDE_PLUGIN_URL));
+        factory.addEventListener(AuditudeEvent.INIT_COMPLETE, initCOmp)
+    }
+
+    private function initCOmp(event:AuditudeEvent):void {
+        trace("initComp")
     }
 
     private function onPluginLoaded(event:MediaFactoryEvent):void {

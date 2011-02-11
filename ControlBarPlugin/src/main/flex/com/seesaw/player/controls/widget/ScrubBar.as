@@ -190,7 +190,9 @@ public class ScrubBar extends Widget implements IWidget {
     override protected function onMediaElementTraitAdd(event:MediaElementEvent):void {
         if (event.traitType == MediaTraitType.TIME) {
             var timeTrait:TimeTrait = media.getTrait(MediaTraitType.TIME) as TimeTrait;
+
             _temporalTime = media ? media.getTrait(MediaTraitType.TIME) as TimeTrait : null;
+
             logger.debug("adding time trait: " + timeTrait);
             timeTrait.addEventListener(TimeEvent.DURATION_CHANGE, onDurationChange);
         }
