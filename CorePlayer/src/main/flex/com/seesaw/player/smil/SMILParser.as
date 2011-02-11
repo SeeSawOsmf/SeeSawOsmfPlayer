@@ -131,11 +131,9 @@ public class SMILParser extends EventDispatcher {
             var element:MediaElement = factory.createMediaElement(dsr);
 
             if (element) {
-                var metadata:Metadata = new Metadata();
-                metadata.addValue(CONTENT_TYPE, contentType);
-                element.addMetadata(SMIL_NAMESPACE, metadata);
+                populateMetadata(element, video);
 
-                metadata = new Metadata();
+                var metadata:Metadata = new Metadata();
                 metadata.addValue(AdMetadata.AD_BREAKS, adBreaks);
                 element.addMetadata(AdMetadata.AD_NAMESPACE, metadata);
 
@@ -156,11 +154,9 @@ public class SMILParser extends EventDispatcher {
             var element:MediaElement = factory.createMediaElement(new URLResource(src));
 
             if (element) {
-                var metadata:Metadata = new Metadata();
-                metadata.addValue(CONTENT_TYPE, contentType);
-                element.addMetadata(SMIL_NAMESPACE, metadata);
+                populateMetadata(element, video);
 
-                metadata = new Metadata();
+                var metadata:Metadata = new Metadata();
                 metadata.addValue(AdMetadata.AD_BREAKS, adBreaks);
                 element.addMetadata(AdMetadata.AD_NAMESPACE, metadata);
 
@@ -181,9 +177,7 @@ public class SMILParser extends EventDispatcher {
             var element:MediaElement = factory.createMediaElement(new URLResource(src));
 
             if (element) {
-                var metadata:Metadata = new Metadata();
-                metadata.addValue(CONTENT_TYPE, contentType);
-                element.addMetadata(SMIL_NAMESPACE, metadata);
+                populateMetadata(element, image);
 
                 dispatchEvent(
                         new SMILParserEvent(
@@ -199,7 +193,7 @@ public class SMILParser extends EventDispatcher {
         var prerollAdded:Boolean = false;
         for each (var video:XML in smilDocument.body..video) {
             if (video.@clipBegin) {
-                if(index > 0 && !prerollAdded) {
+                if (index > 0 && !prerollAdded) {
                     // add a pre-roll break
                     var adBreak:AdBreak = new AdBreak();
                     adBreak.startTime = 0;
@@ -215,6 +209,18 @@ public class SMILParser extends EventDispatcher {
             }
             index++;
         }
+    }
+
+    private function populateMetadata(media:MediaElement, node:XML):void {
+        var metadata:Metadata = new Metadata();
+
+         for each (var meta:XML in node..meta) {
+             if(meta.@name && meta.@content) {
+                metadata.addValue(meta.@name, String(meta.@content));
+             }
+         }
+
+        media.addMetadata(SMIL_NAMESPACE, metadata);
     }
 
     public function getHeadMetaValue(key:String):String {

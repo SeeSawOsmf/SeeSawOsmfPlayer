@@ -37,9 +37,9 @@ import org.osmf.media.MediaElement;
 import org.osmf.metadata.Metadata;
 import org.osmf.traits.MediaTraitType;
 
-public class MainContentHandlerProxy extends ProxyElement {
+public class MainContentCapabilitiesProxy extends ProxyElement {
 
-    public function MainContentHandlerProxy(proxiedElement:MediaElement = null) {
+    public function MainContentCapabilitiesProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
     }
 

@@ -71,15 +71,15 @@ public class SMILContentCapabilitiesPluginInfo extends PluginInfo {
     }
 
     private function createAdHandlerProxy():MediaElement {
-        return new AdHandlerProxy();
+        return new AdCapabilitiesProxy();
     }
 
     private function createStingHandlerProxy():MediaElement {
-        return new StingHandlerProxy();
+        return new StingCapabilitiesProxy();
     }
 
     private function createMainContentHandlerProxy():MediaElement {
-        return new MainContentHandlerProxy();
+        return new MainContentCapabilitiesProxy();
     }
 }
 }

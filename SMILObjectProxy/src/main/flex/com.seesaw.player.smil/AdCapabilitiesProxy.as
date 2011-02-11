@@ -23,8 +23,8 @@
 /**
  * Created by IntelliJ IDEA.
  * User: ibhana
- * Date: 28/01/11
- * Time: 16:07
+ * Date: 27/01/11
+ * Time: 13:37
  * To change this template use File | Settings | File Templates.
  */
 package com.seesaw.player.smil {
@@ -32,9 +32,9 @@ import org.osmf.elements.ProxyElement;
 import org.osmf.media.MediaElement;
 import org.osmf.traits.MediaTraitType;
 
-public class StingHandlerProxy extends ProxyElement {
+public class AdCapabilitiesProxy extends ProxyElement {
 
-    public function StingHandlerProxy(proxiedElement:MediaElement = null) {
+    public function AdCapabilitiesProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
         var traitsToBlock:Vector.<String> = new Vector.<String>();
         traitsToBlock[0] = MediaTraitType.TIME;

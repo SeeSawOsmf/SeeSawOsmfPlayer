@@ -44,6 +44,8 @@ import com.seesaw.player.namespaces.smil;
 import com.seesaw.player.netstatus.NetStatusMetadata;
 import com.seesaw.player.panels.BufferingPanel;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
+import com.seesaw.player.smil.AdCapabilitiesProxy;
+import com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo;
 import com.seesaw.player.smil.SMILParser;
 import com.seesaw.player.smil.SMILParserEvent;
 
@@ -75,6 +77,7 @@ import org.osmf.layout.VerticalAlign;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaPlayer;
+import org.osmf.media.MediaPlayerState;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.MediaType;
 import org.osmf.media.PluginInfoResource;
@@ -132,8 +135,6 @@ public class SeeSawPlayer extends Sprite {
 
     private var parser:SMILParser;
 
-    private var playlistElements:Vector.<MediaElement> = new Vector.<MediaElement>();
-
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
 
@@ -154,7 +155,6 @@ public class SeeSawPlayer extends Sprite {
         factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
         factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadFailed);
         factory.addEventListener(NetStatusEvent.NET_STATUS, netStatusChanged);
-        factory.addEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onMediaElementCreate);
 
         player = new MediaPlayer();
         player.autoPlay = false;
@@ -255,12 +255,12 @@ public class SeeSawPlayer extends Sprite {
                 MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE,
                                function(event:MediaPlayerStateChangeEvent):void {
                                    logger.debug("main: " + event.state);
+                                   onMediaPlayerStateChange(event);
                                });
 
         if (serialPlaylist && serialPlaylist.numChildren > 0) {
             logger.debug("configuring container for playlist ads");
 
-            setMediaLayout(serialPlaylist);
             adContainer.addMediaElement(serialPlaylist);
 
             adPlayer = new MediaPlayer();
@@ -271,6 +271,7 @@ public class SeeSawPlayer extends Sprite {
                     MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE,
                                      function(event:MediaPlayerStateChangeEvent):void {
                                          logger.debug("ad: " + event.state);
+                                         onMediaPlayerStateChange(event);
                                      });
         }
 
@@ -298,7 +299,6 @@ public class SeeSawPlayer extends Sprite {
         factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadFailed);
 
         factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
-//        factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo(new SeeSawSMILLoader())));
         factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
         if (adMode == AdMetadata.LR_AD_TYPE)
@@ -309,7 +309,6 @@ public class SeeSawPlayer extends Sprite {
         serialPlaylist = new SerialElement();
 
         factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
-//        factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
 
         createVideoElement();
     }
@@ -400,7 +399,6 @@ public class SeeSawPlayer extends Sprite {
         }
 
         setContainerSize(contentWidth, contentHeight);
-        setMediaLayout(mainElement);
     }
 
     private function onSmilElementCreated(event:SMILParserEvent):void {
@@ -411,7 +409,7 @@ public class SeeSawPlayer extends Sprite {
             if (serialPlaylist) {
                 logger.debug("created ad element and adding to serial playlist");
                 mediaElement.addEventListener(MediaElementEvent.TRAIT_ADD, onAdElementTraitAdd);
-                serialPlaylist.addChild(mediaElement);
+                serialPlaylist.addChild(new AdCapabilitiesProxy(mediaElement));
             }
         }
         else if (event.mediaType == MediaType.VIDEO && event.contentType == PlayerConstants.MAIN_CONTENT_ID) {
@@ -523,11 +521,6 @@ public class SeeSawPlayer extends Sprite {
         logger.debug("creating control bar media element");
         controlBarElement = factory.createMediaElement(resource);
 
-        if (controlBarElement == null) {
-            logger.warn("failed to create control bar for player");
-            return;
-        }
-
         // get the control bar to point at the main content
         ControlBarElement(controlBarElement).target = mainElement;
 
@@ -552,13 +545,6 @@ public class SeeSawPlayer extends Sprite {
     private function onFullscreen(event:FullScreenEvent):void {
         logger.debug("onFullscreen: " + event.fullScreen);
         setContainerSize(contentWidth, contentHeight);
-
-        // Apply the new resolution to all the playlist media elements. Ideally we'd like to set the size of these
-        // elements to be relative to the container size but that does not seem to work with dynamic stream switching
-        // at the moment.
-        for each (var element:MediaElement in playlistElements) {
-            setMediaLayout(element);
-        }
     }
 
     private function setContainerSize(width:int, height:int):void {
@@ -605,97 +591,14 @@ public class SeeSawPlayer extends Sprite {
         }
     }
 
-    private function onMediaElementCreate(event:MediaFactoryEvent):void {
-        var mediaElement:MediaElement = event.mediaElement;
-
-        if (mediaElement.resource) {
-            var metadata:Metadata = mediaElement.resource.getMetadataValue(SMILConstants.SMIL_CONTENT_NS) as Metadata;
-            if (metadata) {
-                mediaElement.metadata.addEventListener(MetadataEvent.VALUE_ADD, function(event:MetadataEvent):void {
-                    if (event.key == SMILConstants.SMIL_CONTENT_NS) {
-                        configureSmilElement(mediaElement);
-                    }
-                });
-            }
-        }
-    }
-
-    private function configureSmilElement(element:MediaElement):void {
-        var smilMetadata:Metadata = element.getMetadata(SMILConstants.SMIL_CONTENT_NS) as Metadata;
-
-        if (smilMetadata == null) {
-            return;
-        }
-
-        var contentType:String = smilMetadata.getValue(PlayerConstants.CONTENT_TYPE);
-        var layout:LayoutMetadata = new LayoutMetadata();
-
-        logger.debug("setting layout for: " + contentType);
-
-        switch (contentType) {
-            case PlayerConstants.DOG_CONTENT_ID:
-                // Layout the DOG image in the top left corner
-                layout.x = 5;
-                layout.y = 5;
-                layout.verticalAlign = VerticalAlign.TOP;
-                layout.horizontalAlign = HorizontalAlign.LEFT;
-                layout.index = 5;
+    private function onMediaPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
+        switch (event.state) {
+            case MediaPlayerState.PLAYING:
+                toggleLights();
                 break;
-            case PlayerConstants.AD_CONTENT_ID:
-                var adMetadata:AdMetadata = new AdMetadata();
-                adMetadata.adMode = AdMode.AD;
-                element.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
-                processSmilMediaElement(element);
+            case MediaPlayerState.PAUSED:
+                toggleLights();
                 break;
-            case PlayerConstants.STING_CONTENT_ID:
-                var adMetadata:AdMetadata = new AdMetadata();
-                adMetadata.adMode = AdMode.MAIN_CONTENT;
-                element.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
-                processSmilMediaElement(element);
-                break;
-            case PlayerConstants.MAIN_CONTENT_ID:
-                var adMetadata:AdMetadata = new AdMetadata();
-                adMetadata.adMode = AdMode.MAIN_CONTENT;
-//                adMetadata.adBreaks = generateAdBreaksFromSmil();
-                element.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
-                processSmilMediaElement(element);
-                break;
-        }
-
-        element.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
-    }
-
-    private function processSmilMediaElement(element:MediaElement):void {
-        // This layout applies to main content, stings and ads
-        setMediaLayout(element);
-
-        // For some reason dynamic stream changes reset the current layout metadata (bug?) in the playlist
-        // so this is a workaround to always set the right value.
-        element.addEventListener(MediaElementEvent.TRAIT_ADD, function(event:MediaElementEvent):void {
-            if (event.traitType == MediaTraitType.DYNAMIC_STREAM) {
-                var dynamicStreamTrait:DynamicStreamTrait =
-                        element.getTrait(MediaTraitType.DYNAMIC_STREAM) as DynamicStreamTrait;
-                dynamicStreamTrait.addEventListener(
-                        DynamicStreamEvent.SWITCHING_CHANGE, function(event:DynamicStreamEvent):void {
-                    setMediaLayout(element);
-                });
-
-            }
-        });
-
-        // This is another workaround for the above bug - when full screen is set the full screen resolution
-        // needs to be applied to all the video elements.
-        playlistElements.push(element);
-    }
-
-    private function setMediaLayout(element:MediaElement):void {
-        var layout:LayoutMetadata = element.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
-        if (layout) {
-            layout.width = contentWidth;
-            layout.height = contentHeight;
-            layout.verticalAlign = VerticalAlign.MIDDLE;
-            layout.horizontalAlign = HorizontalAlign.CENTER;
-            layout.scaleMode = ScaleMode.LETTERBOX;
         }
     }
 
