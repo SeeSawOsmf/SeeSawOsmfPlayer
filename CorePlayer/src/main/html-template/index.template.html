@@ -107,6 +107,7 @@
 
 				this.lights.observe('click', function (event) {
 					event.stop();
+                    $("corePlayer").updateLightsStatus(false);
 					this.lightsUp();
 				}.bind(this));
 
@@ -119,6 +120,7 @@
 				duration: 0.4,
 				afterFinish: function (effect) {
 					this.lightsDownFade = null;
+                    $("corePlayer").updateLightsStatus(true);
 				}.bind(this)
 			});
 		},
@@ -132,6 +134,7 @@
 					if ($("latchLights")) {
 						$("latchLights").remove();
 					}
+                    $("corePlayer").updateLightsStatus(false);
 				}.bind(this)
 			});
 		}

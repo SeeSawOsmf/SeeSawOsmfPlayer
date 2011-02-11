@@ -104,13 +104,9 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
     }
 
     private function updateLightsStatus(value:Boolean):void {
-        return
-        /// TODO this get into a loop and causes the lights to go off and on in a retarded fashion...
-        if (lightsDownOn) {
-            this.turnLightsUp();
-        } else {
-            this.turnLightsDown();
-        }
+        logger.debug("UPDATE LIGHTS DOWN " + value);
+        this.updateLabel(value);
+        this.lightsDownOn = value;
     }
 
     override public function set media(value:MediaElement):void {
@@ -202,12 +198,12 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
     }
 
     private function turnLightsDown():void {
+        logger.debug("LIGHTS GO DOWN");
         if (xi.available) {
             xi.callLightsDown();
             metadata.addValue(ExternalInterfaceMetadata.LIGHTS_DOWN, true);
         }
-        lightsDownLabel.text = "Turn lights up";
-        this.toolTip.updateToolTip("Turn lights up");
+        this.updateLabel(true);
         this.formatLabelFont();
         if (this.mouseOverLabel == true) {
             this.formatLabelHoverFont();
@@ -215,13 +211,27 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
         this.lightsDownOn = true;
     }
 
+    private function updateLabel(value:Boolean):void {
+        if (value == true) {
+            lightsDownLabel.text = "Turn lights up";
+            this.toolTip.updateToolTip("Turn lights up");
+        } else {
+            lightsDownLabel.text = "Turn lights down";
+            this.toolTip.updateToolTip("Turn lights down");            
+        }
+        this.formatLabelFont();
+        if (this.mouseOverLabel == true) {
+            this.formatLabelHoverFont();
+        }
+    }
+
     private function turnLightsUp():void {
+        logger.debug("LIGHTS GO UP");
         if (xi.available) {
             xi.callLightsUp();
             metadata.addValue(ExternalInterfaceMetadata.LIGHTS_DOWN, false);
         }
-        lightsDownLabel.text = "Turn lights down";
-        this.toolTip.updateToolTip("Turn lights down");
+        this.updateLabel(false);
         this.formatLabelFont();
         if (this.mouseOverLabel == true) {
             this.formatLabelHoverFont();

@@ -152,6 +152,12 @@ public class VolumeScrubBar extends Widget implements IWidget {
 
     private function setVolume(newVolumeDisplay:Number):void {
         audible.volume = newVolumeDisplay / 10;
+
+        if (audible.volume < 0.05) {
+            audible.volume = 0;
+            logger.debug('MUTE');
+        }
+
         logger.debug('New audible.volume: ' + audible.volume);
         //this.volumeDisplay = newVolumeDisplay;
     }
@@ -188,7 +194,11 @@ public class VolumeScrubBar extends Widget implements IWidget {
         var percentage:Number = ((scrubber.x - scrubberStart) / scrubBarWidth);
 
         audible.volume = Math.min(percentage, percentage);
-
+        if (audible.volume < 0.05) {
+            audible.volume = 0;
+            logger.debug('MUTE');
+        }
+        logger.debug("New Volume: audible.volume : " + audible.volume);
         this.volumeDisplay = Math.round(audible.volume * 12);
 
     }
