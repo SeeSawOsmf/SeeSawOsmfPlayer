@@ -35,6 +35,7 @@ import com.seesaw.player.ads.AdState;
 import com.seesaw.player.ads.AuditudeConstants;
 import com.seesaw.player.traits.ads.AdTimeTrait;
 
+import flash.events.Event;
 import flash.system.Security;
 
 import org.as3commons.logging.ILogger;
@@ -85,6 +86,24 @@ public class AdProxy extends ProxyElement {
         }
     }
 
+    private function onAuditudeInit(event:Event):void {
+        if (event is AdPluginEvent) {
+            var breaks:Array = event.target.data.breaks;
+            if (breaks) {
+                var numbers:Array = [2, 3, 5, 7];
+                for each (var prime:Object in breaks) {
+                    trace(prime); // traces 2, 3, 5 and 7
+
+                    var startTime:Number = prime.startTime; // start time in seconds
+                    var isEmpty:Boolean = prime.isEmpty; // boolean indicating if the break is empty
+                }
+            }
+        }
+        else {
+            // no ads
+        }
+    }
+
     private function onTraitAdded(event:MediaElementEvent):void {
         var traitType:String;
         for each (traitType in event.target.traitTypes) {
@@ -130,8 +149,8 @@ public class AdProxy extends ProxyElement {
             _auditude.addEventListener(NonLinearAdEvent.AD_BEGIN, onNonLinearAdBegin);
             _auditude.addEventListener(NonLinearAdEvent.AD_END, onNonLinearAdEnd);
 
-             _auditude.addEventListener(AdPluginEvent.PAUSE_PLAYBACK, triggerPause);
-             _auditude.addEventListener(AdPluginEvent.RESUME_PLAYBACK, triggerPause)
+            _auditude.addEventListener(AdPluginEvent.PAUSE_PLAYBACK, triggerPause);
+            _auditude.addEventListener(AdPluginEvent.RESUME_PLAYBACK, triggerPause)
         }
     }
 
@@ -235,8 +254,8 @@ public class AdProxy extends ProxyElement {
     private function onBreakBegin(event:AdPluginEvent):void {
         logger.debug("AD BREAK BEGIN");
 
-        if(adBreakCount == 0){  // TODO this is a temporary fix, as we have little info about the ammount of adverts available
-           playerMetadata.addValue(AdMetadata.SECTION_COUNT, -1);
+        if (adBreakCount == 0) {  // TODO this is a temporary fix, as we have little info about the ammount of adverts available
+            playerMetadata.addValue(AdMetadata.SECTION_COUNT, -1);
         }
         adBreakCount++;
         // Perhaps this is needed for mid-rolls
@@ -258,7 +277,7 @@ public class AdProxy extends ProxyElement {
 
     private function onLinearAdBegin(event:LinearAdEvent):void {
         logger.debug("AD BEGIN");
-      processAdStateMeta(AdState.STARTED, event);
+        processAdStateMeta(AdState.STARTED, event);
 
     }
 
@@ -269,12 +288,12 @@ public class AdProxy extends ProxyElement {
 
     private function onNonLinearAdBegin(event:NonLinearAdEvent):void {
         logger.debug("AD BEGIN");
-           processAdStateMeta(AdState.STARTED, event);
+        processAdStateMeta(AdState.STARTED, event);
     }
 
     private function onNonLinearAdEnd(event:NonLinearAdEvent):void {
         logger.debug("AD END");
-           processAdStateMeta(AdState.STOPPED, event);
+        processAdStateMeta(AdState.STOPPED, event);
     }
 
     private function onAdClickThrough(event:AdClickThroughEvent):void {
