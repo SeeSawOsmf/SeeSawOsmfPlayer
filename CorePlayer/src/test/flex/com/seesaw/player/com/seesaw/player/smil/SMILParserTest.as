@@ -31,23 +31,45 @@ package com.seesaw.player.com.seesaw.player.smil {
 import com.seesaw.player.smil.SMILParser;
 import com.seesaw.player.smil.SMILParserEvent;
 
+import org.flexunit.asserts.assertEquals;
+import org.hamcrest.assertThat;
+import org.hamcrest.object.equalTo;
+import org.osmf.elements.ParallelElement;
+import org.osmf.elements.SerialElement;
 import org.osmf.media.DefaultMediaFactory;
+import org.osmf.media.MediaType;
 
 public class SMILParserTest {
 
     private var parser:SMILParser;
+    private var serialPlaylist:SerialElement;
+    private var mainContent:ParallelElement;
 
     [Before]
     public function runBeforeAllTests() {
         parser = new SMILParser(smil, new DefaultMediaFactory());
+        serialPlaylist = new SerialElement();
+        mainContent = new ParallelElement();
     }
 
     [Test]
     public function testParse():void {
         parser.addEventListener(SMILParserEvent.MEDIA_ELEMENT_CREATED, function(event:SMILParserEvent):void {
-            event.elementType;
+            if (event.mediaType == MediaType.VIDEO && event.contentType == "advert") {
+                serialPlaylist.addChild(event.mediaElement);
+            }
+            else if (event.mediaType == MediaType.VIDEO && event.contentType == "mainContent") {
+                mainContent.addChild(event.mediaElement);
+                parser.addIgnoredContentType("mainContent");
+            }
+            else if (event.mediaType == MediaType.IMAGE && event.contentType == "dogImage") {
+                mainContent.addChild(event.mediaElement);
+                parser.addIgnoredContentType("dogImage");
+            }
         });
         parser.parse();
+        assertThat(mainContent.numChildren, equalTo(2));
+        assertThat(serialPlaylist.numChildren, equalTo(2));
     }
 
     public function SMILParserTest() {

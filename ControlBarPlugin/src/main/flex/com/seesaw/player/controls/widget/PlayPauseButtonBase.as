@@ -133,7 +133,7 @@ public class PlayPauseButtonBase extends ButtonWidget {
     }
 
     public function get playTrait():PlayTrait {
-        return media.getTrait(MediaTraitType.PLAY) as PlayTrait;
+        return media ? media.getTrait(MediaTraitType.PLAY) as PlayTrait : null;
     }
 }
 }

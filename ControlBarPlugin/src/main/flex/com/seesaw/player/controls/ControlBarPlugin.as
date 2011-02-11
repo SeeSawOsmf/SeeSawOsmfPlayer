@@ -60,7 +60,7 @@ public class ControlBarPlugin extends Sprite {
             var items:Vector.<MediaFactoryItem> = new Vector.<MediaFactoryItem>();
             items.push(item);
 
-            _pluginInfo = new PluginInfo(items, mediaElementCreationNotificationCallback);
+            _pluginInfo = new PluginInfo(items);
         }
 
         return _pluginInfo;
@@ -95,25 +95,7 @@ public class ControlBarPlugin extends Sprite {
 
     private function mediaElementCreationCallback():MediaElement {
         controlBarElement = new ControlBarElement();
-
-        updateControls();
-
         return controlBarElement;
-    }
-
-    private function mediaElementCreationNotificationCallback(target:MediaElement):void {
-        var targetMetadata:Metadata = target.getMetadata(ControlBarPlugin.NS_TARGET);
-        if (targetMetadata) {
-            this.targetElement = target;
-            updateControls();
-        }
-    }
-
-    private function updateControls():void {
-        if (controlBarElement != null && targetElement != null && controlBarElement != targetElement) {
-            logger.debug("setting media target: {0}", targetElement);
-            controlBarElement.addReference(targetElement);
-        }
     }
 }
 }

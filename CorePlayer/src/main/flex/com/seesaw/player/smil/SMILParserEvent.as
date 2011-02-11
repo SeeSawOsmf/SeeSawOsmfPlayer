@@ -38,14 +38,14 @@ public class SMILParserEvent extends Event {
 
     private var _mediaElement:MediaElement;
 
-    private var _elementType:String;
+    private var _mediaType:String;
 
     private var _contentType:String;
 
     public function SMILParserEvent(type:String, mediaElement:MediaElement, elementType:String, contentType:String = null) {
         super(type, false, false);
         _mediaElement = mediaElement;
-        _elementType = elementType;
+        _mediaType = elementType;
         _contentType = contentType;
     }
 
@@ -53,8 +53,8 @@ public class SMILParserEvent extends Event {
         return _mediaElement;
     }
 
-    public function get elementType():String {
-        return _elementType;
+    public function get mediaType():String {
+        return _mediaType;
     }
 
     public function get contentType():String {

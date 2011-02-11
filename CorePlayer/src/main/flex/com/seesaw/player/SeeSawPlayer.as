@@ -33,6 +33,7 @@ import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.batchEventService.BatchEventServicePlugin;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
+import com.seesaw.player.controls.ControlBarElement;
 import com.seesaw.player.controls.ControlBarMetadata;
 import com.seesaw.player.controls.ControlBarPlugin;
 import com.seesaw.player.external.ExternalInterfaceMetadata;
@@ -43,8 +44,8 @@ import com.seesaw.player.namespaces.smil;
 import com.seesaw.player.netstatus.NetStatusMetadata;
 import com.seesaw.player.panels.BufferingPanel;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
-import com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo;
-import com.seesaw.player.smil.SeeSawSMILLoader;
+import com.seesaw.player.smil.SMILParser;
+import com.seesaw.player.smil.SMILParserEvent;
 
 import flash.display.Sprite;
 import flash.display.StageDisplayState;
@@ -56,6 +57,7 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
+import org.osmf.elements.SerialElement;
 import org.osmf.events.BufferEvent;
 import org.osmf.events.DynamicStreamEvent;
 import org.osmf.events.LoadEvent;
@@ -64,6 +66,8 @@ import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.events.MediaPlayerStateChangeEvent;
 import org.osmf.events.MetadataEvent;
+import org.osmf.events.TimeEvent;
+import org.osmf.events.TimelineMetadataEvent;
 import org.osmf.layout.HorizontalAlign;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.layout.ScaleMode;
@@ -71,13 +75,15 @@ import org.osmf.layout.VerticalAlign;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaPlayer;
-import org.osmf.media.MediaPlayerState;
 import org.osmf.media.MediaResourceBase;
+import org.osmf.media.MediaType;
 import org.osmf.media.PluginInfoResource;
 import org.osmf.media.URLResource;
+import org.osmf.metadata.CuePoint;
+import org.osmf.metadata.CuePointType;
 import org.osmf.metadata.Metadata;
+import org.osmf.metadata.TimelineMetadata;
 import org.osmf.smil.SMILConstants;
-import org.osmf.smil.SMILPluginInfo;
 import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.DynamicStreamTrait;
 import org.osmf.traits.LoadState;
@@ -92,24 +98,28 @@ import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
 public class SeeSawPlayer extends Sprite {
 
     use namespace contentinfo;
+    use namespace smil;
 
     private static const AUDITUDE_PLUGIN_URL:String = "http://asset.cdn.auditude.com/flash/sandbox/plugin/osmf/AuditudeOSMFProxyPlugin.swf";
 
     private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
 
     private var config:PlayerConfiguration;
-    private var contentElement:MediaElement;
 
     private var factory:MediaFactory;
     private var player:MediaPlayer;
+    private var adPlayer:MediaPlayer;
+    private var adContainer:MediaContainer;
     private var container:MediaContainer;
     private var mainContainer:MediaContainer;
     private var bufferingContainer:MediaContainer;
     private var controlbarContainer:MediaContainer;
     private var subtitlesContainer:MediaContainer;
+    private var serialPlaylist:SerialElement;
     private var mainElement:ParallelElement;
     private var subtitleElement:MediaElement;
     private var bufferingPanel:BufferingPanel;
+    private var controlBarElement:MediaElement;
 
     private var xi:PlayerExternalInterface;
 
@@ -119,6 +129,8 @@ public class SeeSawPlayer extends Sprite {
     private var playerInit:XML;
     private var videoInfo:XML;
     private var adMode:String;
+
+    private var parser:SMILParser;
 
     private var playlistElements:Vector.<MediaElement> = new Vector.<MediaElement>();
 
@@ -163,7 +175,7 @@ public class SeeSawPlayer extends Sprite {
                 bufferingContainer = null;
                 subtitlesContainer = null;
                 controlbarContainer = null;
-                contentElement = null;
+                mainElement = null;
                 player = null;
                 container = null;
 
@@ -186,6 +198,13 @@ public class SeeSawPlayer extends Sprite {
         mainContainer.layoutMetadata.percentWidth = 100;
         mainContainer.layoutMetadata.percentHeight = 100;
         addChild(mainContainer);
+
+        adContainer = new MediaContainer();
+        adContainer.y = 0;
+        adContainer.x = 0;
+        adContainer.layoutMetadata.percentWidth = 100;
+        adContainer.layoutMetadata.percentHeight = 100;
+        addChild(adContainer);
 
         bufferingContainer = new MediaContainer();
         bufferingContainer.y = 0;
@@ -215,6 +234,7 @@ public class SeeSawPlayer extends Sprite {
         addChild(controlbarContainer);
 
         container.layoutRenderer.addTarget(mainContainer);
+        container.layoutRenderer.addTarget(adContainer);
         container.layoutRenderer.addTarget(bufferingContainer);
         container.layoutRenderer.addTarget(subtitlesContainer);
         container.layoutRenderer.addTarget(controlbarContainer);
@@ -229,9 +249,30 @@ public class SeeSawPlayer extends Sprite {
 
         //handler to show and hide the buffering panel
         player.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
-        player.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onMediaPlayerStateChange);
-
         player.media = mainElement;
+
+        player.addEventListener(
+                MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE,
+                               function(event:MediaPlayerStateChangeEvent):void {
+                                   logger.debug("main: " + event.state);
+                               });
+
+        if (serialPlaylist && serialPlaylist.numChildren > 0) {
+            logger.debug("configuring container for playlist ads");
+
+            setMediaLayout(serialPlaylist);
+            adContainer.addMediaElement(serialPlaylist);
+
+            adPlayer = new MediaPlayer();
+            adPlayer.autoPlay = false;
+            adPlayer.media = serialPlaylist;
+
+            adPlayer.addEventListener(
+                    MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE,
+                                     function(event:MediaPlayerStateChangeEvent):void {
+                                         logger.debug("ad: " + event.state);
+                                     });
+        }
 
         logger.debug("adding media container to stage");
         addChild(container);
@@ -257,15 +298,18 @@ public class SeeSawPlayer extends Sprite {
         factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadFailed);
 
         factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
-        factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo(new SeeSawSMILLoader())));
+//        factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo(new SeeSawSMILLoader())));
         factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
         if (adMode == AdMetadata.LR_AD_TYPE)
             factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.liverail.AdProxyPluginInfo()));
-        if (adMode == AdMetadata.AUDITUDE_AD_TYPE)
+        else if (adMode == AdMetadata.AUDITUDE_AD_TYPE)
             factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.auditude.AdProxyPluginInfo()));
+//        else if (adMode == AdMetadata.CHANNEL_4_AD_TYPE)
+        serialPlaylist = new SerialElement();
+
         factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
-        factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
+//        factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
 
         createVideoElement();
     }
@@ -284,9 +328,9 @@ public class SeeSawPlayer extends Sprite {
         (event.buffering) ? bufferingPanel.show() : bufferingPanel.hide();
     }
 
-    private function createSubtitleElement():void {
+    private function createSubtitleElement(target:MediaElement):void {
         // The subtitle location is actually in the smil document so we have to search for it
-        var subtitleLocation:String = getSmilHeadMetaValue(PlayerConstants.SUBTITLE_LOCATION);
+        var subtitleLocation:String = parser.getHeadMetaValue(PlayerConstants.SUBTITLE_LOCATION);
 
         if (subtitleLocation) {
             logger.debug("creating captions: " + subtitleLocation);
@@ -298,7 +342,7 @@ public class SeeSawPlayer extends Sprite {
 
             var targetMetadata:Metadata = new Metadata();
             targetMetadata.addValue(PlayerConstants.CONTENT_ID, PlayerConstants.MAIN_CONTENT_ID);
-            contentElement.addMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT, targetMetadata);
+            target.addMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT, targetMetadata);
 
             logger.debug("loading subtitle plugin");
             factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
@@ -342,34 +386,130 @@ public class SeeSawPlayer extends Sprite {
 
     private function createVideoElement():void {
         logger.debug("creating video element");
-        contentElement = factory.createMediaElement(config.resource);
 
-        contentElement.addEventListener(MediaElementEvent.METADATA_ADD, onContentMetadataAdd);
-        contentElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onContentMetadataRemove);
+        mainElement.addEventListener(MediaElementEvent.METADATA_ADD, onContentMetadataAdd);
+        mainElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onContentMetadataRemove);
 
-        createBufferingPanel();
-        createControlBarElement();
-        createSubtitleElement();
+        parser = new SMILParser(new XML(videoInfo.smil), factory);
 
-        if (contentElement is IAuditudeMediaElement) {
-            var _auditude:AuditudePlugin = IAuditudeMediaElement(contentElement).plugin;
+        parser.addEventListener(SMILParserEvent.MEDIA_ELEMENT_CREATED, onSmilElementCreated);
+        parser.parse();
+
+        if (serialPlaylist) {
+            setupAdBreaks(mainElement, parser.adBreaks);
+        }
+
+        setContainerSize(contentWidth, contentHeight);
+        setMediaLayout(mainElement);
+    }
+
+    private function onSmilElementCreated(event:SMILParserEvent):void {
+        var mediaElement:MediaElement = event.mediaElement;
+
+        var layout:LayoutMetadata = new LayoutMetadata();
+        if (event.mediaType == MediaType.VIDEO && event.contentType == PlayerConstants.AD_CONTENT_ID) {
+            if (serialPlaylist) {
+                logger.debug("created ad element and adding to serial playlist");
+                mediaElement.addEventListener(MediaElementEvent.TRAIT_ADD, onAdElementTraitAdd);
+                serialPlaylist.addChild(mediaElement);
+            }
+        }
+        else if (event.mediaType == MediaType.VIDEO && event.contentType == PlayerConstants.MAIN_CONTENT_ID) {
+            logger.debug("created main video element");
+            parser.addIgnoredContentType(PlayerConstants.MAIN_CONTENT_ID); // notify only once
+
+            createBufferingPanel();
+            createControlBarElement();
+            createSubtitleElement(mediaElement);
+            configureAuditude();
+
+            mainElement.addChild(mediaElement);
+        }
+        else if (event.mediaType == MediaType.IMAGE && event.contentType == PlayerConstants.DOG_CONTENT_ID) {
+            logger.debug("created dog image element");
+            parser.addIgnoredContentType(PlayerConstants.DOG_CONTENT_ID); // notify only once
+
+            // Layout the DOG image in the top left corner
+            layout.x = 5;
+            layout.y = 5;
+            layout.verticalAlign = VerticalAlign.TOP;
+            layout.horizontalAlign = HorizontalAlign.LEFT;
+            layout.index = 5;
+
+            mainElement.addChild(mediaElement);
+        }
+
+        mediaElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+    }
+
+    private function configureAuditude():void {
+        if (mainElement is IAuditudeMediaElement) {
+            logger.debug("configuring Auditude");
+            var _auditude:AuditudePlugin = IAuditudeMediaElement(mainElement).plugin;
 
             // We set this in the metadata so the auditude AdProxy can pick up the plugin
             var metadata:Metadata = config.resource.getMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) as Metadata;
             metadata.addValue(AuditudeConstants.PLUGIN_INSTANCE, _auditude);
         }
+    }
 
-        setContainerSize(contentWidth, contentHeight);
+    private function setupAdBreaks(element:MediaElement, adBreaks:Vector.<AdBreak>):void {
+        var timelineMetadata:TimelineMetadata = element.getMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) as TimelineMetadata;
+        if (timelineMetadata == null) {
+            timelineMetadata = new TimelineMetadata(element);
+            element.addMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE, timelineMetadata);
+        }
 
-        mainElement.addChild(contentElement);
+        for each (var adBreak:AdBreak in adBreaks) {
+            logger.debug("creating ad break at {0}", adBreak.startTime);
+            timelineMetadata.addMarker(new CuePoint(CuePointType.EVENT, adBreak.startTime, "adBreakStart", adBreak));
+        }
+
+        timelineMetadata.addEventListener(TimelineMetadataEvent.MARKER_TIME_REACHED, onCuePoint);
+    }
+
+    private function onAdElementTraitAdd(event:MediaElementEvent):void {
+        if (event.traitType == MediaTraitType.TIME) {
+            var element:MediaElement = event.target as MediaElement;
+            var timeTrait:TimeTrait = element.getTrait(MediaTraitType.TIME) as TimeTrait;
+            timeTrait.addEventListener(TimeEvent.COMPLETE, function(event:TimeEvent):void {
+                adBreakCompleted();
+            });
+        }
+    }
+
+    private function onCuePoint(event:TimelineMetadataEvent):void {
+        logger.debug("triggering cue point: {0}", event.marker.time);
+        if (player.canPause) {
+            player.pause();
+        }
+        if (adPlayer.canPlay) {
+            adPlayer.play();
+        }
+        mainContainer.visible = false;
+        adContainer.visible = true;
+
+        // get the control bar to point at the ads
+        ControlBarElement(controlBarElement).target = serialPlaylist;
+    }
+
+    private function adBreakCompleted():void {
+        logger.debug("ad break complete");
+        if (adPlayer.canPause) {
+            adPlayer.pause();
+        }
+        if (player.canPlay) {
+            player.play();
+        }
+        mainContainer.visible = true;
+        adContainer.visible = false;
+
+        // get the control bar to point at the main content
+        ControlBarElement(controlBarElement).target = mainElement;
     }
 
     private function createControlBarElement():void {
         logger.debug("adding control bar media element to container");
-
-        var controlBarTarget:Metadata = new Metadata();
-        controlBarTarget.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
-        contentElement.addMetadata(ControlBarPlugin.NS_TARGET, controlBarTarget);
 
         logger.debug("loading control bar plugin");
         factory.loadPlugin(new PluginInfoResource(new ControlBarPlugin().pluginInfo));
@@ -381,12 +521,15 @@ public class SeeSawPlayer extends Sprite {
         resource.addMetadataValue(ControlBarPlugin.NS_SETTINGS, controlBarSettings);
 
         logger.debug("creating control bar media element");
-        var controlBarElement:MediaElement = factory.createMediaElement(resource);
+        controlBarElement = factory.createMediaElement(resource);
 
         if (controlBarElement == null) {
             logger.warn("failed to create control bar for player");
             return;
         }
+
+        // get the control bar to point at the main content
+        ControlBarElement(controlBarElement).target = mainElement;
 
         controlbarContainer.addMediaElement(controlBarElement);
     }
@@ -396,10 +539,10 @@ public class SeeSawPlayer extends Sprite {
 
             factory.removeEventListener(NetStatusEvent.NET_STATUS, netStatusChanged);
 
-            var metadata:Metadata = contentElement.getMetadata(NetStatusMetadata.NET_STATUS_METADATA);
+            var metadata:Metadata = mainElement.getMetadata(NetStatusMetadata.NET_STATUS_METADATA);
             if (metadata == null) {
                 metadata = new Metadata();
-                contentElement.addMetadata(NetStatusMetadata.NET_STATUS_METADATA, metadata);
+                mainElement.addMetadata(NetStatusMetadata.NET_STATUS_METADATA, metadata);
             }
 
             metadata.addValue(NetStatusMetadata.STATUS, event.info);
@@ -425,7 +568,7 @@ public class SeeSawPlayer extends Sprite {
 
     private function onContentMetadataAdd(event:MediaElementEvent):void {
         if (event.namespaceURL == ControlBarMetadata.CONTROL_BAR_METADATA) {
-            var metadata:Metadata = contentElement.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+            var metadata:Metadata = mainElement.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
             metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
             metadata.addEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
         }
@@ -433,7 +576,7 @@ public class SeeSawPlayer extends Sprite {
 
     private function onContentMetadataRemove(event:MediaElementEvent):void {
         if (event.namespaceURL == ControlBarMetadata.CONTROL_BAR_METADATA) {
-            var metadata:Metadata = contentElement.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+            var metadata:Metadata = mainElement.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
             metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
             metadata.removeEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
         }
@@ -513,7 +656,7 @@ public class SeeSawPlayer extends Sprite {
             case PlayerConstants.MAIN_CONTENT_ID:
                 var adMetadata:AdMetadata = new AdMetadata();
                 adMetadata.adMode = AdMode.MAIN_CONTENT;
-                adMetadata.adBreaks = generateAdBreaksFromSmil();
+//                adMetadata.adBreaks = generateAdBreaksFromSmil();
                 element.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
                 processSmilMediaElement(element);
                 break;
@@ -553,18 +696,6 @@ public class SeeSawPlayer extends Sprite {
             layout.verticalAlign = VerticalAlign.MIDDLE;
             layout.horizontalAlign = HorizontalAlign.CENTER;
             layout.scaleMode = ScaleMode.LETTERBOX;
-        }
-    }
-
-    private function onMediaPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
-        logger.debug("MediaPlayerStateChange: " + event.state);
-        switch (event.state) {
-            case MediaPlayerState.PLAYING:
-                toggleLights();
-                break;
-            case MediaPlayerState.PAUSED:
-                toggleLights();
-                break;
         }
     }
 
@@ -615,36 +746,6 @@ public class SeeSawPlayer extends Sprite {
 
     public function get mediaPlayer():MediaPlayer {
         return player;
-    }
-
-    private function getSmilHeadMetaValue(key:String):String {
-        use namespace smil;
-
-        var value:String = null;
-        for each (var meta:XML in videoInfo.smil.head..meta) {
-            if (meta.@name == key) {
-                value = meta.@content;
-                break;
-            }
-        }
-        return value;
-    }
-
-    private function generateAdBreaksFromSmil():Vector.<AdBreak> {
-        use namespace smil;
-
-        var adBreaks:Vector.<AdBreak> = new Vector.<AdBreak>();
-        for each (var video:XML in videoInfo.smil.body..video) {
-            if (video.@clipBegin) {
-                var clipStart:int = parseInt(video.@clipBegin);
-                if (clipStart > 0) {
-                    var adBreak:AdBreak = new AdBreak();
-                    adBreak.startTime = clipStart;
-                    adBreaks.push(adBreak);
-                }
-            }
-        }
-        return adBreaks;
     }
 }
 }

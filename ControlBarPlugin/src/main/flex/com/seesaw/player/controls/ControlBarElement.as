@@ -115,33 +115,20 @@ public class ControlBarElement extends MediaElement {
     public function ControlBarElement():void {
     }
 
-    public function addReference(target:MediaElement):void {
+    public function set target(value:MediaElement):void {
         logger.debug("adding target reference: " + target);
-        if (this.target == null) {
-            this.target = target;
-            processTarget();
-        }
-    }
-
-    private function processTarget():void {
-        if (target != null && settings != null) {
-            // We use the NS_CONTROL_BAR_TARGET namespaced metadata in order
-            // to find out if the instantiated element is the element that our
-            // control bar should control:
-            var targetMetadata:Metadata = target.getMetadata(ControlBarPlugin.NS_TARGET);
-            if (targetMetadata) {
-                if (targetMetadata.getValue(ID) != null && targetMetadata.getValue(ID) == settings.getValue(ID)) {
-                    logger.debug("setting target on control bar: " + target);
-
-                    target.removeEventListener(MediaElementEvent.TRAIT_ADD, onMediaTraitsChange);
-                    target.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onMediaTraitsChange);
-
-                    target.addEventListener(MediaElementEvent.TRAIT_ADD, onMediaTraitsChange);
-                    target.addEventListener(MediaElementEvent.TRAIT_REMOVE, onMediaTraitsChange);
-
-                    controlBar.media = target;
-                }
+        if (value != null) {
+            if(target) {
+                target.removeEventListener(MediaElementEvent.TRAIT_ADD, onMediaTraitsChange);
+                target.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onMediaTraitsChange);
             }
+
+            _target = value;
+
+            target.addEventListener(MediaElementEvent.TRAIT_ADD, onMediaTraitsChange);
+            target.addEventListener(MediaElementEvent.TRAIT_REMOVE, onMediaTraitsChange);
+
+            controlBar.media = target;
         }
     }
 
@@ -178,8 +165,6 @@ public class ControlBarElement extends MediaElement {
         // element that we should be controlling):
         if (value != null) {
             settings = value.getMetadataValue(ControlBarPlugin.NS_SETTINGS) as Metadata;
-
-            processTarget();
         }
 
         super.resource = value;
@@ -249,7 +234,7 @@ public class ControlBarElement extends MediaElement {
 
     private var settings:Metadata;
 
-    private var target:MediaElement;
+    private var _target:MediaElement;
     private var controlBar:Widget;
     private var viewable:DisplayObjectTrait;
 
@@ -258,5 +243,9 @@ public class ControlBarElement extends MediaElement {
     /* static */
 
     private static const ID:String = "ID";
+
+    public function get target():MediaElement {
+        return _target;
+    }
 }
 }
