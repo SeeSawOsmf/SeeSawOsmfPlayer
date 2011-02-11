@@ -49,10 +49,6 @@ import org.osmf.net.StreamType;
  */
 public class SMILParser extends EventDispatcher {
 
-    // TODO: put these into a constant class in PlayerCommon
-    public static const SMIL_NAMESPACE = "http://www.seesaw.com/player/api/smil";
-    public static const CONTENT_TYPE = "contentType";
-
     use namespace smil;
 
     private var smilDocument:XML;
@@ -118,7 +114,7 @@ public class SMILParser extends EventDispatcher {
             var dsi:DynamicStreamingItem = new DynamicStreamingItem(video.@src, video.@["system-bitrate"] / 1000);
             streamItems.push(dsi);
             lastSwitchItem = video;
-            contentType = lastSwitchItem..meta.(@name == CONTENT_TYPE).@content;
+            contentType = lastSwitchItem..meta.(@name == SMILConstants.CONTENT_TYPE).@content;
         }
 
         if (streamItems.length > 0) {
@@ -128,14 +124,17 @@ public class SMILParser extends EventDispatcher {
         }
 
         if (dsr && !isIgnoredContent(contentType)) {
+            var metadata:Metadata = getMetadata(video);
+            dsr.addMetadataValue(SMILConstants.SMIL_NAMESPACE, metadata);
+
             var element:MediaElement = factory.createMediaElement(dsr);
 
             if (element) {
-                populateMetadata(element, video);
+                element.addMetadata(SMILConstants.SMIL_NAMESPACE, metadata);
 
-                var metadata:Metadata = new Metadata();
-                metadata.addValue(AdMetadata.AD_BREAKS, adBreaks);
-                element.addMetadata(AdMetadata.AD_NAMESPACE, metadata);
+                var adMetadata:AdMetadata = new AdMetadata();
+                adMetadata.adBreaks = adBreaks;
+                element.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
 
                 dispatchEvent(
                         new SMILParserEvent(
@@ -148,17 +147,21 @@ public class SMILParser extends EventDispatcher {
 
     private function parseVideo(video:XML):void {
         var src:String = video.@src;
-        var contentType:String = video..meta.(@name == CONTENT_TYPE).@content;
+        var contentType:String = video..meta.(@name == SMILConstants.CONTENT_TYPE).@content;
 
         if (src && !isIgnoredContent(contentType)) {
-            var element:MediaElement = factory.createMediaElement(new URLResource(src));
+            var metadata:Metadata = getMetadata(video);
+            var resource:URLResource = new URLResource(src);
+            resource.addMetadataValue(SMILConstants.SMIL_NAMESPACE, metadata);
+
+            var element:MediaElement = factory.createMediaElement(resource);
 
             if (element) {
-                populateMetadata(element, video);
+                element.addMetadata(SMILConstants.SMIL_NAMESPACE, metadata);
 
-                var metadata:Metadata = new Metadata();
-                metadata.addValue(AdMetadata.AD_BREAKS, adBreaks);
-                element.addMetadata(AdMetadata.AD_NAMESPACE, metadata);
+                var adMetadata:AdMetadata = new AdMetadata();
+                adMetadata.adBreaks = adBreaks;
+                element.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
 
                 dispatchEvent(
                         new SMILParserEvent(
@@ -171,13 +174,17 @@ public class SMILParser extends EventDispatcher {
 
     private function parseImage(image:XML):void {
         var src:String = image.@src;
-        var contentType:String = image..meta.(@name == CONTENT_TYPE).@content;
+        var contentType:String = image..meta.(@name == SMILConstants.CONTENT_TYPE).@content;
 
         if (src && !isIgnoredContent(contentType)) {
-            var element:MediaElement = factory.createMediaElement(new URLResource(src));
+            var metadata:Metadata = getMetadata(image);
+            var resource:URLResource = new URLResource(src);
+            resource.addMetadataValue(SMILConstants.SMIL_NAMESPACE, metadata);
+
+            var element:MediaElement = factory.createMediaElement(resource);
 
             if (element) {
-                populateMetadata(element, image);
+                element.addMetadata(SMILConstants.SMIL_NAMESPACE, metadata);
 
                 dispatchEvent(
                         new SMILParserEvent(
@@ -211,16 +218,16 @@ public class SMILParser extends EventDispatcher {
         }
     }
 
-    private function populateMetadata(media:MediaElement, node:XML):void {
+    private function getMetadata(node:XML):Metadata {
         var metadata:Metadata = new Metadata();
 
-         for each (var meta:XML in node..meta) {
-             if(meta.@name && meta.@content) {
+        for each (var meta:XML in node..meta) {
+            if (meta.@name && meta.@content) {
                 metadata.addValue(meta.@name, String(meta.@content));
-             }
-         }
+            }
+        }
 
-        media.addMetadata(SMIL_NAMESPACE, metadata);
+        return metadata;
     }
 
     public function getHeadMetaValue(key:String):String {

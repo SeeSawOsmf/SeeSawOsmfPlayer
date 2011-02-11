@@ -26,7 +26,6 @@ import com.auditude.ads.osmf.IAuditudeMediaElement;
 import com.auditude.ads.osmf.constants.AuditudeOSMFConstants;
 import com.seesaw.player.ads.AdBreak;
 import com.seesaw.player.ads.AdMetadata;
-import com.seesaw.player.ads.AdMode;
 import com.seesaw.player.ads.AuditudeConstants;
 import com.seesaw.player.ads.auditude.AdProxyPluginInfo;
 import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
@@ -45,6 +44,7 @@ import com.seesaw.player.netstatus.NetStatusMetadata;
 import com.seesaw.player.panels.BufferingPanel;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
 import com.seesaw.player.smil.AdCapabilitiesProxy;
+import com.seesaw.player.smil.SMILConstants;
 import com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo;
 import com.seesaw.player.smil.SMILParser;
 import com.seesaw.player.smil.SMILParserEvent;
@@ -61,7 +61,6 @@ import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
 import org.osmf.elements.SerialElement;
 import org.osmf.events.BufferEvent;
-import org.osmf.events.DynamicStreamEvent;
 import org.osmf.events.LoadEvent;
 import org.osmf.events.LoaderEvent;
 import org.osmf.events.MediaElementEvent;
@@ -72,7 +71,6 @@ import org.osmf.events.TimeEvent;
 import org.osmf.events.TimelineMetadataEvent;
 import org.osmf.layout.HorizontalAlign;
 import org.osmf.layout.LayoutMetadata;
-import org.osmf.layout.ScaleMode;
 import org.osmf.layout.VerticalAlign;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
@@ -86,9 +84,7 @@ import org.osmf.metadata.CuePoint;
 import org.osmf.metadata.CuePointType;
 import org.osmf.metadata.Metadata;
 import org.osmf.metadata.TimelineMetadata;
-import org.osmf.smil.SMILConstants;
 import org.osmf.traits.DisplayObjectTrait;
-import org.osmf.traits.DynamicStreamTrait;
 import org.osmf.traits.LoadState;
 import org.osmf.traits.LoadTrait;
 import org.osmf.traits.MediaTraitType;
@@ -309,6 +305,7 @@ public class SeeSawPlayer extends Sprite {
         serialPlaylist = new SerialElement();
 
         factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
+        factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
 
         createVideoElement();
     }
@@ -409,7 +406,14 @@ public class SeeSawPlayer extends Sprite {
             if (serialPlaylist) {
                 logger.debug("created ad element and adding to serial playlist");
                 mediaElement.addEventListener(MediaElementEvent.TRAIT_ADD, onAdElementTraitAdd);
-                serialPlaylist.addChild(new AdCapabilitiesProxy(mediaElement));
+                serialPlaylist.addChild(mediaElement);
+            }
+        }
+        else if (event.mediaType == MediaType.VIDEO && event.contentType == PlayerConstants.STING_CONTENT_ID) {
+            if (serialPlaylist) {
+                logger.debug("created ad element and adding to serial playlist");
+                mediaElement.addEventListener(MediaElementEvent.TRAIT_ADD, onAdElementTraitAdd);
+                serialPlaylist.addChild(mediaElement);
             }
         }
         else if (event.mediaType == MediaType.VIDEO && event.contentType == PlayerConstants.MAIN_CONTENT_ID) {

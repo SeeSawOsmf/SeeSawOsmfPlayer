@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
+ * Copyright 2011 ioko365 Ltd.  All Rights Reserved.
  *
  * The contents of this file are subject to the Mozilla Public License
  * Version 1.1 (the "License"); you may not use this file except in
@@ -12,30 +12,24 @@
  * under the License.
  *
  * The Initial Developer of the Original Code is ioko365 Ltd.
- * Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
+ * Portions created by ioko365 Ltd are Copyright (C) 2011 ioko365 Ltd
  * Incorporated. All Rights Reserved.
  *
  * The Initial Developer of the Original Code is ioko365 Ltd.
- * Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
+ * Portions created by ioko365 Ltd are Copyright (C) 2011 ioko365 Ltd
  * Incorporated. All Rights Reserved.
  */
-package org.osmf.smil.elements
-{
-	import org.osmf.elements.LoadFromDocumentElement;
-	import org.osmf.media.MediaResourceBase;
-	import org.osmf.smil.loader.SMILLoader;
-import org.osmf.traits.LoaderBase;
 
-public class SMILElement extends LoadFromDocumentElement
-	{
-		public function SMILElement(resource:MediaResourceBase = null, loader:LoaderBase = null)
-		{
-			if (loader == null)
-			{
-				loader = new SMILLoader();
-			}
-			super(resource, loader);		
-		}
-
-	}
+/**
+ * Created by IntelliJ IDEA.
+ * User: ibhana
+ * Date: 11/02/11
+ * Time: 16:08
+ * To change this template use File | Settings | File Templates.
+ */
+package com.seesaw.player.smil {
+public class SMILConstants {
+    public static const SMIL_NAMESPACE = "http://www.seesaw.com/player/api/smil";
+    public static const CONTENT_TYPE = "contentType";
+}
 }

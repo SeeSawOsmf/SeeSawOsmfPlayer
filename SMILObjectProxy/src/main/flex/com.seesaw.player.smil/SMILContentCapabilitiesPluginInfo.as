@@ -36,50 +36,25 @@ import org.osmf.media.MediaFactoryItemType;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfo;
 import org.osmf.metadata.Metadata;
-import org.osmf.smil.SMILConstants;
 
 public class SMILContentCapabilitiesPluginInfo extends PluginInfo {
 
     public function SMILContentCapabilitiesPluginInfo() {
         var items:Vector.<MediaFactoryItem> = new Vector.<MediaFactoryItem>();
 
-        items.push(new MediaFactoryItem("com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo.AdHandlerProxy",
+        items.push(new MediaFactoryItem("com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo.AdCapabilitiesProxy",
                 canHandleAdContent, createAdHandlerProxy, MediaFactoryItemType.PROXY));
-
-        items.push(new MediaFactoryItem("com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo.StingHandlerProxy",
-                canHandleStingContent, createStingHandlerProxy, MediaFactoryItemType.PROXY));
-
-        items.push(new MediaFactoryItem("com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo.MainContentHandlerProxy",
-                canHandleMainContent, createMainContentHandlerProxy, MediaFactoryItemType.PROXY));
 
         super(items);
     }
 
     private function canHandleAdContent(resource:MediaResourceBase):Boolean {
-        var metadata:Metadata = resource.getMetadataValue(SMILConstants.SMIL_CONTENT_NS) as Metadata;
+        var metadata:Metadata = resource.getMetadataValue(SMILConstants.SMIL_NAMESPACE) as Metadata;
         return metadata != null && metadata.getValue(PlayerConstants.CONTENT_TYPE) == PlayerConstants.AD_CONTENT_ID;
-    }
-
-    private function canHandleStingContent(resource:MediaResourceBase):Boolean {
-        var metadata:Metadata = resource.getMetadataValue(SMILConstants.SMIL_CONTENT_NS) as Metadata;
-        return metadata != null && metadata.getValue(PlayerConstants.CONTENT_TYPE) == PlayerConstants.STING_CONTENT_ID;
-    }
-
-    private function canHandleMainContent(resource:MediaResourceBase):Boolean {
-        var metadata:Metadata = resource.getMetadataValue(SMILConstants.SMIL_CONTENT_NS) as Metadata;
-        return metadata != null && metadata.getValue(PlayerConstants.CONTENT_TYPE) == PlayerConstants.MAIN_CONTENT_ID;
     }
 
     private function createAdHandlerProxy():MediaElement {
         return new AdCapabilitiesProxy();
-    }
-
-    private function createStingHandlerProxy():MediaElement {
-        return new StingCapabilitiesProxy();
-    }
-
-    private function createMainContentHandlerProxy():MediaElement {
-        return new MainContentCapabilitiesProxy();
     }
 }
 }
