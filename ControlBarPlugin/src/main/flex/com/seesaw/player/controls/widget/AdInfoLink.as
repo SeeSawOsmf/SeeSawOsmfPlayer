@@ -119,7 +119,7 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
 
     private function updateFromAdMetadata():void {
         var adMetadata:AdMetadata = media.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
-        if (adMetadata && adMetadata.adMode == AdMode.AD) {
+        if (adMetadata) {
             interactiveAdvertisingUrl = adMetadata.clickThru;
             visible = interactiveAdvertisingUrl != null;
         }

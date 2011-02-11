@@ -43,8 +43,6 @@ import com.seesaw.player.namespaces.smil;
 import com.seesaw.player.netstatus.NetStatusMetadata;
 import com.seesaw.player.panels.BufferingPanel;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
-import com.seesaw.player.smil.AdCapabilitiesProxy;
-import com.seesaw.player.smil.SMILConstants;
 import com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo;
 import com.seesaw.player.smil.SMILParser;
 import com.seesaw.player.smil.SMILParserEvent;
@@ -402,11 +400,16 @@ public class SeeSawPlayer extends Sprite {
         var mediaElement:MediaElement = event.mediaElement;
 
         var layout:LayoutMetadata = new LayoutMetadata();
-        if (event.mediaType == MediaType.VIDEO && (event.contentType == PlayerConstants.AD_CONTENT_ID &&
+        if (event.mediaType == MediaType.VIDEO && (event.contentType == PlayerConstants.AD_CONTENT_ID ||
                 event.contentType == PlayerConstants.STING_CONTENT_ID)) {
             if (serialPlaylist) {
                 logger.debug("created ad element and adding to serial playlist");
                 mediaElement.addEventListener(MediaElementEvent.TRAIT_ADD, onAdElementTraitAdd);
+
+                var adMetadata:AdMetadata = new AdMetadata();
+                adMetadata.adBreaks = parser.adBreaks;
+                mediaElement.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
+
                 serialPlaylist.addChild(mediaElement);
             }
         }
@@ -476,32 +479,36 @@ public class SeeSawPlayer extends Sprite {
 
     private function onCuePoint(event:TimelineMetadataEvent):void {
         logger.debug("triggering cue point: {0}", event.marker.time);
-        if (player.canPause) {
-            player.pause();
-        }
-        if (adPlayer.canPlay) {
-            adPlayer.play();
-        }
-        mainContainer.visible = false;
-        adContainer.visible = true;
+        if (adPlayer) {
+            if (player.canPause) {
+                player.pause();
+            }
+            if (adPlayer.canPlay) {
+                adPlayer.play();
+            }
+            mainContainer.visible = false;
+            adContainer.visible = true;
 
-        // get the control bar to point at the ads
-        ControlBarElement(controlBarElement).target = serialPlaylist;
+            // get the control bar to point at the ads
+            ControlBarElement(controlBarElement).target = serialPlaylist;
+        }
     }
 
     private function adBreakCompleted():void {
         logger.debug("ad break complete");
-        if (adPlayer.canPause) {
-            adPlayer.pause();
-        }
-        if (player.canPlay) {
-            player.play();
-        }
-        mainContainer.visible = true;
-        adContainer.visible = false;
+        if (adPlayer) {
+            if (adPlayer.canPause) {
+                adPlayer.pause();
+            }
+            if (player.canPlay) {
+                player.play();
+            }
+            mainContainer.visible = true;
+            adContainer.visible = false;
 
-        // get the control bar to point at the main content
-        ControlBarElement(controlBarElement).target = mainElement;
+            // get the control bar to point at the main content
+            ControlBarElement(controlBarElement).target = mainElement;
+        }
     }
 
     private function createControlBarElement():void {

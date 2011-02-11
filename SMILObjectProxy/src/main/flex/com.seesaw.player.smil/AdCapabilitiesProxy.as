@@ -59,11 +59,11 @@ public class AdCapabilitiesProxy extends ProxyElement {
 
     private function onMetadataAdd(event:MediaElementEvent):void {
         if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
+            var adMetadata:AdMetadata = event.metadata as AdMetadata;
             var metadata:Metadata = getMetadata(SMILConstants.SMIL_NAMESPACE);
             if (metadata) {
                 var trackBack:String = metadata.getValue(AdMetadata.TRACK_BACK) as String;
                 if(trackBack) {
-                    var adMetadata:AdMetadata = event.metadata as AdMetadata;
                     adMetadata.clickThru = trackBack;
                 }
             }

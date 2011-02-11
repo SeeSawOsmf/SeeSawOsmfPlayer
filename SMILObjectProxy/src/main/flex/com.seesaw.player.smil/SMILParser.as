@@ -132,10 +132,6 @@ public class SMILParser extends EventDispatcher {
             if (element) {
                 element.addMetadata(SMILConstants.SMIL_NAMESPACE, metadata);
 
-                var adMetadata:AdMetadata = new AdMetadata();
-                adMetadata.adBreaks = adBreaks;
-                element.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
-
                 dispatchEvent(
                         new SMILParserEvent(
                                 SMILParserEvent.MEDIA_ELEMENT_CREATED,
@@ -158,10 +154,6 @@ public class SMILParser extends EventDispatcher {
 
             if (element) {
                 element.addMetadata(SMILConstants.SMIL_NAMESPACE, metadata);
-
-                var adMetadata:AdMetadata = new AdMetadata();
-                adMetadata.adBreaks = adBreaks;
-                element.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
 
                 dispatchEvent(
                         new SMILParserEvent(
