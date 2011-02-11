@@ -46,8 +46,7 @@ public class GeoBlockPanel extends Sprite {
     public function GeoBlockPanel() {
 
         //set the private variables
-        this.guidanceWarning = "<p><font color='#FFFFFF'>We're sorry...</font></p><br /><p><font color='#FFFFFF'>You need to be located in the UK to watch programmes on SeeSaw. This is because we haven't been given permission by the programme makers and rights holders to show the content outside of the UK.</p><br /><p>If you're located in the UK and think that you've received this message in error, there may be a problem with your Internet Service Provider (ISP).</font></p>";
-        this.findOutMore = "<font color='#00A88E'><a href='/help'>Find out more</a></font>.";
+        this.guidanceWarning = "<p><font color='#FFFFFF'>We're sorry...</font></p><br /><p><font color='#FFFFFF'>You need to be located in the UK to watch programmes on SeeSaw. This is because we haven't been given permission by the programme makers and rights holders to show the content outside of the UK.</p><br /><p>If you're located in the UK and think that you've received this message in error, there may be a problem with your Internet Service Provider (ISP). </font><font color='#00A88E'><a href='/help'>Find out more</a></font>.</p>";
         Security.allowDomain("*");
         super();
 
@@ -88,7 +87,6 @@ public class GeoBlockPanel extends Sprite {
 
         var contentContainer:Sprite = this.buildContentContainer();
         contentContainer.addChild(this.buildWarning());
-        contentContainer.addChild(this.buildFindOutMoreLink());
 
         panel.addChild(contentContainer);
 
@@ -133,41 +131,10 @@ public class GeoBlockPanel extends Sprite {
         return warningLabel;
     }
 
-    private function buildFindOutMoreLink():TextField {
-        var findOutMoreLink = new TextField();
-        findOutMoreLink.width = 90;
-        findOutMoreLink.height = 20;
-        findOutMoreLink.wordWrap = true;
-        findOutMoreLink.htmlText = this.findOutMore;
-        //warningLabel.styleSheet = this.css;
-        findOutMoreLink.x = 34;
-        findOutMoreLink.y = 187;
-
-        this.applyLinkFormat(findOutMoreLink);
-        //var formattedWarningLabel:TextField = this.applyWarningFormat(warningLabel);
-
-        return findOutMoreLink;
-    }
-
     private function applyWarningFormat(textToFormat:TextField):TextField {
         var textFormat:TextFormat = new TextFormat();
         textFormat.size = 12;
         textFormat.font = "Arial";
-        textFormat.color = 0xFFFFFF;
-        textFormat.align = "left";
-        textFormat.leading = 3;
-
-        textToFormat.setTextFormat(textFormat);
-
-        return textToFormat;
-
-    }
-
-    private function applyLinkFormat(textToFormat:TextField):TextField {
-        var textFormat:TextFormat = new TextFormat();
-        textFormat.size = 12;
-        textFormat.font = "Arial";
-        textFormat.color = 0x00A88E;
         textFormat.align = "left";
         textFormat.leading = 3;
 
