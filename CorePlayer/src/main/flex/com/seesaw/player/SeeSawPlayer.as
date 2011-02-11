@@ -402,14 +402,8 @@ public class SeeSawPlayer extends Sprite {
         var mediaElement:MediaElement = event.mediaElement;
 
         var layout:LayoutMetadata = new LayoutMetadata();
-        if (event.mediaType == MediaType.VIDEO && event.contentType == PlayerConstants.AD_CONTENT_ID) {
-            if (serialPlaylist) {
-                logger.debug("created ad element and adding to serial playlist");
-                mediaElement.addEventListener(MediaElementEvent.TRAIT_ADD, onAdElementTraitAdd);
-                serialPlaylist.addChild(mediaElement);
-            }
-        }
-        else if (event.mediaType == MediaType.VIDEO && event.contentType == PlayerConstants.STING_CONTENT_ID) {
+        if (event.mediaType == MediaType.VIDEO && (event.contentType == PlayerConstants.AD_CONTENT_ID &&
+                event.contentType == PlayerConstants.STING_CONTENT_ID)) {
             if (serialPlaylist) {
                 logger.debug("created ad element and adding to serial playlist");
                 mediaElement.addEventListener(MediaElementEvent.TRAIT_ADD, onAdElementTraitAdd);
