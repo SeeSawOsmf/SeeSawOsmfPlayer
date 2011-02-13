@@ -29,11 +29,12 @@
  */
 package com.seesaw.player.smil {
 import com.seesaw.player.ads.AdBreak;
-import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.namespaces.smil;
 
 import flash.events.EventDispatcher;
 
+import org.osmf.elements.ParallelElement;
+import org.osmf.elements.SerialElement;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaType;
@@ -44,8 +45,8 @@ import org.osmf.net.DynamicStreamingResource;
 import org.osmf.net.StreamType;
 
 /**
- * This parser does not build a heirarchy of element. It only notifies the listener when it creates video and image
- * elements and it is up to the listener to add them to serial or parallel compositions depending on contentType.
+ * The input smil document is in a the standard format but we need to parse the elements out in a particular way
+ * so the ads and main content can be added to separate media containers.
  */
 public class SMILParser extends EventDispatcher {
 
@@ -54,7 +55,6 @@ public class SMILParser extends EventDispatcher {
     private var smilDocument:XML;
     private var factory:MediaFactory;
 
-    private var _adBreaks:Vector.<AdBreak> = new Vector.<AdBreak>();
     private var ignoreContent:Vector.<String> = new Vector.<String>();
 
     public function SMILParser(smilDocument:XML, factory:MediaFactory) {
@@ -62,47 +62,47 @@ public class SMILParser extends EventDispatcher {
         this.factory = factory;
     }
 
-    public function parse() {
-        generateAdBreaks();
-
-        for each (var child:XML in smilDocument.body.*) {
-            parseChild(child);
-        }
-    }
-
-    private function parseChild(child:XML):void {
+    private function parseChild(child:XML):MediaElement {
+        var element:MediaElement = null;
         switch (child.name().localName) {
             case "par":
-                parsePar(child);
+                element = parsePar(child);
                 break;
             case "seq":
-                parseSeq(child);
+                element = parseSeq(child);
                 break;
             case "video":
-                parseVideo(child);
+                element = parseVideo(child);
                 break;
             case "switch":
-                parseSwitch(child);
+                element = parseSwitch(child);
                 break;
             case "img":
-                parseImage(child);
+                element = parseImage(child);
                 break;
         }
+        return element;
     }
 
-    private function parseSeq(seq:XML):void {
+    private function parseSeq(seq:XML):SerialElement {
+        var serial:SerialElement = new SerialElement();
         for each (var child:XML in seq.*) {
-            parseChild(child);
+            var mediaElement:MediaElement = parseChild(child);
+            serial.addChild(mediaElement);
         }
+        return serial;
     }
 
-    private function parsePar(par:XML):void {
+    private function parsePar(par:XML):ParallelElement {
+        var parallel:ParallelElement = new ParallelElement();
         for each (var child:XML in par.*) {
-            parseChild(child);
+            var mediaElement:MediaElement = parseChild(child);
+            parallel.addChild(mediaElement);
         }
+        return parallel;
     }
 
-    private function parseSwitch(swit:XML):void {
+    private function parseSwitch(swit:XML):MediaElement {
         var hostURL:String = smilDocument.head.meta[0].@base;
 
         var dsr:DynamicStreamingResource = null;
@@ -110,6 +110,8 @@ public class SMILParser extends EventDispatcher {
 
         var lastSwitchItem:XML = null;
         var contentType:String = null;
+        var element:MediaElement = null;
+
         for each (var video:XML in swit.video) {
             var dsi:DynamicStreamingItem = new DynamicStreamingItem(video.@src, video.@["system-bitrate"] / 1000);
             streamItems.push(dsi);
@@ -127,7 +129,7 @@ public class SMILParser extends EventDispatcher {
             var metadata:Metadata = getMetadata(video);
             dsr.addMetadataValue(SMILConstants.SMIL_NAMESPACE, metadata);
 
-            var element:MediaElement = factory.createMediaElement(dsr);
+            element = factory.createMediaElement(dsr);
 
             if (element) {
                 element.addMetadata(SMILConstants.SMIL_NAMESPACE, metadata);
@@ -139,18 +141,19 @@ public class SMILParser extends EventDispatcher {
                                 MediaType.VIDEO, contentType));
             }
         }
+        return element;
     }
 
-    private function parseVideo(video:XML):void {
+    private function parseVideo(video:XML):MediaElement {
         var src:String = video.@src;
         var contentType:String = video..meta.(@name == SMILConstants.CONTENT_TYPE).@content;
-
+        var element:MediaElement = null;
         if (src && !isIgnoredContent(contentType)) {
             var metadata:Metadata = getMetadata(video);
             var resource:URLResource = new URLResource(src);
             resource.addMetadataValue(SMILConstants.SMIL_NAMESPACE, metadata);
 
-            var element:MediaElement = factory.createMediaElement(resource);
+            element = factory.createMediaElement(resource);
 
             if (element) {
                 element.addMetadata(SMILConstants.SMIL_NAMESPACE, metadata);
@@ -162,18 +165,19 @@ public class SMILParser extends EventDispatcher {
                                 MediaType.VIDEO, contentType));
             }
         }
+        return element;
     }
 
-    private function parseImage(image:XML):void {
+    private function parseImage(image:XML):MediaElement {
         var src:String = image.@src;
         var contentType:String = image..meta.(@name == SMILConstants.CONTENT_TYPE).@content;
-
+        var element:MediaElement = null;
         if (src && !isIgnoredContent(contentType)) {
             var metadata:Metadata = getMetadata(image);
             var resource:URLResource = new URLResource(src);
             resource.addMetadataValue(SMILConstants.SMIL_NAMESPACE, metadata);
 
-            var element:MediaElement = factory.createMediaElement(resource);
+            element = factory.createMediaElement(resource);
 
             if (element) {
                 element.addMetadata(SMILConstants.SMIL_NAMESPACE, metadata);
@@ -185,29 +189,53 @@ public class SMILParser extends EventDispatcher {
                                 MediaType.IMAGE, contentType));
             }
         }
+        return element;
     }
 
-    private function generateAdBreaks():void {
-        var index:int = 0;
-        var prerollAdded:Boolean = false;
-        for each (var video:XML in smilDocument.body..video) {
-            if (video.@clipBegin) {
-                if (index > 0 && !prerollAdded) {
-                    // add a pre-roll break
-                    var adBreak:AdBreak = new AdBreak();
-                    adBreak.startTime = 0;
-                    adBreaks.push(adBreak);
-                    prerollAdded = true;
-                }
-                var clipStart:int = parseInt(video.@clipBegin);
-                if (clipStart > 0) {
-                    var adBreak:AdBreak = new AdBreak();
-                    adBreak.startTime = clipStart;
-                    adBreaks.push(adBreak);
+    public function parseMainContent():MediaElement {
+        var mainElement:MediaElement = null;
+        for each (var child:XML in smilDocument.body.seq.*) {
+            for each (var video:XML in child..video) {
+                var contentType:String = video..meta.(@name == SMILConstants.CONTENT_TYPE).@content;
+                if (contentType == "mainContent") {
+                    mainElement = parseChild(child);
+                    break;
                 }
             }
-            index++;
+            if (mainElement) break;
         }
+        return mainElement;
+    }
+
+    public function parseAdBreaks():Vector.<AdBreak> {
+        var adBreaks:Vector.<AdBreak> = new Vector.<AdBreak>();
+        var adBreak:AdBreak = null;
+        var adStart:int = 0;
+        for each (var video:XML in smilDocument.body..video) {
+            var contentType:String = video..meta.(@name == SMILConstants.CONTENT_TYPE).@content;
+            if (contentType == "advert") {
+                if (!adBreak || adBreak.startTime != adStart) {
+                    // add a pre-roll break
+                    adBreak = new AdBreak();
+                    adBreak.adPlaylist = new SerialElement();
+                    adBreak.startTime = adStart;
+                    adBreaks.push(adBreak);
+                }
+                if (adBreak) {
+                    var mediaElement:MediaElement = parseVideo(video);
+                    if (mediaElement) {
+                        adBreak.adPlaylist.addChild(mediaElement);
+                    }
+                }
+            }
+            else {
+                if (video.@clipEnd) {
+                    // the start time of the next ad break
+                    adStart = parseInt(video.@clipEnd);
+                }
+            }
+        }
+        return adBreaks;
     }
 
     private function getMetadata(node:XML):Metadata {
@@ -249,10 +277,6 @@ public class SMILParser extends EventDispatcher {
         if (index >= 0) {
             ignoreContent.splice(index, 1);
         }
-    }
-
-    public function get adBreaks():Vector.<AdBreak> {
-        return _adBreaks;
     }
 }
 }

@@ -118,7 +118,7 @@ public class ControlBarElement extends MediaElement {
     public function set target(value:MediaElement):void {
         logger.debug("adding target reference: " + target);
         if (value != null) {
-            if(target) {
+            if (target) {
                 target.removeEventListener(MediaElementEvent.TRAIT_ADD, onMediaTraitsChange);
                 target.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onMediaTraitsChange);
             }
@@ -136,7 +136,7 @@ public class ControlBarElement extends MediaElement {
         if (event.type == MediaElementEvent.TRAIT_ADD) {
             // Wait for the target element to display before displaying the control bar
             if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
-                if (controlBar) {
+                if (controlBar && !hasTrait(MediaTraitType.DISPLAY_OBJECT)) {
                     viewable = new DisplayObjectTrait(controlBar, controlBar.measuredWidth, controlBar.measuredHeight);
                     addTrait(MediaTraitType.DISPLAY_OBJECT, viewable);
                     controlBar.measure();
