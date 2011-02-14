@@ -51,6 +51,7 @@ public class PlayButton extends PlayPauseButtonBase implements IWidget {
 
     override protected function onMouseClick(event:MouseEvent):void {
         playPause();
+        updateVisibility();
         updateMetadata();
 
     }
