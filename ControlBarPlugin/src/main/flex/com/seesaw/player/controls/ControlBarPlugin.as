@@ -70,18 +70,14 @@ public class ControlBarPlugin extends Sprite {
     //
 
     public static const ID:String = "com.seesaw.player.controls.ControlBarPlugin";
-    public static const NS_SETTINGS:String = "http://www.osmf.org/samples/controlbar/settings";
-    public static const NS_TARGET:String = "http://www.osmf.org/samples/controlbar/target";
 
     private var _pluginInfo:PluginInfo;
-    private var controlBarElement:ControlBarElement;
-    private var targetElement:MediaElement;
 
     private function canHandleResourceCallback(resource:MediaResourceBase):Boolean {
         var result:Boolean;
 
         if (resource != null) {
-            var settings:Metadata = resource.getMetadataValue(NS_SETTINGS) as Metadata;
+            var settings:Metadata = resource.getMetadataValue(ControlBarConstants.CONTROL_BAR_SETTINGS) as Metadata;
 
             result = settings != null;
         }
@@ -94,8 +90,7 @@ public class ControlBarPlugin extends Sprite {
     }
 
     private function mediaElementCreationCallback():MediaElement {
-        controlBarElement = new ControlBarElement();
-        return controlBarElement;
+        return new ControlBarElement();
     }
 }
 }

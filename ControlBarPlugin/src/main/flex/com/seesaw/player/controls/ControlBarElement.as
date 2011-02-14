@@ -41,6 +41,7 @@ import org.osmf.chrome.configuration.LayoutAttributesParser;
 import org.osmf.chrome.configuration.WidgetsParser;
 import org.osmf.chrome.widgets.Widget;
 import org.osmf.events.MediaElementEvent;
+import org.osmf.events.MetadataEvent;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaResourceBase;
@@ -113,9 +114,31 @@ public class ControlBarElement extends MediaElement {
     // Public interface
     //
     public function ControlBarElement():void {
+        addEventListener(MediaElementEvent.METADATA_ADD, onMetadataAdd);
+        addEventListener(MediaElementEvent.METADATA_REMOVE, onMetadataRemove);
     }
 
-    public function set target(value:MediaElement):void {
+    private function onMetadataAdd(event:MediaElementEvent):void {
+        if (event.namespaceURL == ControlBarConstants.CONTROL_BAR_METADATA) {
+            event.metadata.addEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
+            event.metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
+        }
+    }
+
+    private function onMetadataRemove(event:MediaElementEvent):void {
+        if (event.namespaceURL == ControlBarConstants.CONTROL_BAR_METADATA) {
+            event.metadata.removeEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
+            event.metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
+        }
+    }
+
+    private function onControlBarMetadataChange(event:MetadataEvent):void {
+        if (event.key == ControlBarConstants.TARGET_ELEMENT) {
+            setTarget(event.value as MediaElement);
+        }
+    }
+
+    private function setTarget(value:MediaElement):void {
         logger.debug("adding target reference: " + target);
         if (value != null) {
             if (target) {
@@ -164,7 +187,7 @@ public class ControlBarElement extends MediaElement {
         // (containing only one field: "ID" that tells us the ID of the media
         // element that we should be controlling):
         if (value != null) {
-            settings = value.getMetadataValue(ControlBarPlugin.NS_SETTINGS) as Metadata;
+            settings = value.getMetadataValue(ControlBarConstants.CONTROL_BAR_SETTINGS) as Metadata;
         }
 
         super.resource = value;

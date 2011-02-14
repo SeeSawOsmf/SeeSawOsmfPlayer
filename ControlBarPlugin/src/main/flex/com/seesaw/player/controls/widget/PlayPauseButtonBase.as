@@ -20,7 +20,7 @@
  *    Incorporated. All Rights Reserved.
  */
 package com.seesaw.player.controls.widget {
-import com.seesaw.player.controls.ControlBarMetadata;
+import com.seesaw.player.controls.ControlBarConstants;
 
 import flash.events.Event;
 import flash.external.ExternalInterface;
@@ -48,10 +48,10 @@ public class PlayPauseButtonBase extends ButtonWidget {
           super.media = value;
 
           if (media) {
-              metadata = media.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+              metadata = media.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
               if (metadata == null) {
                   metadata = new Metadata();
-                  media.addMetadata(ControlBarMetadata.CONTROL_BAR_METADATA, metadata);
+                  media.addMetadata(ControlBarConstants.CONTROL_BAR_METADATA, metadata);
               }
           }
       }
@@ -80,7 +80,7 @@ public class PlayPauseButtonBase extends ButtonWidget {
     }
 
     public function updateMetadata():void{
-         metadata.addValue(ControlBarMetadata.USER_CLICK_STATE, playTrait.playState);
+         metadata.addValue(ControlBarConstants.USER_CLICK_STATE, playTrait.playState);
     }
 
     override protected function get requiredTraits():Vector.<String> {

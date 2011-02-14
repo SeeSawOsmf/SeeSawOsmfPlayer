@@ -21,8 +21,11 @@
  */
 
 package com.seesaw.player.controls {
-public class ControlBarMetadata {
+public class ControlBarConstants {
+    public static const CONTROL_BAR_SETTINGS:String = "http://www.osmf.org/samples/controlbar/settings";
+
     public static const CONTROL_BAR_METADATA:String = "http://www.osmf.org/samples/controlbar/metadata";
+    public static const TARGET_ELEMENT:String = "targetElement";
     public static const CONTROL_BAR_HIDDEN:String = "controlBarHidden";
     public static const SUBTITLES_VISIBLE:String = "subtitlesVisible";
     public static const SUBTITLE_BUTTON_ENABLED:String = "subtitleButtonEnabled";

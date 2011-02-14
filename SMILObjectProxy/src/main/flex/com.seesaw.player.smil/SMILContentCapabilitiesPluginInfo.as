@@ -49,8 +49,13 @@ public class SMILContentCapabilitiesPluginInfo extends PluginInfo {
     }
 
     private function canHandleAdContent(resource:MediaResourceBase):Boolean {
+        var canHandle:Boolean = false;
         var metadata:Metadata = resource.getMetadataValue(SMILConstants.SMIL_NAMESPACE) as Metadata;
-        return metadata != null && metadata.getValue(PlayerConstants.CONTENT_TYPE) == PlayerConstants.AD_CONTENT_ID;
+        if(metadata) {
+            var contentType:String = metadata.getValue(PlayerConstants.CONTENT_TYPE) as String;
+            canHandle = contentType == PlayerConstants.AD_CONTENT_ID || contentType == PlayerConstants.STING_CONTENT_ID;
+        }
+        return canHandle;
     }
 
     private function createAdHandlerProxy():MediaElement {

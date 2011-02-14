@@ -18,11 +18,9 @@
                     </metadata>
                 </video>
 
-                <video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Seesaw_Recycling.mp4">
+                <video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Idents_Diner_5s.mp4">
                     <metadata>
-                        <meta content="advert" name="contentType"/>
-                        <meta content="http://seesaw.stage.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/channel4/tv/comedy/alternative/35925/35925/001/L18/12116635505/x13/4OD/SS_IDENT_Feb10_x90/2362406/553249624b3079475550554142667248"
-                              name="trackback"/>
+                        <meta content="sting" name="contentType"/>
                     </metadata>
                 </video>
 

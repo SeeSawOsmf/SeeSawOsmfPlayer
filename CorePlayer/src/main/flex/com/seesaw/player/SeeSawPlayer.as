@@ -29,10 +29,11 @@ import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.ads.AuditudeConstants;
 import com.seesaw.player.ads.auditude.AdProxyPluginInfo;
 import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
+import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.batchEventService.BatchEventServicePlugin;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
+import com.seesaw.player.controls.ControlBarConstants;
 import com.seesaw.player.controls.ControlBarElement;
-import com.seesaw.player.controls.ControlBarMetadata;
 import com.seesaw.player.controls.ControlBarPlugin;
 import com.seesaw.player.external.ExternalInterfaceMetadata;
 import com.seesaw.player.external.PlayerExternalInterface;
@@ -42,6 +43,7 @@ import com.seesaw.player.namespaces.smil;
 import com.seesaw.player.netstatus.NetStatusMetadata;
 import com.seesaw.player.panels.BufferingPanel;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
+import com.seesaw.player.services.ResumeService;
 import com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo;
 import com.seesaw.player.smil.SMILParser;
 import com.seesaw.player.smil.SMILParserEvent;
@@ -56,6 +58,7 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
+import org.osmf.elements.SerialElement;
 import org.osmf.events.BufferEvent;
 import org.osmf.events.LoadEvent;
 import org.osmf.events.LoaderEvent;
@@ -227,12 +230,9 @@ public class SeeSawPlayer extends Sprite {
 
         player.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onMainPlayerStateChange);
 
-        /*if (adMode == AdMetadata.CHANNEL_4_AD_TYPE)*/
-        {
+        if (adMode == AdMetadata.CHANNEL_4_AD_TYPE) {
             logger.debug("configuring container for playlist ads");
-
             adPlayer = new MediaPlayer();
-
             adPlayer.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onAdPlayerStateChange);
         }
 
@@ -258,6 +258,7 @@ public class SeeSawPlayer extends Sprite {
                 var adBreak:AdBreak = cuePoint.parameters as AdBreak;
                 if (adBreak && !adBreak.complete && adBreak.adPlaylist && adBreak.adPlaylist.numChildren > 0) {
                     player.pause();
+                    mainContainer.visible = false;
 
                     currentAdBreak = adBreak;
                     currentAdBreak.adPlaylist.addEventListener(MediaElementEvent.TRAIT_ADD, onAdElementTraitAdd);
@@ -266,32 +267,44 @@ public class SeeSawPlayer extends Sprite {
                     adPlayer.media = currentAdBreak.adPlaylist;
 
                     // get the control bar to point at the ads
-                    ControlBarElement(controlBarElement).target = currentAdBreak.adPlaylist;
+                    setControlBarTarget(currentAdBreak.adPlaylist);
 
-                    mainContainer.visible = false;
                     adContainer.visible = true;
                 }
             }
         }
     }
 
-    private function adBreakCompleted():void {
+    private function setControlBarTarget(element:MediaElement):void {
+        var metadata:Metadata = controlBarElement.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
+        if (metadata == null) {
+            metadata = new Metadata();
+            controlBarElement.addMetadata(ControlBarConstants.CONTROL_BAR_METADATA, metadata);
+        }
+        metadata.addValue(ControlBarConstants.TARGET_ELEMENT, element);
+    }
+
+    private function adBreakCompleted(event:Event = null):void {
         logger.debug("ad break complete");
         if (currentAdBreak) {
-            currentAdBreak.removeEventListener(MediaElementEvent.TRAIT_ADD, onAdElementTraitAdd);
-            adContainer.removeMediaElement(currentAdBreak.adPlaylist);
+            var adPlaylist:SerialElement = currentAdBreak.adPlaylist;
+            var timeTrait:TimeTrait = adPlaylist.getTrait(MediaTraitType.TIME) as TimeTrait;
+            if (timeTrait) timeTrait.removeEventListener(TimeEvent.COMPLETE, adBreakCompleted);
+            adPlaylist.removeEventListener(MediaElementEvent.TRAIT_ADD, onAdElementTraitAdd);
+            adContainer.removeMediaElement(adPlaylist);
             currentAdBreak.complete = true;
             currentAdBreak = null;
         }
 
         if (!player.playing) {
-            player.play();
-
-            mainContainer.visible = true;
             adContainer.visible = false;
 
             // get the control bar to point at the main content
-            ControlBarElement(controlBarElement).target = mainElement;
+            setControlBarTarget(mainElement);
+
+            mainContainer.visible = true;
+
+            player.play();
         }
     }
 
@@ -377,13 +390,14 @@ public class SeeSawPlayer extends Sprite {
             // The subtitle element needs to check and set visibility every time it sets a new display object
             subtitleElement.addEventListener(MediaElementEvent.TRAIT_ADD, function(event:MediaElementEvent):void {
                 if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
-                    var metadata:Metadata = player.media.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+                    var metadata:Metadata = player.media.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
                     if (metadata) {
-                        metadata.addValue(ControlBarMetadata.SUBTITLE_BUTTON_ENABLED, true);
-                        var visible:Boolean = metadata.getValue(ControlBarMetadata.SUBTITLES_VISIBLE) as Boolean;
+                        var visible:Boolean = metadata.getValue(ControlBarConstants.SUBTITLES_VISIBLE) as Boolean;
                         var displayObjectTrait:DisplayObjectTrait =
                                 MediaElement(event.target).getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
                         displayObjectTrait.displayObject.visible = visible == null ? false : visible;
+
+                        metadata.addValue(ControlBarConstants.SUBTITLE_BUTTON_ENABLED, true);
                     }
                 }
             });
@@ -408,8 +422,6 @@ public class SeeSawPlayer extends Sprite {
         parser.addEventListener(SMILParserEvent.MEDIA_ELEMENT_CREATED, onSmilElementCreated);
 
         adBreaks = parser.parseAdBreaks();
-        if(adBreaks.length > 0)
-            mainContainer.visible = adBreaks[0].startTime != 0;
         setupAdBreaks(mainElement, adBreaks);
 
         var mediaElement:MediaElement = parser.parseMainContent();
@@ -447,12 +459,9 @@ public class SeeSawPlayer extends Sprite {
             setMediaLayout(mediaElement);
         }
         else if (event.contentType == PlayerConstants.MAIN_CONTENT_ID) {
-            //            if (adMode == AdMetadata.CHANNEL_4_AD_TYPE)
-            {
-                var adMetadata:AdMetadata = new AdMetadata();
-                adMetadata.adBreaks = adBreaks;
-                mediaElement.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
-            }
+            var adMetadata:AdMetadata = new AdMetadata();
+            adMetadata.adBreaks = adBreaks;
+            mediaElement.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
             createSubtitleElement(mediaElement);
             setMediaLayout(mediaElement);
         }
@@ -484,10 +493,7 @@ public class SeeSawPlayer extends Sprite {
         if (event.traitType == MediaTraitType.TIME) {
             var element:MediaElement = event.target as MediaElement;
             var timeTrait:TimeTrait = element.getTrait(MediaTraitType.TIME) as TimeTrait;
-            timeTrait.addEventListener(TimeEvent.COMPLETE, function(event:TimeEvent):void {
-                // triggered on completion of each serial ad playlist
-                adBreakCompleted();
-            });
+            timeTrait.addEventListener(TimeEvent.COMPLETE, adBreakCompleted);
         }
     }
 
@@ -516,13 +522,13 @@ public class SeeSawPlayer extends Sprite {
         controlBarSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
 
         var resource:MediaResourceBase = new MediaResourceBase();
-        resource.addMetadataValue(ControlBarPlugin.NS_SETTINGS, controlBarSettings);
+        resource.addMetadataValue(ControlBarConstants.CONTROL_BAR_SETTINGS, controlBarSettings);
 
         logger.debug("creating control bar media element");
         controlBarElement = factory.createMediaElement(resource);
 
         // get the control bar to point at the main content
-        ControlBarElement(controlBarElement).target = mainElement;
+        setControlBarTarget(mainElement);
 
         controlbarContainer.addMediaElement(controlBarElement);
     }
@@ -553,16 +559,16 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onContentMetadataAdd(event:MediaElementEvent):void {
-        if (event.namespaceURL == ControlBarMetadata.CONTROL_BAR_METADATA) {
-            var metadata:Metadata = mainElement.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+        if (event.namespaceURL == ControlBarConstants.CONTROL_BAR_METADATA) {
+            var metadata:Metadata = mainElement.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
             metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
             metadata.addEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
         }
     }
 
     private function onContentMetadataRemove(event:MediaElementEvent):void {
-        if (event.namespaceURL == ControlBarMetadata.CONTROL_BAR_METADATA) {
-            var metadata:Metadata = mainElement.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+        if (event.namespaceURL == ControlBarConstants.CONTROL_BAR_METADATA) {
+            var metadata:Metadata = mainElement.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
             metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
             metadata.removeEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
         }
@@ -570,7 +576,7 @@ public class SeeSawPlayer extends Sprite {
 
     private function onControlBarMetadataChange(event:MetadataEvent):void {
         switch (event.key) {
-            case ControlBarMetadata.CONTROL_BAR_HIDDEN:
+            case ControlBarConstants.CONTROL_BAR_HIDDEN:
                 if (subtitleElement) {
                     var layoutMetadata:LayoutMetadata =
                             subtitleElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
@@ -579,7 +585,7 @@ public class SeeSawPlayer extends Sprite {
                     }
                 }
                 break;
-            case ControlBarMetadata.SUBTITLES_VISIBLE:
+            case ControlBarConstants.SUBTITLES_VISIBLE:
                 if (subtitleElement) {
                     var displayTrait:DisplayObjectTrait =
                             subtitleElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
