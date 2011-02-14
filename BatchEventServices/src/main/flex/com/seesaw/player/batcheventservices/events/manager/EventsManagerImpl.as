@@ -35,11 +35,11 @@ public class EventsManagerImpl implements EventsManager {
     private var flushing:Boolean = false;
     private var allowEvent:Boolean = true;
 
-    public function EventsManagerImpl(view:ViewEvent, availabilityType:String, batchUrl:String, cumulativeUrl:String) {
+    public function EventsManagerImpl(view:ViewEvent, previewMode:String, batchUrl:String, cumulativeUrl:String) {
         this.view = view;
         userEvents = new Array();
         contentEvents = new Array();
-        if (availabilityType == "PREVIEW") {
+        if (previewMode == "true") {
             allowEvent = false;
         }
         batchEventURL = batchUrl;

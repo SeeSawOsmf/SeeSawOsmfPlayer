@@ -20,11 +20,11 @@
             <resumeOffset>00:05:00.00</resumeOffset>
             <data>CEN:x01,x02,x92,x80,x81,x93</data>
         </break>
-         <break>
+        <!-- <break>
             <breakOffset>00:08:00.00</breakOffset>
             <resumeOffset>00:08:00.00</resumeOffset>
             <data>CEN:x01,x02,x92,x80,x81,x93</data>
-        </break>
+        </break>-->
     </loggingSheet>
     <guidance>
         <age>16</age>
