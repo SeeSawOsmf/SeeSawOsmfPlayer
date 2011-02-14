@@ -336,6 +336,9 @@ public class Player extends Sprite {
             else if (availability.availabilityType == "AVOD") {
                 playButtonMode = PlayStartButton.PLAY;
             }
+            else if (availability.availabilityType == "SVOD" && availability.noAdsPlayable == "true") {
+                playButtonMode = PlayStartButton.PLAY_SUBSCRIBED;
+            }
         }
         // Note that if none of the conditions above are met, we should not show
         // the play button at all.  Leave playButtonMode as null in this case.
