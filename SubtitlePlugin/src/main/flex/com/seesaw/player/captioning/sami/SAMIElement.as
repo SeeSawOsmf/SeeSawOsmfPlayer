@@ -111,7 +111,7 @@ public class SAMIElement extends LoadableElementBase {
 
     private function onCuePoint(event:TimelineMetadataEvent):void {
         var cuePoint:CuePoint = event.marker as CuePoint;
-        if (cuePoint && displayTrait) {
+        if (cuePoint && displayTrait && cuePoint.name == "sami") {
             var captionDisplayObject:CaptionDisplayObject = displayTrait.displayObject as CaptionDisplayObject;
             var caption:String = cuePoint.parameters as String;
             captionDisplayObject.text = caption;

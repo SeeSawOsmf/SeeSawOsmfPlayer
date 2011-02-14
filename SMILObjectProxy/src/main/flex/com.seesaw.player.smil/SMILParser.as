@@ -37,6 +37,7 @@ import org.osmf.elements.ParallelElement;
 import org.osmf.elements.SerialElement;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
+import org.osmf.media.MediaResourceBase;
 import org.osmf.media.MediaType;
 import org.osmf.media.URLResource;
 import org.osmf.metadata.Metadata;
@@ -54,12 +55,14 @@ public class SMILParser extends EventDispatcher {
 
     private var smilDocument:XML;
     private var factory:MediaFactory;
+    private var originalResource:MediaResourceBase;
 
     private var ignoreContent:Vector.<String> = new Vector.<String>();
 
-    public function SMILParser(smilDocument:XML, factory:MediaFactory) {
+    public function SMILParser(smilDocument:XML, originalResource:MediaResourceBase, factory:MediaFactory) {
         this.smilDocument = smilDocument;
         this.factory = factory;
+        this.originalResource = originalResource;
     }
 
     private function parseChild(child:XML):MediaElement {
@@ -126,20 +129,7 @@ public class SMILParser extends EventDispatcher {
         }
 
         if (dsr && !isIgnoredContent(contentType)) {
-            var metadata:Metadata = getMetadata(video);
-            dsr.addMetadataValue(SMILConstants.SMIL_NAMESPACE, metadata);
-
-            element = factory.createMediaElement(dsr);
-
-            if (element) {
-                element.addMetadata(SMILConstants.SMIL_NAMESPACE, metadata);
-
-                dispatchEvent(
-                        new SMILParserEvent(
-                                SMILParserEvent.MEDIA_ELEMENT_CREATED,
-                                element,
-                                MediaType.VIDEO, contentType));
-            }
+            element = createVideo(dsr, contentType, getMetadata(video));
         }
         return element;
     }
@@ -149,21 +139,7 @@ public class SMILParser extends EventDispatcher {
         var contentType:String = video..meta.(@name == SMILConstants.CONTENT_TYPE).@content;
         var element:MediaElement = null;
         if (src && !isIgnoredContent(contentType)) {
-            var metadata:Metadata = getMetadata(video);
-            var resource:URLResource = new URLResource(src);
-            resource.addMetadataValue(SMILConstants.SMIL_NAMESPACE, metadata);
-
-            element = factory.createMediaElement(resource);
-
-            if (element) {
-                element.addMetadata(SMILConstants.SMIL_NAMESPACE, metadata);
-
-                dispatchEvent(
-                        new SMILParserEvent(
-                                SMILParserEvent.MEDIA_ELEMENT_CREATED,
-                                element,
-                                MediaType.VIDEO, contentType));
-            }
+            element = createVideo(new URLResource(src), contentType, getMetadata(video));
         }
         return element;
     }
@@ -213,7 +189,7 @@ public class SMILParser extends EventDispatcher {
         var adStart:int = 0;
         for each (var video:XML in smilDocument.body..video) {
             var contentType:String = video..meta.(@name == SMILConstants.CONTENT_TYPE).@content;
-            if (contentType == "advert") {
+            if (contentType == "advert" || contentType == "sting") {
                 if (!adBreak || adBreak.startTime != adStart) {
                     // add a pre-roll break
                     adBreak = new AdBreak();
@@ -228,7 +204,7 @@ public class SMILParser extends EventDispatcher {
                     }
                 }
             }
-            else {
+            else if (contentType == "mainContent") {
                 if (video.@clipEnd) {
                     // the start time of the next ad break
                     adStart = parseInt(video.@clipEnd);
@@ -236,6 +212,36 @@ public class SMILParser extends EventDispatcher {
             }
         }
         return adBreaks;
+    }
+
+    private function createVideo(resource:MediaResourceBase, contentType:String, metadata:Metadata):MediaElement {
+        if (originalResource && contentType == "mainContent") {
+            // copy the resource metadata to the video element so that proxies are triggered
+            populateMetdataFromResource(originalResource, resource);
+        }
+
+        resource.addMetadataValue(SMILConstants.SMIL_NAMESPACE, metadata);
+
+        var mediaElement:MediaElement = factory.createMediaElement(resource);
+
+        if (mediaElement) {
+            mediaElement.addMetadata(SMILConstants.SMIL_NAMESPACE, metadata);
+
+            dispatchEvent(
+                    new SMILParserEvent(
+                            SMILParserEvent.MEDIA_ELEMENT_CREATED,
+                            mediaElement,
+                            MediaType.VIDEO, contentType));
+        }
+        return mediaElement;
+    }
+
+    private function populateMetdataFromResource(originalResource:MediaResourceBase, mediaResource:MediaResourceBase):void {
+        // Make sure we transfer any resource metadata from the original resource
+        for each (var metadataNS:String in originalResource.metadataNamespaceURLs) {
+            var metadata:Object = originalResource.getMetadataValue(metadataNS);
+            mediaResource.addMetadataValue(metadataNS, metadata);
+        }
     }
 
     private function getMetadata(node:XML):Metadata {

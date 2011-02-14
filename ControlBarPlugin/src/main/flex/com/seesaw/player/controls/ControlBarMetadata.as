@@ -25,6 +25,7 @@ public class ControlBarMetadata {
     public static const CONTROL_BAR_METADATA:String = "http://www.osmf.org/samples/controlbar/metadata";
     public static const CONTROL_BAR_HIDDEN:String = "controlBarHidden";
     public static const SUBTITLES_VISIBLE:String = "subtitlesVisible";
+    public static const SUBTITLE_BUTTON_ENABLED:String = "subtitleButtonEnabled";
     public static const FULL_SCREEN:String = "fullScreen";
     public static const USER_CLICK_STATE:String = "userClickState";
 }

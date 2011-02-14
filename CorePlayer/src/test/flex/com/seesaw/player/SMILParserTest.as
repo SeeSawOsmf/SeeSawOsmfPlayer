@@ -27,10 +27,9 @@
  * Time: 09:25
  * To change this template use File | Settings | File Templates.
  */
-package com.seesaw.player.com.seesaw.player.smil {
+package com.seesaw.player {
+import com.seesaw.player.smil.*;
 import com.seesaw.player.ads.AdBreak;
-import com.seesaw.player.smil.SMILConstants;
-import com.seesaw.player.smil.SMILParser;
 
 import org.hamcrest.assertThat;
 import org.hamcrest.object.equalTo;
@@ -39,6 +38,7 @@ import org.osmf.elements.ParallelElement;
 import org.osmf.elements.SerialElement;
 import org.osmf.elements.VideoElement;
 import org.osmf.media.DefaultMediaFactory;
+import org.osmf.media.MediaResourceBase;
 import org.osmf.media.URLResource;
 import org.osmf.metadata.Metadata;
 
@@ -48,7 +48,7 @@ public class SMILParserTest {
 
     [Before]
     public function runBeforeAllTests():void {
-        parser = new SMILParser(smil, new DefaultMediaFactory());
+        parser = new SMILParser(smil, null, new DefaultMediaFactory());
     }
 
     [Test]
@@ -77,12 +77,12 @@ public class SMILParserTest {
         assertThat(resource.url, equalTo("rtmp://seesaw.com/ad1.mp4"));
 
         var metadata:Metadata = playlist.getChildAt(0).getMetadata(SMILConstants.SMIL_NAMESPACE);
-        assertThat(metadata.getValue("contentType"), equalTo("advert"));
+        assertThat(metadata.getValue("contentType"), equalTo("sting"));
 
         resource = playlist.getChildAt(1).resource as URLResource;
         assertThat(resource.url, equalTo("rtmp://seesaw.com/ad2.mp4"));
 
-        metadata = playlist.getChildAt(0).getMetadata(SMILConstants.SMIL_NAMESPACE);
+        metadata = playlist.getChildAt(1).getMetadata(SMILConstants.SMIL_NAMESPACE);
         assertThat(metadata.getValue("contentType"), equalTo("advert"));
 
         assertThat(adBreaks[1].startTime, equalTo(300));
@@ -110,8 +110,7 @@ public class SMILParserTest {
                     "<seq>" +
                     "<video src=\"rtmp://seesaw.com/ad1.mp4\">" +
                     "<metadata>" +
-                    "<meta content=\"advert\" name=\"contentType\"/>" +
-                    "<meta content=\"http://seesaw.com/click/ad1\" name=\"trackback\"/>" +
+                    "<meta content=\"sting\" name=\"contentType\"/>" +
                     "</metadata>" +
                     "</video>" +
                     "<video src=\"rtmp://seesaw.com/ad2.mp4\">" +

@@ -29,7 +29,7 @@
  */
 package com.seesaw.player.smil {
 public class SMILConstants {
-    public static const SMIL_NAMESPACE = "http://www.seesaw.com/player/api/smil";
-    public static const CONTENT_TYPE = "contentType";
+    public static const SMIL_NAMESPACE:String = "http://www.seesaw.com/player/api/smil";
+    public static const CONTENT_TYPE:String = "contentType";
 }
 }

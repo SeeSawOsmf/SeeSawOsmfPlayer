@@ -68,7 +68,6 @@ public class ScrubBar extends Widget implements IWidget {
     private var markerContainer:Sprite;
     private var currentTimeInSeconds:Number = 0;
 
-    private var _temporalTime:TimeTrait;
     private var updateAdMarkersOnNextTick:Boolean;
 
     public function ScrubBar() {
@@ -189,7 +188,6 @@ public class ScrubBar extends Widget implements IWidget {
     override protected function onMediaElementTraitAdd(event:MediaElementEvent):void {
         if (event.traitType == MediaTraitType.TIME) {
             var timeTrait:TimeTrait = media.getTrait(MediaTraitType.TIME) as TimeTrait;
-            _temporalTime = media ? media.getTrait(MediaTraitType.TIME) as TimeTrait : null;
             logger.debug("adding time trait: " + timeTrait);
             timeTrait.addEventListener(TimeEvent.DURATION_CHANGE, onDurationChange);
         }
@@ -206,11 +204,21 @@ public class ScrubBar extends Widget implements IWidget {
     }
 
     override protected function processMediaElementChange(oldMediaElement:MediaElement):void {
+        if(oldMediaElement) {
+            var adMetadata:AdMetadata = oldMediaElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+            if (adMetadata) {
+                adMetadata.removeEventListener(MetadataEvent.VALUE_ADD, onAdMetadataChanged);
+                adMetadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onAdMetadataChanged);
+                adMetadata.removeEventListener(MetadataEvent.VALUE_REMOVE, onAdMetadataChanged);
+            }
+        }
         var adMetadata:AdMetadata = media.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
         if (adMetadata) {
             adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdMetadataChanged);
             adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdMetadataChanged);
+            adMetadata.addEventListener(MetadataEvent.VALUE_REMOVE, onAdMetadataChanged);
         }
+        updateAdMarkersOnNextTick = true;
     }
 
     private function onDurationChange(event:TimeEvent):void {
@@ -227,10 +235,7 @@ public class ScrubBar extends Widget implements IWidget {
     }
 
     private function onAdMetadataChanged(event:MetadataEvent):void {
-        if (event.key == AdMetadata.AD_STATE && event.value == AdState.AD_BREAK_COMPLETE) {
-            logger.debug("ad break complete - updating time line markers");
-            updateAdMarkersOnNextTick = true;
-        }
+        updateAdMarkersOnNextTick = true;
     }
 
     private function updateAdMarkers():void {
@@ -295,7 +300,11 @@ public class ScrubBar extends Widget implements IWidget {
     }
 
     private function getPositionOnScrubBar(position:Number):Number {
-        return ((position / _temporalTime.duration) * (scrubberEnd - scrubberStart)) || 0; // default value if calc. returns NaN.
+        var timeTrait:TimeTrait = media.getTrait(MediaTraitType.TIME) as TimeTrait;
+        if(timeTrait)
+            return ((position / timeTrait.duration) * (scrubberEnd - scrubberStart)) || 0; // default value if calc. returns NaN.
+        else
+            return 0;
     }
 
     private function prettyPrintSeconds(seconds:Number):String {

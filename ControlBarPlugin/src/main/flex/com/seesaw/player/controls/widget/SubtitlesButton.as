@@ -36,8 +36,8 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.chrome.widgets.ButtonWidget;
 import org.osmf.events.MediaElementEvent;
+import org.osmf.events.MetadataEvent;
 import org.osmf.media.MediaElement;
-import org.osmf.metadata.CuePoint;
 import org.osmf.metadata.Metadata;
 import org.osmf.traits.MediaTraitType;
 
@@ -79,11 +79,12 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
         visible = false;
     }
 
+    override protected function processRequiredTraitsAvailable(element:MediaElement):void {
+        metadata = media.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+        visible = metadata.getValue(ControlBarMetadata.SUBTITLE_BUTTON_ENABLED) as Boolean;
+    }
+
     override protected function processMediaElementChange(oldMediaElement:MediaElement):void {
-        if (oldMediaElement) {
-            oldMediaElement.removeEventListener(MediaElementEvent.METADATA_ADD, onMetadataAdd);
-            oldMediaElement.removeEventListener(MediaElementEvent.METADATA_REMOVE, onMetadataRemove);
-        }
         if (media) {
             metadata = media.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
             if (metadata == null) {
@@ -91,22 +92,7 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
                 media.addMetadata(ControlBarMetadata.CONTROL_BAR_METADATA, metadata);
             }
 
-            // Show the button if there is timeline metadata or after timeline metadata is added
-            media.addEventListener(MediaElementEvent.METADATA_ADD, onMetadataAdd);
-            media.addEventListener(MediaElementEvent.METADATA_REMOVE, onMetadataRemove);
             metadata.addValue(ControlBarMetadata.SUBTITLES_VISIBLE, false);
-        }
-    }
-
-    private function onMetadataAdd(event:MediaElementEvent):void {
-        if (event.namespaceURL == CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) {
-            visible = true;
-        }
-    }
-
-    private function onMetadataRemove(event:MediaElementEvent):void {
-        if (event.namespaceURL == CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) {
-            visible = false;
         }
     }
 

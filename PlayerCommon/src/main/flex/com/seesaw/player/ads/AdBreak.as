@@ -45,6 +45,8 @@ public class AdBreak extends EventDispatcher {
 
     private var _adPlaylist:SerialElement;
 
+    private var _seekOffset:Number = 0;
+
     public function AdBreak(startTime:Number = NaN) {
         _startTime = startTime;
     }
@@ -110,6 +112,14 @@ public class AdBreak extends EventDispatcher {
 
     public function set adPlaylist(value:SerialElement):void {
         _adPlaylist = value;
+    }
+
+    public function get seekOffset():Number {
+        return _seekOffset;
+    }
+
+    public function set seekOffset(value:Number):void {
+        _seekOffset = value;
     }
 }
 }
