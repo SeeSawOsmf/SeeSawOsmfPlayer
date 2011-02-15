@@ -547,7 +547,7 @@ public class ParentalControlsPanel extends Sprite {
         var buttonLabel = new StyledTextField();
         buttonLabel.text = label;
         buttonLabel.x = 25;
-        buttonLabel.y = 15;
+        buttonLabel.y = 13;
         buttonLabel.height = 18;
         buttonLabel.width = 50;
         var formattedButtonLabel:TextField = this.applyInfoFormat(buttonLabel);
