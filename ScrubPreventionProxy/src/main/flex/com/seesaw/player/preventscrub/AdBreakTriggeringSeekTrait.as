@@ -63,7 +63,7 @@ public class AdBreakTriggeringSeekTrait extends SeekTrait {
                 nextBreak.seekPointAfterAdBreak = time;
                 adActivated = true;
                 // liverail won't trigger exactly on the start time so seek one second back
-                _seekTrait.seek(nextBreak.startTime - 1);
+                _seekTrait.seek(nextBreak.startTime - nextBreak.seekOffset);
             }
         }
 

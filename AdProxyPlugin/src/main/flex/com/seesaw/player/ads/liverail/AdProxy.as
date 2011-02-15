@@ -47,6 +47,7 @@ import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.PlayEvent;
 import org.osmf.events.TimeEvent;
+import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.URLResource;
@@ -71,7 +72,6 @@ public class AdProxy extends ProxyElement {
     private var config:Configuration;
     private var resumePosition:int;
     private var timer:Timer;
-    private var adTimeTrait:AdTimeTrait;
     private var playerMetadata:Metadata;
     private var currentAdBreak:AdBreak;
 
@@ -238,6 +238,7 @@ public class AdProxy extends ProxyElement {
 
             // Dont add the break if it has no ads, eg no content to play, so we don't want a blip for this item
             if (hasAds) {
+                metadataAdBreak.seekOffset = 1; // seek back one second to trigger the ads
                 metadataAdBreaks[i] = metadataAdBreak;
             }
         }
@@ -260,8 +261,6 @@ public class AdProxy extends ProxyElement {
     }
 
     private function onAdProgress(event:Object):void {
-        adTimeTrait.adDuration = event.data.duration;
-        adTimeTrait.adTime = event.data.time;
     }
 
     private function onAdStart(event:Object):void {
@@ -287,9 +286,6 @@ public class AdProxy extends ProxyElement {
         dataObject["creativeId"] = event.data.ad.creativeID;
 
         adMetadata.adState = dataObject;
-
-        adTimeTrait.adDuration = 0;
-        adTimeTrait.adTime = 0;
     }
 
     private function onPrerollComplete(event:Event):void {
@@ -315,9 +311,6 @@ public class AdProxy extends ProxyElement {
 
         // add a display trait that will display the ads
         addTrait(MediaTraitType.DISPLAY_OBJECT, new DisplayObjectTrait(adManager));
-
-        adTimeTrait = new AdTimeTrait();
-        addTrait(MediaTraitType.TIME, adTimeTrait);
     }
 
     private function adbreakComplete(event:Object):void {
@@ -325,7 +318,6 @@ public class AdProxy extends ProxyElement {
         removeTrait(MediaTraitType.PLAY);
         removeTrait(MediaTraitType.DISPLAY_OBJECT);
         removeTrait(MediaTraitType.TIME);
-        adTimeTrait = null;
 
         adMetadata.adState = AdState.AD_BREAK_COMPLETE;
         adMetadata.adMode = AdMode.MAIN_CONTENT;

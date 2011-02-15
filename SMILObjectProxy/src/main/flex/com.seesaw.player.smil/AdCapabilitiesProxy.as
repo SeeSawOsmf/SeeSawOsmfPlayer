@@ -34,16 +34,14 @@ import org.osmf.elements.ProxyElement;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.metadata.Metadata;
-import org.osmf.smil.SMILConstants;
 import org.osmf.traits.MediaTraitType;
 
-public class AdHandlerProxy extends ProxyElement {
+public class AdCapabilitiesProxy extends ProxyElement {
 
-    public function AdHandlerProxy(proxiedElement:MediaElement = null) {
+    public function AdCapabilitiesProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
         var traitsToBlock:Vector.<String> = new Vector.<String>();
-        traitsToBlock[0] = MediaTraitType.TIME;
-        traitsToBlock[1] = MediaTraitType.SEEK;
+        traitsToBlock[0] = MediaTraitType.SEEK;
         blockedTraits = traitsToBlock;
     }
 
@@ -61,11 +59,13 @@ public class AdHandlerProxy extends ProxyElement {
 
     private function onMetadataAdd(event:MediaElementEvent):void {
         if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
-            var metadata:Metadata = getMetadata(SMILConstants.SMIL_CONTENT_NS);
+            var adMetadata:AdMetadata = event.metadata as AdMetadata;
+            var metadata:Metadata = getMetadata(SMILConstants.SMIL_NAMESPACE);
             if (metadata) {
                 var trackBack:String = metadata.getValue(AdMetadata.TRACK_BACK) as String;
-                var adMetadata:AdMetadata = event.metadata as AdMetadata;
-                adMetadata.clickThru = trackBack;
+                if(trackBack) {
+                    adMetadata.clickThru = trackBack;
+                }
             }
         }
     }

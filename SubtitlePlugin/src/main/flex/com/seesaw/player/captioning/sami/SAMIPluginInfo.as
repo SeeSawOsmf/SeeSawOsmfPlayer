@@ -71,8 +71,6 @@ public class SAMIPluginInfo extends PluginInfo {
     }
 
     private function mediaElementCreationNotificationCallback(element:MediaElement):void {
-        logger.debug("mediaElementCreationNotificationCallback: " + element);
-
         var targetMetadata:Metadata = element.getMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT);
         if (targetMetadata) {
             targetElement = element;

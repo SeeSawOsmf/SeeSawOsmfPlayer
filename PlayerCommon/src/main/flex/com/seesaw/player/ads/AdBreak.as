@@ -23,6 +23,8 @@
 package com.seesaw.player.ads {
 import flash.events.EventDispatcher;
 
+import org.osmf.elements.SerialElement;
+
 public class AdBreak extends EventDispatcher {
 
     //total number of ads in this ad-break
@@ -40,6 +42,10 @@ public class AdBreak extends EventDispatcher {
     private var _complete:Boolean;
 
     private var _seekPointAfterAdBreak:Number;
+
+    private var _adPlaylist:SerialElement;
+
+    private var _seekOffset:Number = 0;
 
     public function AdBreak(startTime:Number = NaN) {
         _startTime = startTime;
@@ -98,6 +104,22 @@ public class AdBreak extends EventDispatcher {
 
     public function set seekPointAfterAdBreak(value:Number):void {
         _seekPointAfterAdBreak = value;
+    }
+
+    public function get adPlaylist():SerialElement {
+        return _adPlaylist;
+    }
+
+    public function set adPlaylist(value:SerialElement):void {
+        _adPlaylist = value;
+    }
+
+    public function get seekOffset():Number {
+        return _seekOffset;
+    }
+
+    public function set seekOffset(value:Number):void {
+        _seekOffset = value;
     }
 }
 }

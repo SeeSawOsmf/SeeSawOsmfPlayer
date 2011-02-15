@@ -1,5 +1,5 @@
 package com.seesaw.player.controls.widget {
-import com.seesaw.player.controls.ControlBarMetadata;
+import com.seesaw.player.controls.ControlBarConstants;
 
 import flash.events.Event;
 import flash.events.MouseEvent;
@@ -46,12 +46,12 @@ public class ControlBar extends Widget {
     }
 
     override protected function processMediaElementChange(oldMediaElement:MediaElement):void {
-        var metadata:Metadata = media.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+        var metadata:Metadata = media.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
         if (metadata == null) {
             metadata = new Metadata();
-            media.addMetadata(ControlBarMetadata.CONTROL_BAR_METADATA, metadata);
+            media.addMetadata(ControlBarConstants.CONTROL_BAR_METADATA, metadata);
         }
-        metadata.addValue(ControlBarMetadata.CONTROL_BAR_HIDDEN, visible);
+        metadata.addValue(ControlBarConstants.CONTROL_BAR_HIDDEN, visible);
     }
 
     private function mouseOverControls(event:MouseEvent):void {
@@ -105,9 +105,9 @@ public class ControlBar extends Widget {
     }
 
     private function updateMetadata():void {
-        var metadata:Metadata = media.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+        var metadata:Metadata = media.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
         if (metadata) {
-            metadata.addValue(ControlBarMetadata.CONTROL_BAR_HIDDEN, !visible);
+            metadata.addValue(ControlBarConstants.CONTROL_BAR_HIDDEN, !visible);
         }
     }
 

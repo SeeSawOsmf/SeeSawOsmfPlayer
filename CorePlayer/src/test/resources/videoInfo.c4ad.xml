@@ -8,21 +8,46 @@
         </head>
         <body>
             <seq>
-                <video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Seesaw_Recycling.mp4">
+                <video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/eng-izor002-020-SD.mp4">
                     <metadata>
                         <meta content="advert" name="contentType"/>
-                        <meta content="http://seesaw.stage.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/channel4/tv/comedy/alternative/35925/35925/001/L18/12116635505/x13/4OD/SS_IDENT_Feb10_x90/2362406/553249624b3079475550554142667248"
+                        <meta content="http://seesaw.stage.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/channel4/tv/comedy/alternative/35925/35925/001/L64/11583353263/x12/4OD/UNIVERSAL_MUSIC_011111_13647_2/2701060/553249624b3079475550554142667248"
                               name="trackback"/>
+                        <meta content="http://realmedia.channel4.com/5c/kprod.channel4.com/channel4/channel4/tv/comedy/alternative/35925/35925/001/L64/1583353263/x60/4OD/UNIVERSAL_MUSIC_011111_13647_2/UNIVERSAL_MUSIC_011111_13647_1.html/553249624b3079475550554142667248"
+                              name="popupAdvertisingUrl"/>
                     </metadata>
                 </video>
+
+                <video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Idents_Diner_5s.mp4">
+                    <metadata>
+                        <meta content="sting" name="contentType"/>
+                    </metadata>
+                </video>
+
                 <par>
-                    <video
-                            src="rtmpe://cdn-flash-blue-dev.vodco.co.uk/a2703/mp4:e4/test/ccp/p/STD_RES/00000418/41805.mp4?s=1296224433&amp;e=1296225183&amp;h=a61d40407278eaa0528fbeb2939b8aaa"
-                            system-bitrate="844000" dur="852" clipEnd="300" clipBegin="0">
-                        <metadata>
-                            <meta content="mainContent" name="contentType"/>
-                        </metadata>
-                    </video>
+                    <switch>
+                        <video
+                                src="mp4:e4/test/ccp/p/HIGH_RES/00000418/41803.mp4?s=1296224433&amp;e=1296225183&amp;h=3974f965ca15cc27c724f00a93ad1089"
+                                system-bitrate="1581000" dur="852" clipBegin="0" clipEnd="30">
+                            <metadata>
+                                <meta content="mainContent" name="contentType"/>
+                            </metadata>
+                        </video>
+                        <video
+                                src="mp4:e4/test/ccp/p/LOW_RES/00000418/41804.mp4?s=1296224433&amp;e=1296225183&amp;h=30b0cb8a1af14fcdc3288a8f51b756d1"
+                                system-bitrate="500000" dur="852" clipBegin="0" clipEnd="30">
+                            <metadata>
+                                <meta content="mainContent" name="contentType"/>
+                            </metadata>
+                        </video>
+                        <video
+                                src="mp4:e4/test/ccp/p/STD_RES/00000418/41805.mp4?s=1296224433&amp;e=1296225183&amp;h=a61d40407278eaa0528fbeb2939b8aaa"
+                                system-bitrate="844000" dur="852" clipBegin="0" clipEnd="30">
+                            <metadata>
+                                <meta content="mainContent" name="contentType"/>
+                            </metadata>
+                        </video>
+                    </switch>
                     <img
                             src="http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png">
                         <metadata>
@@ -42,13 +67,29 @@
                 </video>
 
                 <par>
-                    <video
-                            src="rtmpe://cdn-flash-blue-dev.vodco.co.uk/a2703/mp4:e4/test/ccp/p/STD_RES/00000418/41805.mp4?s=1296224433&amp;e=1296225183&amp;h=a61d40407278eaa0528fbeb2939b8aaa"
-                            system-bitrate="844000" dur="852" clipEnd="600" clipBegin="300">
-                        <metadata>
-                            <meta content="mainContent" name="contentType"/>
-                        </metadata>
-                    </video>
+                    <switch>
+                        <video
+                                src="mp4:e4/test/ccp/p/HIGH_RES/00000418/41803.mp4?s=1296224433&amp;e=1296225183&amp;h=3974f965ca15cc27c724f00a93ad1089"
+                                system-bitrate="1581000" dur="852" clipBegin="30" clipEnd="200">
+                            <metadata>
+                                <meta content="mainContent" name="contentType"/>
+                            </metadata>
+                        </video>
+                        <video
+                                src="mp4:e4/test/ccp/p/LOW_RES/00000418/41804.mp4?s=1296224433&amp;e=1296225183&amp;h=30b0cb8a1af14fcdc3288a8f51b756d1"
+                                system-bitrate="500000" dur="852" clipBegin="30" clipEnd="200">
+                            <metadata>
+                                <meta content="mainContent" name="contentType"/>
+                            </metadata>
+                        </video>
+                        <video
+                                src="mp4:e4/test/ccp/p/STD_RES/00000418/41805.mp4?s=1296224433&amp;e=1296225183&amp;h=a61d40407278eaa0528fbeb2939b8aaa"
+                                system-bitrate="844000" dur="852" clipBegin="30" clipEnd="200">
+                            <metadata>
+                                <meta content="mainContent" name="contentType"/>
+                            </metadata>
+                        </video>
+                    </switch>
                     <img
                             src="http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png">
                         <metadata>
@@ -67,14 +108,38 @@
                     </metadata>
                 </video>
 
+                <video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Seesaw_Recycling.mp4">
+                    <metadata>
+                        <meta content="advert" name="contentType"/>
+                        <meta content="http://seesaw.stage.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/channel4/tv/comedy/alternative/35925/35925/001/L18/12116635505/x13/4OD/SS_IDENT_Feb10_x90/2362406/553249624b3079475550554142667248"
+                              name="trackback"/>
+                    </metadata>
+                </video>
+
                 <par>
-                    <video
-                            src="rtmpe://cdn-flash-blue-dev.vodco.co.uk/a2703/mp4:e4/test/ccp/p/STD_RES/00000418/41805.mp4?s=1296224433&amp;e=1296225183&amp;h=a61d40407278eaa0528fbeb2939b8aaa"
-                            system-bitrate="844000" dur="852" clipEnd="852" clipBegin="600">
-                        <metadata>
-                            <meta content="mainContent" name="contentType"/>
-                        </metadata>
-                    </video>
+                    <switch>
+                        <video
+                                src="mp4:e4/test/ccp/p/HIGH_RES/00000418/41803.mp4?s=1296224433&amp;e=1296225183&amp;h=3974f965ca15cc27c724f00a93ad1089"
+                                system-bitrate="1581000" dur="852" clipBegin="200" clipEnd="852">
+                            <metadata>
+                                <meta content="mainContent" name="contentType"/>
+                            </metadata>
+                        </video>
+                        <video
+                                src="mp4:e4/test/ccp/p/LOW_RES/00000418/41804.mp4?s=1296224433&amp;e=1296225183&amp;h=30b0cb8a1af14fcdc3288a8f51b756d1"
+                                system-bitrate="500000" clipBegin="200" clipEnd="852">
+                            <metadata>
+                                <meta content="mainContent" name="contentType"/>
+                            </metadata>
+                        </video>
+                        <video
+                                src="mp4:e4/test/ccp/p/STD_RES/00000418/41805.mp4?s=1296224433&amp;e=1296225183&amp;h=a61d40407278eaa0528fbeb2939b8aaa"
+                                system-bitrate="844000" clipBegin="200" clipEnd="852">
+                            <metadata>
+                                <meta content="mainContent" name="contentType"/>
+                            </metadata>
+                        </video>
+                    </switch>
                     <img
                             src="http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png">
                         <metadata>

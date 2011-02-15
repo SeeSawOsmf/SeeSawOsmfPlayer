@@ -41,6 +41,7 @@ import org.osmf.chrome.configuration.LayoutAttributesParser;
 import org.osmf.chrome.configuration.WidgetsParser;
 import org.osmf.chrome.widgets.Widget;
 import org.osmf.events.MediaElementEvent;
+import org.osmf.events.MetadataEvent;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaResourceBase;
@@ -113,35 +114,44 @@ public class ControlBarElement extends MediaElement {
     // Public interface
     //
     public function ControlBarElement():void {
+        addEventListener(MediaElementEvent.METADATA_ADD, onMetadataAdd);
+        addEventListener(MediaElementEvent.METADATA_REMOVE, onMetadataRemove);
     }
 
-    public function addReference(target:MediaElement):void {
-        logger.debug("adding target reference: " + target);
-        if (this.target == null) {
-            this.target = target;
-            processTarget();
+    private function onMetadataAdd(event:MediaElementEvent):void {
+        if (event.namespaceURL == ControlBarConstants.CONTROL_BAR_METADATA) {
+            event.metadata.addEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
+            event.metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
         }
     }
 
-    private function processTarget():void {
-        if (target != null && settings != null) {
-            // We use the NS_CONTROL_BAR_TARGET namespaced metadata in order
-            // to find out if the instantiated element is the element that our
-            // control bar should control:
-            var targetMetadata:Metadata = target.getMetadata(ControlBarPlugin.NS_TARGET);
-            if (targetMetadata) {
-                if (targetMetadata.getValue(ID) != null && targetMetadata.getValue(ID) == settings.getValue(ID)) {
-                    logger.debug("setting target on control bar: " + target);
+    private function onMetadataRemove(event:MediaElementEvent):void {
+        if (event.namespaceURL == ControlBarConstants.CONTROL_BAR_METADATA) {
+            event.metadata.removeEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
+            event.metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
+        }
+    }
 
-                    target.removeEventListener(MediaElementEvent.TRAIT_ADD, onMediaTraitsChange);
-                    target.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onMediaTraitsChange);
+    private function onControlBarMetadataChange(event:MetadataEvent):void {
+        if (event.key == ControlBarConstants.TARGET_ELEMENT) {
+            setTarget(event.value as MediaElement);
+        }
+    }
 
-                    target.addEventListener(MediaElementEvent.TRAIT_ADD, onMediaTraitsChange);
-                    target.addEventListener(MediaElementEvent.TRAIT_REMOVE, onMediaTraitsChange);
-
-                    controlBar.media = target;
-                }
+    private function setTarget(value:MediaElement):void {
+        logger.debug("adding target reference: " + target);
+        if (value != null) {
+            if (target) {
+                target.removeEventListener(MediaElementEvent.TRAIT_ADD, onMediaTraitsChange);
+                target.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onMediaTraitsChange);
             }
+
+            _target = value;
+
+            target.addEventListener(MediaElementEvent.TRAIT_ADD, onMediaTraitsChange);
+            target.addEventListener(MediaElementEvent.TRAIT_REMOVE, onMediaTraitsChange);
+
+            controlBar.media = target;
         }
     }
 
@@ -149,7 +159,7 @@ public class ControlBarElement extends MediaElement {
         if (event.type == MediaElementEvent.TRAIT_ADD) {
             // Wait for the target element to display before displaying the control bar
             if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
-                if (controlBar) {
+                if (controlBar && !hasTrait(MediaTraitType.DISPLAY_OBJECT)) {
                     viewable = new DisplayObjectTrait(controlBar, controlBar.measuredWidth, controlBar.measuredHeight);
                     addTrait(MediaTraitType.DISPLAY_OBJECT, viewable);
                     controlBar.measure();
@@ -177,9 +187,7 @@ public class ControlBarElement extends MediaElement {
         // (containing only one field: "ID" that tells us the ID of the media
         // element that we should be controlling):
         if (value != null) {
-            settings = value.getMetadataValue(ControlBarPlugin.NS_SETTINGS) as Metadata;
-
-            processTarget();
+            settings = value.getMetadataValue(ControlBarConstants.CONTROL_BAR_SETTINGS) as Metadata;
         }
 
         super.resource = value;
@@ -249,7 +257,7 @@ public class ControlBarElement extends MediaElement {
 
     private var settings:Metadata;
 
-    private var target:MediaElement;
+    private var _target:MediaElement;
     private var controlBar:Widget;
     private var viewable:DisplayObjectTrait;
 
@@ -258,5 +266,9 @@ public class ControlBarElement extends MediaElement {
     /* static */
 
     private static const ID:String = "ID";
+
+    public function get target():MediaElement {
+        return _target;
+    }
 }
 }

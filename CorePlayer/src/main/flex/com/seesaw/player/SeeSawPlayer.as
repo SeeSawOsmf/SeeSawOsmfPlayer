@@ -27,13 +27,14 @@ import com.auditude.ads.osmf.constants.AuditudeOSMFConstants;
 import com.seesaw.player.ads.AdBreak;
 import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.ads.AdMode;
+import com.seesaw.player.ads.AdState;
 import com.seesaw.player.ads.AuditudeConstants;
 import com.seesaw.player.ads.auditude.AdProxyPluginInfo;
 import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.batcheventservices.BatchEventServicePlugin;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
-import com.seesaw.player.controls.ControlBarMetadata;
+import com.seesaw.player.controls.ControlBarConstants;
 import com.seesaw.player.controls.ControlBarPlugin;
 import com.seesaw.player.external.ExternalInterfaceMetadata;
 import com.seesaw.player.external.PlayerExternalInterface;
@@ -43,8 +44,9 @@ import com.seesaw.player.namespaces.smil;
 import com.seesaw.player.netstatus.NetStatusMetadata;
 import com.seesaw.player.panels.BufferingPanel;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
+import com.seesaw.player.smil.SMILConstants;
 import com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo;
-import com.seesaw.player.smil.SeeSawSMILLoader;
+import com.seesaw.player.smil.SMILParser;
 
 import flash.display.Sprite;
 import flash.display.StageDisplayState;
@@ -56,17 +58,18 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
+import org.osmf.elements.SerialElement;
 import org.osmf.events.BufferEvent;
-import org.osmf.events.DynamicStreamEvent;
 import org.osmf.events.LoadEvent;
 import org.osmf.events.LoaderEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.events.MediaPlayerStateChangeEvent;
 import org.osmf.events.MetadataEvent;
+import org.osmf.events.TimeEvent;
+import org.osmf.events.TimelineMetadataEvent;
 import org.osmf.layout.HorizontalAlign;
 import org.osmf.layout.LayoutMetadata;
-import org.osmf.layout.ScaleMode;
 import org.osmf.layout.VerticalAlign;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
@@ -75,11 +78,11 @@ import org.osmf.media.MediaPlayerState;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
 import org.osmf.media.URLResource;
+import org.osmf.metadata.CuePoint;
+import org.osmf.metadata.CuePointType;
 import org.osmf.metadata.Metadata;
-import org.osmf.smil.SMILConstants;
-import org.osmf.smil.SMILPluginInfo;
+import org.osmf.metadata.TimelineMetadata;
 import org.osmf.traits.DisplayObjectTrait;
-import org.osmf.traits.DynamicStreamTrait;
 import org.osmf.traits.LoadState;
 import org.osmf.traits.LoadTrait;
 import org.osmf.traits.MediaTraitType;
@@ -92,16 +95,18 @@ import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
 public class SeeSawPlayer extends Sprite {
 
     use namespace contentinfo;
+    use namespace smil;
 
     private static const AUDITUDE_PLUGIN_URL:String = "http://asset.cdn.auditude.com/flash/sandbox/plugin/osmf/AuditudeOSMFProxyPlugin.swf";
 
     private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
 
     private var config:PlayerConfiguration;
-    private var contentElement:MediaElement;
 
     private var factory:MediaFactory;
     private var player:MediaPlayer;
+    private var adPlayer:MediaPlayer;
+    private var adContainer:MediaContainer;
     private var container:MediaContainer;
     private var mainContainer:MediaContainer;
     private var bufferingContainer:MediaContainer;
@@ -110,6 +115,7 @@ public class SeeSawPlayer extends Sprite {
     private var mainElement:ParallelElement;
     private var subtitleElement:MediaElement;
     private var bufferingPanel:BufferingPanel;
+    private var controlBarElement:MediaElement;
 
     private var xi:PlayerExternalInterface;
 
@@ -120,7 +126,7 @@ public class SeeSawPlayer extends Sprite {
     private var videoInfo:XML;
     private var adMode:String;
 
-    private var playlistElements:Vector.<MediaElement> = new Vector.<MediaElement>();
+    private var currentAdBreak:AdBreak;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
@@ -142,7 +148,6 @@ public class SeeSawPlayer extends Sprite {
         factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
         factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadFailed);
         factory.addEventListener(NetStatusEvent.NET_STATUS, netStatusChanged);
-        factory.addEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onMediaElementCreate);
 
         player = new MediaPlayer();
         player.autoPlay = false;
@@ -151,25 +156,6 @@ public class SeeSawPlayer extends Sprite {
         container = new MediaContainer();
 
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
-    }
-
-    private function playerMetaChange(event:MetadataEvent):void {
-        if (event.key == PlayerConstants.DESTROY) {
-            if (event.value) {
-                // wipe out the objects from memory and off the displayList
-                // removeChild seems to throw errors when trying to removeChild( container ) etc..
-                mainContainer.removeMediaElement(mainElement);
-                mainContainer = null;
-                bufferingContainer = null;
-                subtitlesContainer = null;
-                controlbarContainer = null;
-                contentElement = null;
-                player = null;
-                container = null;
-
-                dispatchEvent(new Event(PlayerConstants.DESTROY));
-            }
-        }
     }
 
     private function onAddedToStage(event:Event):void {
@@ -186,6 +172,13 @@ public class SeeSawPlayer extends Sprite {
         mainContainer.layoutMetadata.percentWidth = 100;
         mainContainer.layoutMetadata.percentHeight = 100;
         addChild(mainContainer);
+
+        adContainer = new MediaContainer();
+        adContainer.y = 0;
+        adContainer.x = 0;
+        adContainer.layoutMetadata.percentWidth = 100;
+        adContainer.layoutMetadata.percentHeight = 100;
+        addChild(adContainer);
 
         bufferingContainer = new MediaContainer();
         bufferingContainer.y = 0;
@@ -215,6 +208,7 @@ public class SeeSawPlayer extends Sprite {
         addChild(controlbarContainer);
 
         container.layoutRenderer.addTarget(mainContainer);
+        container.layoutRenderer.addTarget(adContainer);
         container.layoutRenderer.addTarget(bufferingContainer);
         container.layoutRenderer.addTarget(subtitlesContainer);
         container.layoutRenderer.addTarget(controlbarContainer);
@@ -229,18 +223,102 @@ public class SeeSawPlayer extends Sprite {
 
         //handler to show and hide the buffering panel
         player.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
-        player.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onMediaPlayerStateChange);
-
         player.media = mainElement;
+
+        player.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onMainPlayerStateChange);
+
+        if (adMode == AdMetadata.CHANNEL_4_AD_TYPE)
+        {
+            logger.debug("configuring container for playlist ads");
+            adPlayer = new MediaPlayer();
+            adPlayer.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onAdPlayerStateChange);
+        }
 
         logger.debug("adding media container to stage");
         addChild(container);
     }
 
+    private function onMainPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
+        logger.debug("main: " + event.state);
+        onMediaPlayerStateChange(event);
+    }
+
+    private function onAdPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
+        logger.debug("ad: " + event.state);
+        onMediaPlayerStateChange(event);
+    }
+
+    private function onCuePoint(event:TimelineMetadataEvent):void {
+        logger.debug("triggering cue point: {0}", event.marker.time);
+        if (adPlayer && event.marker is CuePoint) {
+            var cuePoint:CuePoint = event.marker as CuePoint;
+            if (cuePoint.name == AdMetadata.AD_BREAK_CUE) {
+                var adBreak:AdBreak = cuePoint.parameters as AdBreak;
+                if (adBreak && !adBreak.complete && adBreak.adPlaylist && adBreak.adPlaylist.numChildren > 0) {
+                    player.pause();
+                    mainContainer.visible = false;
+
+                    currentAdBreak = adBreak;
+                    currentAdBreak.adPlaylist.addEventListener(MediaElementEvent.TRAIT_ADD, onAdElementTraitAdd);
+
+                    adContainer.addMediaElement(currentAdBreak.adPlaylist);
+                    adPlayer.media = currentAdBreak.adPlaylist;
+
+                    // get the control bar to point at the ads
+                    setControlBarTarget(currentAdBreak.adPlaylist);
+
+                    // Set the main content to ad mode just like liverail and auditude do
+                    var adMetadata:AdMetadata = mainElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+                    adMetadata.adState = AdState.AD_BREAK_START;
+                    adMetadata.adMode = AdMode.AD;
+
+                    adContainer.visible = true;
+                }
+            }
+        }
+    }
+
+    private function adBreakCompleted(event:Event = null):void {
+        logger.debug("ad break complete");
+        if (currentAdBreak) {
+            var adPlaylist:SerialElement = currentAdBreak.adPlaylist;
+            var timeTrait:TimeTrait = adPlaylist.getTrait(MediaTraitType.TIME) as TimeTrait;
+            if (timeTrait) timeTrait.removeEventListener(TimeEvent.COMPLETE, adBreakCompleted);
+            adPlaylist.removeEventListener(MediaElementEvent.TRAIT_ADD, onAdElementTraitAdd);
+            adContainer.removeMediaElement(adPlaylist);
+            currentAdBreak.complete = true;
+            currentAdBreak = null;
+        }
+
+        if (!player.playing) {
+            adContainer.visible = false;
+
+            // get the control bar to point at the main content
+            setControlBarTarget(mainElement);
+
+            // Set the main content to ad mode just like liverail and auditude do
+            var adMetadata:AdMetadata = mainElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+            adMetadata.adState = AdState.AD_BREAK_COMPLETE;
+            adMetadata.adMode = AdMode.MAIN_CONTENT;
+
+            mainContainer.visible = true;
+
+            player.play();
+        }
+    }
+
+    private function setControlBarTarget(element:MediaElement):void {
+        var metadata:Metadata = controlBarElement.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
+        if (metadata == null) {
+            metadata = new Metadata();
+            controlBarElement.addMetadata(ControlBarConstants.CONTROL_BAR_METADATA, metadata);
+        }
+        metadata.addValue(ControlBarConstants.TARGET_ELEMENT, element);
+    }
+
     private function loadAuditude():void {
         factory.loadPlugin(new URLResource(AUDITUDE_PLUGIN_URL));
     }
-
 
     private function onPluginLoaded(event:MediaFactoryEvent):void {
         logger.debug("Loaded plugin " + event.resource);
@@ -258,13 +336,14 @@ public class SeeSawPlayer extends Sprite {
         factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadFailed);
 
         factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
-        factory.loadPlugin(new PluginInfoResource(new SMILPluginInfo(new SeeSawSMILLoader())));
         factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
+
         if (adMode == AdMetadata.LR_AD_TYPE)
             factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.liverail.AdProxyPluginInfo()));
-        if (adMode == AdMetadata.AUDITUDE_AD_TYPE)
+        else if (adMode == AdMetadata.AUDITUDE_AD_TYPE)
             factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.auditude.AdProxyPluginInfo()));
+
         factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
         factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
 
@@ -287,7 +366,7 @@ public class SeeSawPlayer extends Sprite {
 
     private function createSubtitleElement():void {
         // The subtitle location is actually in the smil document so we have to search for it
-        var subtitleLocation:String = getSmilHeadMetaValue(PlayerConstants.SUBTITLE_LOCATION);
+        var subtitleLocation:String = SMILParser.getHeadMetaValue(new XML(videoInfo.smil), PlayerConstants.SUBTITLE_LOCATION);
 
         if (subtitleLocation) {
             logger.debug("creating captions: " + subtitleLocation);
@@ -296,10 +375,6 @@ public class SeeSawPlayer extends Sprite {
                 mainElement.removeChild(subtitleElement);
                 subtitleElement = null;
             }
-
-            var targetMetadata:Metadata = new Metadata();
-            targetMetadata.addValue(PlayerConstants.CONTENT_ID, PlayerConstants.MAIN_CONTENT_ID);
-            contentElement.addMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT, targetMetadata);
 
             logger.debug("loading subtitle plugin");
             factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
@@ -319,12 +394,14 @@ public class SeeSawPlayer extends Sprite {
             // The subtitle element needs to check and set visibility every time it sets a new display object
             subtitleElement.addEventListener(MediaElementEvent.TRAIT_ADD, function(event:MediaElementEvent):void {
                 if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
-                    var metadata:Metadata = player.media.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+                    var metadata:Metadata = player.media.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
                     if (metadata) {
-                        var visible:Boolean = metadata.getValue(ControlBarMetadata.SUBTITLES_VISIBLE) as Boolean;
+                        var visible:Boolean = metadata.getValue(ControlBarConstants.SUBTITLES_VISIBLE) as Boolean;
                         var displayObjectTrait:DisplayObjectTrait =
                                 MediaElement(event.target).getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
                         displayObjectTrait.displayObject.visible = visible == null ? false : visible;
+
+                        metadata.addValue(ControlBarConstants.SUBTITLE_BUTTON_ENABLED, true);
                     }
                 }
             });
@@ -343,34 +420,111 @@ public class SeeSawPlayer extends Sprite {
 
     private function createVideoElement():void {
         logger.debug("creating video element");
-        contentElement = factory.createMediaElement(config.resource);
 
-        contentElement.addEventListener(MediaElementEvent.METADATA_ADD, onContentMetadataAdd);
-        contentElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onContentMetadataRemove);
+        var metadata:Metadata = new Metadata();
+        metadata.addValue(SMILConstants.SMIL_DOCUMENT, new XML(videoInfo.smil));
+        config.resource.addMetadataValue(SMILConstants.SMIL_NAMESPACE, metadata);
 
-        createBufferingPanel();
-        createControlBarElement();
-        createSubtitleElement();
+        factory.addEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onSmilElementCreated);
+        var mediaElement:MediaElement = factory.createMediaElement(config.resource);
+        factory.removeEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onSmilElementCreated);
 
-        if (contentElement is IAuditudeMediaElement) {
-            var _auditude:AuditudePlugin = IAuditudeMediaElement(contentElement).plugin;
+        if (mediaElement) {
+            mainElement.addChild(mediaElement);
+
+            mainElement.addEventListener(MediaElementEvent.METADATA_ADD, onContentMetadataAdd);
+            mainElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onContentMetadataRemove);
+
+            var timelineMetadata:TimelineMetadata =
+                    mediaElement.getMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) as TimelineMetadata;
+            if (timelineMetadata) {
+                timelineMetadata.addEventListener(TimelineMetadataEvent.MARKER_TIME_REACHED, onCuePoint);
+            }
+
+            createBufferingPanel();
+            createControlBarElement();
+            configureAuditude();
+            createSubtitleElement();
+        }
+
+        // get the control bar to point at the main content
+        setControlBarTarget(mainElement);
+
+        setContainerSize(contentWidth, contentHeight);
+    }
+
+    private function onSmilElementCreated(event:MediaFactoryEvent):void {
+        var metadata:Metadata = event.mediaElement.resource.getMetadataValue(SMILConstants.SMIL_NAMESPACE) as Metadata;
+        if (metadata) {
+            var contentType:String = metadata.getValue(SMILConstants.CONTENT_TYPE) as String;
+            if (contentType == PlayerConstants.DOG_CONTENT_ID) {
+                // Layout the DOG image in the top left corner
+                var layout:LayoutMetadata = new LayoutMetadata();
+                layout.x = 5;
+                layout.y = 5;
+                layout.verticalAlign = VerticalAlign.TOP;
+                layout.horizontalAlign = HorizontalAlign.LEFT;
+                layout.index = 5;
+                event.mediaElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+            }
+            else if (contentType == PlayerConstants.AD_CONTENT_ID) {
+                setMediaLayout(event.mediaElement);
+            }
+            else if (contentType == PlayerConstants.MAIN_CONTENT_ID) {
+                var targetMetadata:Metadata = new Metadata();
+                targetMetadata.addValue(PlayerConstants.CONTENT_ID, PlayerConstants.MAIN_CONTENT_ID);
+                event.mediaElement.addMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT, targetMetadata);
+                setMediaLayout(event.mediaElement);
+            }
+        }
+    }
+
+    private function setMediaLayout(element:MediaElement):void {
+        var layout:LayoutMetadata = element.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
+        if (layout) {
+            layout.percentWidth = 100;
+            layout.percentHeight = 100;
+            layout.verticalAlign = VerticalAlign.MIDDLE;
+            layout.horizontalAlign = HorizontalAlign.CENTER;
+        }
+    }
+
+    private function configureAuditude():void {
+        if (mainElement is IAuditudeMediaElement) {
+            logger.debug("configuring Auditude");
+            var _auditude:AuditudePlugin = IAuditudeMediaElement(mainElement).plugin;
 
             // We set this in the metadata so the auditude AdProxy can pick up the plugin
             var metadata:Metadata = config.resource.getMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) as Metadata;
             metadata.addValue(AuditudeConstants.PLUGIN_INSTANCE, _auditude);
         }
+    }
 
-        setContainerSize(contentWidth, contentHeight);
+    private function onAdElementTraitAdd(event:MediaElementEvent):void {
+        if (event.traitType == MediaTraitType.TIME) {
+            var element:MediaElement = event.target as MediaElement;
+            var timeTrait:TimeTrait = element.getTrait(MediaTraitType.TIME) as TimeTrait;
+            timeTrait.addEventListener(TimeEvent.COMPLETE, adBreakCompleted);
+        }
+    }
 
-        mainElement.addChild(contentElement);
+    private function setupAdBreaks(element:MediaElement, adBreaks:Vector.<AdBreak>):void {
+        var timelineMetadata:TimelineMetadata = element.getMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) as TimelineMetadata;
+        if (timelineMetadata == null) {
+            timelineMetadata = new TimelineMetadata(element);
+            element.addMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE, timelineMetadata);
+        }
+
+        for each (var adBreak:AdBreak in adBreaks) {
+            logger.debug("creating ad break at {0} seconds", adBreak.startTime);
+            timelineMetadata.addMarker(new CuePoint(CuePointType.EVENT, adBreak.startTime, "adBreakStart", adBreak));
+        }
+
+        timelineMetadata.addEventListener(TimelineMetadataEvent.MARKER_TIME_REACHED, onCuePoint);
     }
 
     private function createControlBarElement():void {
         logger.debug("adding control bar media element to container");
-
-        var controlBarTarget:Metadata = new Metadata();
-        controlBarTarget.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
-        contentElement.addMetadata(ControlBarPlugin.NS_TARGET, controlBarTarget);
 
         logger.debug("loading control bar plugin");
         factory.loadPlugin(new PluginInfoResource(new ControlBarPlugin().pluginInfo));
@@ -379,27 +533,23 @@ public class SeeSawPlayer extends Sprite {
         controlBarSettings.addValue(PlayerConstants.ID, PlayerConstants.MAIN_CONTENT_ID);
 
         var resource:MediaResourceBase = new MediaResourceBase();
-        resource.addMetadataValue(ControlBarPlugin.NS_SETTINGS, controlBarSettings);
+        resource.addMetadataValue(ControlBarConstants.CONTROL_BAR_SETTINGS, controlBarSettings);
 
         logger.debug("creating control bar media element");
-        var controlBarElement:MediaElement = factory.createMediaElement(resource);
-
-        if (controlBarElement == null) {
-            logger.warn("failed to create control bar for player");
-            return;
-        }
+        controlBarElement = factory.createMediaElement(resource);
 
         controlbarContainer.addMediaElement(controlBarElement);
     }
 
     private function netStatusChanged(event:NetStatusEvent):void {
         if (event.info == "NetConnection.Connect.NetworkChange") {
+
             factory.removeEventListener(NetStatusEvent.NET_STATUS, netStatusChanged);
 
-            var metadata:Metadata = contentElement.getMetadata(NetStatusMetadata.NET_STATUS_METADATA);
+            var metadata:Metadata = mainElement.getMetadata(NetStatusMetadata.NET_STATUS_METADATA);
             if (metadata == null) {
                 metadata = new Metadata();
-                contentElement.addMetadata(NetStatusMetadata.NET_STATUS_METADATA, metadata);
+                mainElement.addMetadata(NetStatusMetadata.NET_STATUS_METADATA, metadata);
             }
 
             metadata.addValue(NetStatusMetadata.STATUS, event.info);
@@ -409,13 +559,6 @@ public class SeeSawPlayer extends Sprite {
     private function onFullscreen(event:FullScreenEvent):void {
         logger.debug("onFullscreen: " + event.fullScreen);
         setContainerSize(contentWidth, contentHeight);
-
-        // Apply the new resolution to all the playlist media elements. Ideally we'd like to set the size of these
-        // elements to be relative to the container size but that does not seem to work with dynamic stream switching
-        // at the moment.
-        for each (var element:MediaElement in playlistElements) {
-            setMediaLayout(element);
-        }
     }
 
     private function setContainerSize(width:int, height:int):void {
@@ -424,16 +567,16 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onContentMetadataAdd(event:MediaElementEvent):void {
-        if (event.namespaceURL == ControlBarMetadata.CONTROL_BAR_METADATA) {
-            var metadata:Metadata = contentElement.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+        if (event.namespaceURL == ControlBarConstants.CONTROL_BAR_METADATA) {
+            var metadata:Metadata = mainElement.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
             metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
             metadata.addEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
         }
     }
 
     private function onContentMetadataRemove(event:MediaElementEvent):void {
-        if (event.namespaceURL == ControlBarMetadata.CONTROL_BAR_METADATA) {
-            var metadata:Metadata = contentElement.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+        if (event.namespaceURL == ControlBarConstants.CONTROL_BAR_METADATA) {
+            var metadata:Metadata = mainElement.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
             metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
             metadata.removeEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
         }
@@ -441,7 +584,7 @@ public class SeeSawPlayer extends Sprite {
 
     private function onControlBarMetadataChange(event:MetadataEvent):void {
         switch (event.key) {
-            case ControlBarMetadata.CONTROL_BAR_HIDDEN:
+            case ControlBarConstants.CONTROL_BAR_HIDDEN:
                 if (subtitleElement) {
                     var layoutMetadata:LayoutMetadata =
                             subtitleElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
@@ -450,7 +593,7 @@ public class SeeSawPlayer extends Sprite {
                     }
                 }
                 break;
-            case ControlBarMetadata.SUBTITLES_VISIBLE:
+            case ControlBarConstants.SUBTITLES_VISIBLE:
                 if (subtitleElement) {
                     var displayTrait:DisplayObjectTrait =
                             subtitleElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
@@ -462,102 +605,7 @@ public class SeeSawPlayer extends Sprite {
         }
     }
 
-    private function onMediaElementCreate(event:MediaFactoryEvent):void {
-        var mediaElement:MediaElement = event.mediaElement;
-
-        if (mediaElement.resource) {
-            var metadata:Metadata = mediaElement.resource.getMetadataValue(SMILConstants.SMIL_CONTENT_NS) as Metadata;
-            if (metadata) {
-                mediaElement.metadata.addEventListener(MetadataEvent.VALUE_ADD, function(event:MetadataEvent):void {
-                    if (event.key == SMILConstants.SMIL_CONTENT_NS) {
-                        configureSmilElement(mediaElement);
-                    }
-                });
-            }
-        }
-    }
-
-    private function configureSmilElement(element:MediaElement):void {
-        var smilMetadata:Metadata = element.getMetadata(SMILConstants.SMIL_CONTENT_NS) as Metadata;
-
-        if (smilMetadata == null) {
-            return;
-        }
-
-        var contentType:String = smilMetadata.getValue(PlayerConstants.CONTENT_TYPE);
-        var layout:LayoutMetadata = new LayoutMetadata();
-
-        logger.debug("setting layout for: " + contentType);
-
-        switch (contentType) {
-            case PlayerConstants.DOG_CONTENT_ID:
-                // Layout the DOG image in the top left corner
-                layout.x = 5;
-                layout.y = 5;
-                layout.verticalAlign = VerticalAlign.TOP;
-                layout.horizontalAlign = HorizontalAlign.LEFT;
-                layout.index = 5;
-                break;
-            case PlayerConstants.AD_CONTENT_ID:
-                var adMetadata:AdMetadata = new AdMetadata();
-                adMetadata.adMode = AdMode.AD;
-                element.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
-                processSmilMediaElement(element);
-                break;
-            case PlayerConstants.STING_CONTENT_ID:
-                var adMetadata:AdMetadata = new AdMetadata();
-                adMetadata.adMode = AdMode.MAIN_CONTENT;
-                element.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
-                processSmilMediaElement(element);
-                break;
-            case PlayerConstants.MAIN_CONTENT_ID:
-                var adMetadata:AdMetadata = new AdMetadata();
-                adMetadata.adMode = AdMode.MAIN_CONTENT;
-                adMetadata.adBreaks = generateAdBreaksFromSmil();
-                element.addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
-                processSmilMediaElement(element);
-                break;
-        }
-
-        element.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
-    }
-
-    private function processSmilMediaElement(element:MediaElement):void {
-        // This layout applies to main content, stings and ads
-        setMediaLayout(element);
-
-        // For some reason dynamic stream changes reset the current layout metadata (bug?) in the playlist
-        // so this is a workaround to always set the right value.
-        element.addEventListener(MediaElementEvent.TRAIT_ADD, function(event:MediaElementEvent):void {
-            if (event.traitType == MediaTraitType.DYNAMIC_STREAM) {
-                var dynamicStreamTrait:DynamicStreamTrait =
-                        element.getTrait(MediaTraitType.DYNAMIC_STREAM) as DynamicStreamTrait;
-                dynamicStreamTrait.addEventListener(
-                        DynamicStreamEvent.SWITCHING_CHANGE, function(event:DynamicStreamEvent):void {
-                    setMediaLayout(element);
-                });
-
-            }
-        });
-
-        // This is another workaround for the above bug - when full screen is set the full screen resolution
-        // needs to be applied to all the video elements.
-        playlistElements.push(element);
-    }
-
-    private function setMediaLayout(element:MediaElement):void {
-        var layout:LayoutMetadata = element.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
-        if (layout) {
-            layout.width = contentWidth;
-            layout.height = contentHeight;
-            layout.verticalAlign = VerticalAlign.MIDDLE;
-            layout.horizontalAlign = HorizontalAlign.CENTER;
-            layout.scaleMode = ScaleMode.LETTERBOX;
-        }
-    }
-
     private function onMediaPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
-        logger.debug("MediaPlayerStateChange: " + event.state);
         switch (event.state) {
             case MediaPlayerState.PLAYING:
                 toggleLights();
@@ -599,6 +647,25 @@ public class SeeSawPlayer extends Sprite {
         }
     }
 
+    private function playerMetaChange(event:MetadataEvent):void {
+        if (event.key == PlayerConstants.DESTROY) {
+            if (event.value) {
+                // wipe out the objects from memory and off the displayList
+                // removeChild seems to throw errors when trying to removeChild( container ) etc..
+                mainContainer.removeMediaElement(mainElement);
+                mainContainer = null;
+                bufferingContainer = null;
+                subtitlesContainer = null;
+                controlbarContainer = null;
+                mainElement = null;
+                player = null;
+                container = null;
+
+                dispatchEvent(new Event(PlayerConstants.DESTROY));
+            }
+        }
+    }
+
     public function get contentWidth():int {
         if (stage == null) {
             return config.width;
@@ -615,36 +682,6 @@ public class SeeSawPlayer extends Sprite {
 
     public function get mediaPlayer():MediaPlayer {
         return player;
-    }
-
-    private function getSmilHeadMetaValue(key:String):String {
-        use namespace smil;
-
-        var value:String = null;
-        for each (var meta:XML in videoInfo.smil.head..meta) {
-            if (meta.@name == key) {
-                value = meta.@content;
-                break;
-            }
-        }
-        return value;
-    }
-
-    private function generateAdBreaksFromSmil():Vector.<AdBreak> {
-        use namespace smil;
-
-        var adBreaks:Vector.<AdBreak> = new Vector.<AdBreak>();
-        for each (var video:XML in videoInfo.smil.body..video) {
-            if (video.@clipBegin) {
-                var clipStart:int = parseInt(video.@clipBegin);
-                if (clipStart > 0) {
-                    var adBreak:AdBreak = new AdBreak();
-                    adBreak.startTime = clipStart;
-                    adBreaks.push(adBreak);
-                }
-            }
-        }
-        return adBreaks;
     }
 }
 }

@@ -21,7 +21,7 @@
  */
 
 package com.seesaw.player.controls.widget {
-import com.seesaw.player.controls.ControlBarMetadata;
+import com.seesaw.player.controls.ControlBarConstants;
 import com.seesaw.player.ui.PlayerToolTip;
 import com.seesaw.player.ui.StyledTextField;
 
@@ -35,9 +35,8 @@ import flash.text.TextFormat;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.chrome.widgets.ButtonWidget;
-import org.osmf.events.MediaElementEvent;
+import org.osmf.events.MetadataEvent;
 import org.osmf.media.MediaElement;
-import org.osmf.metadata.CuePoint;
 import org.osmf.metadata.Metadata;
 import org.osmf.traits.MediaTraitType;
 
@@ -48,8 +47,6 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
     private var subtitlesOn:Boolean;
     private var subtitlesLabel:TextField;
 
-    private var fullscreen:Boolean = false;
-
     private var mouseOverLabel:Boolean = false;
 
     private var toolTip:PlayerToolTip;
@@ -58,7 +55,9 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
     private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.SubtitlesButton";
 
     private static const _requiredTraits:Vector.<String> = new Vector.<String>;
-    _requiredTraits[0] = MediaTraitType.PLAY;
+    _requiredTraits[0] = MediaTraitType.TIME;
+    _requiredTraits[1] = MediaTraitType.PLAY;
+
 
     private var metadata:Metadata;
 
@@ -75,39 +74,26 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
         this.addEventListener(Event.ADDED_TO_STAGE, this.onAddedToStage);
 
         addChild(subtitlesLabel);
-
-        visible = false;
     }
 
     override protected function processMediaElementChange(oldMediaElement:MediaElement):void {
-        if (oldMediaElement) {
-            oldMediaElement.removeEventListener(MediaElementEvent.METADATA_ADD, onMetadataAdd);
-            oldMediaElement.removeEventListener(MediaElementEvent.METADATA_REMOVE, onMetadataRemove);
-        }
         if (media) {
-            metadata = media.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+            metadata = media.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
             if (metadata == null) {
                 metadata = new Metadata();
-                media.addMetadata(ControlBarMetadata.CONTROL_BAR_METADATA, metadata);
+                media.addMetadata(ControlBarConstants.CONTROL_BAR_METADATA, metadata);
             }
 
-            // Show the button if there is timeline metadata or after timeline metadata is added
-            media.addEventListener(MediaElementEvent.METADATA_ADD, onMetadataAdd);
-            media.addEventListener(MediaElementEvent.METADATA_REMOVE, onMetadataRemove);
-            metadata.addValue(ControlBarMetadata.SUBTITLES_VISIBLE, false);
+            metadata.addValue(ControlBarConstants.SUBTITLES_VISIBLE, false);
         }
     }
 
-    private function onMetadataAdd(event:MediaElementEvent):void {
-        if (event.namespaceURL == CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) {
-            visible = true;
-        }
+    private function doEnabledCheck():void {
+        enabled = metadata.getValue(ControlBarConstants.SUBTITLE_BUTTON_ENABLED) as Boolean;
     }
 
-    private function onMetadataRemove(event:MediaElementEvent):void {
-        if (event.namespaceURL == CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) {
-            visible = false;
-        }
+    override protected function processRequiredTraitsAvailable(element:MediaElement):void {
+        doEnabledCheck();
     }
 
     private function onMouseOver(event:MouseEvent):void {
@@ -164,7 +150,7 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
             }
             this.subtitlesOn = false;
         }
-        metadata.addValue(ControlBarMetadata.SUBTITLES_VISIBLE, subtitlesOn);
+        metadata.addValue(ControlBarConstants.SUBTITLES_VISIBLE, subtitlesOn);
     }
 
     public function get classDefinition():String {

@@ -28,6 +28,7 @@ public class AdMetadata extends Metadata {
     public static const AD_NAMESPACE:String = "http://www.seesaw.com/player/ads/1.0";
     public static const AD_STATE:String = "adState";
     public static const AD_MODE:String = "adMode";
+    public static const AD_BREAK_CUE:String = "adBreak";
     public static const AD_BREAKS:String = "adBreaks";
     public static const CLICK_THRU:String = "clickThru";
     public static const LR_AD_TYPE:String = "liverail";

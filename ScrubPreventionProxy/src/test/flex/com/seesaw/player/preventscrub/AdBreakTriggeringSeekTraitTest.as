@@ -64,7 +64,7 @@ public class AdBreakTriggeringSeekTraitTest {
         // see across all the breaks - 75s ad break is triggered
         timeTrait.mockCurrentTime = 0;
         seekTrait.seek(85);
-        assertThat(innerSeekTrait.finalSeekPoint, equalTo(74));
+        assertThat(innerSeekTrait.finalSeekPoint, equalTo(75));
         assertThat(adBreaks[2].seekPointAfterAdBreak, equalTo(85));
         adBreaks[2].complete = true;
         assertThat(innerSeekTrait.finalSeekPoint, equalTo(85));
@@ -94,7 +94,7 @@ public class AdBreakTriggeringSeekTraitTest {
         // seek forward from 10 to 60 - the 50s ad break is triggered
         timeTrait.mockCurrentTime = 10;
         seekTrait.seek(60);
-        assertThat(innerSeekTrait.finalSeekPoint, equalTo(49));
+        assertThat(innerSeekTrait.finalSeekPoint, equalTo(50));
         assertThat(adBreaks[1].seekPointAfterAdBreak, equalTo(60));
         adBreaks[1].complete = true;
         assertThat(innerSeekTrait.finalSeekPoint, equalTo(60));
@@ -115,7 +115,7 @@ public class AdBreakTriggeringSeekTraitTest {
         // seek to exactly 25 from below - ad break at 25s is triggered
         timeTrait.mockCurrentTime = 20;
         seekTrait.seek(25);
-        assertThat(innerSeekTrait.finalSeekPoint, equalTo(24));
+        assertThat(innerSeekTrait.finalSeekPoint, equalTo(25));
         assertThat(adBreaks[0].seekPointAfterAdBreak, equalTo(25));
         adBreaks[0].complete = true;
         assertThat(innerSeekTrait.finalSeekPoint, equalTo(25));

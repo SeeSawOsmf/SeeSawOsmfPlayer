@@ -21,7 +21,7 @@
  */
 
 package com.seesaw.player.controls.widget {
-import com.seesaw.player.controls.ControlBarMetadata;
+import com.seesaw.player.controls.ControlBarConstants;
 import com.seesaw.player.ui.PlayerToolTip;
 import com.seesaw.player.ui.StyledTextField;
 
@@ -71,12 +71,12 @@ public class FullScreen extends ButtonWidget implements IWidget {
     override public function set media(value:MediaElement):void {
         super.media = value;
         if (media) {
-            metadata = media.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+            metadata = media.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
             if (metadata == null) {
                 metadata = new Metadata();
-                media.addMetadata(ControlBarMetadata.CONTROL_BAR_METADATA, metadata);
+                media.addMetadata(ControlBarConstants.CONTROL_BAR_METADATA, metadata);
             }
-            metadata.addValue(ControlBarMetadata.FULL_SCREEN, false);
+            metadata.addValue(ControlBarConstants.FULL_SCREEN, false);
         }
     }
 
@@ -146,7 +146,7 @@ public class FullScreen extends ButtonWidget implements IWidget {
             fullScreenLabel.text = FULLSCREEN_LABEL;
             toolTip.updateToolTip(FULLSCREEN_LABEL);
         }
-        metadata.addValue(ControlBarMetadata.FULL_SCREEN, event.fullScreen);
+        metadata.addValue(ControlBarConstants.FULL_SCREEN, event.fullScreen);
     }
 
     public function get classDefinition():String {

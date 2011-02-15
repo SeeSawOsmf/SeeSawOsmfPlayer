@@ -63,7 +63,6 @@ import org.osmf.logging.Log;
 import org.osmf.media.MediaPlayerState;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.metadata.Metadata;
-import org.osmf.smil.SMILConstants;
 
 [SWF(width=PLAYER::Width, height=PLAYER::Height, backgroundColor="#000000")]
 public class Player extends Sprite {
@@ -206,7 +205,7 @@ public class Player extends Sprite {
             }
             addChild(posterFrame);
         } else {
-            nextInitialisationStage();            
+            nextInitialisationStage();
         }
     }
 
@@ -486,10 +485,6 @@ public class Player extends Sprite {
         metadata.addValue(PlayerConstants.CONTENT_INFO, playerInit);
         metadata.addValue(PlayerConstants.VIDEO_INFO, videoInfo);
         resource.addMetadataValue(PlayerConstants.METADATA_NAMESPACE, metadata);
-
-        metadata = new Metadata();
-        metadata.addValue(SMILConstants.SMIL_DOCUMENT, videoInfo.smil);
-        resource.addMetadataValue(SMILConstants.SMIL_METADATA_NS, metadata);
 
         metadata = new Metadata();
         resource.addMetadataValue(ScrubPreventionConstants.SETTINGS_NAMESPACE, metadata);

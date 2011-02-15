@@ -19,23 +19,17 @@
  * Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
  * Incorporated. All Rights Reserved.
  */
-package org.osmf.smil.elements
-{
-	import org.osmf.elements.LoadFromDocumentElement;
-	import org.osmf.media.MediaResourceBase;
-	import org.osmf.smil.loader.SMILLoader;
-import org.osmf.traits.LoaderBase;
 
-public class SMILElement extends LoadFromDocumentElement
-	{
-		public function SMILElement(resource:MediaResourceBase = null, loader:LoaderBase = null)
-		{
-			if (loader == null)
-			{
-				loader = new SMILLoader();
-			}
-			super(resource, loader);		
-		}
+package com.seesaw.player.controls {
+public class ControlBarConstants {
+    public static const CONTROL_BAR_SETTINGS:String = "http://www.osmf.org/samples/controlbar/settings";
 
-	}
+    public static const CONTROL_BAR_METADATA:String = "http://www.osmf.org/samples/controlbar/metadata";
+    public static const TARGET_ELEMENT:String = "targetElement";
+    public static const CONTROL_BAR_HIDDEN:String = "controlBarHidden";
+    public static const SUBTITLES_VISIBLE:String = "subtitlesVisible";
+    public static const SUBTITLE_BUTTON_ENABLED:String = "subtitleButtonEnabled";
+    public static const FULL_SCREEN:String = "fullScreen";
+    public static const USER_CLICK_STATE:String = "userClickState";
+}
 }
