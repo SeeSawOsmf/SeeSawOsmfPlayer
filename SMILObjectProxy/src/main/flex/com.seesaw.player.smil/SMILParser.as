@@ -256,7 +256,7 @@ public class SMILParser extends EventDispatcher {
         return metadata;
     }
 
-    public function getHeadMetaValue(key:String):String {
+    public static function getHeadMetaValue(smilDocument:XML, key:String):String {
         var value:String = null;
         for each (var meta:XML in smilDocument.head..meta) {
             if (meta.@name == key) {

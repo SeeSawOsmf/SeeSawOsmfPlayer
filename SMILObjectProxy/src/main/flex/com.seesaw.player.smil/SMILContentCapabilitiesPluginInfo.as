@@ -31,6 +31,7 @@ package com.seesaw.player.smil {
 import com.seesaw.player.PlayerConstants;
 
 import org.osmf.media.MediaElement;
+import org.osmf.media.MediaFactory;
 import org.osmf.media.MediaFactoryItem;
 import org.osmf.media.MediaFactoryItemType;
 import org.osmf.media.MediaResourceBase;
@@ -39,27 +40,50 @@ import org.osmf.metadata.Metadata;
 
 public class SMILContentCapabilitiesPluginInfo extends PluginInfo {
 
+    private var mediaFactory:MediaFactory;
+
     public function SMILContentCapabilitiesPluginInfo() {
         var items:Vector.<MediaFactoryItem> = new Vector.<MediaFactoryItem>();
 
         items.push(new MediaFactoryItem("com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo.AdCapabilitiesProxy",
                 canHandleAdContent, createAdHandlerProxy, MediaFactoryItemType.PROXY));
 
+        items.push(new MediaFactoryItem("com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo.MainContentElement",
+                canHandleMainContent, createMainContentElement, MediaFactoryItemType.STANDARD));
+
         super(items);
+    }
+
+    override public function initializePlugin(resource:MediaResourceBase):void {
+        mediaFactory = resource.getMetadataValue(PluginInfo.PLUGIN_MEDIAFACTORY_NAMESPACE) as MediaFactory;
     }
 
     private function canHandleAdContent(resource:MediaResourceBase):Boolean {
         var canHandle:Boolean = false;
         var metadata:Metadata = resource.getMetadataValue(SMILConstants.SMIL_NAMESPACE) as Metadata;
-        if(metadata) {
+        if (metadata) {
             var contentType:String = metadata.getValue(PlayerConstants.CONTENT_TYPE) as String;
             canHandle = contentType == PlayerConstants.AD_CONTENT_ID || contentType == PlayerConstants.STING_CONTENT_ID;
         }
         return canHandle;
     }
 
+    private function canHandleMainContent(resource:MediaResourceBase):Boolean {
+        var canHandle:Boolean = false;
+        var metadata:Metadata = resource.getMetadataValue(SMILConstants.SMIL_NAMESPACE) as Metadata;
+        if (metadata) {
+            var smilDoc:XML = metadata.getValue(SMILConstants.SMIL_DOCUMENT) as XML;
+            canHandle = smilDoc != null;
+        }
+        return canHandle;
+    }
+
     private function createAdHandlerProxy():MediaElement {
         return new AdCapabilitiesProxy();
+    }
+
+    private function createMainContentElement():MediaElement {
+        return new MainContentElement(mediaFactory);
     }
 }
 }

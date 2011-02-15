@@ -22,9 +22,10 @@
 
 package
 com.seesaw.player.controls.widget {
-import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.ads.AdBreak;
+import com.seesaw.player.ads.AdBreakEvent;
 import com.seesaw.player.ads.AdMetadata;
+import com.seesaw.player.ads.AdMode;
 import com.seesaw.player.ads.AdState;
 import com.seesaw.player.traits.ads.AdTraitType;
 import com.seesaw.player.ui.StyledTextField;
@@ -52,9 +53,7 @@ import org.osmf.chrome.widgets.Widget;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MetadataEvent;
 import org.osmf.events.SeekEvent;
-import org.osmf.events.TimeEvent;
 import org.osmf.media.MediaElement;
-import org.osmf.metadata.Metadata;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.PlayTrait;
@@ -67,8 +66,6 @@ public class ScrubBar extends Widget implements IWidget {
 
     private var markerContainer:Sprite;
     private var currentTimeInSeconds:Number = 0;
-
-    private var updateAdMarkersOnNextTick:Boolean;
 
     public function ScrubBar() {
         currentTime = new StyledTextField();
@@ -123,6 +120,7 @@ public class ScrubBar extends Widget implements IWidget {
             scrubBarClickArea.graphics.drawRect(0, 0, scrubBarWidth, scrubber.height);
             scrubBarClickArea.graphics.endFill();
 
+            updateAdMarkers();
             onTimerTick();
         }
     }
@@ -178,51 +176,49 @@ public class ScrubBar extends Widget implements IWidget {
     }
 
     override protected function processRequiredTraitsAvailable(media:MediaElement):void {
+//        createAdMarkers();
+        logger.debug("processRequiredTraitsAvailable");
         updateState();
     }
 
     override protected function processRequiredTraitsUnavailable(media:MediaElement):void {
+        logger.debug("processRequiredTraitsUnavailable");
         updateState();
     }
 
     override protected function onMediaElementTraitAdd(event:MediaElementEvent):void {
-        if (event.traitType == MediaTraitType.TIME) {
-            var timeTrait:TimeTrait = media.getTrait(MediaTraitType.TIME) as TimeTrait;
-            logger.debug("adding time trait: " + timeTrait);
-            timeTrait.addEventListener(TimeEvent.DURATION_CHANGE, onDurationChange);
-        }
+        logger.debug("onMediaElementTraitAdd");
         updateState();
     }
 
     override protected function onMediaElementTraitRemove(event:MediaElementEvent):void {
-        if (event.traitType == MediaTraitType.TIME) {
-            var timeTrait:TimeTrait = media.getTrait(MediaTraitType.TIME) as TimeTrait;
-            logger.debug("removing time trait: " + timeTrait);
-            timeTrait.removeEventListener(TimeEvent.DURATION_CHANGE, onDurationChange);
-        }
+        logger.debug("onMediaElementTraitRemove");
         updateState();
     }
 
     override protected function processMediaElementChange(oldMediaElement:MediaElement):void {
-        if(oldMediaElement) {
+        logger.debug("processMediaElementChange");
+        if (oldMediaElement) {
             var adMetadata:AdMetadata = oldMediaElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
             if (adMetadata) {
-                adMetadata.removeEventListener(MetadataEvent.VALUE_ADD, onAdMetadataChanged);
-                adMetadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onAdMetadataChanged);
-                adMetadata.removeEventListener(MetadataEvent.VALUE_REMOVE, onAdMetadataChanged);
+                adMetadata.removeEventListener(MetadataEvent.VALUE_ADD, onAdMetadataChange);
+                adMetadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onAdMetadataChange);
+                adMetadata.removeEventListener(MetadataEvent.VALUE_REMOVE, onAdMetadataChange);
             }
         }
         var adMetadata:AdMetadata = media.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
         if (adMetadata) {
-            adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdMetadataChanged);
-            adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdMetadataChanged);
-            adMetadata.addEventListener(MetadataEvent.VALUE_REMOVE, onAdMetadataChanged);
+            adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdMetadataChange);
+            adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdMetadataChange);
+            adMetadata.addEventListener(MetadataEvent.VALUE_REMOVE, onAdMetadataChange);
         }
-        updateAdMarkersOnNextTick = true;
     }
 
-    private function onDurationChange(event:TimeEvent):void {
-        updateAdMarkers();
+    private function onAdMetadataChange(event:MetadataEvent):void {
+        logger.debug("onAdMetadataChange");
+        if(event.key == AdMetadata.AD_STATE && event.value == AdState.AD_BREAK_COMPLETE) {
+            updateAdMarkers();
+        }
     }
 
     private function updateState():void {
@@ -232,10 +228,6 @@ public class ScrubBar extends Widget implements IWidget {
 
     private function get adMetadata():AdMetadata {
         return media ? media.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata : null;
-    }
-
-    private function onAdMetadataChanged(event:MetadataEvent):void {
-        updateAdMarkersOnNextTick = true;
     }
 
     private function updateAdMarkers():void {
@@ -252,6 +244,7 @@ public class ScrubBar extends Widget implements IWidget {
                     sprite.x = scrubBarTrack.x + getPositionOnScrubBar(value.startTime) - 3;
                     sprite.y = scrubBarTrack.y - 0.5;
                     sprite.graphics.endFill();
+                    logger.debug("adding ad break at {0}x{1}", sprite.x, sprite.y);
                     markerContainer.addChild(sprite);
                 }
             }
@@ -292,16 +285,11 @@ public class ScrubBar extends Widget implements IWidget {
         else {
             resetUI();
         }
-
-        if(updateAdMarkersOnNextTick) {
-            updateAdMarkersOnNextTick = false;
-            updateAdMarkers();
-        }
     }
 
     private function getPositionOnScrubBar(position:Number):Number {
         var timeTrait:TimeTrait = media.getTrait(MediaTraitType.TIME) as TimeTrait;
-        if(timeTrait)
+        if (timeTrait)
             return ((position / timeTrait.duration) * (scrubberEnd - scrubberStart)) || 0; // default value if calc. returns NaN.
         else
             return 0;
@@ -440,7 +428,6 @@ public class ScrubBar extends Widget implements IWidget {
     private static const CURRENT_POSITION_UPDATE_INTERVAL:int = 100;
     private static const _requiredTraits:Vector.<String> = new Vector.<String>;
     _requiredTraits[0] = MediaTraitType.TIME;
-    _requiredTraits[1] = AdTraitType.AD_PLAY;
-
+    _requiredTraits[1] = MediaTraitType.SEEK;
 }
 }
