@@ -85,6 +85,68 @@ public class AdProxy extends ProxyElement {
         }
     }
 
+    private function onAuditudeInit(event:AdPluginEvent):void {
+/*        if (event is AdPluginEvent) {
+            var breaks:Array = event.data.breaks;
+            if (breaks) {
+
+                for each (var adBreak:Object in breaks) {
+
+                    var startTime:Number = adBreak.startTime; // start time in seconds
+                    var isEmpty:Boolean = adBreak.isEmpty; // boolean indicating if the break is empty
+                }
+            }
+        }
+          */
+ /*      var ad1:Object;
+        var ad2:Object;
+        ad1 = {"isEmpty":false,"startTimeValue": 50 }
+         ad2 = {"isEmpty":false,"startTimeValue": 100 }
+
+        var dummyArray:Array = [ad1, ad2];
+*/
+        var metadataAdBreaks:Vector.<AdBreak> = new Vector.<AdBreak>();
+       var adBreaks:Array = event.data.breaks;
+
+
+          for (var i:uint = 0; i < adBreaks.length; i++) {
+            var adBreak:Object = adBreaks[i];
+
+            //total number of ads in this ad-break
+            var queueAdsTotal:uint = 0; //TODO Currently not available
+
+            //total duration of ad-break in seconds
+            //sometimes duration is not available for 3rd party ads such as VPAID
+            //when duration cannot be computed, this value remains zero
+            var queueDuration:Number = 0;  //TODO Currently not available
+
+            var hasAds:Boolean = adBreak.isEmpty ? true : true;
+
+            //start time value converted to Number: 0, 768.52, 100
+            var startTimeValue:Number = adBreak.startTime;
+
+            //specifies whether the startTimeValue is Percent (true) or  seconds (false)
+            var startTimeIsPercent:Boolean = false;
+
+            // sets the ad breaks as metadata on the element
+            var metadataAdBreak:AdBreak = new AdBreak();
+            metadataAdBreak.queueAdsTotal = queueAdsTotal;
+            metadataAdBreak.queueDuration = queueDuration;
+            metadataAdBreak.startTime = startTimeValue;
+            metadataAdBreak.startTimeIsPercent = startTimeIsPercent;
+
+            // Dont add the break if it has no ads, eg no content to play, so we don't want a blip for this item
+            if (hasAds) {
+                metadataAdBreaks[i] = metadataAdBreak;
+            }
+        }
+        adMetadata.adBreaks = metadataAdBreaks;
+
+        // section count need to occur before we start the adContent. as this is required for the first view to be registered.
+        playerMetadata.addValue(AdMetadata.SECTION_COUNT, metadataAdBreaks.length);
+
+    }
+
     private function onTraitAdded(event:MediaElementEvent):void {
         var traitType:String;
         for each (traitType in event.target.traitTypes) {
@@ -121,6 +183,7 @@ public class AdProxy extends ProxyElement {
         logger.debug("METADATA CHANGED: " + event.key);
         if (event.key == AuditudeConstants.PLUGIN_INSTANCE) {
             var _auditude:AuditudePlugin = event.value;
+             _auditude.addEventListener(AdPluginEvent.INIT_COMPLETE, onAuditudeInit);
             _auditude.addEventListener(AdPluginEvent.BREAK_BEGIN, onBreakBegin);
             _auditude.addEventListener(AdPluginEvent.BREAK_END, onBreakEnd);
 
@@ -129,7 +192,14 @@ public class AdProxy extends ProxyElement {
             _auditude.addEventListener(LinearAdEvent.AD_END, onLinearAdEnd);
             _auditude.addEventListener(NonLinearAdEvent.AD_BEGIN, onNonLinearAdBegin);
             _auditude.addEventListener(NonLinearAdEvent.AD_END, onNonLinearAdEnd);
+
+            _auditude.addEventListener(AdPluginEvent.PAUSE_PLAYBACK, triggerPause);
+            _auditude.addEventListener(AdPluginEvent.RESUME_PLAYBACK, triggerPause)
         }
+    }
+
+    private function triggerPause(event:AdPluginEvent):void {
+        trace("pause)");
     }
 
 
@@ -228,8 +298,8 @@ public class AdProxy extends ProxyElement {
     private function onBreakBegin(event:AdPluginEvent):void {
         logger.debug("AD BREAK BEGIN");
 
-        if(adBreakCount == 0){  // TODO this is a temporary fix, as we have little info about the ammount of adverts available
-           playerMetadata.addValue(AdMetadata.SECTION_COUNT, -1);
+        if (adBreakCount == 0) {  // TODO this is a temporary fix, as we have little info about the ammount of adverts available
+            playerMetadata.addValue(AdMetadata.SECTION_COUNT, -1);
         }
         adBreakCount++;
         // Perhaps this is needed for mid-rolls
@@ -251,7 +321,7 @@ public class AdProxy extends ProxyElement {
 
     private function onLinearAdBegin(event:LinearAdEvent):void {
         logger.debug("AD BEGIN");
-      processAdStateMeta(AdState.STARTED, event);
+        processAdStateMeta(AdState.STARTED, event);
 
     }
 
@@ -262,12 +332,12 @@ public class AdProxy extends ProxyElement {
 
     private function onNonLinearAdBegin(event:NonLinearAdEvent):void {
         logger.debug("AD BEGIN");
-           processAdStateMeta(AdState.STARTED, event);
+        processAdStateMeta(AdState.STARTED, event);
     }
 
     private function onNonLinearAdEnd(event:NonLinearAdEvent):void {
         logger.debug("AD END");
-           processAdStateMeta(AdState.STOPPED, event);
+        processAdStateMeta(AdState.STOPPED, event);
     }
 
     private function onAdClickThrough(event:AdClickThroughEvent):void {

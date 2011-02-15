@@ -23,11 +23,8 @@
 package
 com.seesaw.player.controls.widget {
 import com.seesaw.player.ads.AdBreak;
-import com.seesaw.player.ads.AdBreakEvent;
 import com.seesaw.player.ads.AdMetadata;
-import com.seesaw.player.ads.AdMode;
 import com.seesaw.player.ads.AdState;
-import com.seesaw.player.traits.ads.AdTraitType;
 import com.seesaw.player.ui.StyledTextField;
 
 import controls.seesaw.widget.interfaces.IWidget;
@@ -216,7 +213,7 @@ public class ScrubBar extends Widget implements IWidget {
 
     private function onAdMetadataChange(event:MetadataEvent):void {
         logger.debug("onAdMetadataChange");
-        if(event.key == AdMetadata.AD_STATE && event.value == AdState.AD_BREAK_COMPLETE) {
+        if (event.key == AdMetadata.AD_STATE && event.value == AdState.AD_BREAK_COMPLETE) {
             updateAdMarkers();
         }
     }
@@ -329,7 +326,6 @@ public class ScrubBar extends Widget implements IWidget {
                 seekToTime = time;
                 seekable.seek(time);
             }
-
         }
     }
 

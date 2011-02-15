@@ -67,6 +67,9 @@ public class ParentalControlsPanel extends Sprite {
     private var parentalControlsButton:Sprite = new Sprite();
     private var turnOffControlsButton:Sprite = new Sprite();
 
+    //layout info
+    private var yFill:Number = 0;
+
     //Password logic related
     private var parentalControlPasswordInput = new TextField();
     private var passwordError = new StyledTextField();
@@ -194,24 +197,17 @@ public class ParentalControlsPanel extends Sprite {
     private function buildPanel():Sprite {
         var panel:Sprite = new Sprite();
 
-        panel.addChild(this.buildPanelBG());
-
         var contentContainer:Sprite = this.buildContentContainer();
         contentContainer.addChild(this.buildTitle());
         contentContainer.addChild(this.buildWarning());
         contentContainer.addChild(this.buildWarningIcon());
         contentContainer.addChild(this.buildExplanation());
         contentContainer.addChild(this.buildEnterMessage());
-        contentContainer.addChild(this.buildPasswordLabel());
-        contentContainer.addChild(this.buildPasswordEntryBG());
-        contentContainer.addChild(this.buildPasswordEntryErrorBG());
-        contentContainer.addChild(this.buildPasswordEntry());
-        contentContainer.addChild(this.buildPasswordError());
-        contentContainer.addChild(this.buildForgotPasswordLink());
-        contentContainer.addChild(this.buildAcceptButton("Enter"));
-        contentContainer.addChild(this.buildDeclineButton("Cancel"));
-        contentContainer.addChild(this.buildParentalControlsLink());
-        contentContainer.addChild(this.buildTurnOffControlsLink());
+
+        contentContainer.addChild(this.buildActions());
+
+        panel.addChild(this.buildPanelBG());
+
         panel.addChild(contentContainer);
 
         return panel;
@@ -222,9 +218,8 @@ public class ParentalControlsPanel extends Sprite {
         var panelBG:Sprite = new Sprite();
 
         with (panelBG.graphics) {
-            lineStyle(1, 0x000000);
             beginFill(0x000000, 0.8);
-            drawRoundRect(0, 0, 525, 353, 10);
+            drawRoundRect(0, 0, 525, (this.yFill + 60), 10);
             endFill();
         }
 
@@ -246,15 +241,21 @@ public class ParentalControlsPanel extends Sprite {
         titleLabel.y = 0;
         var formattedWarningLabel:TextField = this.applyTitleFormat(titleLabel);
 
+        this.yFill += titleLabel.height;
+
         return titleLabel;
     }
 
     private function buildWarning():TextField {
         var warningLabel = new StyledTextField();
-        warningLabel.width = 500;
+        warningLabel.width = 460;
         warningLabel.htmlText = this.guidanceWarning;
+        warningLabel.wordWrap = true;
+        warningLabel.multiline = true;
         warningLabel.y = 32;
         var formattedWarningLabel:TextField = this.applyWarningFormat(warningLabel);
+
+        this.yFill += warningLabel.height;
 
         return warningLabel;
     }
@@ -271,9 +272,15 @@ public class ParentalControlsPanel extends Sprite {
 
         var explanationLabel = new StyledTextField();
         explanationLabel.width = 500;
+        explanationLabel.wordWrap = true;
         explanationLabel.htmlText = this.assetWarning.replace("%TYPE_TOKEN%", this.assetType);
-        explanationLabel.y = 66;
-        var formattedWarningLabel:TextField = this.applyInfoFormat(explanationLabel);
+
+        this.yFill += 15;
+
+        explanationLabel.y = this.yFill;
+        var formattedWarningLabel:TextField = this.applyInfoFormat(explanationLabel)
+
+        this.yFill += explanationLabel.height;
 
         return explanationLabel;
     }
@@ -283,10 +290,39 @@ public class ParentalControlsPanel extends Sprite {
         var explanationLabel = new StyledTextField();
         explanationLabel.width = 500;
         explanationLabel.htmlText = 'Please enter your Parental Control password to continue.';
-        explanationLabel.y = 100;
+
+        this.yFill += 15;
+
+        explanationLabel.y = this.yFill;
+
+        this.yFill += explanationLabel.height;
+
         var formattedWarningLabel:TextField = this.applyInfoFormat(explanationLabel);
 
         return explanationLabel;
+    }
+
+    private function buildActions():Sprite {
+        var actionsContainer:Sprite = new Sprite();
+
+        actionsContainer.addChild(this.buildPasswordLabel());
+        actionsContainer.addChild(this.buildPasswordEntryBG());
+        actionsContainer.addChild(this.buildPasswordEntryErrorBG());
+        actionsContainer.addChild(this.buildPasswordEntry());
+        actionsContainer.addChild(this.buildPasswordError());
+        actionsContainer.addChild(this.buildForgotPasswordLink());
+        actionsContainer.addChild(this.buildAcceptButton("Enter"));
+        actionsContainer.addChild(this.buildDeclineButton("Cancel"));
+        actionsContainer.addChild(this.buildParentalControlsLink());
+        actionsContainer.addChild(this.buildTurnOffControlsLink());
+
+        this.yFill += 15;
+        actionsContainer.y = this.yFill;
+
+        this.yFill += actionsContainer.height;
+
+        return actionsContainer;
+
     }
 
     private function buildPasswordLabel():TextField {
@@ -294,7 +330,7 @@ public class ParentalControlsPanel extends Sprite {
         var passwordLabel = new StyledTextField();
         passwordLabel.width = 500;
         passwordLabel.htmlText = "Enter password";
-        passwordLabel.y = 135;
+        passwordLabel.y = 0;
         var formattedWarningLabel:TextField = this.applyInfoFormat(passwordLabel);
 
         return passwordLabel;
@@ -309,7 +345,7 @@ public class ParentalControlsPanel extends Sprite {
         }
 
         this.passwordEntryBG.x = 113;
-        this.passwordEntryBG.y = 135;
+        this.passwordEntryBG.y = 0;
 
         return this.passwordEntryBG;
     }
@@ -323,7 +359,7 @@ public class ParentalControlsPanel extends Sprite {
         }
 
         this.passwordEntryErrorBG.x = 113;
-        this.passwordEntryErrorBG.y = 135;
+        this.passwordEntryErrorBG.y = 0;
 
         this.passwordEntryErrorBG.visible = false;
 
@@ -342,7 +378,7 @@ public class ParentalControlsPanel extends Sprite {
         this.parentalControlPasswordInput.type = TextFieldType.INPUT;
 
         this.parentalControlPasswordInput.x = 114;
-        this.parentalControlPasswordInput.y = 136;
+        this.parentalControlPasswordInput.y = 1;
 
         return this.parentalControlPasswordInput;
     }
@@ -352,7 +388,7 @@ public class ParentalControlsPanel extends Sprite {
         this.passwordError.width = 222;
         this.passwordError.htmlText = "Invalid password. Please try again.";
         this.passwordError.x = 223;
-        this.passwordError.y = 135;
+        this.passwordError.y = 0;
         this.passwordError.visible = false;
         var formattedWarningLabel:TextField = this.applyErrorFormat(this.passwordError);
 
@@ -387,7 +423,7 @@ public class ParentalControlsPanel extends Sprite {
         forgotPasswordButton.addEventListener(MouseEvent.CLICK, this.onParentalControlClick);
 
         //position the button
-        forgotPasswordButton.y = 165;
+        forgotPasswordButton.y = 30;
         forgotPasswordButton.x = 0;
 
         return forgotPasswordButton;
@@ -477,7 +513,7 @@ public class ParentalControlsPanel extends Sprite {
 
         //position the button
         acceptButton.x = -5;
-        acceptButton.y = 199;
+        acceptButton.y = 64;
         acceptButton.height = 48;
         acceptButton.width = 108;
 
@@ -525,7 +561,7 @@ public class ParentalControlsPanel extends Sprite {
         declineButton.addEventListener(MouseEvent.CLICK, this.onDeclineClick);
 
         //position the button
-        declineButton.y = 197;
+        declineButton.y = 64;
         declineButton.x = 109;
 
         return declineButton;
@@ -574,7 +610,7 @@ public class ParentalControlsPanel extends Sprite {
         parentalControlsButton.addEventListener(MouseEvent.CLICK, this.onParentalControlClick);
 
         //position the button
-        parentalControlsButton.y = 270;
+        parentalControlsButton.y = 135;
         parentalControlsButton.x = 0;
 
         return parentalControlsButton;
@@ -616,7 +652,7 @@ public class ParentalControlsPanel extends Sprite {
         turnOffControlsButton.addEventListener(MouseEvent.CLICK, this.onFindOutMoreClick);
 
         //position the button
-        turnOffControlsButton.y = 270;
+        turnOffControlsButton.y = 135;
         turnOffControlsButton.x = 157;
 
         return turnOffControlsButton;

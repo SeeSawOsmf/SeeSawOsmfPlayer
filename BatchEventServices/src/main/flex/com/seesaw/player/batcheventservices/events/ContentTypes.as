@@ -5,7 +5,7 @@
  * Time: 17:12
  * To change this template use File | Settings | File Templates.
  */
-package com.seesaw.player.batchEventService.events {
+package com.seesaw.player.batcheventservices.events {
 public class ContentTypes {
 
 	public static const AD_BREAK:String = "AdBreak";

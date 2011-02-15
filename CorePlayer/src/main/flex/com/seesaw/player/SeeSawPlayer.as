@@ -31,7 +31,7 @@ import com.seesaw.player.ads.AdState;
 import com.seesaw.player.ads.AuditudeConstants;
 import com.seesaw.player.ads.auditude.AdProxyPluginInfo;
 import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
-import com.seesaw.player.batchEventService.BatchEventServicePlugin;
+import com.seesaw.player.batcheventservices.BatchEventServicePlugin;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.controls.ControlBarConstants;
 import com.seesaw.player.controls.ControlBarPlugin;
@@ -227,7 +227,7 @@ public class SeeSawPlayer extends Sprite {
 
         player.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onMainPlayerStateChange);
 
-        /*if (adMode == AdMetadata.CHANNEL_4_AD_TYPE)*/
+        if (adMode == AdMetadata.CHANNEL_4_AD_TYPE)
         {
             logger.debug("configuring container for playlist ads");
             adPlayer = new MediaPlayer();

@@ -335,6 +335,9 @@ public class Player extends Sprite {
             else if (availability.availabilityType == "AVOD") {
                 playButtonMode = PlayStartButton.PLAY;
             }
+            else if (availability.availabilityType == "SVOD" && availability.noAdsPlayable == "true") {
+                playButtonMode = PlayStartButton.PLAY_SUBSCRIBED;
+            }
         }
         // Note that if none of the conditions above are met, we should not show
         // the play button at all.  Leave playButtonMode as null in this case.
@@ -390,6 +393,7 @@ public class Player extends Sprite {
         // we need to evaluate if ads are not required for SVOD, TVOD and NO_ADS and adjust the
         // adMode which is then persisted as metaData
         playerInit.adMode[0] = adModulePlayableEvaluation();
+        playerInit.preview[0] =  userInit.preview;
 
         if (videoInfo.geoblocked == "true") {
             var geoBlockPanel:GeoBlockPanel = new GeoBlockPanel();

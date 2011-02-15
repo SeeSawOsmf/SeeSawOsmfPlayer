@@ -5,13 +5,13 @@
  * Time: 17:19
  * To change this template use File | Settings | File Templates.
  */
-package com.seesaw.player.batchEventService.events.manager {
+package com.seesaw.player.batcheventservices.events.manager {
 import com.adobe.serialization.json.JSON;
-import com.seesaw.player.batchEventService.events.BatchEvent;
-import com.seesaw.player.batchEventService.events.ContentEvent;
-import com.seesaw.player.batchEventService.events.CumulativeDurationEvent;
-import com.seesaw.player.batchEventService.events.UserEvent;
-import com.seesaw.player.batchEventService.events.ViewEvent;
+import com.seesaw.player.batcheventservices.events.BatchEvent;
+import com.seesaw.player.batcheventservices.events.ContentEvent;
+import com.seesaw.player.batcheventservices.events.CumulativeDurationEvent;
+import com.seesaw.player.batcheventservices.events.UserEvent;
+import com.seesaw.player.batcheventservices.events.ViewEvent;
 import com.seesaw.player.utils.ServiceRequest;
 
 import flash.net.URLVariables;
@@ -35,11 +35,11 @@ public class EventsManagerImpl implements EventsManager {
     private var flushing:Boolean = false;
     private var allowEvent:Boolean = true;
 
-    public function EventsManagerImpl(view:ViewEvent, availabilityType:String, batchUrl:String, cumulativeUrl:String) {
+    public function EventsManagerImpl(view:ViewEvent, previewMode:String, batchUrl:String, cumulativeUrl:String) {
         this.view = view;
         userEvents = new Array();
         contentEvents = new Array();
-        if (availabilityType == "PREVIEW") {
+        if (previewMode == "true") {
             allowEvent = false;
         }
         batchEventURL = batchUrl;

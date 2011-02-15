@@ -5,10 +5,10 @@
  * Time: 17:18
  * To change this template use File | Settings | File Templates.
  */
-package com.seesaw.player.batchEventService.events.manager {
-import com.seesaw.player.batchEventService.events.ContentEvent;
-import com.seesaw.player.batchEventService.events.CumulativeDurationEvent;
-import com.seesaw.player.batchEventService.events.UserEvent;
+package com.seesaw.player.batcheventservices.events.manager {
+import com.seesaw.player.batcheventservices.events.ContentEvent;
+import com.seesaw.player.batcheventservices.events.CumulativeDurationEvent;
+import com.seesaw.player.batcheventservices.events.UserEvent;
 
 public interface EventsManager {
 
