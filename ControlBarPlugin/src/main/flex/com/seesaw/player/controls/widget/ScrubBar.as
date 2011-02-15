@@ -1,24 +1,24 @@
 /*
- * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
- *
- *    The contents of this file are subject to the Mozilla Public License
- *    Version 1.1 (the "License"); you may not use this file except in
- *    compliance with the License. You may obtain a copy of the
- *    License athttp://www.mozilla.org/MPL/
- *
- *    Software distributed under the License is distributed on an "AS IS"
- *    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- *    License for the specific language governing rights and limitations
- *    under the License.
- *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
- *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
- */
+* Copyright 2010 ioko365 Ltd.  All Rights Reserved.
+*
+*    The contents of this file are subject to the Mozilla Public License
+*    Version 1.1 (the "License"); you may not use this file except in
+*    compliance with the License. You may obtain a copy of the
+*    License athttp://www.mozilla.org/MPL/
+*
+*    Software distributed under the License is distributed on an "AS IS"
+*    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+*    License for the specific language governing rights and limitations
+*    under the License.
+*
+*    The Initial Developer of the Original Code is ioko365 Ltd.
+*    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
+*    Incorporated. All Rights Reserved.
+*
+*    The Initial Developer of the Original Code is ioko365 Ltd.
+*    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
+*    Incorporated. All Rights Reserved.
+*/
 
 package
 com.seesaw.player.controls.widget {
@@ -63,7 +63,6 @@ public class ScrubBar extends Widget implements IWidget {
 
     private var markerContainer:Sprite;
     private var currentTimeInSeconds:Number = 0;
-    private var currentAdState:String = "default";
 
     public function ScrubBar() {
         currentTime = new StyledTextField();
@@ -213,14 +212,11 @@ public class ScrubBar extends Widget implements IWidget {
         logger.debug("onAdMetadataChange");
         if (event.key == AdMetadata.AD_STATE && event.value == AdState.AD_BREAK_COMPLETE) {
             updateAdMarkers();
-        }else   if (event.key == AdMetadata.AD_STATE && event.value == AdState.AD_BREAK_START) {
-
         }
-        currentAdState =  event.value;
     }
 
     private function updateState():void {
-       visible = scrubber.enabled = media ? media.hasTrait(MediaTraitType.SEEK) : false;
+        visible = scrubber.enabled = media ? media.hasTrait(MediaTraitType.SEEK) : false;
         updateTimerState();
     }
 
@@ -274,7 +270,7 @@ public class ScrubBar extends Widget implements IWidget {
             currentTime.text
                     = prettyPrintSeconds(position) + " / " + prettyPrintSeconds(temporal.duration);
 
-            var scrubberX:Number = scrubberStart + getPositionOnScrubBar(position);
+           var scrubberX:Number = scrubberStart + getPositionOnScrubBar(position);
 
             scrubber.x = Math.min(scrubberEnd, Math.max(scrubberStart, scrubberX));
             scrubBarTrail.width = scrubber.x - scrubBarTrail.x + 4;
