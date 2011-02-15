@@ -47,8 +47,6 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
     private var subtitlesOn:Boolean;
     private var subtitlesLabel:TextField;
 
-    private var fullscreen:Boolean = false;
-
     private var mouseOverLabel:Boolean = false;
 
     private var toolTip:PlayerToolTip;

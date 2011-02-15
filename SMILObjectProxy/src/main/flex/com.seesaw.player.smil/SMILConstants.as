@@ -32,6 +32,5 @@ public class SMILConstants {
     public static const SMIL_NAMESPACE:String = "http://www.seesaw.com/player/api/smil";
     public static const CONTENT_TYPE:String = "contentType";
     public static const SMIL_DOCUMENT:String = "smilDocument";
-    public static const AD_BREAK_START:String = "adBreakStart";
 }
 }

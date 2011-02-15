@@ -244,7 +244,6 @@ public class ScrubBar extends Widget implements IWidget {
                     sprite.x = scrubBarTrack.x + getPositionOnScrubBar(value.startTime) - 3;
                     sprite.y = scrubBarTrack.y - 0.5;
                     sprite.graphics.endFill();
-                    logger.debug("adding ad break at {0}x{1}", sprite.x, sprite.y);
                     markerContainer.addChild(sprite);
                 }
             }

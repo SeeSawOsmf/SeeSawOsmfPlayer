@@ -58,7 +58,6 @@ public class BatchEventServicePlugin extends PluginInfo {
     }
 
     private function mediaElementCreationNotificationCallback(target:MediaElement):void {
-        logger.debug("mediaElementCreationNotificationCallback:" + target);
     }
 }
 }

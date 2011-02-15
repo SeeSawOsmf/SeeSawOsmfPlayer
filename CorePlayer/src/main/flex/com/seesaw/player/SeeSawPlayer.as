@@ -46,7 +46,6 @@ import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
 import com.seesaw.player.smil.SMILConstants;
 import com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo;
 import com.seesaw.player.smil.SMILParser;
-import com.seesaw.player.smil.SMILParserEvent;
 
 import flash.display.Sprite;
 import flash.display.StageDisplayState;
@@ -253,7 +252,7 @@ public class SeeSawPlayer extends Sprite {
         logger.debug("triggering cue point: {0}", event.marker.time);
         if (adPlayer && event.marker is CuePoint) {
             var cuePoint:CuePoint = event.marker as CuePoint;
-            if (cuePoint.name == "adBreakStart") {
+            if (cuePoint.name == AdMetadata.AD_BREAK_CUE) {
                 var adBreak:AdBreak = cuePoint.parameters as AdBreak;
                 if (adBreak && !adBreak.complete && adBreak.adPlaylist && adBreak.adPlaylist.numChildren > 0) {
                     player.pause();
@@ -377,10 +376,6 @@ public class SeeSawPlayer extends Sprite {
                 subtitleElement = null;
             }
 
-            var targetMetadata:Metadata = new Metadata();
-            targetMetadata.addValue(PlayerConstants.CONTENT_ID, PlayerConstants.MAIN_CONTENT_ID);
-            mainElement.addMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT, targetMetadata);
-
             logger.debug("loading subtitle plugin");
             factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
 
@@ -442,7 +437,7 @@ public class SeeSawPlayer extends Sprite {
 
             var timelineMetadata:TimelineMetadata =
                     mediaElement.getMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) as TimelineMetadata;
-            if(timelineMetadata) {
+            if (timelineMetadata) {
                 timelineMetadata.addEventListener(TimelineMetadataEvent.MARKER_TIME_REACHED, onCuePoint);
             }
 
@@ -460,7 +455,7 @@ public class SeeSawPlayer extends Sprite {
 
     private function onSmilElementCreated(event:MediaFactoryEvent):void {
         var metadata:Metadata = event.mediaElement.resource.getMetadataValue(SMILConstants.SMIL_NAMESPACE) as Metadata;
-        if(metadata) {
+        if (metadata) {
             var contentType:String = metadata.getValue(SMILConstants.CONTENT_TYPE) as String;
             if (contentType == PlayerConstants.DOG_CONTENT_ID) {
                 // Layout the DOG image in the top left corner
@@ -476,6 +471,9 @@ public class SeeSawPlayer extends Sprite {
                 setMediaLayout(event.mediaElement);
             }
             else if (contentType == PlayerConstants.MAIN_CONTENT_ID) {
+                var targetMetadata:Metadata = new Metadata();
+                targetMetadata.addValue(PlayerConstants.CONTENT_ID, PlayerConstants.MAIN_CONTENT_ID);
+                event.mediaElement.addMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT, targetMetadata);
                 setMediaLayout(event.mediaElement);
             }
         }
