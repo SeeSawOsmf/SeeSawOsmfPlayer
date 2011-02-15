@@ -58,7 +58,6 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
     _requiredTraits[0] = MediaTraitType.TIME;
     _requiredTraits[1] = MediaTraitType.PLAY;
 
-
     private var metadata:Metadata;
 
     public function SubtitlesButton() {
@@ -89,7 +88,8 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
     }
 
     private function doEnabledCheck():void {
-        enabled = metadata.getValue(ControlBarConstants.SUBTITLE_BUTTON_ENABLED) as Boolean;
+        // FIXME: should not be visible during ads
+        enabled = visible = true; // metadata.getValue(ControlBarConstants.SUBTITLE_BUTTON_ENABLED) as Boolean;
     }
 
     override protected function processRequiredTraitsAvailable(element:MediaElement):void {

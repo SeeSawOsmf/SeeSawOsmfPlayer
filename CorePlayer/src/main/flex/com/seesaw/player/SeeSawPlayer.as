@@ -61,7 +61,6 @@ import org.osmf.elements.ParallelElement;
 import org.osmf.elements.SerialElement;
 import org.osmf.events.BufferEvent;
 import org.osmf.events.LoadEvent;
-import org.osmf.events.LoaderEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.events.MediaPlayerStateChangeEvent;
@@ -79,7 +78,6 @@ import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfoResource;
 import org.osmf.media.URLResource;
 import org.osmf.metadata.CuePoint;
-import org.osmf.metadata.CuePointType;
 import org.osmf.metadata.Metadata;
 import org.osmf.metadata.TimelineMetadata;
 import org.osmf.traits.DisplayObjectTrait;
@@ -227,12 +225,13 @@ public class SeeSawPlayer extends Sprite {
 
         player.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onMainPlayerStateChange);
 
-        if (adMode == AdMetadata.CHANNEL_4_AD_TYPE)
-        {
+        if (adMode == AdMetadata.CHANNEL_4_AD_TYPE) {
             logger.debug("configuring container for playlist ads");
             adPlayer = new MediaPlayer();
             adPlayer.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onAdPlayerStateChange);
         }
+
+        setContainerSize(contentWidth, contentHeight);
 
         logger.debug("adding media container to stage");
         addChild(container);
@@ -392,29 +391,36 @@ public class SeeSawPlayer extends Sprite {
             layout.index = 10;
 
             // The subtitle element needs to check and set visibility every time it sets a new display object
-            subtitleElement.addEventListener(MediaElementEvent.TRAIT_ADD, function(event:MediaElementEvent):void {
-                if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
-                    var metadata:Metadata = player.media.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
-                    if (metadata) {
-                        var visible:Boolean = metadata.getValue(ControlBarConstants.SUBTITLES_VISIBLE) as Boolean;
-                        var displayObjectTrait:DisplayObjectTrait =
-                                MediaElement(event.target).getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
-                        displayObjectTrait.displayObject.visible = visible == null ? false : visible;
-
-                        metadata.addValue(ControlBarConstants.SUBTITLE_BUTTON_ENABLED, true);
-                    }
-                }
-            });
+            subtitleElement.addEventListener(MediaElementEvent.TRAIT_ADD, onSubtitleTraitAdd);
 
             var loadTrait:LoadTrait = subtitleElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
-            loadTrait.addEventListener(LoaderEvent.LOAD_STATE_CHANGE, function(event:LoadEvent):void {
-                if (event.loadState == LoadState.LOAD_ERROR) {
-                    // if the subtitles fail to load remove the element to allow the rest of the media to load correctly
-                    mainElement.removeChild(subtitleElement);
-                    subtitleElement = null;
-                }
-            });
+            loadTrait.addEventListener(LoadEvent.LOAD_STATE_CHANGE, onSubtitleLoadStateChange);
+
+            var metadata:Metadata = mainElement.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
+            metadata.addValue(ControlBarConstants.SUBTITLE_BUTTON_ENABLED, true);
+
             mainElement.addChild(subtitleElement);
+        }
+    }
+
+    private function onSubtitleLoadStateChange(event:LoadEvent):void {
+        if (event.loadState == LoadState.LOAD_ERROR) {
+            // if the subtitles fail to load remove the element to allow the rest of the media to load correctly
+            mainElement.removeChild(subtitleElement);
+            subtitleElement = null;
+        }
+    }
+
+    private function onSubtitleTraitAdd(event:MediaElementEvent):void {
+        if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
+            var metadata:Metadata = player.media.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
+            if (metadata) {
+                var visible:Boolean = metadata.getValue(ControlBarConstants.SUBTITLES_VISIBLE) as Boolean;
+
+                var displayObjectTrait:DisplayObjectTrait =
+                        MediaElement(event.target).getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
+                displayObjectTrait.displayObject.visible = visible == null ? false : visible;
+            }
         }
     }
 
@@ -441,6 +447,12 @@ public class SeeSawPlayer extends Sprite {
                 timelineMetadata.addEventListener(TimelineMetadataEvent.MARKER_TIME_REACHED, onCuePoint);
             }
 
+            var subtitleMetadata:Metadata = new Metadata();
+            subtitleMetadata.addValue(PlayerConstants.CONTENT_ID, PlayerConstants.MAIN_CONTENT_ID);
+            mediaElement.addMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT, subtitleMetadata);
+
+            mainElement.addMetadata(ControlBarConstants.CONTROL_BAR_METADATA, new Metadata());
+
             createBufferingPanel();
             createControlBarElement();
             configureAuditude();
@@ -449,8 +461,6 @@ public class SeeSawPlayer extends Sprite {
 
         // get the control bar to point at the main content
         setControlBarTarget(mainElement);
-
-        setContainerSize(contentWidth, contentHeight);
     }
 
     private function onSmilElementCreated(event:MediaFactoryEvent):void {
@@ -471,9 +481,6 @@ public class SeeSawPlayer extends Sprite {
                 setMediaLayout(event.mediaElement);
             }
             else if (contentType == PlayerConstants.MAIN_CONTENT_ID) {
-                var targetMetadata:Metadata = new Metadata();
-                targetMetadata.addValue(PlayerConstants.CONTENT_ID, PlayerConstants.MAIN_CONTENT_ID);
-                event.mediaElement.addMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT, targetMetadata);
                 setMediaLayout(event.mediaElement);
             }
         }
@@ -481,12 +488,14 @@ public class SeeSawPlayer extends Sprite {
 
     private function setMediaLayout(element:MediaElement):void {
         var layout:LayoutMetadata = element.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
-        if (layout) {
-            layout.percentWidth = 100;
-            layout.percentHeight = 100;
-            layout.verticalAlign = VerticalAlign.MIDDLE;
-            layout.horizontalAlign = HorizontalAlign.CENTER;
+        if (layout == null) {
+            layout = new LayoutMetadata();
+            element.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
         }
+        layout.percentWidth = 100;
+        layout.percentHeight = 100;
+        layout.verticalAlign = VerticalAlign.MIDDLE;
+        layout.horizontalAlign = HorizontalAlign.CENTER;
     }
 
     private function configureAuditude():void {
@@ -506,21 +515,6 @@ public class SeeSawPlayer extends Sprite {
             var timeTrait:TimeTrait = element.getTrait(MediaTraitType.TIME) as TimeTrait;
             timeTrait.addEventListener(TimeEvent.COMPLETE, adBreakCompleted);
         }
-    }
-
-    private function setupAdBreaks(element:MediaElement, adBreaks:Vector.<AdBreak>):void {
-        var timelineMetadata:TimelineMetadata = element.getMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) as TimelineMetadata;
-        if (timelineMetadata == null) {
-            timelineMetadata = new TimelineMetadata(element);
-            element.addMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE, timelineMetadata);
-        }
-
-        for each (var adBreak:AdBreak in adBreaks) {
-            logger.debug("creating ad break at {0} seconds", adBreak.startTime);
-            timelineMetadata.addMarker(new CuePoint(CuePointType.EVENT, adBreak.startTime, "adBreakStart", adBreak));
-        }
-
-        timelineMetadata.addEventListener(TimelineMetadataEvent.MARKER_TIME_REACHED, onCuePoint);
     }
 
     private function createControlBarElement():void {
@@ -608,6 +602,8 @@ public class SeeSawPlayer extends Sprite {
     private function onMediaPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
         switch (event.state) {
             case MediaPlayerState.PLAYING:
+                // This was the simplest fix I could find for FEEDBACK-2311.
+                container.validateNow();
                 toggleLights();
                 break;
             case MediaPlayerState.PAUSED:
