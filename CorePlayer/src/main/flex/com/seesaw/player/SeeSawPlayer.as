@@ -31,6 +31,7 @@ import com.seesaw.player.ads.AdState;
 import com.seesaw.player.ads.AuditudeConstants;
 import com.seesaw.player.ads.auditude.AdProxyPluginInfo;
 import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
+import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.batcheventservices.BatchEventServicePlugin;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.controls.ControlBarConstants;
@@ -125,7 +126,6 @@ public class SeeSawPlayer extends Sprite {
     private var videoInfo:XML;
     private var adMode:String;
 
-    private var parser:SMILParser;
     private var currentAdBreak:AdBreak;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
@@ -335,7 +335,7 @@ public class SeeSawPlayer extends Sprite {
         factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
         factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadFailed);
 
-//        factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
 

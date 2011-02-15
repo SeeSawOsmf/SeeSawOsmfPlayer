@@ -57,7 +57,7 @@ public class MainContentElement extends ParallelElement {
             if (metadata) {
                 var smilDocument:XML = metadata.getValue(SMILConstants.SMIL_DOCUMENT) as XML;
                 if (smilDocument) {
-                    var parser:SMILParser = new SMILParser(smilDocument, value, factory);
+                    var parser:SMILParser = new SMILParser(smilDocument, null, factory);
                     var mediaElement:MediaElement = parser.parseMainContent();
 
                     var adBreaks:Vector.<AdBreak> = parser.parseAdBreaks();
@@ -70,8 +70,8 @@ public class MainContentElement extends ParallelElement {
                     addChild(mediaElement);
                 }
             }
+            _resource = value;
         }
-        _resource = value;
     }
 
     private function setupAdBreaks(element:MediaElement, adBreaks:Vector.<AdBreak>):void {

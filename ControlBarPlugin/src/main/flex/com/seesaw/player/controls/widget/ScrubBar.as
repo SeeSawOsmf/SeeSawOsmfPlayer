@@ -102,7 +102,6 @@ public class ScrubBar extends Widget implements IWidget {
             scrubBarTrail.y = scrubBarTrack.y;
             scrubBarTrail.x = scrubBarTrack.x;
 
-
             scrubberStart = scrubBarTrack.x - Math.round(scrubber.width / 2);
             scrubberEnd = scrubberStart + scrubBarWidth;
 
@@ -146,7 +145,6 @@ public class ScrubBar extends Widget implements IWidget {
         scrubBarTrail = assetManager.getDisplayObject(xml.@trackTrail) || new Sprite();
         addChild(scrubBarTrail);
 
-
         scrubber
                 = new Scrubber
                 (assetManager.getDisplayObject(xml.@scrubberUp) || new Sprite()
@@ -173,7 +171,6 @@ public class ScrubBar extends Widget implements IWidget {
     }
 
     override protected function processRequiredTraitsAvailable(media:MediaElement):void {
-//        createAdMarkers();
         logger.debug("processRequiredTraitsAvailable");
         updateState();
     }
