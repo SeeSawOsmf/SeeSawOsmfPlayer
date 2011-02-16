@@ -41,6 +41,7 @@ public class PlayStartButton extends Sprite {
     public static const PLAY_SUBSCRIBED:String = "playSubscribed";
     public static const PREVIEW:String = "preview";
     public static const RESUME:String = "resume";
+    public static const RESUME_SVOD:String = "resumeSVOD";
 
 
     // Requested button type - play, resume or preview
@@ -58,6 +59,9 @@ public class PlayStartButton extends Sprite {
     [Embed(source="resources/resumePreplayButton.png")]
     private var resumeButtonImageEmbed:Class;
     private var resumeButtonImage:Bitmap = new resumeButtonImageEmbed();
+    [Embed(source="resources/resumePreplayButtonS.png")]
+    private var resumeSVODButtonImageEmbed:Class;
+    private var resumeSVODButtonImage:Bitmap = new resumeSVODButtonImageEmbed();
     [Embed(source="resources/Player_Preview.png")]
     private var previewButtonImageEmbed:Class;
     private var previewButtonImage:Bitmap = new previewButtonImageEmbed();
@@ -116,6 +120,10 @@ public class PlayStartButton extends Sprite {
                 break;
             case "resume":
                 proceedButton.addChild(this.resumeButtonImage);
+                this.toolTip = new PlayerToolTip(this, "Resume");
+                break;
+            case "resumeSVOD":
+                proceedButton.addChild(this.resumeSVODButtonImage);
                 this.toolTip = new PlayerToolTip(this, "Resume");
                 break;
             default:

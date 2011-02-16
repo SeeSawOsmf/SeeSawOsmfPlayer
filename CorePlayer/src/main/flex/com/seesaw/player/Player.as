@@ -219,7 +219,15 @@ public class Player extends Sprite {
         // if playButtonMode is null, this indicates that the user has no entitlement to play the video
         if (playButtonMode != null) {
             // assume the resume overrides other play button modes
-            var mode:String = getResumePosition() > 0 ? PlayStartButton.RESUME : playButtonMode;
+            if (getResumePosition() > 0) {
+                if (playButtonMode == PlayStartButton.PLAY_SUBSCRIBED) {
+                    var mode:String = PlayStartButton.RESUME_SVOD;                    
+                } else {
+                    var mode:String = PlayStartButton.RESUME;
+                }
+            } else {
+                var mode:String = playButtonMode;
+            }
             var playButton:PlayStartButton = new PlayStartButton(mode);
             playButton.addEventListener(PlayStartButton.PROCEED, onNextInitialisationState);
             addChild(playButton);
