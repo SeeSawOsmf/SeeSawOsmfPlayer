@@ -27,6 +27,7 @@ public class PlayerConstants {
     public static const SMIL_METADATA_NS:String = "http://www.w3.org/ns/SMIL/metadata";
     public static const CONTROL_BAR_METADATA:String = "http://www.osmf.org/samples/controlbar/metadata";
     public static const CONTENT_INFO:String = "contentInfo";
+    public static const USER_INFO:String = "userInfo";
     public static const CONTENT_ID:String = "contentId";
     public static const VIDEO_INFO:String = "videoInfo";
     public static const CONTENT_TYPE:String = "contentType";

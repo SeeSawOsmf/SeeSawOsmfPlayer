@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<videoInfo xmlns:ns2="http://www.w3.org/ns/SMIL" xmlns="http://www.seesaw.com/api/contentinfo/v1.0">
+    <ns2:smil>
+        <ns2:head>
+            <ns2:meta base="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703"/>
+        </ns2:head>
+        <ns2:body>
+            <ns2:seq>
+                <ns2:video src="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703/mp4:e5/test/cms/clips/playlist_sting2.mp4">
+                    <ns2:metadata>
+                        <ns2:meta content="sting" name="contentType"/>
+                    </ns2:metadata>
+                </ns2:video>
+                <ns2:video
+                        src="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703/mp4:e5/test/cms/clips/DRG/Kingdom_26_v2.mp4">
+                    <ns2:metadata>
+                        <ns2:meta content="sting" name="contentType"/>
+                    </ns2:metadata>
+                </ns2:video>
+                <ns2:switch>
+                    <ns2:video dur="3529" system-bitrate="844000" clipEnd="3529" clipBegin="0"
+                               src="mp4:e5/test/ccp/p/LOW_RES/test/test_asset.mp4?s=1297857083&amp;e=1297857833&amp;h=465d3645a4635e77898187d9a553cc72">
+                        <ns2:metadata>
+                            <ns2:meta content="mainContent" name="contentType"/>
+                        </ns2:metadata>
+                    </ns2:video>
+                    <ns2:video dur="3529" system-bitrate="500000" clipEnd="3529" clipBegin="0"
+                               src="mp4:e5/test/ccp/p/LOW_RES/test/test_asset.mp4?s=1297857083&amp;e=1297857833&amp;h=465d3645a4635e77898187d9a553cc72">
+                        <ns2:metadata>
+                            <ns2:meta content="mainContent" name="contentType"/>
+                        </ns2:metadata>
+                    </ns2:video>
+                    <ns2:video dur="3529" system-bitrate="1581000" clipEnd="3529" clipBegin="0"
+                               src="mp4:e5/test/ccp/p/LOW_RES/test/test_asset.mp4?s=1297857083&amp;e=1297857833&amp;h=465d3645a4635e77898187d9a553cc72">
+                        <ns2:metadata>
+                            <ns2:meta content="mainContent" name="contentType"/>
+                        </ns2:metadata>
+                    </ns2:video>
+                </ns2:switch>
+            </ns2:seq>
+        </ns2:body>
+    </ns2:smil>
+    <geoblocked>false</geoblocked>
+    <serverTimestamp>1297857113402</serverTimestamp>
+    <anonymousUserId>5147733</anonymousUserId>
+    <sectionCount>2</sectionCount>
+    <availability>
+        <availabilityType>TVOD</availabilityType>
+        <noAdsPlayable>false</noAdsPlayable>
+        <tvodPlayable>true</tvodPlayable>
+        <svodPlayable>false</svodPlayable>
+        <exceededDrmRule>false</exceededDrmRule>
+    </availability>
+</videoInfo>

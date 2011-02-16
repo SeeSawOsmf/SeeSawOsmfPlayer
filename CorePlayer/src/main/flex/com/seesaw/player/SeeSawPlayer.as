@@ -122,9 +122,11 @@ public class SeeSawPlayer extends Sprite {
 
     private var playerInit:XML;
     private var videoInfo:XML;
+    private var userInfo:XML;
     private var adMode:String;
 
     private var currentAdBreak:AdBreak;
+    private var controlBarMetadata:Metadata;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
@@ -139,8 +141,10 @@ public class SeeSawPlayer extends Sprite {
         metadata.addEventListener(MetadataEvent.VALUE_CHANGE, playerMetaChange);
 
         playerInit = metadata.getValue(PlayerConstants.CONTENT_INFO) as XML;
-        adMode = String(metadata.getValue(PlayerConstants.CONTENT_INFO).adMode);
         videoInfo = metadata.getValue(PlayerConstants.VIDEO_INFO) as XML;
+        userInfo = metadata.getValue(PlayerConstants.USER_INFO) as XML;
+
+        adMode = String(playerInit.adMode);
 
         factory = config.factory;
         factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
@@ -149,6 +153,9 @@ public class SeeSawPlayer extends Sprite {
 
         player = new MediaPlayer();
         player.autoPlay = false;
+
+        adPlayer = new MediaPlayer();
+        adPlayer.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onAdPlayerStateChange);
 
         mainElement = new ParallelElement();
         container = new MediaContainer();
@@ -211,7 +218,7 @@ public class SeeSawPlayer extends Sprite {
         container.layoutRenderer.addTarget(subtitlesContainer);
         container.layoutRenderer.addTarget(controlbarContainer);
 
-        if (adMode == AdMetadata.AUDITUDE_AD_TYPE) {
+        if (adsEnabled && adMode == AdMetadata.AUDITUDE_AD_TYPE) {
             loadAuditude();
         } else {
             loadPlugins();
@@ -224,12 +231,6 @@ public class SeeSawPlayer extends Sprite {
         player.media = mainElement;
 
         player.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onMainPlayerStateChange);
-
-        if (adMode == AdMetadata.CHANNEL_4_AD_TYPE) {
-            logger.debug("configuring container for playlist ads");
-            adPlayer = new MediaPlayer();
-            adPlayer.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onAdPlayerStateChange);
-        }
 
         setContainerSize(contentWidth, contentHeight);
 
@@ -249,11 +250,11 @@ public class SeeSawPlayer extends Sprite {
 
     private function onCuePoint(event:TimelineMetadataEvent):void {
         logger.debug("triggering cue point: {0}", event.marker.time);
-        if (adPlayer && event.marker is CuePoint) {
+        if (event.marker is CuePoint) {
             var cuePoint:CuePoint = event.marker as CuePoint;
             if (cuePoint.name == AdMetadata.AD_BREAK_CUE) {
                 var adBreak:AdBreak = cuePoint.parameters as AdBreak;
-                if (adBreak && !adBreak.complete && adBreak.adPlaylist && adBreak.adPlaylist.numChildren > 0) {
+                if (adPlayer && adBreak && !adBreak.complete && adBreak.adPlaylist && adBreak.adPlaylist.numChildren > 0) {
                     player.pause();
                     mainContainer.visible = false;
 
@@ -270,6 +271,8 @@ public class SeeSawPlayer extends Sprite {
                     var adMetadata:AdMetadata = mainElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
                     adMetadata.adState = AdState.AD_BREAK_START;
                     adMetadata.adMode = AdMode.AD;
+
+                    setSubtitlesButtonEnabled(false);
 
                     adContainer.visible = true;
                 }
@@ -299,6 +302,8 @@ public class SeeSawPlayer extends Sprite {
             var adMetadata:AdMetadata = mainElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
             adMetadata.adState = AdState.AD_BREAK_COMPLETE;
             adMetadata.adMode = AdMode.MAIN_CONTENT;
+
+            setSubtitlesButtonEnabled(subtitleElement != null);
 
             mainContainer.visible = true;
 
@@ -334,25 +339,36 @@ public class SeeSawPlayer extends Sprite {
         factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
         factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadFailed);
 
-        if (adMode == AdMetadata.LR_AD_TYPE)
-            factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.liverail.AdProxyPluginInfo()));
-        else if (adMode == AdMetadata.AUDITUDE_AD_TYPE)
-            factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.auditude.AdProxyPluginInfo()));
+        setupAdProvider();
 
         factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
         factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
-
-
         factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
 
         createVideoElement();
     }
 
+    private function setupAdProvider():void {
+        if(!adsEnabled) {
+            // just play and don't bother to load the ad plugins
+            player.autoPlay = true;
+            return;
+        }
+
+        if (adMode == AdMetadata.LR_AD_TYPE) {
+            logger.debug("configuring liverail ads");
+            factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.liverail.AdProxyPluginInfo()));
+        } else if (adMode == AdMetadata.CHANNEL_4_AD_TYPE) {
+            logger.debug("configuring playlist ads");
+        }  else if (adMode == AdMetadata.AUDITUDE_AD_TYPE) {
+            factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.auditude.AdProxyPluginInfo()));
+        }
+    }
+
     private function onPluginLoadFailed(event:MediaFactoryEvent):void {
         logger.debug("PROBLEM LOADING " + event.toString());
-        trace("hello");
     }
 
     private function createBufferingPanel():void {
@@ -398,26 +414,27 @@ public class SeeSawPlayer extends Sprite {
             var loadTrait:LoadTrait = subtitleElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
             loadTrait.addEventListener(LoadEvent.LOAD_STATE_CHANGE, onSubtitleLoadStateChange);
 
-            var metadata:Metadata = mainElement.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
-            metadata.addValue(ControlBarConstants.SUBTITLE_BUTTON_ENABLED, true);
-
             mainElement.addChild(subtitleElement);
         }
     }
 
     private function onSubtitleLoadStateChange(event:LoadEvent):void {
         if (event.loadState == LoadState.LOAD_ERROR) {
+            logger.error("failed to load subtitles");
             // if the subtitles fail to load remove the element to allow the rest of the media to load correctly
             mainElement.removeChild(subtitleElement);
             subtitleElement = null;
+            setSubtitlesButtonEnabled(false);
+        }
+        else if (event.loadState == LoadState.READY) {
+            setSubtitlesButtonEnabled(true);
         }
     }
 
     private function onSubtitleTraitAdd(event:MediaElementEvent):void {
         if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
-            var metadata:Metadata = player.media.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
-            if (metadata) {
-                var visible:Boolean = metadata.getValue(ControlBarConstants.SUBTITLES_VISIBLE) as Boolean;
+            if (controlBarMetadata) {
+                var visible:Boolean = controlBarMetadata.getValue(ControlBarConstants.SUBTITLES_VISIBLE) as Boolean;
 
                 var displayObjectTrait:DisplayObjectTrait =
                         MediaElement(event.target).getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
@@ -434,14 +451,13 @@ public class SeeSawPlayer extends Sprite {
         config.resource.addMetadataValue(SMILConstants.SMIL_NAMESPACE, metadata);
 
         factory.addEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onSmilElementCreated);
+
         var mediaElement:MediaElement = factory.createMediaElement(config.resource);
+
         factory.removeEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onSmilElementCreated);
 
         if (mediaElement) {
             mainElement.addChild(mediaElement);
-
-            mainElement.addEventListener(MediaElementEvent.METADATA_ADD, onContentMetadataAdd);
-            mainElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onContentMetadataRemove);
 
             var timelineMetadata:TimelineMetadata =
                     mediaElement.getMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) as TimelineMetadata;
@@ -453,11 +469,14 @@ public class SeeSawPlayer extends Sprite {
             subtitleMetadata.addValue(PlayerConstants.CONTENT_ID, PlayerConstants.MAIN_CONTENT_ID);
             mediaElement.addMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT, subtitleMetadata);
 
-            mainElement.addMetadata(ControlBarConstants.CONTROL_BAR_METADATA, new Metadata());
+            controlBarMetadata = new Metadata();
+            controlBarMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
+            controlBarMetadata.addEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
+            mainElement.addMetadata(ControlBarConstants.CONTROL_BAR_METADATA, controlBarMetadata);
 
             createBufferingPanel();
             createControlBarElement();
-            configureAuditude();
+            if (adMode == AdMetadata.AUDITUDE_AD_TYPE)  configureAuditude(mediaElement);
             createSubtitleElement();
         }
 
@@ -506,10 +525,10 @@ public class SeeSawPlayer extends Sprite {
         layout.horizontalAlign = HorizontalAlign.CENTER;
     }
 
-    private function configureAuditude():void {
-        if (mainElement is IAuditudeMediaElement) {
+    private function configureAuditude(mediaElement:MediaElement):void {
+        if (mediaElement is IAuditudeMediaElement) {
             logger.debug("configuring Auditude");
-            var _auditude:AuditudePlugin = IAuditudeMediaElement(mainElement).plugin;
+            var _auditude:AuditudePlugin = IAuditudeMediaElement(mediaElement).plugin;
 
             // We set this in the metadata so the auditude AdProxy can pick up the plugin
             var metadata:Metadata = config.resource.getMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) as Metadata;
@@ -568,23 +587,8 @@ public class SeeSawPlayer extends Sprite {
         container.height = height;
     }
 
-    private function onContentMetadataAdd(event:MediaElementEvent):void {
-        if (event.namespaceURL == ControlBarConstants.CONTROL_BAR_METADATA) {
-            var metadata:Metadata = mainElement.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
-            metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
-            metadata.addEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
-        }
-    }
-
-    private function onContentMetadataRemove(event:MediaElementEvent):void {
-        if (event.namespaceURL == ControlBarConstants.CONTROL_BAR_METADATA) {
-            var metadata:Metadata = mainElement.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
-            metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
-            metadata.removeEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
-        }
-    }
-
     private function onControlBarMetadataChange(event:MetadataEvent):void {
+        logger.debug("control bar metadata change: {0} = {1}", event.key, event.value);
         switch (event.key) {
             case ControlBarConstants.CONTROL_BAR_HIDDEN:
                 if (subtitleElement) {
@@ -668,6 +672,19 @@ public class SeeSawPlayer extends Sprite {
                 dispatchEvent(new Event(PlayerConstants.DESTROY));
             }
         }
+    }
+
+    public function get adsEnabled():Boolean {
+        if(userInfo.availability.tvodPlayable == "true" || userInfo.availability.svodPlayable == "true" || (userInfo.availability.noAdsPlayable && !userInfo.availability.exceededDrmRule)){
+          return false;
+        } else {
+            return true;
+        }
+    }
+
+    private function setSubtitlesButtonEnabled(enabled:Boolean):void {
+        if (controlBarMetadata)
+            controlBarMetadata.addValue(ControlBarConstants.SUBTITLE_BUTTON_ENABLED, enabled);
     }
 
     public function get contentWidth():int {

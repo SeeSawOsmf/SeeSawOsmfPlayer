@@ -35,7 +35,6 @@ import flash.text.TextFormat;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.chrome.widgets.ButtonWidget;
-import org.osmf.events.MetadataEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.metadata.Metadata;
 import org.osmf.traits.MediaTraitType;
@@ -88,8 +87,7 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
     }
 
     private function doEnabledCheck():void {
-        // FIXME: should not be visible during ads
-        enabled = visible = true; // metadata.getValue(ControlBarConstants.SUBTITLE_BUTTON_ENABLED) as Boolean;
+        enabled = visible = metadata.getValue(ControlBarConstants.SUBTITLE_BUTTON_ENABLED) as Boolean;
     }
 
     override protected function processRequiredTraitsAvailable(element:MediaElement):void {
@@ -134,7 +132,6 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
     }
 
     override protected function onMouseClick(event:MouseEvent):void {
-        logger.debug("X POS: " + this.x + " WIDTH: " + this.width);
         if (this.subtitlesOn == false) {
             subtitlesLabel.text = "Subtitles are on";
             this.toolTip.updateToolTip("Subtitles are on");

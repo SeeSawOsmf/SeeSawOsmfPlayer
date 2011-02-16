@@ -157,7 +157,7 @@ public class AdProxy extends ProxyElement {
 
     private function onMetaDataAdd(event:MediaElementEvent):void {
         if (event.namespaceURL == AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) {
-
+           trace(event);
         }
     }
 
@@ -280,9 +280,6 @@ public class AdProxy extends ProxyElement {
     private function onBreakBegin(event:AdPluginEvent):void {
         logger.debug("AD BREAK BEGIN");
 
-        if (adBreakCount == 0) {  // TODO this is a temporary fix, as we have little info about the ammount of adverts available
-            playerMetadata.addValue(AdMetadata.SECTION_COUNT, -1);
-        }
         adBreakCount++;
         // Perhaps this is needed for mid-rolls
         //pause();

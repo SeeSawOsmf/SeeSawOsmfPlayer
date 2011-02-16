@@ -62,6 +62,10 @@
                             <name>PLAYER::DEV_MODE</name>
                             <value>${player.dev_mode}</value>
                         </property>
+                        <property>
+                            <name>PLAYER::BUILD_TIMESTAMP</name>
+                            <value>'${maven.build.timestamp}'</value>
+                        </property>
                     </definesDeclaration>
                     <templateURI>folder:${basedir}/src/main/html-template</templateURI>
                 </configuration>
@@ -91,7 +95,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <player.dev_mode>true</player.dev_mode>
+                <player.dev_mode>false</player.dev_mode>
             </properties>
         </profile>
         <profile>
@@ -196,5 +200,7 @@
         </dependency>
     </dependencies>
 
-
+    <properties>
+        <maven.build.timestamp.format>dd-MM-yyyy HH:mm</maven.build.timestamp.format>
+    </properties>
 </project>

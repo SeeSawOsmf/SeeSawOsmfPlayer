@@ -56,6 +56,8 @@ import flash.display.StageScaleMode;
 import flash.events.Event;
 import flash.external.ExternalInterface;
 import flash.net.URLVariables;
+import flash.ui.ContextMenu;
+import flash.ui.ContextMenuItem;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -121,6 +123,14 @@ public class Player extends Sprite {
     private function onAddedToStage(event:Event):void {
         logger.debug("added to stage");
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+
+        if (PLAYER::V && PLAYER::BUILD_TIMESTAMP) {
+            var menu:ContextMenu = new ContextMenu();
+            menu.hideBuiltInItems();
+            menu.customItems.push(new ContextMenuItem("Version: " + PLAYER::V));
+            menu.customItems.push(new ContextMenuItem("Built: " + PLAYER::BUILD_TIMESTAMP));
+            contextMenu = menu;
+        }
 
         if (PLAYER::DEV_MODE) {
             loadDevConfiguration();
@@ -220,7 +230,15 @@ public class Player extends Sprite {
         // if playButtonMode is null, this indicates that the user has no entitlement to play the video
         if (playButtonMode != null) {
             // assume the resume overrides other play button modes
-            var mode:String = getResumePosition() > 0 ? PlayStartButton.RESUME : playButtonMode;
+            if (getResumePosition() > 0) {
+                if (playButtonMode == PlayStartButton.PLAY_SUBSCRIBED) {
+                    var mode:String = PlayStartButton.RESUME_SVOD;
+                } else {
+                    var mode:String = PlayStartButton.RESUME;
+                }
+            } else {
+                var mode:String = playButtonMode;
+            }
             var playButton:PlayStartButton = new PlayStartButton(mode);
             playButton.addEventListener(PlayStartButton.PROCEED, onNextInitialisationState);
             addChild(playButton);
@@ -485,6 +503,7 @@ public class Player extends Sprite {
         var metadata:Metadata = new Metadata();
         metadata.addValue(PlayerConstants.CONTENT_INFO, playerInit);
         metadata.addValue(PlayerConstants.VIDEO_INFO, videoInfo);
+        metadata.addValue(PlayerConstants.USER_INFO, userInit);
         resource.addMetadataValue(PlayerConstants.METADATA_NAMESPACE, metadata);
 
         metadata = new Metadata();
@@ -493,9 +512,11 @@ public class Player extends Sprite {
         metadata = new Metadata();
         resource.addMetadataValue(AutoResumeConstants.SETTINGS_NAMESPACE, metadata);
 
-
         metadata = new Metadata();
         resource.addMetadataValue(BatchEventContants.SETTINGS_NAMESPACE, metadata);
+
+         metadata = new Metadata();
+         resource.addMetadataValue(BatchEventContants.SETTINGS_NAMESPACE, metadata);
 
 
         if (playerInit && playerInit.adMode == LiverailConstants.AD_MODE_ID) {
