@@ -20,6 +20,6 @@
   ~ Incorporated. All Rights Reserved.
   -->
 <config>
-    <userInitUrl>../src/test/resources/userInfo.tvod.xml</userInitUrl>
-    <playerInitUrl>../src/test/resources/contentInfo.tvod.xml</playerInitUrl>
+    <userInitUrl>../src/test/resources/userInfo.xml</userInitUrl>
+    <playerInitUrl>../src/test/resources/contentInfo.noad.xml</playerInitUrl>
 </config>
