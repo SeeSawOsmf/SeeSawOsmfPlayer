@@ -125,6 +125,7 @@ public class SeeSawPlayer extends Sprite {
     private var adMode:String;
 
     private var currentAdBreak:AdBreak;
+    private var controlBarMetadata:Metadata;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
@@ -271,6 +272,8 @@ public class SeeSawPlayer extends Sprite {
                     adMetadata.adState = AdState.AD_BREAK_START;
                     adMetadata.adMode = AdMode.AD;
 
+                    setSubtitlesButtonEnabled(false);
+
                     adContainer.visible = true;
                 }
             }
@@ -299,6 +302,8 @@ public class SeeSawPlayer extends Sprite {
             var adMetadata:AdMetadata = mainElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
             adMetadata.adState = AdState.AD_BREAK_COMPLETE;
             adMetadata.adMode = AdMode.MAIN_CONTENT;
+
+            setSubtitlesButtonEnabled(subtitleElement != null);
 
             mainContainer.visible = true;
 
@@ -343,9 +348,6 @@ public class SeeSawPlayer extends Sprite {
         factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
-
-
-
         factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
 
         createVideoElement();
@@ -398,26 +400,27 @@ public class SeeSawPlayer extends Sprite {
             var loadTrait:LoadTrait = subtitleElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
             loadTrait.addEventListener(LoadEvent.LOAD_STATE_CHANGE, onSubtitleLoadStateChange);
 
-            var metadata:Metadata = mainElement.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
-            metadata.addValue(ControlBarConstants.SUBTITLE_BUTTON_ENABLED, true);
-
             mainElement.addChild(subtitleElement);
         }
     }
 
     private function onSubtitleLoadStateChange(event:LoadEvent):void {
         if (event.loadState == LoadState.LOAD_ERROR) {
+            logger.error("failed to load subtitles");
             // if the subtitles fail to load remove the element to allow the rest of the media to load correctly
             mainElement.removeChild(subtitleElement);
             subtitleElement = null;
+            setSubtitlesButtonEnabled(false);
+        }
+        else if (event.loadState == LoadState.READY) {
+            setSubtitlesButtonEnabled(true);
         }
     }
 
     private function onSubtitleTraitAdd(event:MediaElementEvent):void {
         if (event.traitType == MediaTraitType.DISPLAY_OBJECT) {
-            var metadata:Metadata = player.media.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
-            if (metadata) {
-                var visible:Boolean = metadata.getValue(ControlBarConstants.SUBTITLES_VISIBLE) as Boolean;
+            if (controlBarMetadata) {
+                var visible:Boolean = controlBarMetadata.getValue(ControlBarConstants.SUBTITLES_VISIBLE) as Boolean;
 
                 var displayObjectTrait:DisplayObjectTrait =
                         MediaElement(event.target).getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
@@ -440,9 +443,6 @@ public class SeeSawPlayer extends Sprite {
         if (mediaElement) {
             mainElement.addChild(mediaElement);
 
-            mainElement.addEventListener(MediaElementEvent.METADATA_ADD, onContentMetadataAdd);
-            mainElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onContentMetadataRemove);
-
             var timelineMetadata:TimelineMetadata =
                     mediaElement.getMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) as TimelineMetadata;
             if (timelineMetadata) {
@@ -453,7 +453,10 @@ public class SeeSawPlayer extends Sprite {
             subtitleMetadata.addValue(PlayerConstants.CONTENT_ID, PlayerConstants.MAIN_CONTENT_ID);
             mediaElement.addMetadata(SAMIPluginInfo.NS_TARGET_ELEMENT, subtitleMetadata);
 
-            mainElement.addMetadata(ControlBarConstants.CONTROL_BAR_METADATA, new Metadata());
+            controlBarMetadata = new Metadata();
+            controlBarMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
+            controlBarMetadata.addEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
+            mainElement.addMetadata(ControlBarConstants.CONTROL_BAR_METADATA, controlBarMetadata);
 
             createBufferingPanel();
             createControlBarElement();
@@ -562,23 +565,8 @@ public class SeeSawPlayer extends Sprite {
         container.height = height;
     }
 
-    private function onContentMetadataAdd(event:MediaElementEvent):void {
-        if (event.namespaceURL == ControlBarConstants.CONTROL_BAR_METADATA) {
-            var metadata:Metadata = mainElement.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
-            metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
-            metadata.addEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
-        }
-    }
-
-    private function onContentMetadataRemove(event:MediaElementEvent):void {
-        if (event.namespaceURL == ControlBarConstants.CONTROL_BAR_METADATA) {
-            var metadata:Metadata = mainElement.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
-            metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
-            metadata.removeEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
-        }
-    }
-
     private function onControlBarMetadataChange(event:MetadataEvent):void {
+        logger.debug("control bar metadata change: {0} = {1}", event.key, event.value);
         switch (event.key) {
             case ControlBarConstants.CONTROL_BAR_HIDDEN:
                 if (subtitleElement) {
@@ -662,6 +650,11 @@ public class SeeSawPlayer extends Sprite {
                 dispatchEvent(new Event(PlayerConstants.DESTROY));
             }
         }
+    }
+
+    private function setSubtitlesButtonEnabled(enabled:Boolean):void {
+        if (controlBarMetadata)
+            controlBarMetadata.addValue(ControlBarConstants.SUBTITLE_BUTTON_ENABLED, enabled);
     }
 
     public function get contentWidth():int {
