@@ -56,9 +56,7 @@ import flash.display.StageScaleMode;
 import flash.events.Event;
 import flash.external.ExternalInterface;
 import flash.net.URLVariables;
-
 import flash.ui.ContextMenu;
-
 import flash.ui.ContextMenuItem;
 
 import org.as3commons.logging.ILogger;
@@ -126,7 +124,7 @@ public class Player extends Sprite {
         logger.debug("added to stage");
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 
-        if(PLAYER::V && PLAYER::BUILD_TIMESTAMP) {
+        if (PLAYER::V && PLAYER::BUILD_TIMESTAMP) {
             var menu:ContextMenu = new ContextMenu();
             menu.hideBuiltInItems();
             menu.customItems.push(new ContextMenuItem("Version: " + PLAYER::V));
@@ -234,7 +232,7 @@ public class Player extends Sprite {
             // assume the resume overrides other play button modes
             if (getResumePosition() > 0) {
                 if (playButtonMode == PlayStartButton.PLAY_SUBSCRIBED) {
-                    var mode:String = PlayStartButton.RESUME_SVOD;                    
+                    var mode:String = PlayStartButton.RESUME_SVOD;
                 } else {
                     var mode:String = PlayStartButton.RESUME;
                 }
@@ -414,7 +412,7 @@ public class Player extends Sprite {
         // we need to evaluate if ads are not required for SVOD, TVOD and NO_ADS and adjust the
         // adMode which is then persisted as metaData
         playerInit.adMode[0] = adModulePlayableEvaluation();
-        playerInit.preview[0] =  userInit.preview;
+        playerInit.preview[0] = userInit.preview;
 
         if (videoInfo.geoblocked == "true") {
             var geoBlockPanel:GeoBlockPanel = new GeoBlockPanel();
@@ -505,6 +503,7 @@ public class Player extends Sprite {
         var metadata:Metadata = new Metadata();
         metadata.addValue(PlayerConstants.CONTENT_INFO, playerInit);
         metadata.addValue(PlayerConstants.VIDEO_INFO, videoInfo);
+        metadata.addValue(PlayerConstants.USER_INFO, userInit);
         resource.addMetadataValue(PlayerConstants.METADATA_NAMESPACE, metadata);
 
         metadata = new Metadata();
@@ -513,10 +512,8 @@ public class Player extends Sprite {
         metadata = new Metadata();
         resource.addMetadataValue(AutoResumeConstants.SETTINGS_NAMESPACE, metadata);
 
-
-         metadata = new Metadata();
-         resource.addMetadataValue(BatchEventContants.SETTINGS_NAMESPACE, metadata);
-
+        metadata = new Metadata();
+        resource.addMetadataValue(BatchEventContants.SETTINGS_NAMESPACE, metadata);
 
         if (playerInit && playerInit.adMode == LiverailConstants.AD_MODE_ID) {
             metadata = new Metadata();

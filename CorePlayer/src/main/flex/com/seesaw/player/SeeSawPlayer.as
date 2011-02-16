@@ -29,7 +29,6 @@ import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.ads.AdMode;
 import com.seesaw.player.ads.AdState;
 import com.seesaw.player.ads.AuditudeConstants;
-import com.seesaw.player.ads.auditude.AdProxyPluginInfo;
 import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.batcheventservices.BatchEventServicePlugin;
@@ -122,6 +121,7 @@ public class SeeSawPlayer extends Sprite {
 
     private var playerInit:XML;
     private var videoInfo:XML;
+    private var userInfo:XML;
     private var adMode:String;
 
     private var currentAdBreak:AdBreak;
@@ -140,8 +140,10 @@ public class SeeSawPlayer extends Sprite {
         metadata.addEventListener(MetadataEvent.VALUE_CHANGE, playerMetaChange);
 
         playerInit = metadata.getValue(PlayerConstants.CONTENT_INFO) as XML;
-        adMode = String(metadata.getValue(PlayerConstants.CONTENT_INFO).adMode);
         videoInfo = metadata.getValue(PlayerConstants.VIDEO_INFO) as XML;
+        userInfo = metadata.getValue(PlayerConstants.USER_INFO) as XML;
+
+        adMode = String(playerInit.adMode);
 
         factory = config.factory;
         factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
@@ -150,6 +152,9 @@ public class SeeSawPlayer extends Sprite {
 
         player = new MediaPlayer();
         player.autoPlay = false;
+
+        adPlayer = new MediaPlayer();
+        adPlayer.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onAdPlayerStateChange);
 
         mainElement = new ParallelElement();
         container = new MediaContainer();
@@ -212,7 +217,7 @@ public class SeeSawPlayer extends Sprite {
         container.layoutRenderer.addTarget(subtitlesContainer);
         container.layoutRenderer.addTarget(controlbarContainer);
 
-        if (adMode == AdMetadata.AUDITUDE_AD_TYPE) {
+        if (adsEnabled && adMode == AdMetadata.AUDITUDE_AD_TYPE) {
             loadAuditude();
         } else {
             loadPlugins();
@@ -225,12 +230,6 @@ public class SeeSawPlayer extends Sprite {
         player.media = mainElement;
 
         player.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onMainPlayerStateChange);
-
-        if (adMode == AdMetadata.CHANNEL_4_AD_TYPE) {
-            logger.debug("configuring container for playlist ads");
-            adPlayer = new MediaPlayer();
-            adPlayer.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onAdPlayerStateChange);
-        }
 
         setContainerSize(contentWidth, contentHeight);
 
@@ -250,11 +249,11 @@ public class SeeSawPlayer extends Sprite {
 
     private function onCuePoint(event:TimelineMetadataEvent):void {
         logger.debug("triggering cue point: {0}", event.marker.time);
-        if (adPlayer && event.marker is CuePoint) {
+        if (event.marker is CuePoint) {
             var cuePoint:CuePoint = event.marker as CuePoint;
             if (cuePoint.name == AdMetadata.AD_BREAK_CUE) {
                 var adBreak:AdBreak = cuePoint.parameters as AdBreak;
-                if (adBreak && !adBreak.complete && adBreak.adPlaylist && adBreak.adPlaylist.numChildren > 0) {
+                if (adPlayer && adBreak && !adBreak.complete && adBreak.adPlaylist && adBreak.adPlaylist.numChildren > 0) {
                     player.pause();
                     mainContainer.visible = false;
 
@@ -339,10 +338,7 @@ public class SeeSawPlayer extends Sprite {
         factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
         factory.removeEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadFailed);
 
-        if (adMode == AdMetadata.LR_AD_TYPE)
-            factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.liverail.AdProxyPluginInfo()));
-        else if (adMode == AdMetadata.AUDITUDE_AD_TYPE)
-            factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.auditude.AdProxyPluginInfo()));
+        setupAdProvider();
 
         factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
         factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
@@ -351,6 +347,22 @@ public class SeeSawPlayer extends Sprite {
         factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
 
         createVideoElement();
+    }
+
+    private function setupAdProvider():void {
+        if(!adsEnabled) {
+            // just play and don't bother to load the ad plugins
+            player.autoPlay = true;
+            return;
+        }
+
+        if (adMode == AdMetadata.LR_AD_TYPE) {
+            logger.debug("configuring liverail ads");
+            factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
+        }
+        else if (adMode == AdMetadata.CHANNEL_4_AD_TYPE) {
+            logger.debug("configuring playlist ads");
+        }
     }
 
     private function onPluginLoadFailed(event:MediaFactoryEvent):void {
@@ -650,6 +662,10 @@ public class SeeSawPlayer extends Sprite {
                 dispatchEvent(new Event(PlayerConstants.DESTROY));
             }
         }
+    }
+
+    public function get adsEnabled():Boolean {
+        return userInfo.tvodPlayable && !userInfo.exceededDrmRule;
     }
 
     private function setSubtitlesButtonEnabled(enabled:Boolean):void {
