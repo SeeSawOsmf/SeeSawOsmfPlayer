@@ -171,11 +171,19 @@ public class SMILParser extends EventDispatcher {
     public function parseMainContent():MediaElement {
         var mainElement:MediaElement = null;
         for each (var child:XML in smilDocument.body.seq.*) {
-            for each (var video:XML in child..video) {
-                var contentType:String = video..meta.(@name == SMILConstants.CONTENT_TYPE).@content;
+            if(child.name().localName == "video") {
+                var contentType:String = child..meta.(@name == SMILConstants.CONTENT_TYPE).@content;
                 if (contentType == "mainContent") {
                     mainElement = parseChild(child);
-                    break;
+                }
+            }
+            else {
+                for each (var video:XML in child..video) {
+                    var contentType:String = video..meta.(@name == SMILConstants.CONTENT_TYPE).@content;
+                    if (contentType == "mainContent") {
+                        mainElement = parseChild(child);
+                        break;
+                    }
                 }
             }
             if (mainElement) break;
