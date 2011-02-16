@@ -26,6 +26,7 @@ import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.ads.AuditudeConstants;
 import com.seesaw.player.ads.LiverailConstants;
 import com.seesaw.player.autoresume.AutoResumeConstants;
+import com.seesaw.player.batcheventservices.BatchEventContants;
 import com.seesaw.player.buttons.PlayStartButton;
 import com.seesaw.player.external.PlayerExternalInterface;
 import com.seesaw.player.external.PlayerExternalInterfaceImpl;
@@ -499,6 +500,11 @@ public class Player extends Sprite {
 
         metadata = new Metadata();
         resource.addMetadataValue(AutoResumeConstants.SETTINGS_NAMESPACE, metadata);
+
+
+         metadata = new Metadata();
+         resource.addMetadataValue(BatchEventContants.SETTINGS_NAMESPACE, metadata);
+
 
         if (playerInit && playerInit.adMode == LiverailConstants.AD_MODE_ID) {
             metadata = new Metadata();

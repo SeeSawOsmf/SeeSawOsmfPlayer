@@ -303,7 +303,7 @@ public class BatchEventServices extends ProxyElement {
     }
 
     private function onAdsMetaDataChange(event:MetadataEvent):void {
-        if (event.key == AdMetadata.AD_STATE) {
+        if (event.key == AdMetadata.AD_STATE || event.key == AdMetadata.AD_MODE ) {
             AdMetaEvaluation(event.value);
         } else {
             AdMetaEvaluation(event.key);
@@ -335,6 +335,9 @@ public class BatchEventServices extends ProxyElement {
 
         } else if (value == AdMetadata.CLICK_THRU) {
             eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.CLICK));
+        }  else if(value == "mainContent") {
+               contentUrl = "mainResource";
+            defineContentUrl(false);
         }
     }
 

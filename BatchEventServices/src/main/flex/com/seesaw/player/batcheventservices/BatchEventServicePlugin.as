@@ -1,6 +1,4 @@
 package com.seesaw.player.batcheventservices {
-import com.seesaw.player.PlayerConstants;
-
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.media.MediaElement;
@@ -8,7 +6,6 @@ import org.osmf.media.MediaFactoryItem;
 import org.osmf.media.MediaFactoryItemType;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.PluginInfo;
-import org.osmf.metadata.Metadata;
 
 public class BatchEventServicePlugin extends PluginInfo {
 
@@ -32,15 +29,11 @@ public class BatchEventServicePlugin extends PluginInfo {
     }
 
     private static function canHandleResourceFunction(resource:MediaResourceBase):Boolean {
-        logger.debug("can handle this resource: " + resource);
-        var result:Boolean;
-
-        if (resource != null) {
-            var settings:Metadata = resource.getMetadataValue(PlayerConstants.SMIL_METADATA_NS) as Metadata;
-            result = settings != null;
+      var canHandle:Boolean = resource && resource.getMetadataValue(BatchEventContants.SETTINGS_NAMESPACE) != null;
+        if(canHandle) {
+            logger.debug("handling resource: {0}", resource);
         }
-
-        return result;
+        return canHandle;
     }
 
     private static function mediaElementCreationFunction():MediaElement {
