@@ -173,7 +173,7 @@ public class SMILParser extends EventDispatcher {
         for each (var child:XML in smilDocument.body.seq.*) {
             for each (var video:XML in child..video) {
                 var contentType:String = video..meta.(@name == SMILConstants.CONTENT_TYPE).@content;
-                if (contentType == "mainContent" || contentType == "clip") {
+                if (contentType == "mainContent") {
                     mainElement = parseChild(child);
                     break;
                 }
