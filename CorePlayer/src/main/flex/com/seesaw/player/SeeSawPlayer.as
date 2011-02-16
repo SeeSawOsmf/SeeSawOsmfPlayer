@@ -407,6 +407,7 @@ public class SeeSawPlayer extends Sprite {
             layout.horizontalAlign = HorizontalAlign.CENTER;
             layout.verticalAlign = VerticalAlign.BOTTOM;
             layout.index = 10;
+            layout.bottom = 20;
 
             // The subtitle element needs to check and set visibility every time it sets a new display object
             subtitleElement.addEventListener(MediaElementEvent.TRAIT_ADD, onSubtitleTraitAdd);
@@ -580,6 +581,7 @@ public class SeeSawPlayer extends Sprite {
     private function onFullscreen(event:FullScreenEvent):void {
         logger.debug("onFullscreen: " + event.fullScreen);
         setContainerSize(contentWidth, contentHeight);
+        container.validateNow();
     }
 
     private function setContainerSize(width:int, height:int):void {
@@ -591,16 +593,12 @@ public class SeeSawPlayer extends Sprite {
         logger.debug("control bar metadata change: {0} = {1}", event.key, event.value);
         switch (event.key) {
             case ControlBarConstants.CONTROL_BAR_HIDDEN:
-                if (subtitleElement) {
-                    var layoutMetadata:LayoutMetadata =
-                            subtitleElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
-                    if (layoutMetadata) {
-                        layoutMetadata.bottom = event.value ? 20 : 110;
-                    }
-                }
+                updateSubtitlePosition();
                 break;
             case ControlBarConstants.SUBTITLES_VISIBLE:
                 if (subtitleElement) {
+                    updateSubtitlePosition();
+
                     var displayTrait:DisplayObjectTrait =
                             subtitleElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
                     if (displayTrait) {
@@ -608,6 +606,29 @@ public class SeeSawPlayer extends Sprite {
                     }
                 }
                 break;
+        }
+    }
+
+    private function updateSubtitlePosition():void {
+        if (subtitleElement) {
+            var layoutMetadata:LayoutMetadata =
+                    subtitleElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
+
+            var controlBarHeight:int = 0;
+            var controlBarVisible:Boolean = false;
+
+            if(controlBarElement) {
+                var displayTrait:DisplayObjectTrait =
+                            controlBarElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
+                if(displayTrait) {
+                    controlBarVisible = displayTrait.displayObject.visible;
+                    controlBarHeight = displayTrait.mediaHeight + 10;
+                }
+            }
+
+            if (layoutMetadata) {
+                layoutMetadata.bottom = controlBarVisible ? controlBarHeight : 20;
+            }
         }
     }
 
