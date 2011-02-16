@@ -394,7 +394,7 @@ public class Player extends Sprite {
         // we need to evaluate if ads are not required for SVOD, TVOD and NO_ADS and adjust the
         // adMode which is then persisted as metaData
         playerInit.adMode[0] = adModulePlayableEvaluation();
-        playerInit.preview[0] =  userInit.preview;
+        playerInit.preview[0] = userInit.preview;
 
         if (videoInfo.geoblocked == "true") {
             var geoBlockPanel:GeoBlockPanel = new GeoBlockPanel();
@@ -494,8 +494,8 @@ public class Player extends Sprite {
         resource.addMetadataValue(AutoResumeConstants.SETTINGS_NAMESPACE, metadata);
 
 
-         metadata = new Metadata();
-         resource.addMetadataValue(BatchEventContants.SETTINGS_NAMESPACE, metadata);
+        metadata = new Metadata();
+        resource.addMetadataValue(BatchEventContants.SETTINGS_NAMESPACE, metadata);
 
 
         if (playerInit && playerInit.adMode == LiverailConstants.AD_MODE_ID) {

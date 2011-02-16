@@ -86,30 +86,12 @@ public class AdProxy extends ProxyElement {
     }
 
     private function onAuditudeInit(event:AdPluginEvent):void {
-/*        if (event is AdPluginEvent) {
-            var breaks:Array = event.data.breaks;
-            if (breaks) {
 
-                for each (var adBreak:Object in breaks) {
-
-                    var startTime:Number = adBreak.startTime; // start time in seconds
-                    var isEmpty:Boolean = adBreak.isEmpty; // boolean indicating if the break is empty
-                }
-            }
-        }
-          */
- /*      var ad1:Object;
-        var ad2:Object;
-        ad1 = {"isEmpty":false,"startTimeValue": 50 }
-         ad2 = {"isEmpty":false,"startTimeValue": 100 }
-
-        var dummyArray:Array = [ad1, ad2];
-*/
         var metadataAdBreaks:Vector.<AdBreak> = new Vector.<AdBreak>();
-       var adBreaks:Array = event.data.breaks;
+        var adBreaks:Array = event.data.breaks;
 
 
-          for (var i:uint = 0; i < adBreaks.length; i++) {
+        for (var i:uint = 0; i < adBreaks.length; i++) {
             var adBreak:Object = adBreaks[i];
 
             //total number of ads in this ad-break
@@ -183,7 +165,7 @@ public class AdProxy extends ProxyElement {
         logger.debug("METADATA CHANGED: " + event.key);
         if (event.key == AuditudeConstants.PLUGIN_INSTANCE) {
             var _auditude:AuditudePlugin = event.value;
-             _auditude.addEventListener(AdPluginEvent.INIT_COMPLETE, onAuditudeInit);
+            _auditude.addEventListener(AdPluginEvent.INIT_COMPLETE, onAuditudeInit);
             _auditude.addEventListener(AdPluginEvent.BREAK_BEGIN, onBreakBegin);
             _auditude.addEventListener(AdPluginEvent.BREAK_END, onBreakEnd);
 

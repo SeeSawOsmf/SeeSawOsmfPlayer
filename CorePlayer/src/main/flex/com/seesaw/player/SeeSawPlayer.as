@@ -345,7 +345,6 @@ public class SeeSawPlayer extends Sprite {
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
 
 
-
         factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
 
         createVideoElement();
@@ -353,6 +352,7 @@ public class SeeSawPlayer extends Sprite {
 
     private function onPluginLoadFailed(event:MediaFactoryEvent):void {
         logger.debug("PROBLEM LOADING " + event.toString());
+        trace("hello");
     }
 
     private function createBufferingPanel():void {
@@ -466,7 +466,13 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onSmilElementCreated(event:MediaFactoryEvent):void {
-        var metadata:Metadata = event.mediaElement.resource.getMetadataValue(SMILConstants.SMIL_NAMESPACE) as Metadata;
+        var metadata:Metadata;
+        if (event.mediaElement.resource) {
+            metadata = event.mediaElement.resource.getMetadataValue(SMILConstants.SMIL_NAMESPACE) as Metadata;
+        } else if (event.mediaElement) {
+            metadata = event.mediaElement.getMetadata(SMILConstants.SMIL_NAMESPACE) as Metadata;
+        }
+
         if (metadata) {
             var contentType:String = metadata.getValue(SMILConstants.CONTENT_TYPE) as String;
             if (contentType == PlayerConstants.DOG_CONTENT_ID) {

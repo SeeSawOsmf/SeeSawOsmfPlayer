@@ -417,7 +417,7 @@ public class ScrubBar extends Widget implements IWidget {
 
     /* static */
     private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.ScrubBar";
-    private static const CURRENT_POSITION_UPDATE_INTERVAL:int = 100;
+    private static const CURRENT_POSITION_UPDATE_INTERVAL:int = 50;
     private static const _requiredTraits:Vector.<String> = new Vector.<String>;
     _requiredTraits[0] = MediaTraitType.TIME;
     _requiredTraits[1] = MediaTraitType.SEEK;
