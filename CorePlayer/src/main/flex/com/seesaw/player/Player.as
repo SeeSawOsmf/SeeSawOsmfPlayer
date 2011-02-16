@@ -57,6 +57,10 @@ import flash.events.Event;
 import flash.external.ExternalInterface;
 import flash.net.URLVariables;
 
+import flash.ui.ContextMenu;
+
+import flash.ui.ContextMenuItem;
+
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.events.MediaPlayerStateChangeEvent;
@@ -121,6 +125,14 @@ public class Player extends Sprite {
     private function onAddedToStage(event:Event):void {
         logger.debug("added to stage");
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+
+        if(PLAYER::V && PLAYER::BUILD_TIMESTAMP) {
+            var menu:ContextMenu = new ContextMenu();
+            menu.hideBuiltInItems();
+            menu.customItems.push(new ContextMenuItem("Version: " + PLAYER::V));
+            menu.customItems.push(new ContextMenuItem("Built: " + PLAYER::BUILD_TIMESTAMP));
+            contextMenu = menu;
+        }
 
         if (PLAYER::DEV_MODE) {
             loadDevConfiguration();
