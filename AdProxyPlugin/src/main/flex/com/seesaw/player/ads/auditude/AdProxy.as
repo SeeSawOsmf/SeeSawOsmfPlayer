@@ -176,58 +176,26 @@ public class AdProxy extends ProxyElement {
             _auditude.addEventListener(NonLinearAdEvent.AD_END, onNonLinearAdEnd);
 
             _auditude.addEventListener(AdPluginEvent.PAUSE_PLAYBACK, triggerPause);
-            _auditude.addEventListener(AdPluginEvent.RESUME_PLAYBACK, triggerPause)
+            _auditude.addEventListener(AdPluginEvent.RESUME_PLAYBACK, triggerPlay)
         }
     }
 
     private function triggerPause(event:AdPluginEvent):void {
-        trace("pause)");
-    }
-
-
-    // TODO: Implement this for auditude
-    private function setAdBreaks():void {
-        // get these from somewhere!
-        var adMap:Object = {} //ev.data.adMap;
-        var adBreaks:Array = []; //adMap.adBreaks;
-
-        var metadataAdBreaks:Vector.<AdBreak> = new Vector.<AdBreak>(adBreaks.length, true);
-
-        for (var i:uint = 0; i < adBreaks.length; i++) {
-            var adBreak:Object = adBreaks[i];
-
-            //total number of ads in this ad-break
-            var queueAdsTotal:uint = adBreak.queueAdsTotal;
-
-            //total duration of ad-break in seconds
-            //sometimes duration is not available for 3rd party ads such as VPAID
-            //when duration cannot be computed, this value remains zero
-            var queueDuration:Number = adBreak.queueDuration;
-
-            // (queueAdsTotal > 0)
-            var hasAds:Boolean = adBreak.hasAds;
-
-            //start time passed in the LR_ADMAP param: "0", "768.52" and "100%", all values are String
-            var startTimeString:String = adBreak.startTimeString;
-
-            //start time value converted to Number: 0, 768.52, 100
-            var startTimeValue:Number = adBreak.startTimeValue;
-
-            //specifies whether the startTimeValue is Percent (true) or  seconds (false)
-            var startTimeIsPercent:Boolean = adBreak.startTimeIsPercent;
-
-            // sets the ad breaks as metadata on the element
-            var metadataAdBreak:AdBreak = new AdBreak();
-            metadataAdBreak.queueAdsTotal = queueAdsTotal;
-            metadataAdBreak.queueDuration = queueDuration;
-            metadataAdBreak.startTime = startTimeValue;
-            metadataAdBreak.startTimeIsPercent = startTimeIsPercent;
-
-            metadataAdBreaks[i] = metadataAdBreak;
+          var playTrait:PlayTrait = getTrait(MediaTraitType.PLAY) as PlayTrait;
+          if (playTrait) {
+            // pauses the main content or the ads depending on the current adtrait
+          playTrait.pause();
         }
-
-        adMetadata.adBreaks = metadataAdBreaks;
     }
+
+    private function triggerPlay(event:AdPluginEvent):void {
+          var playTrait:PlayTrait = getTrait(MediaTraitType.PLAY) as PlayTrait;
+          if (playTrait) {
+            // pauses the main content or the ads depending on the current adtrait
+          playTrait.play();
+        }
+    }
+
 
     private function getSetting(key:String):* {
         var metadata:Metadata = proxiedElement.resource.getMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) as Metadata;
@@ -246,7 +214,7 @@ public class AdProxy extends ProxyElement {
         var playTrait:PlayTrait = getTrait(MediaTraitType.PLAY) as PlayTrait;
         if (playTrait) {
             // pauses the main content or the ads depending on the current adtrait
-            playTrait.pause();
+          playTrait.pause();
         }
     }
 
