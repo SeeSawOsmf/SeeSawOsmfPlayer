@@ -171,27 +171,22 @@ public class ScrubBar extends Widget implements IWidget {
     }
 
     override protected function processRequiredTraitsAvailable(media:MediaElement):void {
-        logger.debug("processRequiredTraitsAvailable");
         updateState();
     }
 
     override protected function processRequiredTraitsUnavailable(media:MediaElement):void {
-        logger.debug("processRequiredTraitsUnavailable");
         updateState();
     }
 
     override protected function onMediaElementTraitAdd(event:MediaElementEvent):void {
-        logger.debug("onMediaElementTraitAdd");
         updateState();
     }
 
     override protected function onMediaElementTraitRemove(event:MediaElementEvent):void {
-        logger.debug("onMediaElementTraitRemove");
         updateState();
     }
 
     override protected function processMediaElementChange(oldMediaElement:MediaElement):void {
-        logger.debug("processMediaElementChange");
         if (oldMediaElement) {
             var adMetadata:AdMetadata = oldMediaElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
             if (adMetadata) {
@@ -209,7 +204,7 @@ public class ScrubBar extends Widget implements IWidget {
     }
 
     private function onAdMetadataChange(event:MetadataEvent):void {
-        logger.debug("onAdMetadataChange");
+        logger.debug("onAdMetadataChange: {0} = {1}", event.key, event.value);
         if (event.key == AdMetadata.AD_STATE && event.value == AdState.AD_BREAK_COMPLETE) {
             updateAdMarkers();
         }

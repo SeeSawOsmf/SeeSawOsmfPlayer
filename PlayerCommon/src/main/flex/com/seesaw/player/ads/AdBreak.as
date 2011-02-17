@@ -121,5 +121,10 @@ public class AdBreak extends EventDispatcher {
     public function set seekOffset(value:Number):void {
         _seekOffset = value;
     }
+
+    public override function toString():String {
+        return "[startTime=" + String(_startTime) +
+                ",queueAdsTotal=" + String(_queueAdsTotal) + ",complete=" + String(_complete) + "]";
+    }
 }
 }

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<contentInfo xmlns:ns2="http://www.w3.org/ns/SMIL" xmlns="http://www.seesaw.com/api/contentinfo/v1.0">
+  <primaryGenre>TV:COMEDY:SATIRE</primaryGenre>
+  <sourceId>SONY</sourceId>
+  <firstPresentationBrand>NONE</firstPresentationBrand>
+  <programmeId>1bfa73c1-d919-47e0-9f3b-c9f8a38dfcf5</programmeId>
+  <programmeTitle>SONY Std Resolution</programmeTitle>
+  <tvAgeRating>0</tvAgeRating>
+  <duration>1500</duration>
+  <adRule>ALWAYS</adRule>
+  <catchup>true</catchup>
+  <loggingSheet>
+    <break>
+      <breakOffset>00:00:00.00</breakOffset>
+      <resumeOffset>00:00:00.00</resumeOffset>
+      <data>PRE:x01,x02,x60</data>
+    </break>
+    <break>
+      <breakOffset>00:00:10.00</breakOffset>
+      <resumeOffset>00:00:10.00</resumeOffset>
+      <data>CEN:x01,x02,x92</data>
+    </break>
+  </loggingSheet>
+  <parentalControls>
+    <parentalControlsPageURL>http://kgd-red-test-zxtm01.dev.vodco.co.uk/ParentalControls</parentalControlsPageURL>
+    <termsAndConditionsLinkURL>http://kgd-red-test-zxtm01.dev.vodco.co.uk/TermsAndConditions</termsAndConditionsLinkURL>
+    <helpSectionLinkURL>http://kgd-red-test-zxtm01.dev.vodco.co.uk/help/watchingtv/aboutparentalcontrols</helpSectionLinkURL>
+    <lostPinLinkURL>http://kgd-red-test-zxtm01.dev.vodco.co.uk/technicalproblems/parental</lostPinLinkURL>
+    <whatsThisLinkURL>http://kgd-red-test-zxtm01.dev.vodco.co.uk/help/watchingtv/aboutparentalcontrols</whatsThisLinkURL>
+  </parentalControls>
+  <unavailablePageUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/unavailable</unavailablePageUrl>
+  <videoInfoUrl>../src/test/resources/videoInfo.fa.xml</videoInfoUrl>
+  <!--<videoInfoUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player/videoinitinfo/26772</videoInfoUrl>-->
+  <batchEventUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player/initinfo:registerbatchevent?t:ac=26772</batchEventUrl>
+  <playIntervalEventUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player/initinfo:playintervalevent?t:ac=26772</playIntervalEventUrl>
+  <largeImageUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/NONE_LARGE.png</largeImageUrl>
+  <adMode>liverail</adMode>
+  <liverail>
+    <version>4.1</version>
+    <publisherId>1332</publisherId>
+  </liverail>
+  <programme>26772</programme>
+</contentInfo>
