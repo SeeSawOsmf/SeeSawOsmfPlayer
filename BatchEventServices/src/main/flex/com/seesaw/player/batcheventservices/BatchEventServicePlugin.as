@@ -25,7 +25,7 @@ public class BatchEventServicePlugin extends PluginInfo {
         var items:Vector.<MediaFactoryItem> = new Vector.<MediaFactoryItem>();
         items.push(item);
 
-        super(items, mediaElementCreationNotificationCallback);
+        super(items);
     }
 
     private static function canHandleResourceFunction(resource:MediaResourceBase):Boolean {
@@ -39,9 +39,6 @@ public class BatchEventServicePlugin extends PluginInfo {
     private static function mediaElementCreationFunction():MediaElement {
         logger.debug("constructing proxy element");
         return new BatchEventServices();
-    }
-
-    private function mediaElementCreationNotificationCallback(target:MediaElement):void {
     }
 }
 }

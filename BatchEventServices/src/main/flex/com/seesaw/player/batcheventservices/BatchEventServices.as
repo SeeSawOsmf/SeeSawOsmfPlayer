@@ -100,6 +100,7 @@ public class BatchEventServices extends ProxyElement {
     private var previewMode:String;
 
     public function BatchEventServices(proxiedElement:MediaElement = null) {
+         super(proxiedElement);
         var provider:ObjectProvider = ObjectProvider.getInstance();
         resumeService = provider.getObject(ResumeService);
         if (resumeService == null) {
@@ -171,8 +172,7 @@ public class BatchEventServices extends ProxyElement {
                 }
             }
         }
-        adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
-        adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
+
     }
 
     private function playerMetaChanged(event:MetadataEvent):void {
@@ -208,7 +208,7 @@ public class BatchEventServices extends ProxyElement {
 
 
     private function get adMetadata():AdMetadata {
-        var adMetadata:AdMetadata = getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+        var adMetadata:AdMetadata = proxiedElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
         if (adMetadata == null) {
             adMetadata = new AdMetadata();
             addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
