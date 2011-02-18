@@ -72,6 +72,8 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
         this.addEventListener(Event.ADDED_TO_STAGE, this.onAddedToStage);
 
         addChild(subtitlesLabel);
+
+        visible = true;
     }
 
     override protected function processMediaElementChange(oldMediaElement:MediaElement):void {
@@ -91,7 +93,8 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
     }
 
     override protected function processRequiredTraitsAvailable(element:MediaElement):void {
-        doEnabledCheck();
+        // FIXME: this is not working as expected
+        // doEnabledCheck();
     }
 
     private function onMouseOver(event:MouseEvent):void {
