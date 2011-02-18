@@ -512,8 +512,6 @@ public class Player extends Sprite {
         metadata = new Metadata();
         resource.addMetadataValue(AutoResumeConstants.SETTINGS_NAMESPACE, metadata);
 
-        metadata = new Metadata();
-        resource.addMetadataValue(BatchEventContants.SETTINGS_NAMESPACE, metadata);
 
          metadata = new Metadata();
          resource.addMetadataValue(BatchEventContants.SETTINGS_NAMESPACE, metadata);

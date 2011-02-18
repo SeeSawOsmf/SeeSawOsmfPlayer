@@ -100,6 +100,7 @@ public class BatchEventServices extends ProxyElement {
     private var previewMode:String;
 
     public function BatchEventServices(proxiedElement:MediaElement = null) {
+         super(proxiedElement);
         var provider:ObjectProvider = ObjectProvider.getInstance();
         resumeService = provider.getObject(ResumeService);
         if (resumeService == null) {
@@ -139,6 +140,9 @@ public class BatchEventServices extends ProxyElement {
             playerMetadata.addEventListener(MetadataEvent.VALUE_ADD, playerMetaChanged);
             playerMetadata.addEventListener(MediaElementEvent.METADATA_ADD, playerMetaChanged);
 
+            adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
+            adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
+
             if (playerMetadata) {
                 transactionItemId = playerMetadata.getValue("videoInfo").transactionItemId;
                 serverTimeStamp = playerMetadata.getValue("videoInfo").serverTimeStamp;
@@ -171,8 +175,7 @@ public class BatchEventServices extends ProxyElement {
                 }
             }
         }
-        adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
-        adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
+
     }
 
     private function playerMetaChanged(event:MetadataEvent):void {
@@ -208,7 +211,7 @@ public class BatchEventServices extends ProxyElement {
 
 
     private function get adMetadata():AdMetadata {
-        var adMetadata:AdMetadata = getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+        var adMetadata:AdMetadata = proxiedElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
         if (adMetadata == null) {
             adMetadata = new AdMetadata();
             addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
@@ -248,21 +251,6 @@ public class BatchEventServices extends ProxyElement {
             }
             adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
             adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
-
-        } else if (event.namespaceURL == "http://www.w3.org/ns/SMIL/content") {
-            SMILMetadata = event.target.getMetadata("http://www.w3.org/ns/SMIL/content");
-            var contentType:String = SMILMetadata.getValue(PlayerConstants.CONTENT_TYPE);
-            switch (contentType) {
-                case PlayerConstants.MAIN_CONTENT_ID :
-                    playingMainContent = true;
-                    break;
-                case PlayerConstants.STING_CONTENT_ID :
-                    playingMainContent = false;
-                    break;
-                case PlayerConstants.AD_CONTENT_ID :
-                    playingMainContent = false;
-                    break;
-            }
 
         } else if (event.namespaceURL == "http://www.seesaw.com/netstatus/metadata") {
             metadata = event.target.getMetadata("http://www.seesaw.com/netstatus/metadata");
