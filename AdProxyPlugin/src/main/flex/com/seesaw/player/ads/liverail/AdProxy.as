@@ -238,7 +238,7 @@ public class AdProxy extends ProxyElement {
 
             // Dont add the break if it has no ads, eg no content to play, so we don't want a blip for this item
             if (hasAds) {
-                metadataAdBreak.seekOffset = 1; // seek back one second to trigger the ads
+                metadataAdBreak.seekOffset = 0.5; // seek back half a second to trigger the ads
                 metadataAdBreaks[i] = metadataAdBreak;
             }
         }
