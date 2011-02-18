@@ -140,6 +140,9 @@ public class BatchEventServices extends ProxyElement {
             playerMetadata.addEventListener(MetadataEvent.VALUE_ADD, playerMetaChanged);
             playerMetadata.addEventListener(MediaElementEvent.METADATA_ADD, playerMetaChanged);
 
+            adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
+            adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
+
             if (playerMetadata) {
                 transactionItemId = playerMetadata.getValue("videoInfo").transactionItemId;
                 serverTimeStamp = playerMetadata.getValue("videoInfo").serverTimeStamp;
@@ -248,21 +251,6 @@ public class BatchEventServices extends ProxyElement {
             }
             adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
             adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
-
-        } else if (event.namespaceURL == "http://www.w3.org/ns/SMIL/content") {
-            SMILMetadata = event.target.getMetadata("http://www.w3.org/ns/SMIL/content");
-            var contentType:String = SMILMetadata.getValue(PlayerConstants.CONTENT_TYPE);
-            switch (contentType) {
-                case PlayerConstants.MAIN_CONTENT_ID :
-                    playingMainContent = true;
-                    break;
-                case PlayerConstants.STING_CONTENT_ID :
-                    playingMainContent = false;
-                    break;
-                case PlayerConstants.AD_CONTENT_ID :
-                    playingMainContent = false;
-                    break;
-            }
 
         } else if (event.namespaceURL == "http://www.seesaw.com/netstatus/metadata") {
             metadata = event.target.getMetadata("http://www.seesaw.com/netstatus/metadata");

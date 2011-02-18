@@ -263,7 +263,6 @@ public class SeeSawPlayer extends Sprite {
 
                     adContainer.addMediaElement(currentAdBreak.adPlaylist);
                     adPlayer.media = currentAdBreak.adPlaylist;
-
                     // get the control bar to point at the ads
                     setControlBarTarget(currentAdBreak.adPlaylist);
 
@@ -538,11 +537,16 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onAdElementTraitAdd(event:MediaElementEvent):void {
+          var element:MediaElement = event.target as MediaElement;
         if (event.traitType == MediaTraitType.TIME) {
-            var element:MediaElement = event.target as MediaElement;
             var timeTrait:TimeTrait = element.getTrait(MediaTraitType.TIME) as TimeTrait;
             timeTrait.addEventListener(TimeEvent.COMPLETE, adBreakCompleted);
+            timeTrait.addEventListener(TimeEvent.DURATION_CHANGE, adBreakDurEvent);
         }
+    }
+
+    private function adBreakDurEvent(event:TimeEvent):void {
+        trace(event);
     }
 
     private function createControlBarElement():void {
