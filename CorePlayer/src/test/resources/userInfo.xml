@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <userInfo xmlns:ns2="http://www.w3.org/ns/SMIL" xmlns="http://www.seesaw.com/api/contentinfo/v1.0">
   <preview>false</preview>
+  <showGuidance>true</showGuidance>
   <!-- note that the preview setting overrides everything below this line -->
   <availability>
     <availabilityType>AVOD</availabilityType>

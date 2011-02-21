@@ -55,7 +55,9 @@ import flash.display.StageAlign;
 import flash.display.StageScaleMode;
 import flash.events.Event;
 import flash.external.ExternalInterface;
+import flash.net.URLRequest;
 import flash.net.URLVariables;
+import flash.net.navigateToURL;
 import flash.ui.ContextMenu;
 import flash.ui.ContextMenuItem;
 
@@ -162,6 +164,7 @@ public class Player extends Sprite {
             xi.addGetGuidanceCallback(checkGuidance);
             xi.addGetCurrentItemTitleCallback(getCurrentItemTitle);
             xi.addGetCurrentItemDurationCallback(getCurrentItemDuration);
+            xi.addGetEntitlementCallback(getEntitlement);
             xi.addSetPlaylistCallback(setPlaylist);   /// todo this might not be needed anymore as the playlist is already set...
             // Let JS know we're ready to receive calls (e.g. C4 ad script):
             xi.callSWFInit(); /// noAdsCTA will call prematurely in this instance..
@@ -185,6 +188,23 @@ public class Player extends Sprite {
             return playerInit.duration;
         }
         return 0;
+    }
+
+    private function getEntitlement():String {
+
+        var availability:XMLList = userInit.availability;
+
+        var playerMessage:String = "";
+        var seriesEntitled:Boolean = false;
+        var videoPlayerInfoLink:String = "/videoplayerinfo/26432/PAID";
+        var isSubscriptionEntitled:Boolean = false;
+        var episodeEntitled:Boolean = true;
+        var available:Boolean = true;
+        var showPreviewClip:Boolean = false;
+        var statusMessage:String = "";
+
+        var JSONString:String = '{ "playerMessage": "' + playerMessage + '", "seriesEntitled": "' + seriesEntitled.toString() + '", "videoPlayerInfoLink" : "' + videoPlayerInfoLink + '", "isSubscriptionEntitled" : "' + isSubscriptionEntitled.toString() + '", "episodeEntitled" : "' + episodeEntitled.toString() + '", "available" : "' + available + '", "showPreviewClip" : "' + showPreviewClip.toString() + '", "statusMessage" : "' + statusMessage + '" }';
+        return JSONString;
     }
 
     private function resetInitialisationStages():void {
@@ -260,46 +280,60 @@ public class Player extends Sprite {
             if (guidanceBar) {
                 guidanceBar.visible = false;
             }
-
-            if (ExternalInterface.available) {
-                var hashedPassword:String = ParentalControlsPanel.getHashedPassword();
-                logger.debug("COOKIE PASSWORD: " + hashedPassword);
+            if (userInit.ageBlockUrl.toString()) {
+                logger.debug("URL: " + userInit.ageBlockUrl.toString());
+                var request:URLRequest = new URLRequest(userInit.ageBlockUrl);
+                try {
+                    navigateToURL(request, "_self");
+                } catch (e:Error) {
+                    trace("Error occurred!");
+                }
+                return;
             }
+               if (userInit.showGuidance == true) {
 
-            var assetType:String = "programme";
+                if (ExternalInterface.available) {
+                    var hashedPassword:String = ParentalControlsPanel.getHashedPassword();
+                    logger.debug("COOKIE PASSWORD: " + hashedPassword);
+                }
 
-            if (playerInit.guidance.type != "tv" && playerInit.guidance.type != "TV") {
-                assetType = "film";
-            }
+                var assetType:String = "programme";
 
-            if (hashedPassword) {
-                var parentalControlsPanel:ParentalControlsPanel = new ParentalControlsPanel(
-                        hashedPassword,
-                        playerInit.guidance.message,
-                        assetType,
-                        playerInit.guidance.age,
-                        playerInit.parentalControls.parentalControlsPageURL,
-                        playerInit.parentalControls.whatsThisLinkURL
-                        );
+                if (playerInit.guidance.type != "tv" && playerInit.guidance.type != "TV") {
+                    assetType = "film";
+                }
 
-                parentalControlsPanel.addEventListener(ParentalControlsPanel.PARENTAL_CHECK_PASSED, onNextInitialisationState);
-                parentalControlsPanel.addEventListener(ParentalControlsPanel.PARENTAL_CHECK_FAILED, onResetInitialisationState);
+                if (hashedPassword) {
+                    var parentalControlsPanel:ParentalControlsPanel = new ParentalControlsPanel(
+                            hashedPassword,
+                            playerInit.guidance.message,
+                            assetType,
+                            playerInit.guidance.age,
+                            playerInit.parentalControls.parentalControlsPageURL,
+                            playerInit.parentalControls.whatsThisLinkURL
+                            );
 
-                addChild(parentalControlsPanel);
+                    parentalControlsPanel.addEventListener(ParentalControlsPanel.PARENTAL_CHECK_PASSED, onNextInitialisationState);
+                    parentalControlsPanel.addEventListener(ParentalControlsPanel.PARENTAL_CHECK_FAILED, onResetInitialisationState);
+
+                    addChild(parentalControlsPanel);
+                } else {
+                    var guidancePanel:GuidancePanel = new GuidancePanel(
+                            playerInit.guidance.message,
+                            assetType,
+                            playerInit.guidance.age,
+                            playerInit.parentalControls.parentalControlsPageURL,
+                            playerInit.parentalControls.whatsThisLinkURL,
+                            playerInit.parentalControls.termsAndConditionsLinkURL
+                            );
+
+                    guidancePanel.addEventListener(GuidancePanel.GUIDANCE_ACCEPTED, onNextInitialisationState);
+                    guidancePanel.addEventListener(GuidancePanel.GUIDANCE_DECLINED, onResetInitialisationState);
+
+                    addChild(guidancePanel);
+                }
             } else {
-                var guidancePanel:GuidancePanel = new GuidancePanel(
-                        playerInit.guidance.message,
-                        assetType,
-                        playerInit.guidance.age,
-                        playerInit.parentalControls.parentalControlsPageURL,
-                        playerInit.parentalControls.whatsThisLinkURL,
-                        playerInit.parentalControls.termsAndConditionsLinkURL
-                        );
-
-                guidancePanel.addEventListener(GuidancePanel.GUIDANCE_ACCEPTED, onNextInitialisationState);
-                guidancePanel.addEventListener(GuidancePanel.GUIDANCE_DECLINED, onResetInitialisationState);
-
-                addChild(guidancePanel);
+                nextInitialisationStage();
             }
 
         }

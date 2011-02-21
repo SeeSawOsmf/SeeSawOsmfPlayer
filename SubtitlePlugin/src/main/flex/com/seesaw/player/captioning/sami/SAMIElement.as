@@ -72,10 +72,10 @@ public class SAMIElement extends LoadableElementBase {
         loadTrait = getTrait(MediaTraitType.LOAD) as CaptionLoadTrait;
 
         if (target) {
-            var timelineMetadata:TimelineMetadata = target.getMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) as TimelineMetadata;
+            var timelineMetadata:TimelineMetadata = getMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) as TimelineMetadata;
             if (timelineMetadata == null) {
                 timelineMetadata = new TimelineMetadata(target);
-                target.addMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE, timelineMetadata);
+                addMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE, timelineMetadata);
             }
 
             for each (var caption:CaptionSync in loadTrait.document.captions) {

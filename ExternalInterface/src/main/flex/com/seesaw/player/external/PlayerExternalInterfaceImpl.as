@@ -57,6 +57,10 @@ public class PlayerExternalInterfaceImpl implements PlayerExternalInterface {
         addCallback(ExternalInterfaceConstants.GET_CURRENT_ITEM_DURATION, callback);
     }
 
+    public function addGetEntitlementCallback(callback:Function):void {
+        addCallback(ExternalInterfaceConstants.GET_ENTITLEMENT, callback);
+    }
+
     public function addHideDogCallback(callback:Function):void {
         addCallback(ExternalInterfaceConstants.SHOW_DOG, callback);
     }
