@@ -290,7 +290,7 @@ public class Player extends Sprite {
                 }
                 return;
             }
-               if (userInit.showGuidance == true) {
+            if (userInit.showGuidance == true) {
 
                 if (ExternalInterface.available) {
                     var hashedPassword:String = ParentalControlsPanel.getHashedPassword();
@@ -547,39 +547,39 @@ public class Player extends Sprite {
         resource.addMetadataValue(AutoResumeConstants.SETTINGS_NAMESPACE, metadata);
 
 
-         metadata = new Metadata();
-         resource.addMetadataValue(BatchEventContants.SETTINGS_NAMESPACE, metadata);
+        metadata = new Metadata();
+        resource.addMetadataValue(BatchEventContants.SETTINGS_NAMESPACE, metadata);
 
+        if (playerInit && !playerInit.preview) {
+            if (playerInit.adMode == LiverailConstants.AD_MODE_ID) {
+                metadata = new Metadata();
+                metadata.addValue(LiverailConstants.VERSION, playerInit.liverail.version);
+                metadata.addValue(LiverailConstants.PUBLISHER_ID, playerInit.liverail.publisherId);
+                metadata.addValue(LiverailConstants.CONFIG_OBJECT, new LiverailConfig(playerInit));
+                metadata.addValue(LiverailConstants.RESUME_POSITION, getResumePosition());
+                metadata.addValue(LiverailConstants.ADMANAGER_URL, LiverailConstants.LIVERAIL_PLUGIN_URL);
+                resource.addMetadataValue(LiverailConstants.SETTINGS_NAMESPACE, metadata);
+            } else if (playerInit.adMode == AuditudeConstants.AD_MODE_ID) {
+                metadata = new Metadata();
 
-        if (playerInit && playerInit.adMode == LiverailConstants.AD_MODE_ID) {
-            metadata = new Metadata();
-            metadata.addValue(LiverailConstants.VERSION, playerInit.liverail.version);
-            metadata.addValue(LiverailConstants.PUBLISHER_ID, playerInit.liverail.publisherId);
-            metadata.addValue(LiverailConstants.CONFIG_OBJECT, new LiverailConfig(playerInit));
-            metadata.addValue(LiverailConstants.RESUME_POSITION, getResumePosition());
-            metadata.addValue(LiverailConstants.ADMANAGER_URL, LiverailConstants.LIVERAIL_PLUGIN_URL);
-            resource.addMetadataValue(LiverailConstants.SETTINGS_NAMESPACE, metadata);
-        } else if (playerInit && playerInit.adMode == AuditudeConstants.AD_MODE_ID) {
-            metadata = new Metadata();
+                // the following 4 keys are required attributes for the Auditude plug-in
+                // a) version: version of auditude plug-in
+                // b) domain: adserver domain
+                // c) zone-id: zone id assigned by Auditude
+                // d) media-id: The video id of the currently playing content
+                metadata.addValue(AuditudeOSMFConstants.VERSION, "adunitv2-1.0");
+                metadata.addValue(AuditudeOSMFConstants.DOMAIN, "auditude.com");
+                metadata.addValue(AuditudeOSMFConstants.ZONE_ID, 9575);
+                metadata.addValue(AuditudeOSMFConstants.MEDIA_ID, "717670423001"); //playerInit.programmeId
+                // pass the mediaplayer instance to Auditude. This is required to listen for audio and content progress updates
+                //metadata.addValue(AuditudeOSMFConstants.PLAYER_INSTANCE, videoPlayer.mediaPlayer());
 
-            // the following 4 keys are required attributes for the Auditude plug-in
-            // a) version: version of auditude plug-in
-            // b) domain: adserver domain
-            // c) zone-id: zone id assigned by Auditude
-            // d) media-id: The video id of the currently playing content
-            metadata.addValue(AuditudeOSMFConstants.VERSION, "adunitv2-1.0");
-            metadata.addValue(AuditudeOSMFConstants.DOMAIN, "auditude.com");
-            metadata.addValue(AuditudeOSMFConstants.ZONE_ID, 9575);
-            metadata.addValue(AuditudeOSMFConstants.MEDIA_ID, "717670423001"); //playerInit.programmeId
+                // any additional metadata can be passed to the Auditude plug-in through this key.
+                metadata.addValue(AuditudeOSMFConstants.USER_DATA, null);
 
-            // pass the mediaplayer instance to Auditude. This is required to listen for audio and content progress updates
-            //metadata.addValue(AuditudeOSMFConstants.PLAYER_INSTANCE, videoPlayer.mediaPlayer());
-
-            // any additional metadata can be passed to the Auditude plug-in through this key.
-            metadata.addValue(AuditudeOSMFConstants.USER_DATA, null);
-
-            metadata.addValue(AuditudeConstants.RESUME_POSITION, getResumePosition());
-            resource.addMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE, metadata)
+                metadata.addValue(AuditudeConstants.RESUME_POSITION, getResumePosition());
+                resource.addMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE, metadata)
+            }
         }
 
         return resource;
