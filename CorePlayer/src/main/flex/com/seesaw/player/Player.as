@@ -164,6 +164,7 @@ public class Player extends Sprite {
             xi.addGetGuidanceCallback(checkGuidance);
             xi.addGetCurrentItemTitleCallback(getCurrentItemTitle);
             xi.addGetCurrentItemDurationCallback(getCurrentItemDuration);
+            xi.addGetEntitlementCallback(getEntitlement);
             xi.addSetPlaylistCallback(setPlaylist);   /// todo this might not be needed anymore as the playlist is already set...
             // Let JS know we're ready to receive calls (e.g. C4 ad script):
             xi.callSWFInit(); /// noAdsCTA will call prematurely in this instance..
@@ -187,6 +188,23 @@ public class Player extends Sprite {
             return playerInit.duration;
         }
         return 0;
+    }
+
+    private function getEntitlement():String {
+
+        var availability:XMLList = userInit.availability;
+
+        var playerMessage:String = "";
+        var seriesEntitled:Boolean = false;
+        var videoPlayerInfoLink:String = "/videoplayerinfo/26432/PAID";
+        var isSubscriptionEntitled:Boolean = false;
+        var episodeEntitled:Boolean = true;
+        var available:Boolean = true;
+        var showPreviewClip:Boolean = false;
+        var statusMessage:String = "";
+
+        var JSONString:String = '{ "playerMessage": "' + playerMessage + '", "seriesEntitled": "' + seriesEntitled.toString() + '", "videoPlayerInfoLink" : "' + videoPlayerInfoLink + '", "isSubscriptionEntitled" : "' + isSubscriptionEntitled.toString() + '", "episodeEntitled" : "' + episodeEntitled.toString() + '", "available" : "' + available + '", "showPreviewClip" : "' + showPreviewClip.toString() + '", "statusMessage" : "' + statusMessage + '" }';
+        return JSONString;
     }
 
     private function resetInitialisationStages():void {
@@ -272,7 +290,7 @@ public class Player extends Sprite {
                 }
                 return;
             }
-            if (userInit.showGuidance == true) {
+               if (userInit.showGuidance == true) {
 
                 if (ExternalInterface.available) {
                     var hashedPassword:String = ParentalControlsPanel.getHashedPassword();

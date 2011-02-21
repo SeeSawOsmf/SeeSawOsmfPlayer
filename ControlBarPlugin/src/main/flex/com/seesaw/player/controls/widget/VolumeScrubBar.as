@@ -49,6 +49,12 @@ public class VolumeScrubBar extends Widget implements IWidget {
 
     private var volumeDisplay:Number;
 
+    private var defaultVolume:Number = 6;
+
+    public static const EXTERNAL_GET_COOKIE_FUNCTION_NAME:String = "SEESAW.Utils.getCookie";
+	public static const EXTERNAL_SET_COOKIE_FUNCTION_NAME:String = "SEESAW.Utils.setCookie";
+    public static const PLAYER_VOLUME_COOKIE:String = "seesaw.player.volume";
+
     public function VolumeScrubBar() {
         scrubBarClickArea = new Sprite();
         scrubBarClickArea.addEventListener(MouseEvent.MOUSE_DOWN, onTrackMouseDown);
@@ -126,6 +132,7 @@ public class VolumeScrubBar extends Widget implements IWidget {
     private function scrubberAddedToStage(event:Event) {
         stage.addChild(this.toolTip);
         if (ExternalInterface.available) {
+            this.checkCookieVolume();
             ExternalInterface.addCallback("getVolume", this.getVolume);
             ExternalInterface.addCallback("setVolume", this.setVolume);
         }
@@ -150,6 +157,24 @@ public class VolumeScrubBar extends Widget implements IWidget {
         return this.volumeDisplay;
     }
 
+    private function checkCookieVolume():void {
+        var tmpVol:*;
+        tmpVol = ExternalInterface.call(EXTERNAL_GET_COOKIE_FUNCTION_NAME, PLAYER_VOLUME_COOKIE);
+        if (tmpVol != "" && tmpVol != null) {
+            logger.debug("VALUE OF VOLUME COOKIE: " + tmpVol);
+            setVolume(tmpVol);
+        } else {
+            setVolume(defaultVolume);
+        }
+    }
+
+    private function setCookieVolume():void {
+        if (ExternalInterface.available) {
+            logger.debug("SET VOLUME COOKIE TO: " + (audible.volume * 10));
+            ExternalInterface.call(EXTERNAL_SET_COOKIE_FUNCTION_NAME, PLAYER_VOLUME_COOKIE, (audible.volume * 10), false, "/");
+        }
+    }
+
     private function setVolume(newVolumeDisplay:Number):void {
         audible.volume = newVolumeDisplay / 10;
 
@@ -157,6 +182,8 @@ public class VolumeScrubBar extends Widget implements IWidget {
             audible.volume = 0;
             logger.debug('MUTE');
         }
+
+        this.setCookieVolume();
 
         logger.debug('New audible.volume: ' + audible.volume);
         //this.volumeDisplay = newVolumeDisplay;
@@ -201,6 +228,7 @@ public class VolumeScrubBar extends Widget implements IWidget {
         logger.debug("New Volume: audible.volume : " + audible.volume);
         this.volumeDisplay = Math.round(audible.volume * 12);
 
+        this.setCookieVolume();
     }
 
 

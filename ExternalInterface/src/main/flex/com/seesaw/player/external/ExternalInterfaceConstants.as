@@ -29,6 +29,8 @@ public class ExternalInterfaceConstants {
     public static const GET_CURRENT_ITEM_TITLE:String = "getCurrentItemTitle";
     public static const GET_CURRENT_ITEM_DURATION:String = "getCurrentItemDuration";
 
+    public static const GET_ENTITLEMENT:String = "getEntitlement";
+
     public static const SHOW_DOG:String = "showDog";
     public static const HIDE_DOG:String = "hideDog";
 
