@@ -151,7 +151,7 @@ public class BatchEventServices extends ProxyElement {
                 cumulativeDurationURL = playerMetadata.getValue("contentInfo").playIntervalEventUrl;
                 sectionCount = playerMetadata.getValue("videoInfo").sectionCount;
                 userId = playerMetadata.getValue("contentInfo").userId;
-                anonymousUserId = playerMetadata.getValue("contentInfo").anonymousUserId;
+                anonymousUserId = playerMetadata.getValue("videoInfo").anonymousUserId;
                 programmeId = playerMetadata.getValue("contentInfo").programme;
                 adMode = playerMetadata.getValue("contentInfo").adMode;
                 availabilityType = playerMetadata.getValue("videoInfo").availabilityType;
