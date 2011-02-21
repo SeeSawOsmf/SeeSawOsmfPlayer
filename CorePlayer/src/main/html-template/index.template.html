@@ -54,6 +54,7 @@
         <li><a href="#" id="getGuidance">Get Guidance</a></li>
         <li><a href="#" id="acceptGuidance">Accept Guidance</a></li>
         <li><a href="#" id="rejectGuidance">Reject Guidance</a></li>
+        <li><a href="#" id="getEntitlement">Get Entitlement</a></li>
     </ul>
 </div>
 <script type="text/javascript">
@@ -209,6 +210,12 @@
 		event.stop();
 		if ($("corePlayer").rejectGuidance) {
 			$("corePlayer").rejectGuidance();
+		}
+	});
+    $("getEntitlement").observe('click', function(event) {
+		event.stop();
+		if ($("corePlayer").getEntitlement) {
+            alert($("corePlayer").getEntitlement());
 		}
 	});
 </script>
