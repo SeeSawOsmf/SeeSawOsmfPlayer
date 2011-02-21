@@ -534,9 +534,9 @@ public class Player extends Sprite {
             // c) zone-id: zone id assigned by Auditude
             // d) media-id: The video id of the currently playing content
             metadata.addValue(AuditudeOSMFConstants.VERSION, "adunitv2-1.0");
-            metadata.addValue(AuditudeOSMFConstants.DOMAIN, "sandbox.auditude.com");
-            metadata.addValue(AuditudeOSMFConstants.ZONE_ID, 1947);
-            metadata.addValue(AuditudeOSMFConstants.MEDIA_ID, "GcE_e7ewtw2lMJVbDEJClpllo6mVJXSb"); //playerInit.programmeId
+            metadata.addValue(AuditudeOSMFConstants.DOMAIN, "auditude.com");
+            metadata.addValue(AuditudeOSMFConstants.ZONE_ID, 9575);
+            metadata.addValue(AuditudeOSMFConstants.MEDIA_ID, "717670423001"); //playerInit.programmeId
 
             // pass the mediaplayer instance to Auditude. This is required to listen for audio and content progress updates
             //metadata.addValue(AuditudeOSMFConstants.PLAYER_INSTANCE, videoPlayer.mediaPlayer());
