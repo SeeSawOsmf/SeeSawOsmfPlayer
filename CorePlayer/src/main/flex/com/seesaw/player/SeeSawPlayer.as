@@ -700,7 +700,10 @@ public class SeeSawPlayer extends Sprite {
     }
 
     public function get adsEnabled():Boolean {
-        if(userInfo.availability.tvodPlayable == "true" || userInfo.availability.svodPlayable == "true" || (userInfo.availability.noAdsPlayable && !userInfo.availability.exceededDrmRule)){
+        if(userInfo.availability.tvodPlayable == "true"
+                || userInfo.availability.svodPlayable == "true"
+                || playerInit.preview
+                || (userInfo.availability.noAdsPlayable && !userInfo.availability.exceededDrmRule)){
           return false;
         } else {
             return true;

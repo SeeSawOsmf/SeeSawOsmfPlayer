@@ -14,3 +14,5 @@
   The Initial Developer of the Original Code is Adobe Systems Incorporated.
   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe Systems
   Incorporated. All Rights Reserved.
+
+  Portions created by ioko365 Ltd are Copyright (C) 2010, 2011 ioko365 Ltd. All Rights Reserved.
