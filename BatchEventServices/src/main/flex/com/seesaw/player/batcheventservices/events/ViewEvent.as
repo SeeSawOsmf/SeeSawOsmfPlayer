@@ -3,13 +3,13 @@ package com.seesaw.player.batcheventservices.events {
 public class ViewEvent {
 
     private var transactionItemId:int;
-    private var _serverTimeStamp:int;
+    private var _serverTimeStamp:Number;
     private var _userId:int;
-    private var _anonymousUserId:int;
+    private var _anonymousUserId:uint;
     private var sectionCount:int;
     private var mainAssetId:int;
 
-    public function ViewEvent(transactionItemId:int, serverTimeStamp:int, sectionCount:int, mainAssetId:int, userId:int, anonymousUserId:int) {
+    public function ViewEvent(transactionItemId:int, serverTimeStamp:Number, sectionCount:int, mainAssetId:int, userId:int, anonymousUserId:Number) {
         this._userId = userId;
         this._anonymousUserId = anonymousUserId;
         this.transactionItemId = transactionItemId;
@@ -42,11 +42,11 @@ public class ViewEvent {
         return sectionCount;
     }
 
-    public function get anonymousUserId():int {
+    public function get anonymousUserId():Number {
         return _anonymousUserId;
     }
 
-    public function get getAnonymousUserId():int{
+    public function get getAnonymousUserId():Number{
         return _anonymousUserId;
     }
 

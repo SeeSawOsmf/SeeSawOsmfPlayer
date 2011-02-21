@@ -62,12 +62,12 @@ public class BatchEventServices extends ProxyElement {
     private var seeking:Boolean;
 
     private var transactionItemId:int;
-    private var serverTimeStamp:uint;
+    private var serverTimeStamp:Number;
     private var mainAssetId:int;
     private var sectionCount:int;
     private var programmeId:int;
     private var userId:int;
-    private var anonymousUserId:int;
+    private var anonymousUserId:Number;
 
     private var contentViewingSequenceNumber:int = 0;
     private var currentAdBreakSequenceNumber:int = 0;
@@ -144,18 +144,22 @@ public class BatchEventServices extends ProxyElement {
             adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
 
             if (playerMetadata) {
-                transactionItemId = playerMetadata.getValue("videoInfo").transactionItemId;
-                serverTimeStamp = playerMetadata.getValue("videoInfo").serverTimeStamp;
-                /// mainAssetId = playerMetadata.getValue("videoInfo").mainAssetID; this is nolongerNeeded
-                batchEventURL = playerMetadata.getValue("contentInfo").batchEventUrl;
-                cumulativeDurationURL = playerMetadata.getValue("contentInfo").playIntervalEventUrl;
-                sectionCount = playerMetadata.getValue("videoInfo").sectionCount;
-                userId = playerMetadata.getValue("contentInfo").userId;
-                anonymousUserId = playerMetadata.getValue("videoInfo").anonymousUserId;
-                programmeId = playerMetadata.getValue("contentInfo").programme;
-                adMode = playerMetadata.getValue("contentInfo").adMode;
-                availabilityType = playerMetadata.getValue("videoInfo").availabilityType;
-                previewMode = playerMetadata.getValue("contentInfo").preview;
+
+                var videoInfo:XML =    playerMetadata.getValue("videoInfo");
+                var contentInfo:XML =    playerMetadata.getValue("contentInfo");
+
+                transactionItemId = videoInfo.transactionItemId;
+                serverTimeStamp = videoInfo.serverTimestamp;
+                mainAssetId = playerMetadata.getValue("videoInfo").mainAssetID;
+                batchEventURL = contentInfo.batchEventUrl;
+                cumulativeDurationURL = contentInfo.playIntervalEventUrl;
+                sectionCount = videoInfo.sectionCount;
+                userId = contentInfo.userId;
+                anonymousUserId = videoInfo.anonymousUserId;
+                programmeId = contentInfo.programme;
+                adMode = contentInfo.adMode;
+                availabilityType =videoInfo.availabilityType;
+                previewMode = contentInfo.preview;
 
                 if (adMode != AdMetadata.LR_AD_TYPE && adMode != AdMetadata.AUDITUDE_AD_TYPE) {
 
