@@ -23,7 +23,7 @@
  * User: bmeade
  * Date: 18/01/11
  * Time: 13:47
- * To change this template use File | Settings | File Templates.
+
  */
 package com.seesaw.player.netstatus {
 public class NetStatusMetadata {

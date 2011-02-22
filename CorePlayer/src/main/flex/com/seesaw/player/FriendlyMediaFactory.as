@@ -18,13 +18,6 @@
  *   Contributor(s):  Adobe Systems Incorporated
  */
 
-/**
- * Created by IntelliJ IDEA.
- * User: bmeade
- * Date: 18/01/11
- * Time: 12:00
- * To change this template use File | Settings | File Templates.
- */
 package com.seesaw.player {
 import com.seesaw.player.netloaders.FriendlyNetLoader;
 import com.seesaw.player.netloaders.FriendlyRTMPDynamicStreamingNetLoader;

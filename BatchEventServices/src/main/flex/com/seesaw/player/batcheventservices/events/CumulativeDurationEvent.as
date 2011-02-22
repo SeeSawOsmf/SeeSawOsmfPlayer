@@ -18,13 +18,6 @@
  *   Contributor(s):  Adobe Systems Incorporated
  */
 
-/**
- * Created by IntelliJ IDEA.
- * User: usaimbi
- * Date: 13/01/11
- * Time: 11:27
- * To change this template use File | Settings | File Templates.
- */
 package com.seesaw.player.batcheventservices.events {
 public class CumulativeDurationEvent {
 

@@ -18,13 +18,6 @@
  *   Contributor(s):  Adobe Systems Incorporated
  */
 
-/**
- * Created by IntelliJ IDEA.
- * User: bmeade
- * Date: 08/02/11
- * Time: 15:52
- * To change this template use File | Settings | File Templates.
- */
 package com.seesaw.player.batcheventservices {
 import org.flexunit.assertThat;
 import org.hamcrest.object.notNullValue;

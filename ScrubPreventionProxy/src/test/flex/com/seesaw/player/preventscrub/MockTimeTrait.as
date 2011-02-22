@@ -23,7 +23,7 @@
  * User: ibhana
  * Date: 08/02/11
  * Time: 13:51
- * To change this template use File | Settings | File Templates.
+
  */
 package com.seesaw.player.preventscrub {
 import org.osmf.traits.TimeTrait;

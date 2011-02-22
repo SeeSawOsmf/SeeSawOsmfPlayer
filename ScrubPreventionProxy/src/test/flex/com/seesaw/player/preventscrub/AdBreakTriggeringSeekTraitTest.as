@@ -23,7 +23,7 @@
  * User: ibhana
  * Date: 08/02/11
  * Time: 13:45
- * To change this template use File | Settings | File Templates.
+
  */
 package com.seesaw.player.preventscrub {
 import com.seesaw.player.ads.AdBreak;

@@ -23,7 +23,7 @@
  * User: ibhana
  * Date: 11/02/11
  * Time: 08:36
- * To change this template use File | Settings | File Templates.
+
  */
 package com.seesaw.player.smil {
 import flash.events.Event;

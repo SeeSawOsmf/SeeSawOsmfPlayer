@@ -23,7 +23,7 @@
  * User: ibhana
  * Date: 27/01/11
  * Time: 13:48
- * To change this template use File | Settings | File Templates.
+
  */
 package com.seesaw.player.smil {
 import com.seesaw.player.PlayerConstants;

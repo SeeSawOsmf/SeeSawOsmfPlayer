@@ -23,7 +23,7 @@
  * User: ibhana
  * Date: 08/02/11
  * Time: 09:39
- * To change this template use File | Settings | File Templates.
+
  */
 package com.seesaw.player.ads {
 import flash.events.Event;

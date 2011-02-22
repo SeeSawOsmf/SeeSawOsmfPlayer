@@ -18,13 +18,6 @@
  *   Contributor(s):  Adobe Systems Incorporated
  */
 
-/**
- * Created by IntelliJ IDEA.
- * User: usaimbi
- * Date: 12/01/11
- * Time: 17:19
- * To change this template use File | Settings | File Templates.
- */
 package com.seesaw.player.batcheventservices.events.manager {
 import com.adobe.serialization.json.JSON;
 import com.seesaw.player.batcheventservices.events.BatchEvent;
