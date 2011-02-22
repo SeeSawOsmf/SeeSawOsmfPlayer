@@ -26,9 +26,10 @@ import flash.display.DisplayObject;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
-
 import flash.external.ExternalInterface;
 
+import org.as3commons.logging.ILogger;
+import org.as3commons.logging.LoggerFactory;
 import org.osmf.chrome.assets.AssetsManager;
 import org.osmf.chrome.assets.FontAsset;
 import org.osmf.chrome.events.ScrubberEvent;
@@ -38,8 +39,6 @@ import org.osmf.events.MediaElementEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.traits.AudioTrait;
 import org.osmf.traits.MediaTraitType;
-import org.as3commons.logging.ILogger;
-import org.as3commons.logging.LoggerFactory;
 
 public class VolumeScrubBar extends Widget implements IWidget {
 
