@@ -47,6 +47,7 @@ import com.seesaw.player.panels.PosterFrame;
 import com.seesaw.player.preloader.Preloader;
 import com.seesaw.player.preventscrub.ScrubPreventionConstants;
 import com.seesaw.player.services.ResumeService;
+import com.seesaw.player.utils.HelperUtils;
 import com.seesaw.player.utils.ServiceRequest;
 
 import flash.display.LoaderInfo;
@@ -550,7 +551,7 @@ public class Player extends Sprite {
         metadata = new Metadata();
         resource.addMetadataValue(BatchEventContants.SETTINGS_NAMESPACE, metadata);
 
-        if (playerInit && !playerInit.preview) {
+        if (playerInit && !HelperUtils.getBoolean(playerInit.preview)) {
             if (playerInit.adMode == LiverailConstants.AD_MODE_ID) {
                 metadata = new Metadata();
                 metadata.addValue(LiverailConstants.VERSION, playerInit.liverail.version);
