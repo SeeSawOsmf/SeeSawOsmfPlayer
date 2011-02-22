@@ -1,35 +1,26 @@
 /*
- * Copyright 2011 ioko365 Ltd.  All Rights Reserved.
- *
  * The contents of this file are subject to the Mozilla Public License
- * Version 1.1 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the
- * License athttp://www.mozilla.org/MPL/
+ *   Version 1.1 (the "License"); you may not use this file except in
+ *   compliance with the License. You may obtain a copy of the License at
+ *   http://www.mozilla.org/MPL/
  *
- * Software distributed under the License is distributed on an "AS IS"
- * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- * License for the specific language governing rights and limitations
- * under the License.
+ *   Software distributed under the License is distributed on an "AS IS"
+ *   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *   License for the specific language governing rights and limitations
+ *   under the License.
  *
- * The Initial Developer of the Original Code is ioko365 Ltd.
- * Portions created by ioko365 Ltd are Copyright (C) 2011 ioko365 Ltd
- * Incorporated. All Rights Reserved.
+ *   The Initial Developer of the Original Code is Arqiva Ltd.
+ *   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+ *   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+ * 	Systems Incorporated.
+ *   All Rights Reserved.
  *
- * The Initial Developer of the Original Code is ioko365 Ltd.
- * Portions created by ioko365 Ltd are Copyright (C) 2011 ioko365 Ltd
- * Incorporated. All Rights Reserved.
+ *   Contributor(s):  Adobe Systems Incorporated
  */
 
-/**
- * Created by IntelliJ IDEA.
- * User: ibhana
- * Date: 11/02/11
- * Time: 09:25
- * To change this template use File | Settings | File Templates.
- */
 package com.seesaw.player {
-import com.seesaw.player.smil.*;
 import com.seesaw.player.ads.AdBreak;
+import com.seesaw.player.smil.*;
 
 import org.hamcrest.assertThat;
 import org.hamcrest.object.equalTo;
@@ -38,7 +29,6 @@ import org.osmf.elements.ParallelElement;
 import org.osmf.elements.SerialElement;
 import org.osmf.elements.VideoElement;
 import org.osmf.media.DefaultMediaFactory;
-import org.osmf.media.MediaResourceBase;
 import org.osmf.media.URLResource;
 import org.osmf.metadata.Metadata;
 

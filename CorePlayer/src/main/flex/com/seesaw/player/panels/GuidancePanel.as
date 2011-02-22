@@ -1,23 +1,21 @@
 /*
- * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
+ * The contents of this file are subject to the Mozilla Public License
+ *   Version 1.1 (the "License"); you may not use this file except in
+ *   compliance with the License. You may obtain a copy of the License at
+ *   http://www.mozilla.org/MPL/
  *
- *    The contents of this file are subject to the Mozilla Public License
- *    Version 1.1 (the "License"); you may not use this file except in
- *    compliance with the License. You may obtain a copy of the
- *    License athttp://www.mozilla.org/MPL/
+ *   Software distributed under the License is distributed on an "AS IS"
+ *   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *   License for the specific language governing rights and limitations
+ *   under the License.
  *
- *    Software distributed under the License is distributed on an "AS IS"
- *    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- *    License for the specific language governing rights and limitations
- *    under the License.
+ *   The Initial Developer of the Original Code is Arqiva Ltd.
+ *   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+ *   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+ * 	Systems Incorporated.
+ *   All Rights Reserved.
  *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
- *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
+ *   Contributor(s):  Adobe Systems Incorporated
  */
 
 package com.seesaw.player.panels {
@@ -31,7 +29,6 @@ import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.external.ExternalInterface;
 import flash.net.URLRequest;
-import flash.net.getClassByAlias;
 import flash.net.navigateToURL;
 import flash.system.Security;
 import flash.text.StyleSheet;
@@ -53,7 +50,7 @@ public class GuidancePanel extends Sprite {
 
     private var assetWarning:String = "This %TYPE_TOKEN% isn't suitable for younger viewers.<br/><br/>";
     private var ageMessage:String = "Please confirm you are aged %AGE_TOKEN% or older " +
-				"and accept our <a href=\"%TERMSURL%\"><font color=\"#00A88E\">Terms and Conditions.</font></a>";
+            "and accept our <a href=\"%TERMSURL%\"><font color=\"#00A88E\">Terms and Conditions.</font></a>";
 
     //components which need tooltips
     private var acceptButton:Sprite = new Sprite();
@@ -280,7 +277,6 @@ public class GuidancePanel extends Sprite {
     }
 
 
-
     private function buildAcceptButton(label:String):Sprite {
 
         //setup the hand cursor
@@ -486,6 +482,7 @@ public class GuidancePanel extends Sprite {
     public function getAcceptButton():Sprite {
         return acceptButton;
     }
+
     public function getCancelButton():Sprite {
         return cancelButton;
     }

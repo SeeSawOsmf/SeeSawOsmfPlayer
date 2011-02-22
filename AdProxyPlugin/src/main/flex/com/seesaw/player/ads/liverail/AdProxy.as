@@ -1,23 +1,21 @@
 /*
- * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
+ * The contents of this file are subject to the Mozilla Public License
+ *   Version 1.1 (the "License"); you may not use this file except in
+ *   compliance with the License. You may obtain a copy of the License at
+ *   http://www.mozilla.org/MPL/
  *
- *    The contents of this file are subject to the Mozilla Public License
- *    Version 1.1 (the "License"); you may not use this file except in
- *    compliance with the License. You may obtain a copy of the
- *    License athttp://www.mozilla.org/MPL/
+ *   Software distributed under the License is distributed on an "AS IS"
+ *   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *   License for the specific language governing rights and limitations
+ *   under the License.
  *
- *    Software distributed under the License is distributed on an "AS IS"
- *    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- *    License for the specific language governing rights and limitations
- *    under the License.
+ *   The Initial Developer of the Original Code is Arqiva Ltd.
+ *   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+ *   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+ * 	Systems Incorporated.
+ *   All Rights Reserved.
  *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
- *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
+ *   Contributor(s):  Adobe Systems Incorporated
  */
 
 package com.seesaw.player.ads.liverail {
@@ -32,7 +30,6 @@ import com.seesaw.player.ads.LiverailConstants;
 import com.seesaw.player.ads.events.LiveRailEvent;
 import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.traits.ads.AdPlayTrait;
-import com.seesaw.player.traits.ads.AdTimeTrait;
 
 import flash.events.Event;
 import flash.events.TimerEvent;
@@ -47,7 +44,6 @@ import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.PlayEvent;
 import org.osmf.events.TimeEvent;
-import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.URLResource;
@@ -122,7 +118,7 @@ public class AdProxy extends ProxyElement {
             // block these until the liverail events kick in
             setTraitsToBlock(MediaTraitType.PLAY, MediaTraitType.TIME, MediaTraitType.DISPLAY_OBJECT);
 
-            // After calling initAds(config), the main video player’s controls should be disabled and any requests to
+            // After calling initAds(config), the main video playerï¿½s controls should be disabled and any requests to
             // play a movie should be cancelled or delayed until the initComplete (or the initError) event is received
             // from the ad manager. If initComplete has been received, first call lrAdManager.onContentStart() and only
             // resume your main video after prerollComplete event is triggered.

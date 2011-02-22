@@ -1,3 +1,23 @@
+/*
+ * The contents of this file are subject to the Mozilla Public License
+ *   Version 1.1 (the "License"); you may not use this file except in
+ *   compliance with the License. You may obtain a copy of the License at
+ *   http://www.mozilla.org/MPL/
+ *
+ *   Software distributed under the License is distributed on an "AS IS"
+ *   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *   License for the specific language governing rights and limitations
+ *   under the License.
+ *
+ *   The Initial Developer of the Original Code is Arqiva Ltd.
+ *   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+ *   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+ * 	Systems Incorporated.
+ *   All Rights Reserved.
+ *
+ *   Contributor(s):  Adobe Systems Incorporated
+ */
+
 package com.seesaw.player.batcheventservices {
 import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.ads.AdMetadata;
@@ -100,7 +120,7 @@ public class BatchEventServices extends ProxyElement {
     private var previewMode:String;
 
     public function BatchEventServices(proxiedElement:MediaElement = null) {
-         super(proxiedElement);
+        super(proxiedElement);
         var provider:ObjectProvider = ObjectProvider.getInstance();
         resumeService = provider.getObject(ResumeService);
         if (resumeService == null) {
@@ -145,8 +165,8 @@ public class BatchEventServices extends ProxyElement {
 
             if (playerMetadata) {
 
-                var videoInfo:XML =    playerMetadata.getValue("videoInfo");
-                var contentInfo:XML =    playerMetadata.getValue("contentInfo");
+                var videoInfo:XML = playerMetadata.getValue("videoInfo");
+                var contentInfo:XML = playerMetadata.getValue("contentInfo");
 
                 transactionItemId = videoInfo.transactionItemId;
                 serverTimeStamp = new Number(String(videoInfo.serverTimestamp));
@@ -158,7 +178,7 @@ public class BatchEventServices extends ProxyElement {
                 anonymousUserId = videoInfo.anonymousUserId;
                 programmeId = contentInfo.programme;
                 adMode = contentInfo.adMode;
-                availabilityType =videoInfo.availabilityType;
+                availabilityType = videoInfo.availabilityType;
                 previewMode = contentInfo.preview;
 
                 if (adMode != AdMetadata.LR_AD_TYPE && adMode != AdMetadata.AUDITUDE_AD_TYPE) {
@@ -295,7 +315,7 @@ public class BatchEventServices extends ProxyElement {
     }
 
     private function onAdsMetaDataChange(event:MetadataEvent):void {
-        if (event.key == AdMetadata.AD_STATE || event.key == AdMetadata.AD_MODE ) {
+        if (event.key == AdMetadata.AD_STATE || event.key == AdMetadata.AD_MODE) {
             AdMetaEvaluation(event.value);
         } else {
             AdMetaEvaluation(event.key);
@@ -327,8 +347,8 @@ public class BatchEventServices extends ProxyElement {
 
         } else if (value == AdMetadata.CLICK_THRU) {
             eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.CLICK));
-        }  else if(value == "mainContent") {
-               contentUrl = "mainResource";
+        } else if (value == "mainContent") {
+            contentUrl = "mainResource";
             defineContentUrl(false);
         }
     }

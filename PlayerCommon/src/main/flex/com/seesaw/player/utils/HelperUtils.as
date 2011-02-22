@@ -8,7 +8,7 @@
 package com.seesaw.player.utils {
 public class HelperUtils {
 
-public static function getBoolean(string:String):Boolean {
+    public static function getBoolean(string:String):Boolean {
         switch (string) {
             case "1":
             case "true":

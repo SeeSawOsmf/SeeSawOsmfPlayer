@@ -1,23 +1,21 @@
 /*
- * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
+ * The contents of this file are subject to the Mozilla Public License
+ *   Version 1.1 (the "License"); you may not use this file except in
+ *   compliance with the License. You may obtain a copy of the License at
+ *   http://www.mozilla.org/MPL/
  *
- *    The contents of this file are subject to the Mozilla Public License
- *    Version 1.1 (the "License"); you may not use this file except in
- *    compliance with the License. You may obtain a copy of the
- *    License athttp://www.mozilla.org/MPL/
+ *   Software distributed under the License is distributed on an "AS IS"
+ *   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *   License for the specific language governing rights and limitations
+ *   under the License.
  *
- *    Software distributed under the License is distributed on an "AS IS"
- *    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- *    License for the specific language governing rights and limitations
- *    under the License.
+ *   The Initial Developer of the Original Code is Arqiva Ltd.
+ *   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+ *   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+ * 	Systems Incorporated.
+ *   All Rights Reserved.
  *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
- *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
+ *   Contributor(s):  Adobe Systems Incorporated
  */
 
 package com.seesaw.player.panels {
@@ -45,7 +43,7 @@ public class ParentalControlsPanel extends Sprite {
     public static const PARENTAL_CHECK_FAILED = "PARENTAL_CHECK_FAILED";
 
     public static const EXTERNAL_GET_COOKIE_FUNCTION_NAME:String = "SEESAW.Utils.getCookie";
-	public static const EXTERNAL_SET_COOKIE_FUNCTION_NAME:String = "SEESAW.Utils.setCookie";
+    public static const EXTERNAL_SET_COOKIE_FUNCTION_NAME:String = "SEESAW.Utils.setCookie";
     public static const PARENTAL_CONTROL_PASSWORD_COOKIE_NAME:String = "seesaw.player.monitor";
 
     private var toolTip:PlayerToolTip;
@@ -55,9 +53,9 @@ public class ParentalControlsPanel extends Sprite {
     private var assetType:String;
     private var age:String;
     private var ageMessage:String = "Please confirm you are aged %AGE_TOKEN% or older " +
-				"and accept our <a href=\"%TERMSURL%\"><font color=\"#00A88E\">Terms and Conditions.</font></a>";
+            "and accept our <a href=\"%TERMSURL%\"><font color=\"#00A88E\">Terms and Conditions.</font></a>";
     private var assetWarning:String = "This %TYPE_TOKEN% isn't suitable for younger viewers.<br/><br/>";
-    
+
     private var moreAboutParentalControlsLink:String;
     private var turnOffParentalControlsLink:String;
 
@@ -78,7 +76,7 @@ public class ParentalControlsPanel extends Sprite {
     private var hashedPassword:String;
     private var enteredPassword:String;
     private var attempts:int = 0;
-    
+
     //Embed images
     [Embed(source="resources/enter_up.png")]
     private var acceptImageUpEmbed:Class;
@@ -98,7 +96,7 @@ public class ParentalControlsPanel extends Sprite {
      *
      */
     public function ParentalControlsPanel(password:String, warning:String, assetType:String, age:String, turnOffParentalControlsLink:String, moreAboutParentalControlsLink:String) {
-        
+
         this.hashedPassword = password;
         //set the private variables
         if (ExternalInterface.available) {
@@ -124,8 +122,8 @@ public class ParentalControlsPanel extends Sprite {
     }
 
     public static function getHashedPassword():String {
-	    return ExternalInterface.call(EXTERNAL_GET_COOKIE_FUNCTION_NAME, PARENTAL_CONTROL_PASSWORD_COOKIE_NAME);
-	}
+        return ExternalInterface.call(EXTERNAL_GET_COOKIE_FUNCTION_NAME, PARENTAL_CONTROL_PASSWORD_COOKIE_NAME);
+    }
 
     private function onAddedToStage(event:Event):void {
         this.positionPanel(event);
@@ -146,23 +144,23 @@ public class ParentalControlsPanel extends Sprite {
     }
 
     /*private function checkPassword():void {
-        if (this.hashedPassword == this.enteredPassword) {
-            this.visible = false;
-            this.dispatchEvent(new Event(PARENTAL_CHECK_PASSED));
-        } else {
-            this.showErrorState();
-        }
-    }*/
+     if (this.hashedPassword == this.enteredPassword) {
+     this.visible = false;
+     this.dispatchEvent(new Event(PARENTAL_CHECK_PASSED));
+     } else {
+     this.showErrorState();
+     }
+     }*/
 
     private function checkPassword():void {
         var userEnteredPassword:String = MD5.hash(this.enteredPassword);
-        if (hashedPassword == userEnteredPassword){
+        if (hashedPassword == userEnteredPassword) {
             this.visible = false;
             this.dispatchEvent(new Event(PARENTAL_CHECK_PASSED));
         } else {
             this.showErrorState();
             this.attempts++;
-            if(this.attempts>=3) this.onDeclineClick();
+            if (this.attempts >= 3) this.onDeclineClick();
         }
     }
 
