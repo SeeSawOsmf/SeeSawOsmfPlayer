@@ -11,9 +11,11 @@
  *
  *   The Initial Developer of the Original Code is Arqiva Ltd.
  *   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+ *   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+ * 	Systems Incorporated.
  *   All Rights Reserved.
  *
- *   Contributor(s):
+ *   Contributor(s):  Adobe Systems Incorporated
  */
 
 package com.seesaw.player.ads.events {
