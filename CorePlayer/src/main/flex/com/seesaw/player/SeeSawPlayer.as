@@ -64,6 +64,7 @@ import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.events.MediaPlayerStateChangeEvent;
 import org.osmf.events.MetadataEvent;
+import org.osmf.events.PlayEvent;
 import org.osmf.events.TimeEvent;
 import org.osmf.events.TimelineMetadataEvent;
 import org.osmf.layout.HorizontalAlign;
@@ -245,7 +246,7 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onAdPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
-        logger.debug("ad: " + event.state);
+        logger.debug("ad::::::::::::::::::: " + event.state);
         onMediaPlayerStateChange(event);
     }
 
@@ -264,6 +265,7 @@ public class SeeSawPlayer extends Sprite {
 
                     adContainer.addMediaElement(currentAdBreak.adPlaylist);
                     adPlayer.media = currentAdBreak.adPlaylist;
+
                     // get the control bar to point at the ads
                     setControlBarTarget(currentAdBreak.adPlaylist);
 
@@ -280,12 +282,39 @@ public class SeeSawPlayer extends Sprite {
         }
     }
 
+
+    private function adPlayStateChange(event:PlayEvent):void {
+        if (!currentAdBreak.complete) {
+            if (event.playState == PlayState.STOPPED) {
+                var adMetadata:AdMetadata = mainElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+                adMetadata.adState = AdState.STOPPED;
+            }
+        }
+    }
+
+    private function adDurationChange(event:TimeEvent):void {
+        if (!currentAdBreak.complete) {
+            if (event.type == TimeEvent.DURATION_CHANGE) {
+                var adMetadata:AdMetadata = mainElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+                adMetadata.adState = AdState.STARTED;
+            }
+        }
+    }
+
+
     private function adBreakCompleted(event:Event = null):void {
         logger.debug("ad break complete");
         if (currentAdBreak) {
             var adPlaylist:SerialElement = currentAdBreak.adPlaylist;
             var timeTrait:TimeTrait = adPlaylist.getTrait(MediaTraitType.TIME) as TimeTrait;
-            if (timeTrait) timeTrait.removeEventListener(TimeEvent.COMPLETE, adBreakCompleted);
+            var playable:PlayTrait = adPlaylist.getTrait(MediaTraitType.PLAY) as PlayTrait;
+            if (timeTrait) {
+                timeTrait.removeEventListener(TimeEvent.COMPLETE, adBreakCompleted);
+                timeTrait.addEventListener(TimeEvent.DURATION_CHANGE, adDurationChange);
+            }
+            if (playable) {
+                playable.addEventListener(PlayEvent.PLAY_STATE_CHANGE, adPlayStateChange);
+            }
             adPlaylist.removeEventListener(MediaElementEvent.TRAIT_ADD, onAdElementTraitAdd);
             adContainer.removeMediaElement(adPlaylist);
             currentAdBreak.complete = true;
@@ -542,13 +571,13 @@ public class SeeSawPlayer extends Sprite {
         if (event.traitType == MediaTraitType.TIME) {
             var timeTrait:TimeTrait = element.getTrait(MediaTraitType.TIME) as TimeTrait;
             timeTrait.addEventListener(TimeEvent.COMPLETE, adBreakCompleted);
-            timeTrait.addEventListener(TimeEvent.DURATION_CHANGE, adBreakDurEvent);
+            timeTrait.addEventListener(TimeEvent.DURATION_CHANGE, adDurationChange);
+        } else if (event.traitType == MediaTraitType.PLAY) {
+            var playable:PlayTrait = element.getTrait(MediaTraitType.PLAY) as PlayTrait;
+            if (playable)  playable.addEventListener(PlayEvent.PLAY_STATE_CHANGE, adPlayStateChange);
         }
     }
 
-    private function adBreakDurEvent(event:TimeEvent):void {
-        trace(event);
-    }
 
     private function createControlBarElement():void {
         logger.debug("adding control bar media element to container");
@@ -648,6 +677,7 @@ public class SeeSawPlayer extends Sprite {
             case MediaPlayerState.PAUSED:
                 toggleLights();
                 break;
+
         }
     }
 
@@ -702,11 +732,11 @@ public class SeeSawPlayer extends Sprite {
     }
 
     public function get adsEnabled():Boolean {
-        if(HelperUtils.getBoolean(userInfo.availability.tvodPlayable)
+        if (HelperUtils.getBoolean(userInfo.availability.tvodPlayable)
                 || HelperUtils.getBoolean(userInfo.availability.svodPlayable)
                 || HelperUtils.getBoolean(playerInit.preview)
-                || (HelperUtils.getBoolean(userInfo.availability.noAdsPlayable) && !HelperUtils.getBoolean(userInfo.availability.exceededDrmRule))){
-          return false;
+                || (HelperUtils.getBoolean(userInfo.availability.noAdsPlayable) && !HelperUtils.getBoolean(userInfo.availability.exceededDrmRule))) {
+            return false;
         } else {
             return true;
         }
