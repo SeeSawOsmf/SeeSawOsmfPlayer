@@ -154,6 +154,7 @@ public class SeeSawPlayer extends Sprite {
 
         adPlayer = new MediaPlayer();
         adPlayer.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onAdPlayerStateChange);
+        adPlayer.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
 
         mainElement = new ParallelElement();
         container = new MediaContainer();
@@ -226,6 +227,7 @@ public class SeeSawPlayer extends Sprite {
 
         //handler to show and hide the buffering panel
         player.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
+
         player.media = mainElement;
 
         player.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onMainPlayerStateChange);
@@ -237,7 +239,7 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onMainPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
-        logger.debug("main: " + event.state);
+        logger.debug("main::::::::::: " + event.state);
         onMediaPlayerStateChange(event);
     }
 
@@ -566,6 +568,7 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function netStatusChanged(event:NetStatusEvent):void {
+        logger.debug(event.info as String);
         if (event.info == "NetConnection.Connect.NetworkChange") {
 
             factory.removeEventListener(NetStatusEvent.NET_STATUS, netStatusChanged);
@@ -700,7 +703,7 @@ public class SeeSawPlayer extends Sprite {
     public function get adsEnabled():Boolean {
         if (userInfo.availability.tvodPlayable == "true"
                 || userInfo.availability.svodPlayable == "true"
-                || playerInit.preview
+                || playerInit.preview == "true"
                 || (userInfo.availability.noAdsPlayable && !userInfo.availability.exceededDrmRule)) {
             return false;
         } else {
