@@ -1,23 +1,21 @@
 /*
- * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
+ * The contents of this file are subject to the Mozilla Public License
+ *   Version 1.1 (the "License"); you may not use this file except in
+ *   compliance with the License. You may obtain a copy of the License at
+ *   http://www.mozilla.org/MPL/
  *
- *    The contents of this file are subject to the Mozilla Public License
- *    Version 1.1 (the "License"); you may not use this file except in
- *    compliance with the License. You may obtain a copy of the
- *    License athttp://www.mozilla.org/MPL/
+ *   Software distributed under the License is distributed on an "AS IS"
+ *   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *   License for the specific language governing rights and limitations
+ *   under the License.
  *
- *    Software distributed under the License is distributed on an "AS IS"
- *    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- *    License for the specific language governing rights and limitations
- *    under the License.
+ *   The Initial Developer of the Original Code is Arqiva Ltd.
+ *   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+ *   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+ * 	Systems Incorporated.
+ *   All Rights Reserved.
  *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
- *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
+ *   Contributor(s):  Adobe Systems Incorporated
  */
 package com.seesaw.player.controls.widget {
 import com.seesaw.player.ui.PlayerToolTip;
@@ -52,7 +50,7 @@ public class VolumeScrubBar extends Widget implements IWidget {
     private var defaultVolume:Number = 6;
 
     public static const EXTERNAL_GET_COOKIE_FUNCTION_NAME:String = "SEESAW.Utils.getCookie";
-	public static const EXTERNAL_SET_COOKIE_FUNCTION_NAME:String = "SEESAW.Utils.setCookie";
+    public static const EXTERNAL_SET_COOKIE_FUNCTION_NAME:String = "SEESAW.Utils.setCookie";
     public static const PLAYER_VOLUME_COOKIE:String = "seesaw.player.volume";
 
     public function VolumeScrubBar() {
@@ -128,7 +126,7 @@ public class VolumeScrubBar extends Widget implements IWidget {
         updateState();
 
     }
-    
+
     private function scrubberAddedToStage(event:Event) {
         stage.addChild(this.toolTip);
         if (ExternalInterface.available) {

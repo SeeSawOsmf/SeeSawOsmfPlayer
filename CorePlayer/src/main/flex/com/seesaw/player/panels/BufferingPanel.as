@@ -1,27 +1,24 @@
 /*
-* Copyright 2010 ioko365 Ltd.  All Rights Reserved.
-*
-*    The contents of this file are subject to the Mozilla Public License
-*    Version 1.1 (the "License"); you may not use this file except in
-*    compliance with the License. You may obtain a copy of the
-*    License athttp://www.mozilla.org/MPL/
-*
-*    Software distributed under the License is distributed on an "AS IS"
-*    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
-*    License for the specific language governing rights and limitations
-*    under the License.
-*
-*    The Initial Developer of the Original Code is ioko365 Ltd.
-*    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
-*    Incorporated. All Rights Reserved.
-*
-*    The Initial Developer of the Original Code is ioko365 Ltd.
-*    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
-*    Incorporated. All Rights Reserved.
-*/
+ * The contents of this file are subject to the Mozilla Public License
+ *   Version 1.1 (the "License"); you may not use this file except in
+ *   compliance with the License. You may obtain a copy of the License at
+ *   http://www.mozilla.org/MPL/
+ *
+ *   Software distributed under the License is distributed on an "AS IS"
+ *   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *   License for the specific language governing rights and limitations
+ *   under the License.
+ *
+ *   The Initial Developer of the Original Code is Arqiva Ltd.
+ *   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+ *   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+ * 	Systems Incorporated.
+ *   All Rights Reserved.
+ *
+ *   Contributor(s):  Adobe Systems Incorporated
+ */
 
 package com.seesaw.player.panels {
-
 import com.seesaw.player.preloader.Preloader;
 
 import flash.display.Sprite;
@@ -70,7 +67,7 @@ public class BufferingPanel extends MediaElement {
      */
     public function BufferingPanel(container:MediaContainer) {
         parentContainer = container;
-        
+
         //set the private variables
         this.bufferingMessage = "<p><font color='#FFFFFF'>Your internet connection speed is too slow.</font></p>";
         this.findOutWhyLink = "<font color='#00A88E'><a href='/help'>Find out why</a></font>.";
@@ -95,30 +92,30 @@ public class BufferingPanel extends MediaElement {
         layoutMetadata.verticalAlign = VerticalAlign.MIDDLE;
 
         this.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layoutMetadata);
-        
+
         hide();
     }
 
     public function show():void {
-      tooSlowTimer.reset();
-      tooSlowTimer.start();
+        tooSlowTimer.reset();
+        tooSlowTimer.start();
     }
 
     public function hide():void {
-      parentContainer.layoutMetadata.includeInLayout = false;
-      panel.visible = false;
-      tooSlowTimer.stop();
-      hideTooSlowMessage();
+        parentContainer.layoutMetadata.includeInLayout = false;
+        panel.visible = false;
+        tooSlowTimer.stop();
+        hideTooSlowMessage();
     }
 
     private function showTooSlowMessage(event:Event):void {
-      parentContainer.backgroundAlpha = 0.8;
-      parentContainer.layoutMetadata.includeInLayout = true;
-      panel.visible = true;
+        parentContainer.backgroundAlpha = 0.8;
+        parentContainer.layoutMetadata.includeInLayout = true;
+        panel.visible = true;
     }
 
     private function hideTooSlowMessage():void {
-      parentContainer.backgroundAlpha = 0.0;
+        parentContainer.backgroundAlpha = 0.0;
     }
 
     private function buildCSS():void {
@@ -142,7 +139,7 @@ public class BufferingPanel extends MediaElement {
         preloader = new Preloader();
         panel.addEventListener(Event.ADDED_TO_STAGE, positionPreloader);
         panel.addChild(preloader);
-        
+
         panel.addChild(this.buildWarning());
         panel.addChild(this.buildFindOutMoreLink());
 

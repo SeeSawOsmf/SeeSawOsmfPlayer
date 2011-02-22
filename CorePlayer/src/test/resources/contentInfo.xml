@@ -1,4 +1,24 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?> 
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+~ The contents of this file are subject to the Mozilla Public License
+~   Version 1.1 (the "License"); you may not use this file except in
+~   compliance with the License. You may obtain a copy of the License at
+~   http://www.mozilla.org/MPL/
+~
+~   Software distributed under the License is distributed on an "AS IS"
+~   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+~   License for the specific language governing rights and limitations
+~   under the License.
+~
+~   The Initial Developer of the Original Code is Arqiva Ltd.
+~   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+~   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+~ 	Systems Incorporated.
+~   All Rights Reserved.
+~
+~   Contributor(s):  Adobe Systems Incorporated
+-->
+
 <contentInfo xmlns:ns2="http://www.w3.org/ns/SMIL" xmlns="http://www.seesaw.com/api/contentinfo/v1.0">
     <primaryGenre>TV:DRAMA:SCI-FI_AND_FANTASY</primaryGenre>
     <sourceId>CHANNEL4</sourceId>
@@ -40,15 +60,20 @@
     </parentalControls>
     <unavailablePageUrl>http://localhost:8080/unavailable</unavailablePageUrl>
     <videoInfoUrl>../src/test/resources/videoInfo.xml</videoInfoUrl>
-    <batchEventService>http://localhost:8080/player.videoplayer:registerbatchevent?t:ac=TV:COMEDY/b/8542/Nathan-Barley</batchEventService>
-    <cumulativeDurationService>http://localhost:8080/player.videoplayer:playIntervalEvent?t:ac=TV:COMEDY/b/8542/Nathan-Barley</cumulativeDurationService>
-    <largeImageUrl>http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/E4_LARGE.png</largeImageUrl>
+    <batchEventService>http://localhost:8080/player.videoplayer:registerbatchevent?t:ac=TV:COMEDY/b/8542/Nathan-Barley
+    </batchEventService>
+    <cumulativeDurationService>
+        http://localhost:8080/player.videoplayer:playIntervalEvent?t:ac=TV:COMEDY/b/8542/Nathan-Barley
+    </cumulativeDurationService>
+    <largeImageUrl>http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/E4_LARGE.png
+    </largeImageUrl>
     <liverail>
         <version>4.1</version>
         <publisherId>1373</publisherId>
     </liverail>
     <adMode>liverail</adMode>
-    <dogImage>http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png</dogImage>
+    <dogImage>http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png
+    </dogImage>
     <programme>33535</programme>
     <userId>911112222</userId>
     <anonymousUserId>0000</anonymousUserId>

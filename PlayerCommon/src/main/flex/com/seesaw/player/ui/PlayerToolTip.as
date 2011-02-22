@@ -1,3 +1,23 @@
+/*
+ * The contents of this file are subject to the Mozilla Public License
+ *   Version 1.1 (the "License"); you may not use this file except in
+ *   compliance with the License. You may obtain a copy of the License at
+ *   http://www.mozilla.org/MPL/
+ *
+ *   Software distributed under the License is distributed on an "AS IS"
+ *   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *   License for the specific language governing rights and limitations
+ *   under the License.
+ *
+ *   The Initial Developer of the Original Code is Arqiva Ltd.
+ *   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+ *   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+ * 	Systems Incorporated.
+ *   All Rights Reserved.
+ *
+ *   Contributor(s):  Adobe Systems Incorporated
+ */
+
 package com.seesaw.player.ui {
 import flash.display.Sprite;
 import flash.events.MouseEvent;
@@ -42,7 +62,7 @@ public class PlayerToolTip extends Sprite {
     }
 
     private function buildToolTip():Sprite {
-        
+
         this.toolTipTextField.text = this.toolTipText;
         this.toolTipTextField.autoSize = TextFieldAutoSize.LEFT;
 
@@ -68,13 +88,13 @@ public class PlayerToolTip extends Sprite {
     private function drawToolTipBG() {
 
         this.toolTipBG.graphics.clear();
-        
+
         with (this.toolTipBG.graphics) {
             beginFill(0xFFFFFF, 0.6);
             drawRoundRect(0, 0, this.toolTipTextField.width, this.toolTipTextField.height, 6);
             endFill();
         }
-        
+
     }
 
     private function styleToolTip(textToFormat:TextField):void {
