@@ -22,14 +22,14 @@ package com.seesaw.player.batcheventservices.events {
 
 public class ViewEvent {
 
-    private var transactionItemId:int;
-    private var _serverTimeStamp:int;
-    private var _userId:int;
-    private var _anonymousUserId:uint;
+    private var transactionItemId:Number;
+    private var _serverTimeStamp:Number;
+    private var _userId:Number;
+    private var _anonymousUserId:Number;
     private var sectionCount:int;
     private var mainAssetId:int;
 
-    public function ViewEvent(transactionItemId:int, serverTimeStamp:Number, sectionCount:int, mainAssetId:int, userId:int, anonymousUserId:Number) {
+    public function ViewEvent(transactionItemId:Number, serverTimeStamp:Number, sectionCount:int, mainAssetId:int, userId:Number, anonymousUserId:Number) {
         this._userId = userId;
         this._anonymousUserId = anonymousUserId;
         this.transactionItemId = transactionItemId;
@@ -38,7 +38,7 @@ public class ViewEvent {
         this.mainAssetId = mainAssetId;
     }
 
-    public function get serverTimeStamp():int {
+    public function get serverTimeStamp():Number {
         return _serverTimeStamp;
     }
 
@@ -50,7 +50,7 @@ public class ViewEvent {
         return mainAssetId;
     }
 
-    public function get getTransactionItemId():int {
+    public function get getTransactionItemId():Number {
         return transactionItemId;
     }
 
@@ -70,11 +70,11 @@ public class ViewEvent {
         return _anonymousUserId;
     }
 
-    public function get getUserId():int {
+    public function get getUserId():Number {
         return _userId;
     }
 
-    public function get userId():int {
+    public function get userId():Number {
         return _userId;
     }
 }

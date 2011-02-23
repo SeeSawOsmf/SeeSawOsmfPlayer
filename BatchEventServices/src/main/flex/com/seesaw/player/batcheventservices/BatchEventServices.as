@@ -81,12 +81,12 @@ public class BatchEventServices extends ProxyElement {
 
     private var seeking:Boolean;
 
-    private var transactionItemId:int;
+    private var transactionItemId:Number;
     private var serverTimeStamp:Number;
     private var mainAssetId:int;
     private var sectionCount:int;
     private var programmeId:int;
-    private var userId:int;
+    private var userId:Number;
     private var anonymousUserId:Number;
 
     private var contentViewingSequenceNumber:int = 0;
@@ -170,7 +170,7 @@ public class BatchEventServices extends ProxyElement {
 
                 transactionItemId = videoInfo.transactionItemId;
                 serverTimeStamp = new Number(String(videoInfo.serverTimestamp));
-                mainAssetId = videoInfo.mainAssetID;
+                mainAssetId = videoInfo.mainAssetId;
                 batchEventURL = contentInfo.batchEventUrl;
                 cumulativeDurationURL = contentInfo.playIntervalEventUrl;
                 sectionCount = videoInfo.sectionCount;
