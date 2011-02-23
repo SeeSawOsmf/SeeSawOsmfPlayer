@@ -407,7 +407,9 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onBufferingChange(event:BufferEvent):void {
-        (event.buffering) ? bufferingPanel.show() : bufferingPanel.hide();
+          if (event.currentTarget.bufferLength < 0.5){
+              (event.buffering) ? bufferingPanel.show() : bufferingPanel.hide();
+          }
     }
 
     private function createSubtitleElement():void {

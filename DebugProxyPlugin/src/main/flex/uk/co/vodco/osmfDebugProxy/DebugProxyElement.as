@@ -230,6 +230,7 @@ public class DebugProxyElement extends ProxyElement {
             if (added) {
                 buffer.addEventListener(BufferEvent.BUFFER_TIME_CHANGE, onBufferTimeChange);
                 buffer.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
+
             }
             else {
                 buffer.removeEventListener(BufferEvent.BUFFER_TIME_CHANGE, onBufferTimeChange);
