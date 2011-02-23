@@ -19,8 +19,6 @@
  */
 
 package com.seesaw.player.panels {
-import com.seesaw.player.ui.StyledTextField;
-
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.system.Security;

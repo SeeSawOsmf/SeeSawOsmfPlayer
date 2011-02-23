@@ -29,7 +29,6 @@ import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.external.ExternalInterface;
 import flash.net.URLRequest;
-import flash.net.getClassByAlias;
 import flash.net.navigateToURL;
 import flash.system.Security;
 import flash.text.StyleSheet;

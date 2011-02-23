@@ -19,16 +19,6 @@
  */
 
 package com.seesaw.player.autoresume {
-import com.seesaw.player.PlayerConstants;
-
-import org.flexunit.asserts.assertNotNull;
-import org.flexunit.asserts.assertTrue;
-import org.osmf.media.DefaultMediaFactory;
-import org.osmf.media.MediaElement;
-import org.osmf.media.MediaFactory;
-import org.osmf.media.MediaResourceBase;
-import org.osmf.metadata.Metadata;
-
 public class AutoResumeProxyTest {
 
     public function AutoResumeProxyTest() {

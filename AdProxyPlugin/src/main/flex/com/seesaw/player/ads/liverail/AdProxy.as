@@ -30,7 +30,6 @@ import com.seesaw.player.ads.LiverailConstants;
 import com.seesaw.player.ads.events.LiveRailEvent;
 import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.traits.ads.AdPlayTrait;
-import com.seesaw.player.traits.ads.AdTimeTrait;
 
 import flash.events.Event;
 import flash.events.TimerEvent;
@@ -45,7 +44,6 @@ import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.PlayEvent;
 import org.osmf.events.TimeEvent;
-import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.media.URLResource;

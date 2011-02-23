@@ -20,7 +20,6 @@
 
 package com.seesaw.player.smil {
 import com.seesaw.player.ads.AdBreak;
-
 import com.seesaw.player.ads.AdMetadata;
 
 import org.osmf.elements.ParallelElement;

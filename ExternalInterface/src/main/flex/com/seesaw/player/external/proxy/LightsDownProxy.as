@@ -20,7 +20,6 @@
 
 package com.seesaw.player.external.proxy {
 import com.seesaw.player.external.*;
-
 import com.seesaw.player.ioc.ObjectProvider;
 
 import flash.external.ExternalInterface;

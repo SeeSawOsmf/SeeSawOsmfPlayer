@@ -23,10 +23,8 @@ import flash.display.Sprite;
 import flash.events.MouseEvent;
 import flash.events.TimerEvent;
 import flash.text.TextField;
-
 import flash.text.TextFieldAutoSize;
 import flash.text.TextFormat;
-
 import flash.utils.Timer;
 
 import org.as3commons.logging.ILogger;

@@ -46,6 +46,7 @@ import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
 import com.seesaw.player.smil.SMILConstants;
 import com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo;
 import com.seesaw.player.smil.SMILParser;
+import com.seesaw.player.utils.HelperUtils;
 
 import flash.display.Sprite;
 import flash.display.StageDisplayState;
@@ -703,11 +704,11 @@ public class SeeSawPlayer extends Sprite {
     }
 
     public function get adsEnabled():Boolean {
-        if (userInfo.availability.tvodPlayable == "true"
-                || userInfo.availability.svodPlayable == "true"
-                || playerInit.preview == "true"
-                || (userInfo.availability.noAdsPlayable && !userInfo.availability.exceededDrmRule)) {
-            return false;
+        if(HelperUtils.getBoolean(userInfo.availability.tvodPlayable)
+                || HelperUtils.getBoolean(userInfo.availability.svodPlayable)
+                || HelperUtils.getBoolean(playerInit.preview)
+                || (HelperUtils.getBoolean(userInfo.availability.noAdsPlayable) && !HelperUtils.getBoolean(userInfo.availability.exceededDrmRule))){
+          return false;
         } else {
             return true;
         }

@@ -19,8 +19,8 @@
  */
 
 package com.seesaw.player {
-import com.seesaw.player.smil.*;
 import com.seesaw.player.ads.AdBreak;
+import com.seesaw.player.smil.*;
 
 import org.hamcrest.assertThat;
 import org.hamcrest.object.equalTo;
@@ -29,7 +29,6 @@ import org.osmf.elements.ParallelElement;
 import org.osmf.elements.SerialElement;
 import org.osmf.elements.VideoElement;
 import org.osmf.media.DefaultMediaFactory;
-import org.osmf.media.MediaResourceBase;
 import org.osmf.media.URLResource;
 import org.osmf.metadata.Metadata;
 

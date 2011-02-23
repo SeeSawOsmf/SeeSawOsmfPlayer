@@ -19,10 +19,6 @@
  */
 
 package com.seesaw.player {
-import org.flexunit.assertThat;
-import org.hamcrest.object.notNullValue;
-import org.osmf.net.StreamingURLResource;
-
 public class SeeSawPlayerTest {
 
     private static const VIDEO_URL:String

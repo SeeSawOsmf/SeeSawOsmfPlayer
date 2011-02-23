@@ -20,7 +20,6 @@
 
 package com.seesaw.player.controls.widget {
 import com.seesaw.player.ads.AdMetadata;
-import com.seesaw.player.ads.AdMode;
 import com.seesaw.player.external.PlayerExternalInterface;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.ui.PlayerToolTip;
