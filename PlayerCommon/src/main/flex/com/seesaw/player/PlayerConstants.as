@@ -42,5 +42,8 @@ public class PlayerConstants {
     public static const PROCEED_BUTTON_NAME:String = "PlayerStartButton.proceedButton";
     public static const GUIDANCE_PANEL_ACCEPT_BUTTON_NAME:String = "GuidancePanel.acceptButton";
     public static const GUIDANCE_PANEL_CANCEL_BUTTON_NAME:String = "GuidancePanel.cancelButton";
+
+    public static const MIN_BUFFER_SIZE_SECONDS:Number = 0.1;
+    public static const MAX_BUFFER_SIZE_SECONDS:Number = 60;
 }
 }

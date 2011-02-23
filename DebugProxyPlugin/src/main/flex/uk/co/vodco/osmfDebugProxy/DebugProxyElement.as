@@ -136,8 +136,15 @@ public class DebugProxyElement extends ProxyElement {
 
     private function onSwitchingChange(event:DynamicStreamEvent):void {
         var trait:DynamicStreamTrait = getTrait(MediaTraitType.DYNAMIC_STREAM) as DynamicStreamTrait;
-        if (trait && trait.switching) {
-            logger.debug("Switching dynamic stream: bitrate = {0}", trait.getBitrateForIndex(trait.currentIndex));
+        if (trait) {
+            if (trait.switching) {
+                logger.debug("Switching dynamic stream from bitrate = {0}",
+                        trait.getBitrateForIndex(trait.currentIndex));
+            }
+            else {
+                logger.debug("Completed dynamic stream switch to bitrate = {0}",
+                        trait.getBitrateForIndex(trait.currentIndex));
+            }
         }
     }
 
