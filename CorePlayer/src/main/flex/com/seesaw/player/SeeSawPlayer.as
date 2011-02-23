@@ -408,8 +408,10 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onBufferingChange(event:BufferEvent):void {
-          if (event.currentTarget.bufferLength <= 0){
+          if (event.currentTarget.bufferLength <= 0.1){
               (event.buffering) ? bufferingPanel.show() : bufferingPanel.hide();
+          }else{
+             bufferingPanel.hide();
           }
     }
 
