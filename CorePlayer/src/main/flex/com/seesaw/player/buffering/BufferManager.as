@@ -18,9 +18,6 @@
  *   Contributor(s):  Adobe Systems Incorporated
  */
 package com.seesaw.player.buffering {
-import flash.events.TimerEvent;
-import flash.utils.Timer;
-
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ProxyElement;
@@ -44,7 +41,6 @@ public class BufferManager extends ProxyElement {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(BufferManager);
 
-    private var timer:Timer;
     private var initialBufferTime:Number;
     private var expandedBufferTime:Number;
 
@@ -64,10 +60,6 @@ public class BufferManager extends ProxyElement {
         dispatcher.addEventListener(BufferEvent.BUFFERING_CHANGE, processBufferingChange, false, 100);
         dispatcher.addEventListener(BufferEvent.BUFFER_TIME_CHANGE, onBufferTimeChange);
         dispatcher.addEventListener(SeekEvent.SEEKING_CHANGE, processSeekingChange);
-
-        timer = new Timer(UPDATE_INTERVAL);
-        timer.repeatCount = expandedBufferTime;
-        timer.addEventListener(TimerEvent.TIMER, onTimer);
     }
 
     private function onBufferTimeChange(event:BufferEvent):void {
@@ -85,27 +77,15 @@ public class BufferManager extends ProxyElement {
 
     private function processBufferingChange(event:BufferEvent):void {
         var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
-        if (event.buffering == false) {
-            if (bufferTrait.bufferTime < expandedBufferTime) {
-                logger.debug("growing buffer from {0} to {1} seconds", event.bufferTime, expandedBufferTime);
-                timer.start();
-            }
+        if (bufferTrait) {
+            bufferTrait.bufferTime = bufferTrait.bufferLength +0.1;
         }
     }
 
-    private function onTimer(event:TimerEvent = null):void {
-        var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
-        if (bufferTrait) {
-            if (bufferTrait.bufferTime < expandedBufferTime) {
-                bufferTrait.bufferTime += 1;
-            }
-        }
-    }
 
     private function processSeekingChange(event:SeekEvent):void {
         var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
         if (bufferTrait) {
-            timer.reset();
             bufferTrait.bufferTime = initialBufferTime;
         }
     }

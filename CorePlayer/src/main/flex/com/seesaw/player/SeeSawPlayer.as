@@ -408,7 +408,7 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onBufferingChange(event:BufferEvent):void {
-          if (event.currentTarget.bufferLength < 0.5){
+          if (event.currentTarget.bufferLength <= 0){
               (event.buffering) ? bufferingPanel.show() : bufferingPanel.hide();
           }
     }
@@ -602,7 +602,7 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function netStatusChanged(event:NetStatusEvent):void {
-        logger.debug(event.info as String);
+        logger.debug("-----------------------------------------------------------------"+event.info as String);
         if (event.info == "NetConnection.Connect.NetworkChange") {
 
             factory.removeEventListener(NetStatusEvent.NET_STATUS, netStatusChanged);
@@ -674,6 +674,7 @@ public class SeeSawPlayer extends Sprite {
     private function onMediaPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
         switch (event.state) {
             case MediaPlayerState.PLAYING:
+                bufferingPanel.hide();       // hide the buffering Panel if content is playing...
                 // This was the simplest fix I could find for FEEDBACK-2311.
                 container.validateNow();
                 toggleLights();
