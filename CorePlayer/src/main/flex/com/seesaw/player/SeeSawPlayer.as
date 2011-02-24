@@ -31,6 +31,7 @@ import com.seesaw.player.ads.auditude.AdProxyPluginInfo;
 import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.batcheventservices.BatchEventServicePlugin;
+import com.seesaw.player.buffering.BufferManager;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.controls.ControlBarConstants;
 import com.seesaw.player.controls.ControlBarPlugin;
@@ -64,6 +65,7 @@ import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.events.MediaPlayerStateChangeEvent;
 import org.osmf.events.MetadataEvent;
+import org.osmf.events.PlayEvent;
 import org.osmf.events.TimeEvent;
 import org.osmf.events.TimelineMetadataEvent;
 import org.osmf.layout.HorizontalAlign;
@@ -245,7 +247,7 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onAdPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
-        logger.debug("ad: " + event.state);
+        logger.debug("ad::::::::::::::::::: " + event.state);
         onMediaPlayerStateChange(event);
     }
 
@@ -264,6 +266,7 @@ public class SeeSawPlayer extends Sprite {
 
                     adContainer.addMediaElement(currentAdBreak.adPlaylist);
                     adPlayer.media = currentAdBreak.adPlaylist;
+
                     // get the control bar to point at the ads
                     setControlBarTarget(currentAdBreak.adPlaylist);
 
@@ -280,12 +283,39 @@ public class SeeSawPlayer extends Sprite {
         }
     }
 
+
+    private function adPlayStateChange(event:PlayEvent):void {
+        if (!currentAdBreak.complete) {
+            if (event.playState == PlayState.STOPPED) {
+                var adMetadata:AdMetadata = mainElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+                adMetadata.adState = AdState.STOPPED;
+            }
+        }
+    }
+
+    private function adDurationChange(event:TimeEvent):void {
+        if (!currentAdBreak.complete) {
+            if (event.type == TimeEvent.DURATION_CHANGE) {
+                var adMetadata:AdMetadata = mainElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+                adMetadata.adState = AdState.STARTED;
+            }
+        }
+    }
+
+
     private function adBreakCompleted(event:Event = null):void {
         logger.debug("ad break complete");
         if (currentAdBreak) {
             var adPlaylist:SerialElement = currentAdBreak.adPlaylist;
             var timeTrait:TimeTrait = adPlaylist.getTrait(MediaTraitType.TIME) as TimeTrait;
-            if (timeTrait) timeTrait.removeEventListener(TimeEvent.COMPLETE, adBreakCompleted);
+            var playable:PlayTrait = adPlaylist.getTrait(MediaTraitType.PLAY) as PlayTrait;
+            if (timeTrait) {
+                timeTrait.removeEventListener(TimeEvent.COMPLETE, adBreakCompleted);
+                timeTrait.addEventListener(TimeEvent.DURATION_CHANGE, adDurationChange);
+            }
+            if (playable) {
+                playable.addEventListener(PlayEvent.PLAY_STATE_CHANGE, adPlayStateChange);
+            }
             adPlaylist.removeEventListener(MediaElementEvent.TRAIT_ADD, onAdElementTraitAdd);
             adContainer.removeMediaElement(adPlaylist);
             currentAdBreak.complete = true;
@@ -378,7 +408,11 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onBufferingChange(event:BufferEvent):void {
-        (event.buffering) ? bufferingPanel.show() : bufferingPanel.hide();
+          if (event.currentTarget.bufferLength <= 0.1){
+              (event.buffering) ? bufferingPanel.show() : bufferingPanel.hide();
+          }else{
+             bufferingPanel.hide();
+          }
     }
 
     private function createSubtitleElement():void {
@@ -458,7 +492,8 @@ public class SeeSawPlayer extends Sprite {
         factory.removeEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onSmilElementCreated);
 
         if (mediaElement) {
-            mainElement.addChild(mediaElement);
+            mainElement.addChild(new BufferManager(PlayerConstants.MIN_BUFFER_SIZE_SECONDS,
+                    PlayerConstants.MAX_BUFFER_SIZE_SECONDS, mediaElement));
 
             var timelineMetadata:TimelineMetadata =
                     mediaElement.getMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) as TimelineMetadata;
@@ -542,13 +577,13 @@ public class SeeSawPlayer extends Sprite {
         if (event.traitType == MediaTraitType.TIME) {
             var timeTrait:TimeTrait = element.getTrait(MediaTraitType.TIME) as TimeTrait;
             timeTrait.addEventListener(TimeEvent.COMPLETE, adBreakCompleted);
-            timeTrait.addEventListener(TimeEvent.DURATION_CHANGE, adBreakDurEvent);
+            timeTrait.addEventListener(TimeEvent.DURATION_CHANGE, adDurationChange);
+        } else if (event.traitType == MediaTraitType.PLAY) {
+            var playable:PlayTrait = element.getTrait(MediaTraitType.PLAY) as PlayTrait;
+            if (playable)  playable.addEventListener(PlayEvent.PLAY_STATE_CHANGE, adPlayStateChange);
         }
     }
 
-    private function adBreakDurEvent(event:TimeEvent):void {
-        trace(event);
-    }
 
     private function createControlBarElement():void {
         logger.debug("adding control bar media element to container");
@@ -569,7 +604,7 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function netStatusChanged(event:NetStatusEvent):void {
-        logger.debug(event.info as String);
+        logger.debug("-----------------------------------------------------------------"+event.info as String);
         if (event.info == "NetConnection.Connect.NetworkChange") {
 
             factory.removeEventListener(NetStatusEvent.NET_STATUS, netStatusChanged);
@@ -641,6 +676,7 @@ public class SeeSawPlayer extends Sprite {
     private function onMediaPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
         switch (event.state) {
             case MediaPlayerState.PLAYING:
+                bufferingPanel.hide();       // hide the buffering Panel if content is playing...
                 // This was the simplest fix I could find for FEEDBACK-2311.
                 container.validateNow();
                 toggleLights();
@@ -648,6 +684,7 @@ public class SeeSawPlayer extends Sprite {
             case MediaPlayerState.PAUSED:
                 toggleLights();
                 break;
+
         }
     }
 

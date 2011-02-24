@@ -18,18 +18,15 @@
  *   Contributor(s):  Adobe Systems Incorporated
  */
 package com.seesaw.player.buffering {
-import flash.events.TimerEvent;
-import flash.utils.Timer;
-
+import org.as3commons.logging.ILogger;
+import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ProxyElement;
 import org.osmf.events.BufferEvent;
 import org.osmf.events.MediaElementEvent;
-import org.osmf.events.PlayEvent;
 import org.osmf.events.SeekEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.traits.BufferTrait;
 import org.osmf.traits.MediaTraitType;
-import org.osmf.traits.PlayState;
 import org.osmf.traits.TraitEventDispatcher;
 
 /**
@@ -39,86 +36,58 @@ import org.osmf.traits.TraitEventDispatcher;
  * the buffer state.
  **/
 public class BufferManager extends ProxyElement {
-    private var timer:Timer = new Timer(100);
-    private var bufferTrait:BufferTrait;
 
-    public function BufferManager(initialBufferTime:Number, expandedBufferTime:Number, wrappedElement:MediaElement) {
-        super(wrappedElement);
+    private static const UPDATE_INTERVAL:uint = 250;
+
+    private var logger:ILogger = LoggerFactory.getClassLogger(BufferManager);
+
+    private var initialBufferTime:Number;
+    private var expandedBufferTime:Number;
+
+    public function BufferManager(initialBufferTime:Number, expandedBufferTime:Number, element:MediaElement) {
+        super(element);
+
+        if(initialBufferTime > expandedBufferTime)
+            throw new ArgumentError("initialBufferTime > expandedBufferTime");
 
         this.initialBufferTime = initialBufferTime;
         this.expandedBufferTime = expandedBufferTime;
 
         var dispatcher:TraitEventDispatcher = new TraitEventDispatcher();
-        dispatcher.media = wrappedElement;
+        dispatcher.media = element;
 
-
-        timer.addEventListener(TimerEvent.TIMER, onTimer);
-        timer.start();
-        wrappedElement.addEventListener(MediaElementEvent.TRAIT_ADD, processTraitAdd);
+        element.addEventListener(MediaElementEvent.TRAIT_ADD, processTraitAdd);
         dispatcher.addEventListener(BufferEvent.BUFFERING_CHANGE, processBufferingChange, false, 100);
+        dispatcher.addEventListener(BufferEvent.BUFFER_TIME_CHANGE, onBufferTimeChange);
         dispatcher.addEventListener(SeekEvent.SEEKING_CHANGE, processSeekingChange);
-        dispatcher.addEventListener(PlayEvent.PLAY_STATE_CHANGE, processPlayStateChange);
-
     }
 
-    private function processTraitAdd(traitType:String):void {
-        if (traitType == MediaTraitType.BUFFER) {
+    private function onBufferTimeChange(event:BufferEvent):void {
+        if(event.bufferTime >= expandedBufferTime)
+            logger.debug("buffer has reached maximum time of {0} ", event.bufferTime);
+    }
+
+    private function processTraitAdd(event:MediaElementEvent):void {
+        if (event.traitType == MediaTraitType.BUFFER) {
             // As soon as we can buffer, set the initial buffer time.
-            bufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
+            var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
             bufferTrait.bufferTime = initialBufferTime;
         }
     }
 
     private function processBufferingChange(event:BufferEvent):void {
-        // As soon as we stop buffering, make sure our buffer time is
-        // set to the maximum.
-        bufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
-
-        if (event.buffering == false) {
-
-            onTimer();
-            //  bufferTrait.bufferTime = expandedBufferTime;
-
-        } else {
-            bufferTrait.bufferTime = initialBufferTime;
-            timer.start();
-
-        }
-    }
-
-    private function onTimer(event:TimerEvent = null):void {
+        var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
         if (bufferTrait) {
-            trace(bufferTrait.bufferLength);
-            if (bufferTrait.bufferLength < 1.5) {
-                bufferTrait.bufferTime = initialBufferTime;
-            }
-            bufferTrait.bufferTime += 1;
-
-            if (bufferTrait.bufferTime > expandedBufferTime) {
-                timer.stop();
-            }
+            bufferTrait.bufferTime = bufferTrait.bufferLength +0.1;
         }
     }
+
 
     private function processSeekingChange(event:SeekEvent):void {
-        // Whenever we seek, reset our buffer time to the minimum so that
-        // playback starts quickly after the seek.
-        if (event.seeking == true) {
-            var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
+        var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
+        if (bufferTrait) {
             bufferTrait.bufferTime = initialBufferTime;
         }
     }
-
-    private function processPlayStateChange(event:PlayEvent):void {
-        // Whenever we pause, reset our buffer time to the minimum so that
-        // playback starts quickly after the unpause.
-        if (event.playState == PlayState.PAUSED) {
-            var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
-            bufferTrait.bufferTime = initialBufferTime;
-        }
-    }
-
-    private var initialBufferTime:Number;
-    private var expandedBufferTime:Number;
 }
 }

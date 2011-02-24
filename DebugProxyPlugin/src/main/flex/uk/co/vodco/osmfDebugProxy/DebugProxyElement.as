@@ -136,8 +136,15 @@ public class DebugProxyElement extends ProxyElement {
 
     private function onSwitchingChange(event:DynamicStreamEvent):void {
         var trait:DynamicStreamTrait = getTrait(MediaTraitType.DYNAMIC_STREAM) as DynamicStreamTrait;
-        if (trait && trait.switching) {
-            logger.debug("Switching dynamic stream: bitrate = {0}", trait.getBitrateForIndex(trait.currentIndex));
+        if (trait) {
+            if (trait.switching) {
+                logger.debug("Switching dynamic stream from bitrate = {0}",
+                        trait.getBitrateForIndex(trait.currentIndex));
+            }
+            else {
+                logger.debug("Completed dynamic stream switch to bitrate = {0}",
+                        trait.getBitrateForIndex(trait.currentIndex));
+            }
         }
     }
 
@@ -230,6 +237,7 @@ public class DebugProxyElement extends ProxyElement {
             if (added) {
                 buffer.addEventListener(BufferEvent.BUFFER_TIME_CHANGE, onBufferTimeChange);
                 buffer.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
+
             }
             else {
                 buffer.removeEventListener(BufferEvent.BUFFER_TIME_CHANGE, onBufferTimeChange);
@@ -239,11 +247,11 @@ public class DebugProxyElement extends ProxyElement {
     }
 
     private function onBufferingChange(event:BufferEvent):void {
-        logger.debug("On Buffering Change:{0}", event.buffering);
+        logger.debug("On Buffering Change:{0} Length: {1}", event.buffering, event.currentTarget.bufferLength);
     }
 
     private function onBufferTimeChange(event:BufferEvent):void {
-        logger.debug("On Buffer Time Change:{0}", event.bufferTime);
+        logger.debug("On Buffer Time Change:{0} LEngth:{1}", event.bufferTime, event.currentTarget.bufferLength);
     }
 
     private function togglePlayListeners(added:Boolean):void {

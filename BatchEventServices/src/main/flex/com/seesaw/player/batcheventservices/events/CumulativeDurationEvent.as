@@ -22,9 +22,9 @@ package com.seesaw.player.batcheventservices.events {
 public class CumulativeDurationEvent {
 
     private var _programmeId:int;
-    private var _transactionItemId:int;
+    private var _transactionItemId:Number;
 
-    public function CumulativeDurationEvent(programmeId:int, transactionItemId:int) {
+    public function CumulativeDurationEvent(programmeId:int, transactionItemId:Number) {
         this._programmeId = programmeId;
         this._transactionItemId = transactionItemId;
     }
@@ -33,7 +33,7 @@ public class CumulativeDurationEvent {
         return _programmeId;
     }
 
-    public function get transactionItemId():int {
+    public function get transactionItemId():Number {
         return _transactionItemId;
     }
 }
