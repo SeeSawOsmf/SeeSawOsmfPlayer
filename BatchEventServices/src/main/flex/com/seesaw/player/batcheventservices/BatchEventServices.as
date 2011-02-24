@@ -48,7 +48,6 @@ import org.osmf.events.MetadataEvent;
 import org.osmf.events.PlayEvent;
 import org.osmf.events.SeekEvent;
 import org.osmf.events.TimeEvent;
-import org.osmf.layout.LayoutMetadata;
 import org.osmf.media.MediaElement;
 import org.osmf.metadata.Metadata;
 import org.osmf.net.StreamingURLResource;
@@ -118,6 +117,7 @@ public class BatchEventServices extends ProxyElement {
     private var adUrlResource:String;
     private var oldUserEventId:int = 0;
     private var previewMode:String;
+    private var userEventMetadata:Metadata;
 
     public function BatchEventServices(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -160,8 +160,11 @@ public class BatchEventServices extends ProxyElement {
             playerMetadata.addEventListener(MetadataEvent.VALUE_ADD, playerMetaChanged);
             playerMetadata.addEventListener(MediaElementEvent.METADATA_ADD, playerMetaChanged);
 
+
+
             adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
             adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
+
 
             if (playerMetadata) {
 
@@ -216,6 +219,39 @@ public class BatchEventServices extends ProxyElement {
                 eventsManager.addUserEvent(userEvent);
                 eventsManager.flushAll();
             }
+        }if(event.key == PlayerConstants.USEREVENTS_METADATA_NAMESPACE) {
+            userEventMetadata = playerMetadata.getValue(PlayerConstants.USEREVENTS_METADATA_NAMESPACE) as Metadata;
+            userEventMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, userEventMetaChanged);
+            userEventMetadata.addEventListener(MetadataEvent.VALUE_ADD, userEventMetaChanged);
+            userEventMetadata.addEventListener(MediaElementEvent.METADATA_ADD, userEventMetaChanged);
+        }
+    }
+
+
+        private function userEventMetaChanged(event:MetadataEvent):void {
+        var userEventType:String;
+        if (event.key == "subtitlesVisible" && event.type != MetadataEvent.VALUE_ADD) {
+            if (event.value) {
+                userEventType = UserEventTypes.SUBTITLES_ON;
+            } else {
+                userEventType = UserEventTypes.SUBTITLES_OFF;
+            }
+        } else if (event.key == "fullScreen" && event.type != MetadataEvent.VALUE_ADD) {
+            if (event.value) {
+                userEventType = UserEventTypes.ENTER_FULL_SCREEN;
+            } else {
+                userEventType = UserEventTypes.EXIT_FULL_SCREEN;
+            }
+        } else if (event.key == "userClickState") {
+            if (event.value == "playing") {
+                userEventType = UserEventTypes.PLAY;
+            }
+            if (event.value == "paused") {
+                userEventType = UserEventTypes.PAUSE;
+            }
+        }
+        if (userEventType != null) {
+            eventsManager.addUserEvent(buildAndReturnUserEvent(userEventType));
         }
     }
 
@@ -247,12 +283,7 @@ public class BatchEventServices extends ProxyElement {
     }
 
     private function onMetaDataRemove(event:MediaElementEvent):void {
-        if (event.namespaceURL == PlayerConstants.CONTROL_BAR_METADATA) {
-            var metadata:Metadata = event.target.getMetadata(PlayerConstants.CONTROL_BAR_METADATA);
-            metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
-            metadata.removeEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
-
-        } else if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
+         if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
             adMetadata.removeEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
             adMetadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
         }
@@ -260,12 +291,7 @@ public class BatchEventServices extends ProxyElement {
 
     private function onMetaDataAdd(event:MediaElementEvent):void {
         var metadata:Metadata;
-        if (event.namespaceURL == PlayerConstants.CONTROL_BAR_METADATA) {
-            metadata = event.target.getMetadata(PlayerConstants.CONTROL_BAR_METADATA);
-            metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
-            metadata.addEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
-
-        } else if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
+if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
 
             if (adMetadata) {
                 adMetadata.removeEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
@@ -279,17 +305,9 @@ public class BatchEventServices extends ProxyElement {
             metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onNetstatusMetadataChange);
             metadata.addEventListener(MetadataEvent.VALUE_ADD, onNetstatusMetadataChange);
 
-        } else if (event.namespaceURL == LayoutMetadata.LAYOUT_NAMESPACE) {
-            metadata = event.target.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE);
-            metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onLayoutMetadataChange);
-            metadata.addEventListener(MetadataEvent.VALUE_ADD, onLayoutMetadataChange);
-
         }
     }
 
-    private function onLayoutMetadataChange(event:MetadataEvent):void {
-        trace(event);
-    }
 
     private function onNetstatusMetadataChange(event:MetadataEvent):void {
         if (event.value == "NetConnection.Connect.NetworkChange")
@@ -348,37 +366,23 @@ public class BatchEventServices extends ProxyElement {
         } else if (value == AdMetadata.CLICK_THRU) {
             eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.CLICK));
         } else if (value == "mainContent") {
+             if (playingMainContent) {
+
+            if (!cumulativeDurationMonitor.running) cumulativeDurationMonitor.start();    // this should only fire when the main content starts...
+
             contentUrl = "mainResource";
             defineContentUrl(false);
+
+            contentViewingSequenceNumber++;        // content sequence has changed by 1. same occurs when an advert starts
+            currentAdBreakSequenceNumber = 0;     ///we are not in an adBreak so set it to 0
+            mainContentCount++;
+
+            eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.MAIN_CONTENT));
+            eventsManager.flushAll();
+        }
         }
     }
 
-    private function onControlBarMetadataChange(event:MetadataEvent):void {
-        var userEventType:String;
-        if (event.key == "subtitlesVisible" && event.type != MetadataEvent.VALUE_ADD) {
-            if (event.value) {
-                userEventType = UserEventTypes.SUBTITLES_ON;
-            } else {
-                userEventType = UserEventTypes.SUBTITLES_OFF;
-            }
-        } else if (event.key == "fullScreen" && event.type != MetadataEvent.VALUE_ADD) {
-            if (event.value) {
-                userEventType = UserEventTypes.ENTER_FULL_SCREEN;
-            } else {
-                userEventType = UserEventTypes.EXIT_FULL_SCREEN;
-            }
-        } else if (event.key == "userClickState") {
-            if (event.value == "playing") {
-                userEventType = UserEventTypes.PLAY;
-            }
-            if (event.value == "paused") {
-                userEventType = UserEventTypes.PAUSE;
-            }
-        }
-        if (userEventType != null) {
-            eventsManager.addUserEvent(buildAndReturnUserEvent(userEventType));
-        }
-    }
 
     private function onTimerTick(event:TimerEvent):void {
         eventsManager.flushCumulativeDuration(new CumulativeDurationEvent(programmeId, transactionItemId));
@@ -547,10 +551,8 @@ public class BatchEventServices extends ProxyElement {
         var time:TimeTrait = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
         if (time) {
             time.addEventListener(TimeEvent.COMPLETE, onComplete);
-            time.addEventListener(TimeEvent.DURATION_CHANGE, onDurationChange);
         } else {
             time.removeEventListener(TimeEvent.COMPLETE, onComplete);
-            time.removeEventListener(TimeEvent.DURATION_CHANGE, onDurationChange);
         }
     }
 
@@ -563,28 +565,6 @@ public class BatchEventServices extends ProxyElement {
         }
     }
 
-    private function onDurationChange(event:TimeEvent):void {
-        ///MetaDataAdded of the MediaElementEvent, fires 3 times, so wiring this to the duration change seems to be the next most reliable event....
-        if (playingMainContent) {
-
-            if (!cumulativeDurationMonitor.running) cumulativeDurationMonitor.start();    // this should only fire when the main content starts...
-
-            contentUrl = "mainResource";
-            defineContentUrl(false);
-
-            contentViewingSequenceNumber++;        // content sequence has changed by 1. same occurs when an advert starts
-            currentAdBreakSequenceNumber = 0;     ///we are not in an adBreak so set it to 0
-            mainContentCount++;
-
-            eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.MAIN_CONTENT));
-            eventsManager.flushAll();
-        } else if (!adMetadata) {
-            defineContentUrl(true);
-
-            contentViewingSequenceNumber++;
-            eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.AD_BREAK));
-        }
-    }
 
     private function defineContentUrl(checkResource:Boolean):void {
         if (loadable && checkResource) {

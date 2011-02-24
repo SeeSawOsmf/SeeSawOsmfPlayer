@@ -22,6 +22,7 @@ package com.seesaw.player {
 public class PlayerConstants {
     public static const ID:String = "ID";
     public static const METADATA_NAMESPACE:String = "http://www.seesaw.com/player/1.0";
+    public static const USEREVENTS_METADATA_NAMESPACE:String = "http://www.seesaw.com/userevents/1.0";
     public static const SMIL_METADATA_NS:String = "http://www.w3.org/ns/SMIL/metadata";
     public static const CONTROL_BAR_METADATA:String = "http://www.osmf.org/samples/controlbar/metadata";
     public static const CONTENT_INFO:String = "contentInfo";

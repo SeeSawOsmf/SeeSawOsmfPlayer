@@ -267,6 +267,13 @@ public class SeeSawPlayer extends Sprite {
                     adContainer.addMediaElement(currentAdBreak.adPlaylist);
                     adPlayer.media = currentAdBreak.adPlaylist;
 
+                    if (!controlBarMetadata) {
+                        controlBarMetadata = new Metadata();
+                        controlBarMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
+                        controlBarMetadata.addEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
+                    }
+                    currentAdBreak.adPlaylist.addMetadata(ControlBarConstants.CONTROL_BAR_METADATA, controlBarMetadata);
+
                     // get the control bar to point at the ads
                     setControlBarTarget(currentAdBreak.adPlaylist);
 
@@ -278,6 +285,7 @@ public class SeeSawPlayer extends Sprite {
                     setSubtitlesButtonEnabled(false);
 
                     adContainer.visible = true;
+
                 }
             }
         }
@@ -408,11 +416,11 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onBufferingChange(event:BufferEvent):void {
-          if (event.currentTarget.bufferLength < 0.1){
-              (event.buffering) ? bufferingPanel.show() : bufferingPanel.hide();
-          }else{
-             bufferingPanel.hide();
-          }
+        if (event.currentTarget.bufferLength < 0.1) {
+            (event.buffering) ? bufferingPanel.show() : bufferingPanel.hide();
+        } else {
+            bufferingPanel.hide();
+        }
     }
 
     private function createSubtitleElement():void {
@@ -604,7 +612,7 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function netStatusChanged(event:NetStatusEvent):void {
-        logger.debug("-----------------------------------------------------------------"+event.info as String);
+        logger.debug("-----------------------------------------------------------------" + event.info as String);
         if (event.info == "NetConnection.Connect.NetworkChange") {
 
             factory.removeEventListener(NetStatusEvent.NET_STATUS, netStatusChanged);
@@ -648,6 +656,17 @@ public class SeeSawPlayer extends Sprite {
                 }
                 break;
         }
+        generateUserEventMetadata(event);
+    }
+
+    private function generateUserEventMetadata(event:MetadataEvent):void {
+        var playerMetadata:Metadata = config.resource.getMetadataValue(PlayerConstants.METADATA_NAMESPACE) as Metadata;
+        var metadata:Metadata = playerMetadata.getValue(PlayerConstants.USEREVENTS_METADATA_NAMESPACE);
+        if(!metadata){
+            metadata = new Metadata();
+            playerMetadata.addValue(PlayerConstants.USEREVENTS_METADATA_NAMESPACE, metadata);
+        }
+        metadata.addValue(event.key, event.value);
     }
 
     private function updateSubtitlePosition():void {
@@ -745,11 +764,11 @@ public class SeeSawPlayer extends Sprite {
         var preview:Boolean = HelperUtils.getBoolean(playerInit.preview);
         var noAds:Boolean = HelperUtils.getBoolean(userInfo.availability.noAdsPlayable);
         var exceededDrm:Boolean = HelperUtils.getBoolean(userInfo.availability.exceededDrmRule);
-        if (tvVodPlayable){
+        if (tvVodPlayable) {
             return false;
-        } else if  (svodPlayable){
+        } else if (svodPlayable) {
             return false;
-        } else if (preview){
+        } else if (preview) {
             return false
         } else if (noAds && !exceededDrm) {
             return false;
