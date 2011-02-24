@@ -47,6 +47,8 @@ public class AdBreak extends EventDispatcher {
 
     private var _seekOffset:Number = 0;
 
+     private var _canShowBlip:Boolean = true;
+
     public function AdBreak(startTime:Number = NaN) {
         _startTime = startTime;
     }
@@ -133,6 +135,14 @@ public class AdBreak extends EventDispatcher {
     public override function toString():String {
         return "[startTime=" + String(_startTime) +
                 ",queueAdsTotal=" + String(_queueAdsTotal) + ",complete=" + String(_complete) + "]";
+    }
+
+    public function get canShowBlip():Boolean {
+        return _canShowBlip;
+    }
+
+    public function set canShowBlip(value:Boolean):void {
+        _canShowBlip = value;
     }
 }
 }

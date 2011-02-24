@@ -18,15 +18,20 @@
  *   Contributor(s):  Adobe Systems Incorporated
  */
 package com.seesaw.player.buffering {
+import flash.events.TimerEvent;
+import flash.utils.Timer;
+
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ProxyElement;
 import org.osmf.events.BufferEvent;
 import org.osmf.events.MediaElementEvent;
+import org.osmf.events.PlayEvent;
 import org.osmf.events.SeekEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.traits.BufferTrait;
 import org.osmf.traits.MediaTraitType;
+import org.osmf.traits.PlayState;
 import org.osmf.traits.TraitEventDispatcher;
 
 /**
@@ -41,13 +46,14 @@ public class BufferManager extends ProxyElement {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(BufferManager);
 
+    private var timer:Timer;
     private var initialBufferTime:Number;
     private var expandedBufferTime:Number;
 
     public function BufferManager(initialBufferTime:Number, expandedBufferTime:Number, element:MediaElement) {
         super(element);
 
-        if(initialBufferTime > expandedBufferTime)
+        if (initialBufferTime > expandedBufferTime)
             throw new ArgumentError("initialBufferTime > expandedBufferTime");
 
         this.initialBufferTime = initialBufferTime;
@@ -60,11 +66,15 @@ public class BufferManager extends ProxyElement {
         dispatcher.addEventListener(BufferEvent.BUFFERING_CHANGE, processBufferingChange, false, 100);
         dispatcher.addEventListener(BufferEvent.BUFFER_TIME_CHANGE, onBufferTimeChange);
         dispatcher.addEventListener(SeekEvent.SEEKING_CHANGE, processSeekingChange);
+        dispatcher.addEventListener(PlayEvent.PLAY_STATE_CHANGE, processPlayStateChange);
+
+        timer = new Timer(UPDATE_INTERVAL);
+        timer.repeatCount = expandedBufferTime;
+        timer.addEventListener(TimerEvent.TIMER, onTimer);
     }
 
     private function onBufferTimeChange(event:BufferEvent):void {
-        if(event.bufferTime >= expandedBufferTime)
-            logger.debug("buffer has reached maximum time of {0} ", event.bufferTime);
+        logger.debug("buffer has reached maximum time of {0} ", event.bufferTime);
     }
 
     private function processTraitAdd(event:MediaElementEvent):void {
@@ -76,16 +86,50 @@ public class BufferManager extends ProxyElement {
     }
 
     private function processBufferingChange(event:BufferEvent):void {
+        // As soon as we stop buffering, make sure our buffer time is
+        // set to the maximum.
         var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
-        if (bufferTrait) {
-            bufferTrait.bufferTime = bufferTrait.bufferLength +0.1;
+
+        if (event.buffering == false) {
+
+            onTimer();
+            //  bufferTrait.bufferTime = expandedBufferTime;
+
+        } else {
+            bufferTrait.bufferTime = initialBufferTime;
+            timer.start();
+
         }
+
     }
 
+    private function onTimer(event:TimerEvent = null):void {
+        var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
+        if (bufferTrait) {
+            if (bufferTrait.bufferLength < 1.5) {
+                bufferTrait.bufferTime = initialBufferTime;
+            } else{
+                  bufferTrait.bufferTime += 1;
+            }
+            if (bufferTrait.bufferTime > expandedBufferTime) {
+                timer.stop();
+            }
+        }
+    }
 
     private function processSeekingChange(event:SeekEvent):void {
         var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
         if (bufferTrait) {
+            timer.reset();
+            bufferTrait.bufferTime = initialBufferTime;
+        }
+    }
+
+    private function processPlayStateChange(event:PlayEvent):void {
+        // Whenever we pause, reset our buffer time to the minimum so that
+        // playback starts quickly after the unpause.
+        if (event.playState == PlayState.PAUSED) {
+            var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
             bufferTrait.bufferTime = initialBufferTime;
         }
     }

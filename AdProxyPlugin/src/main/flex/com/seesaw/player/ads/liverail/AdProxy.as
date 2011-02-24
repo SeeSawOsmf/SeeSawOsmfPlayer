@@ -118,7 +118,7 @@ public class AdProxy extends ProxyElement {
             // block these until the liverail events kick in
             setTraitsToBlock(MediaTraitType.PLAY, MediaTraitType.TIME, MediaTraitType.DISPLAY_OBJECT);
 
-            // After calling initAds(config), the main video player�s controls should be disabled and any requests to
+            // After calling initAds(config), the main video playerï¿½s controls should be disabled and any requests to
             // play a movie should be cancelled or delayed until the initComplete (or the initError) event is received
             // from the ad manager. If initComplete has been received, first call lrAdManager.onContentStart() and only
             // resume your main video after prerollComplete event is triggered.
@@ -232,6 +232,7 @@ public class AdProxy extends ProxyElement {
             metadataAdBreak.startTime = startTimeValue;
             metadataAdBreak.startTimeIsPercent = startTimeIsPercent;
 
+            (startTimeValue == 100 && startTimeIsPercent) ? metadataAdBreak.canShowBlip = false : metadataAdBreak.canShowBlip = true;
             // Dont add the break if it has no ads, eg no content to play, so we don't want a blip for this item
             if (hasAds) {
                 metadataAdBreak.seekOffset = 0.5; // seek back half a second to trigger the ads
