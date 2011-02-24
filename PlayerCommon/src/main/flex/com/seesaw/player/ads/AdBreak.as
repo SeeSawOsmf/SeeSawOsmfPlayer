@@ -61,7 +61,7 @@ public class AdBreak extends EventDispatcher {
     }
 
     public function get queueDuration():Number {
-        if(_adPlaylist) {
+        if (_adPlaylist) {
             var timeTrait:TimeTrait = _adPlaylist.getTrait(MediaTraitType.TIME) as TimeTrait;
             return timeTrait ? timeTrait.duration : NaN;
         }
@@ -131,18 +131,13 @@ public class AdBreak extends EventDispatcher {
         return !complete && adPlaylist && adPlaylist.numChildren > 0;
     }
 
+    public function get canShowBlip():Boolean {
+        return !(complete || startTime == 0 || (startTime == 100 && startTimeIsPercent));
+    }
+
     public override function toString():String {
         return "[startTime=" + String(_startTime) +
                 ",queueAdsTotal=" + String(_queueAdsTotal) + ",complete=" + String(_complete) + "]";
-    }
-
-    public function get canShowBlip():Boolean {
-        if (complete || startTime == 0 || (startTime == 100 && startTimeIsPercent)){
-            return false;
-        } else {
-            return true;
-        }
-
     }
 }
 }

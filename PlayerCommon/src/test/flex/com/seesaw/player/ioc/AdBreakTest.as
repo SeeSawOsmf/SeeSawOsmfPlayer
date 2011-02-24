@@ -32,22 +32,46 @@ import com.seesaw.player.ads.AdBreak;
 
 import org.hamcrest.assertThat;
 import org.hamcrest.object.equalTo;
-import org.mockito.integrations.given;
 import org.osmf.elements.SerialElement;
 import org.osmf.media.MediaElement;
-import org.osmf.net.ModifiableTimeTrait;
 import org.osmf.traits.MediaTraitType;
+import org.osmf.utils.DynamicMediaElement;
+import org.osmf.utils.DynamicTimeTrait;
 
 public class AdBreakTest {
 
     [Test]
     public function canShowAdBlip():void {
         var adBreak:AdBreak = new AdBreak();
-        adBreak.startTime = 0;
         adBreak.startTimeIsPercent = false;
         adBreak.complete = false;
 
-//        assertThat(adBreak.canShowBlip, equalTo(true));
+        // can't show ad blip at 0
+        adBreak.startTime = 0;
+        assertThat(adBreak.canShowBlip, equalTo(false));
+
+        // can show ad blip as long as not completed
+        adBreak.startTime = 1;
+        assertThat(adBreak.canShowBlip, equalTo(true));
+
+        // can't show ad blip when completed
+        adBreak.complete = true;
+        assertThat(adBreak.canShowBlip, equalTo(false));
+
+        adBreak.startTimeIsPercent = true;
+        adBreak.complete = false;
+
+        adBreak.startTime = 0;
+        assertThat(adBreak.canShowBlip, equalTo(false));
+
+        adBreak.startTime = 1;
+        assertThat(adBreak.canShowBlip, equalTo(true));
+
+        adBreak.startTime = 99;
+        assertThat(adBreak.canShowBlip, equalTo(true));
+
+        adBreak.startTime = 100;
+        assertThat(adBreak.canShowBlip, equalTo(false));
     }
 
     [Test]
@@ -64,13 +88,23 @@ public class AdBreakTest {
         adBreak.adPlaylist = new SerialElement();
         assertThat(adBreak.canPlayAdPlaylist, equalTo(false));
 
-        adBreak.adPlaylist.addChild(new MediaElement());
-        adBreak.adPlaylist.addChild(new MediaElement());
-        adBreak.adPlaylist.addChild(new MediaElement());
+        adBreak.adPlaylist.addChild(createMediaElementWithDuration(5));
+        adBreak.adPlaylist.addChild(createMediaElementWithDuration(11));
+        adBreak.adPlaylist.addChild(createMediaElementWithDuration(12));
 
         assertThat(adBreak.canPlayAdPlaylist, equalTo(true));
         assertThat(adBreak.queueAdsTotal, equalTo(3));
         assertThat(adBreak.adPlaylist.numChildren, equalTo(3));
+        assertThat(adBreak.queueDuration, equalTo(28));
+    }
+
+    private function createMediaElementWithDuration(duration:int):MediaElement {
+        var dynamicMediaElement:DynamicMediaElement = new DynamicMediaElement(null, null, null, true);
+        var dynamicTimeTrait:DynamicTimeTrait = new DynamicTimeTrait();
+        dynamicTimeTrait.currentTime = 0;
+        dynamicTimeTrait.duration = duration;
+        dynamicMediaElement.doAddTrait(MediaTraitType.TIME, dynamicTimeTrait);
+        return dynamicMediaElement;
     }
 
     public function AdBreakTest() {

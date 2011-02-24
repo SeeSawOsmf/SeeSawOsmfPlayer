@@ -249,6 +249,14 @@
                 <scope>test</scope>
             </dependency>
 
+            <dependency>
+                <groupId>org.osmf</groupId>
+                <artifactId>osmftest</artifactId>
+                <version>1.5</version>
+                <type>swc</type>
+                <scope>test</scope>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
