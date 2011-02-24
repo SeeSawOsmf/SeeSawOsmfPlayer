@@ -26,12 +26,18 @@ import flash.text.TextField;
 import flash.text.TextFormat;
 import flash.text.TextFormatAlign;
 
+import org.as3commons.logging.ILogger;
+import org.as3commons.logging.LoggerFactory;
 import org.osmf.layout.LayoutMetadata;
 import org.osmf.layout.LayoutTargetSprite;
 
 public class CaptionDisplayObject extends LayoutTargetSprite {
 
     private var captionField:TextField;
+
+    private var captionValue:String = "";
+
+    private var logger:ILogger = LoggerFactory.getClassLogger(CaptionDisplayObject);
 
     public function CaptionDisplayObject(layoutMetadata:LayoutMetadata = null) {
         super(layoutMetadata);
@@ -54,11 +60,45 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
         addChild(captionField);
     }
 
+    private function applyStandardTextSize():void {
+        var format:TextFormat = new TextFormat();
+        format.align = TextFormatAlign.CENTER;
+        format.size = 16;
+        format.font = 'Arial';
+        captionField.defaultTextFormat = format;
+        captionField.htmlText = captionValue;
+    }
+
+    private function applyLargeTextSize():void {
+        var format:TextFormat = new TextFormat();
+        format.align = TextFormatAlign.CENTER;
+        format.size = 23;
+        format.font = 'Arial';
+        captionField.defaultTextFormat = format;
+        captionField.htmlText = captionValue;
+    }
+
     override public function layout(availableWidth:Number, availableHeight:Number, deep:Boolean = true):void {
         super.layout(availableWidth, availableHeight, deep);
-        captionField.width = availableWidth;
-        captionField.height = availableHeight;
+
+        if (availableWidth != captionField.width) {
+
+            var goLarge:Boolean = availableWidth >= captionField.width;
+
+            captionField.width = availableWidth;
+            captionField.height = availableHeight;
+
+            if (goLarge) {
+                applyLargeTextSize();
+                logger.debug("APPLY LARGE SIZE");
+            } else {
+                applyStandardTextSize();
+                logger.debug("APPLY STANDARD SIZE");
+            }
+
+        }
     }
+
 
     private function positionSubtitles(event:Event):void {
         event.target.y = height - (event.target.height + 27);
@@ -66,7 +106,7 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
 
     public function set text(value:String):void {
         if (captionField) {
-            captionField.htmlText = value;
+            captionField.htmlText = captionValue = value;
         }
     }
 }
