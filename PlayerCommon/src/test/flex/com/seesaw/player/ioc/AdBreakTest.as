@@ -58,20 +58,19 @@ public class AdBreakTest {
         adBreak.complete = false;
 
         // false by default
-        assertThat(adBreak.adPlaylistPlayable, equalTo(false));
+        assertThat(adBreak.canPlayAdPlaylist, equalTo(false));
 
         // false with empty playlist
         adBreak.adPlaylist = new SerialElement();
-        assertThat(adBreak.adPlaylistPlayable, equalTo(false));
+        assertThat(adBreak.canPlayAdPlaylist, equalTo(false));
 
         adBreak.adPlaylist.addChild(new MediaElement());
         adBreak.adPlaylist.addChild(new MediaElement());
         adBreak.adPlaylist.addChild(new MediaElement());
 
-        assertThat(adBreak.adPlaylistPlayable, equalTo(true));
+        assertThat(adBreak.canPlayAdPlaylist, equalTo(true));
         assertThat(adBreak.queueAdsTotal, equalTo(3));
         assertThat(adBreak.adPlaylist.numChildren, equalTo(3));
-
     }
 
     public function AdBreakTest() {

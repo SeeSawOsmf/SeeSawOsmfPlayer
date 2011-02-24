@@ -128,7 +128,7 @@ public class AdBreak extends EventDispatcher {
         _seekOffset = value;
     }
 
-    public function get adPlaylistPlayable():Boolean {
+    public function get canPlayAdPlaylist():Boolean {
         return !complete && adPlaylist && adPlaylist.numChildren > 0;
     }
 
