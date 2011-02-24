@@ -63,7 +63,7 @@ public class BufferManager extends ProxyElement {
         dispatcher.media = element;
 
         element.addEventListener(MediaElementEvent.TRAIT_ADD, processTraitAdd);
-        dispatcher.addEventListener(BufferEvent.BUFFERING_CHANGE, processBufferingChange, false, 100);
+        dispatcher.addEventListener(BufferEvent.BUFFERING_CHANGE, processBufferingChange);
         dispatcher.addEventListener(BufferEvent.BUFFER_TIME_CHANGE, onBufferTimeChange);
         dispatcher.addEventListener(SeekEvent.SEEKING_CHANGE, processSeekingChange);
         dispatcher.addEventListener(PlayEvent.PLAY_STATE_CHANGE, processPlayStateChange);
@@ -89,7 +89,7 @@ public class BufferManager extends ProxyElement {
         // As soon as we stop buffering, make sure our buffer time is
         // set to the maximum.
         var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
-
+           logger.debug("-------------------- buffer TIME {0} ", bufferTrait.bufferTime);
         if (event.buffering == false) {
 
             onTimer();
