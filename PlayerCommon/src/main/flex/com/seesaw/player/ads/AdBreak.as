@@ -45,7 +45,6 @@ public class AdBreak extends EventDispatcher {
 
     private var _seekOffset:Number = 0;
 
-     private var _canShowBlip:Boolean = true;
 
     public function AdBreak(startTime:Number = NaN) {
         _startTime = startTime;
@@ -128,11 +127,12 @@ public class AdBreak extends EventDispatcher {
     }
 
     public function get canShowBlip():Boolean {
-        return _canShowBlip;
-    }
+        if (complete || startTime == 0 || (startTime == 100 && startTimeIsPercent)){
+            return false;
+        } else {
+            return true;
+        }
 
-    public function set canShowBlip(value:Boolean):void {
-        _canShowBlip = value;
     }
 }
 }
