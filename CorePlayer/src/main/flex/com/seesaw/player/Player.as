@@ -193,16 +193,7 @@ public class Player extends Sprite {
 
         var availability:XMLList = userInit.availability;
 
-        var playerMessage:String = "";
-        var seriesEntitled:Boolean = false;
-        var videoPlayerInfoLink:String = "/videoplayerinfo/26432/PAID";
-        var isSubscriptionEntitled:Boolean = false;
-        var episodeEntitled:Boolean = true;
-        var available:Boolean = true;
-        var showPreviewClip:Boolean = false;
-        var statusMessage:String = "";
-
-        var JSONString:String = '{ "playerMessage": "' + playerMessage + '", "seriesEntitled": "' + seriesEntitled.toString() + '", "videoPlayerInfoLink" : "' + videoPlayerInfoLink + '", "isSubscriptionEntitled" : "' + isSubscriptionEntitled.toString() + '", "episodeEntitled" : "' + episodeEntitled.toString() + '", "available" : "' + available + '", "showPreviewClip" : "' + showPreviewClip.toString() + '", "statusMessage" : "' + statusMessage + '" }';
+        var JSONString:String = '{ "playerMessage": "' + availability.playerMessage + '", "seriesEntitled": ' + availability.seriesEntitled + ', "isSubscriptionEntitled" : ' + availability.subscriptionEntitled + ', "episodeEntitled" : ' + availability.episodeEntitled + ', "available" : ' + availability.available + ', "showPreviewClip" : ' + availability.showPreviewClip + ', "statusMessage" : "' + availability.statusMessage + '" }';
         return JSONString;
     }
 
@@ -275,6 +266,7 @@ public class Player extends Sprite {
     }
 
     private function showGuidancePanel():void {
+        getEntitlement();
         if (playerInit.tvAgeRating && playerInit.tvAgeRating >= 16 && playerInit.guidance) {
             if (guidanceBar) {
                 guidanceBar.visible = false;
@@ -388,7 +380,7 @@ public class Player extends Sprite {
                 playButtonMode = PlayStartButton.PLAY;
             }
             else if (availability.availabilityType == "SVOD" && availability.noAdsPlayable == "true") {
-                playButtonMode = PlayStartButton.PLAY_SUBSCRIBED;
+                playButtonMode = PlayStartButton.PLAY;
             }
         }
         // Note that if none of the conditions above are met, we should not show
