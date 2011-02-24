@@ -22,6 +22,8 @@ package com.seesaw.player.ads {
 import flash.events.EventDispatcher;
 
 import org.osmf.elements.SerialElement;
+import org.osmf.traits.MediaTraitType;
+import org.osmf.traits.TimeTrait;
 
 public class AdBreak extends EventDispatcher {
 
@@ -50,7 +52,7 @@ public class AdBreak extends EventDispatcher {
     }
 
     public function get queueAdsTotal():uint {
-        return _queueAdsTotal;
+        return _adPlaylist ? _adPlaylist.numChildren : _queueAdsTotal;
     }
 
     public function set queueAdsTotal(value:uint):void {
@@ -58,6 +60,10 @@ public class AdBreak extends EventDispatcher {
     }
 
     public function get queueDuration():Number {
+        if(_adPlaylist) {
+            var timeTrait:TimeTrait = _adPlaylist.getTrait(MediaTraitType.TIME) as TimeTrait;
+            return timeTrait ? timeTrait.duration : NaN;
+        }
         return _queueDuration;
     }
 
@@ -118,6 +124,10 @@ public class AdBreak extends EventDispatcher {
 
     public function set seekOffset(value:Number):void {
         _seekOffset = value;
+    }
+
+    public function get adPlaylistPlayable():Boolean {
+        return !complete && adPlaylist && adPlaylist.numChildren > 0;
     }
 
     public override function toString():String {

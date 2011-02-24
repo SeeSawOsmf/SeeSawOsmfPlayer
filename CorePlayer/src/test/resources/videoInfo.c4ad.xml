@@ -22,7 +22,6 @@
     <ns2:smil>
         <ns2:head>
             <ns2:meta base="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703"/>
-            <ns2:meta base="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703"/>
         </ns2:head>
         <ns2:body>
             <ns2:seq>

@@ -54,7 +54,7 @@ public class ResumeServiceImpl implements ResumeService {
     }
 
     public function getResumeCookie():Number {
-        var cookie:Number = 0;
+        var cookie:Number = NaN;
         if (localSharedObject.data[programmeId] && localSharedObject.data[programmeId].savedValue) {
             cookie = Number(getDecryptedValue(localSharedObject.data[programmeId].savedValue));
         }
