@@ -31,6 +31,7 @@ import com.seesaw.player.ads.auditude.AdProxyPluginInfo;
 import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.batcheventservices.BatchEventServicePlugin;
+import com.seesaw.player.buffering.BufferManager;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.controls.ControlBarConstants;
 import com.seesaw.player.controls.ControlBarPlugin;
@@ -67,6 +68,7 @@ import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MediaFactoryEvent;
 import org.osmf.events.MediaPlayerStateChangeEvent;
 import org.osmf.events.MetadataEvent;
+import org.osmf.events.PlayEvent;
 import org.osmf.events.TimeEvent;
 import org.osmf.events.TimelineMetadataEvent;
 import org.osmf.layout.HorizontalAlign;
@@ -250,7 +252,7 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onAdPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
-        logger.debug("ad: " + event.state);
+        logger.debug("ad::::::::::::::::::: " + event.state);
         onMediaPlayerStateChange(event);
     }
 
@@ -269,6 +271,14 @@ public class SeeSawPlayer extends Sprite {
 
                     adContainer.addMediaElement(currentAdBreak.adPlaylist);
                     adPlayer.media = currentAdBreak.adPlaylist;
+
+                    if (!controlBarMetadata) {
+                        controlBarMetadata = new Metadata();
+                        controlBarMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onControlBarMetadataChange);
+                        controlBarMetadata.addEventListener(MetadataEvent.VALUE_ADD, onControlBarMetadataChange);
+                    }
+                    currentAdBreak.adPlaylist.addMetadata(ControlBarConstants.CONTROL_BAR_METADATA, controlBarMetadata);
+
                     // get the control bar to point at the ads
                     setControlBarTarget(currentAdBreak.adPlaylist);
 
@@ -277,20 +287,47 @@ public class SeeSawPlayer extends Sprite {
                     adMetadata.adState = AdState.AD_BREAK_START;
                     adMetadata.adMode = AdMode.AD;
 
-                    setSubtitlesButtonEnabled(false);
 
                     adContainer.visible = true;
+
                 }
             }
         }
     }
+
+
+    private function adPlayStateChange(event:PlayEvent):void {
+        if (!currentAdBreak.complete) {
+            if (event.playState == PlayState.STOPPED) {
+                var adMetadata:AdMetadata = mainElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+                adMetadata.adState = AdState.STOPPED;
+            }
+        }
+    }
+
+    private function adDurationChange(event:TimeEvent):void {
+        if (!currentAdBreak.complete) {
+            if (event.type == TimeEvent.DURATION_CHANGE) {
+                var adMetadata:AdMetadata = mainElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+                adMetadata.adState = AdState.STARTED;
+            }
+        }
+    }
+
 
     private function adBreakCompleted(event:Event = null):void {
         logger.debug("ad break complete");
         if (currentAdBreak) {
             var adPlaylist:SerialElement = currentAdBreak.adPlaylist;
             var timeTrait:TimeTrait = adPlaylist.getTrait(MediaTraitType.TIME) as TimeTrait;
-            if (timeTrait) timeTrait.removeEventListener(TimeEvent.COMPLETE, adBreakCompleted);
+            var playable:PlayTrait = adPlaylist.getTrait(MediaTraitType.PLAY) as PlayTrait;
+            if (timeTrait) {
+                timeTrait.removeEventListener(TimeEvent.COMPLETE, adBreakCompleted);
+                timeTrait.addEventListener(TimeEvent.DURATION_CHANGE, adDurationChange);
+            }
+            if (playable) {
+                playable.addEventListener(PlayEvent.PLAY_STATE_CHANGE, adPlayStateChange);
+            }
             adPlaylist.removeEventListener(MediaElementEvent.TRAIT_ADD, onAdElementTraitAdd);
             adContainer.removeMediaElement(adPlaylist);
             currentAdBreak.complete = true;
@@ -307,8 +344,6 @@ public class SeeSawPlayer extends Sprite {
             var adMetadata:AdMetadata = mainElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
             adMetadata.adState = AdState.AD_BREAK_COMPLETE;
             adMetadata.adMode = AdMode.MAIN_CONTENT;
-
-            setSubtitlesButtonEnabled(subtitleElement != null);
 
             mainContainer.visible = true;
 
@@ -383,7 +418,11 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onBufferingChange(event:BufferEvent):void {
-        (event.buffering) ? bufferingPanel.show() : bufferingPanel.hide();
+        if (event.currentTarget.bufferLength < 0.1) {
+            (event.buffering) ? bufferingPanel.show() : bufferingPanel.hide();
+        } else {
+            bufferingPanel.hide();
+        }
     }
 
     private function createSubtitleElement():void {
@@ -463,7 +502,8 @@ public class SeeSawPlayer extends Sprite {
         factory.removeEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onSmilElementCreated);
 
         if (mediaElement) {
-            mainElement.addChild(mediaElement);
+            mainElement.addChild(new BufferManager(PlayerConstants.MIN_BUFFER_SIZE_SECONDS,
+                    PlayerConstants.MAX_BUFFER_SIZE_SECONDS, mediaElement));
 
             mediaElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
             
@@ -592,13 +632,13 @@ public class SeeSawPlayer extends Sprite {
         if (event.traitType == MediaTraitType.TIME) {
             var timeTrait:TimeTrait = element.getTrait(MediaTraitType.TIME) as TimeTrait;
             timeTrait.addEventListener(TimeEvent.COMPLETE, adBreakCompleted);
-            timeTrait.addEventListener(TimeEvent.DURATION_CHANGE, adBreakDurEvent);
+            timeTrait.addEventListener(TimeEvent.DURATION_CHANGE, adDurationChange);
+        } else if (event.traitType == MediaTraitType.PLAY) {
+            var playable:PlayTrait = element.getTrait(MediaTraitType.PLAY) as PlayTrait;
+            if (playable)  playable.addEventListener(PlayEvent.PLAY_STATE_CHANGE, adPlayStateChange);
         }
     }
 
-    private function adBreakDurEvent(event:TimeEvent):void {
-        trace(event);
-    }
 
     private function createControlBarElement():void {
         logger.debug("adding control bar media element to container");
@@ -619,7 +659,7 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function netStatusChanged(event:NetStatusEvent):void {
-        logger.debug(event.info as String);
+        logger.debug("-----------------------------------------------------------------" + event.info as String);
         if (event.info == "NetConnection.Connect.NetworkChange") {
 
             factory.removeEventListener(NetStatusEvent.NET_STATUS, netStatusChanged);
@@ -663,6 +703,17 @@ public class SeeSawPlayer extends Sprite {
                 }
                 break;
         }
+        generateUserEventMetadata(event);
+    }
+
+    private function generateUserEventMetadata(event:MetadataEvent):void {
+        var playerMetadata:Metadata = config.resource.getMetadataValue(PlayerConstants.METADATA_NAMESPACE) as Metadata;
+        var metadata:Metadata = playerMetadata.getValue(PlayerConstants.USEREVENTS_METADATA_NAMESPACE);
+        if(!metadata){
+            metadata = new Metadata();
+            playerMetadata.addValue(PlayerConstants.USEREVENTS_METADATA_NAMESPACE, metadata);
+        }
+        metadata.addValue(event.key, event.value);
     }
 
     private function updateSubtitlePosition():void {
@@ -691,6 +742,7 @@ public class SeeSawPlayer extends Sprite {
     private function onMediaPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
         switch (event.state) {
             case MediaPlayerState.PLAYING:
+                bufferingPanel.hide();       // hide the buffering Panel if content is playing...
                 // This was the simplest fix I could find for FEEDBACK-2311.
                 container.validateNow();
                 toggleLights();
@@ -698,6 +750,7 @@ public class SeeSawPlayer extends Sprite {
             case MediaPlayerState.PAUSED:
                 toggleLights();
                 break;
+
         }
     }
 
@@ -752,11 +805,20 @@ public class SeeSawPlayer extends Sprite {
     }
 
     public function get adsEnabled():Boolean {
-        if(HelperUtils.getBoolean(userInfo.availability.tvodPlayable)
-                || HelperUtils.getBoolean(userInfo.availability.svodPlayable)
-                || HelperUtils.getBoolean(playerInit.preview)
-                || (HelperUtils.getBoolean(userInfo.availability.noAdsPlayable) && !HelperUtils.getBoolean(userInfo.availability.exceededDrmRule))){
-          return false;
+        // This has been expanded to make it easy to debug as e4x can't be expanded in the debugger
+        var tvVodPlayable:Boolean = HelperUtils.getBoolean(userInfo.availability.tvodPlayable);
+        var svodPlayable:Boolean = HelperUtils.getBoolean(userInfo.availability.svodPlayable);
+        var preview:Boolean = HelperUtils.getBoolean(playerInit.preview);
+        var noAds:Boolean = HelperUtils.getBoolean(userInfo.availability.noAdsPlayable);
+        var exceededDrm:Boolean = HelperUtils.getBoolean(userInfo.availability.exceededDrmRule);
+        if (tvVodPlayable) {
+            return false;
+        } else if (svodPlayable) {
+            return false;
+        } else if (preview) {
+            return false
+        } else if (noAds && !exceededDrm) {
+            return false;
         } else {
             return true;
         }

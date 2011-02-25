@@ -19,6 +19,8 @@
  */
 
 package com.seesaw.player.controls.widget {
+import com.seesaw.player.ads.AdMetadata;
+import com.seesaw.player.ads.AdState;
 import com.seesaw.player.controls.ControlBarConstants;
 import com.seesaw.player.ui.PlayerToolTip;
 import com.seesaw.player.ui.StyledTextField;
@@ -33,6 +35,7 @@ import flash.text.TextFormat;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.chrome.widgets.ButtonWidget;
+import org.osmf.events.MetadataEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.metadata.Metadata;
 import org.osmf.traits.MediaTraitType;
@@ -71,7 +74,7 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
 
         addChild(subtitlesLabel);
 
-        visible = true;
+        this.subtitlesLabel.visible = false;
     }
 
     override protected function processMediaElementChange(oldMediaElement:MediaElement):void {
@@ -82,13 +85,26 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
                 media.addMetadata(ControlBarConstants.CONTROL_BAR_METADATA, metadata);
             }
 
-            metadata.addValue(ControlBarConstants.SUBTITLES_VISIBLE, false);
+            var adMetadata:AdMetadata = media.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+            if (adMetadata) {
+                adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdMetadataChange);
+                adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdMetadataChange);
+                adMetadata.addEventListener(MetadataEvent.VALUE_REMOVE, onAdMetadataChange);
+            }
         }
     }
 
-    private function doEnabledCheck():void {
-        enabled = visible = metadata.getValue(ControlBarConstants.SUBTITLE_BUTTON_ENABLED) as Boolean;
+
+    private function onAdMetadataChange(event:MetadataEvent):void {
+        if (metadata.getValue(ControlBarConstants.SUBTITLE_BUTTON_ENABLED)) {
+            if (event.key == AdMetadata.AD_STATE && event.value == AdState.AD_BREAK_COMPLETE) {
+                this.subtitlesLabel.visible = true
+            } else if (event.key == AdMetadata.AD_STATE && event.value == AdState.AD_BREAK_START) {
+                this.subtitlesLabel.visible = false;
+            }
+        }
     }
+
 
     override protected function processRequiredTraitsAvailable(element:MediaElement):void {
         // FIXME: this is not working as expected

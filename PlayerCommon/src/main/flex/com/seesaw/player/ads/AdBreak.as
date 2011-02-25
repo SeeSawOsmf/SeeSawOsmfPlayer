@@ -45,6 +45,7 @@ public class AdBreak extends EventDispatcher {
 
     private var _seekOffset:Number = 0;
 
+
     public function AdBreak(startTime:Number = NaN) {
         _startTime = startTime;
     }
@@ -123,6 +124,15 @@ public class AdBreak extends EventDispatcher {
     public override function toString():String {
         return "[startTime=" + String(_startTime) +
                 ",queueAdsTotal=" + String(_queueAdsTotal) + ",complete=" + String(_complete) + "]";
+    }
+
+    public function get canShowBlip():Boolean {
+        if (complete || startTime == 0 || (startTime == 100 && startTimeIsPercent)){
+            return false;
+        } else {
+            return true;
+        }
+
     }
 }
 }
