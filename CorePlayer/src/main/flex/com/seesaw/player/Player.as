@@ -406,11 +406,9 @@ public class Player extends Sprite {
         playerInit = xmlDoc;
         setupExternalInterface();
 
-        ///adModulePlayableEvaluation
-        if (playerInit.adMode != AdMetadata.CHANNEL_4_AD_TYPE) {
+
             resetInitialisationStages();
             nextInitialisationStage();
-        }
     }
 
     private function requestProgrammeData(videoInfoUrl:String):void {
