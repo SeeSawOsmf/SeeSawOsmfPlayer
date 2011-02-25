@@ -22,6 +22,7 @@ package com.seesaw.player.preventscrub {
 import com.seesaw.player.ads.AdBreak;
 import com.seesaw.player.ads.AdBreakEvent;
 
+import org.osmf.events.SeekEvent;
 import org.osmf.traits.SeekTrait;
 import org.osmf.traits.TimeTrait;
 
@@ -34,14 +35,31 @@ public class AdBreakTriggeringSeekTrait extends SeekTrait {
         super(time);
         _adBreaks = adBreaks;
         _seekTrait = seekTrait;
+
+        seekTrait.addEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChanged, false, 0, true);
+
     }
+
+    /**
+     * If the 'inner' item stops seeking we should also stop seeking.
+     * We don't need to do the true state as that is done behind .seek.
+     * @param event
+     */
+    private function onSeekingChanged(event:SeekEvent):void {
+        if (event.seeking == false) {
+            setSeeking(false, event.time);
+        }
+    }
+
 
     override public function canSeekTo(time:Number):Boolean {
         return _seekTrait.canSeekTo(time);
     }
 
     override protected function seekingChangeStart(newSeeking:Boolean, time:Number):void {
-        triggerLastAdBreakBeforeSeekPosition(time);
+        if (newSeeking) {
+            triggerLastAdBreakBeforeSeekPosition(time);
+        }
     }
 
     private function triggerLastAdBreakBeforeSeekPosition(time:Number):void {
