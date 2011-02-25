@@ -47,7 +47,6 @@ public class AdBreak extends EventDispatcher {
 
     private var _seekOffset:Number = 0;
 
-
     public function AdBreak(startTime:Number = NaN) {
         _startTime = startTime;
     }

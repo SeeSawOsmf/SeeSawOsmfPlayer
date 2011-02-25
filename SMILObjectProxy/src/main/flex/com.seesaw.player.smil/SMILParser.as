@@ -27,7 +27,9 @@
  */
 package com.seesaw.player.smil {
 import com.seesaw.player.ads.AdBreak;
+import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.namespaces.smil;
+import com.seesaw.player.services.ResumeService;
 
 import flash.events.EventDispatcher;
 
@@ -196,6 +198,10 @@ public class SMILParser extends EventDispatcher {
     }
 
     public function parseAdBreaks():Vector.<AdBreak> {
+        var provider:ObjectProvider = ObjectProvider.getInstance();
+        var resumeService:ResumeService = provider.getObject(ResumeService);
+        var resumePoint:Number = resumeService ? resumeService.getResumeCookie() : 0;
+
         var adBreaks:Vector.<AdBreak> = new Vector.<AdBreak>();
         var adBreak:AdBreak = null;
         var adStart:int = 0;
@@ -203,11 +209,12 @@ public class SMILParser extends EventDispatcher {
             var contentType:String = video..meta.(@name == SMILConstants.CONTENT_TYPE).@content;
             if (contentType == "advert" || contentType == "sting") {
                 if (!adBreak || adBreak.startTime != adStart) {
-                    // add a pre-roll break
-                    adBreak = new AdBreak();
-                    adBreak.adPlaylist = new SerialElement();
-                    adBreak.startTime = adStart;
-                    adBreaks.push(adBreak);
+                    if (adStart >= resumePoint) {
+                        adBreak = new AdBreak();
+                        adBreak.adPlaylist = new SerialElement();
+                        adBreak.startTime = adStart;
+                        adBreaks.push(adBreak);
+                    }
                 }
                 if (adBreak) {
                     var mediaElement:MediaElement = parseVideo(video);

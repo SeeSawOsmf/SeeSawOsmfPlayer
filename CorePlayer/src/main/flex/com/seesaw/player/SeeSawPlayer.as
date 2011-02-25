@@ -263,13 +263,6 @@ public class SeeSawPlayer extends Sprite {
             if (cuePoint.name == AdMetadata.AD_BREAK_CUE) {
                 var adBreak:AdBreak = cuePoint.parameters as AdBreak;
                 if (adPlayer && adBreak && adBreak.canPlayAdPlaylist) {
-
-                    var resumePosition:Number = resumeService ? resumeService.getResumeCookie() : NaN;
-                    var skipBreak:Boolean = !isNaN(resumePosition) && resumePosition == event.marker.time;
-
-                    if(skipBreak)
-                        return;
-
                     player.pause();
                     mainContainer.visible = false;
 
