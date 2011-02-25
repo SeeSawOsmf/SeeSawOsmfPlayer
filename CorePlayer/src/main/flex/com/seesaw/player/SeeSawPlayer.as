@@ -282,7 +282,6 @@ public class SeeSawPlayer extends Sprite {
                     adMetadata.adState = AdState.AD_BREAK_START;
                     adMetadata.adMode = AdMode.AD;
 
-                    setSubtitlesButtonEnabled(false);
 
                     adContainer.visible = true;
 
@@ -340,8 +339,6 @@ public class SeeSawPlayer extends Sprite {
             var adMetadata:AdMetadata = mainElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
             adMetadata.adState = AdState.AD_BREAK_COMPLETE;
             adMetadata.adMode = AdMode.MAIN_CONTENT;
-
-            setSubtitlesButtonEnabled(subtitleElement != null);
 
             mainContainer.visible = true;
 
