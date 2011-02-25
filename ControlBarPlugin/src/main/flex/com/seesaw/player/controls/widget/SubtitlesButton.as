@@ -94,12 +94,6 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
         }
     }
 
-    private function updateVisibility(event:MetadataEvent):void {
-        if (event.key == ControlBarConstants.SUBTITLE_BUTTON_ENABLED) {
-            ///   visible = event.value;
-        }
-
-    }
 
     private function onAdMetadataChange(event:MetadataEvent):void {
         if (metadata.getValue(ControlBarConstants.SUBTITLE_BUTTON_ENABLED)) {
