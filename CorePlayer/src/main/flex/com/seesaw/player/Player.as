@@ -102,6 +102,7 @@ public class Player extends Sprite {
 
     private var testApi:TestApi;
     private var devConfig:XML;
+    private var playButton:PlayStartButton;
 
     public function Player() {
         super();
@@ -249,7 +250,7 @@ public class Player extends Sprite {
             } else {
                 var mode:String = playButtonMode;
             }
-            var playButton:PlayStartButton = new PlayStartButton(mode);
+            playButton = new PlayStartButton(mode);
             playButton.addEventListener(PlayStartButton.PROCEED, onNextInitialisationState);
             addChild(playButton);
         }
@@ -406,11 +407,9 @@ public class Player extends Sprite {
         playerInit = xmlDoc;
         setupExternalInterface();
 
-        ///adModulePlayableEvaluation
-        if (playerInit.adMode != AdMetadata.CHANNEL_4_AD_TYPE) {
+
             resetInitialisationStages();
             nextInitialisationStage();
-        }
     }
 
     private function requestProgrammeData(videoInfoUrl:String):void {
@@ -492,7 +491,7 @@ public class Player extends Sprite {
         }
 
         removePosterFrame();
-
+        removeChild(playButton);
         addChild(videoPlayer);
 
         videoPlayer.init();
