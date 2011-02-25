@@ -42,7 +42,7 @@ import org.osmf.traits.TraitEventDispatcher;
  **/
 public class BufferManager extends ProxyElement {
 
-    private static const UPDATE_INTERVAL:uint = 250;
+    private static const UPDATE_INTERVAL:uint = 100;
 
     private var logger:ILogger = LoggerFactory.getClassLogger(BufferManager);
 
@@ -85,23 +85,20 @@ public class BufferManager extends ProxyElement {
         // set to the maximum.
         var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
         if (event.buffering == false) {
-            onTimer();
+            timer.start();
         } else {
             bufferTrait.bufferTime = initialBufferTime;
-            timer.start();
         }
     }
 
     private function onTimer(event:TimerEvent = null):void {
         var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
         if (bufferTrait) {
-            if (bufferTrait.bufferLength < 1.5) {
-                bufferTrait.bufferTime = initialBufferTime;
-            } else{
-                  bufferTrait.bufferTime += 1;
-            }
-            if (bufferTrait.bufferTime > expandedBufferTime) {
+            if (bufferTrait.bufferLength > 5) {
+                bufferTrait.bufferTime += 1;
+            } else if (bufferTrait.bufferLength < 5) {
                 timer.stop();
+                bufferTrait.bufferTime = initialBufferTime;
             }
         }
     }

@@ -55,6 +55,7 @@ public class AdBreakTriggeringSeekTraitTest {
         assertThat(seekTrait.canSeekTo(100), equalTo(true));
     }
 
+
     [Test]
     public function testSeekTrait():void {
         timeTrait.mockDuration = 100;

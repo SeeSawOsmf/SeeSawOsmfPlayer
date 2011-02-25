@@ -22,6 +22,7 @@ package com.seesaw.player {
 public class PlayerConstants {
     public static const ID:String = "ID";
     public static const METADATA_NAMESPACE:String = "http://www.seesaw.com/player/1.0";
+    public static const USEREVENTS_METADATA_NAMESPACE:String = "http://www.seesaw.com/userevents/1.0";
     public static const SMIL_METADATA_NS:String = "http://www.w3.org/ns/SMIL/metadata";
     public static const CONTROL_BAR_METADATA:String = "http://www.osmf.org/samples/controlbar/metadata";
     public static const CONTENT_INFO:String = "contentInfo";
@@ -43,7 +44,7 @@ public class PlayerConstants {
     public static const GUIDANCE_PANEL_ACCEPT_BUTTON_NAME:String = "GuidancePanel.acceptButton";
     public static const GUIDANCE_PANEL_CANCEL_BUTTON_NAME:String = "GuidancePanel.cancelButton";
 
-    public static const MIN_BUFFER_SIZE_SECONDS:Number = 0.1;
-    public static const MAX_BUFFER_SIZE_SECONDS:Number = 30;
+    public static const MIN_BUFFER_SIZE_SECONDS:Number = 0.05;
+    public static const MAX_BUFFER_SIZE_SECONDS:Number = 40;
 }
 }

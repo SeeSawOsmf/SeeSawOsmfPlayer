@@ -60,6 +60,10 @@
     <unavailablePageUrl>http://localhost:8080/unavailable</unavailablePageUrl>
     <videoInfoUrl>../src/test/resources/videoInfo.tvod.xml</videoInfoUrl>
     <largeImageUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/i/ccp/00000178/17883.jpg</largeImageUrl>
+    <batchEventUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player/initinfo:registerbatchevent?t:ac=26772
+    </batchEventUrl>
+    <playIntervalEventUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player/initinfo:playintervalevent?t:ac=26772
+    </playIntervalEventUrl>
     <adMode>liverail</adMode>
     <liverail>
         <version>4.1</version>
