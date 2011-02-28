@@ -414,9 +414,10 @@ public class Player extends Sprite {
 
         resumeService.programmeId = playerInit.programmeId;
 
-
+       if (playerInit.adMode != AdMetadata.CHANNEL_4_AD_TYPE) {
         resetInitialisationStages();
         nextInitialisationStage();
+         }
     }
 
     private function requestProgrammeData(videoInfoUrl:String):void {
