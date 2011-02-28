@@ -200,7 +200,7 @@ public class BatchEventServices extends ProxyElement {
         viewEvent = new ViewEvent(transactionItemId, serverTimeStamp, sectionCount, mainAssetId, userId, anonymousUserId);
         eventsManager = new EventsManagerImpl(viewEvent, previewMode, batchEventURL, cumulativeDurationURL);
 
-        if(sectionCount == 1 && !adsEnabled)  playingMainContent = true;/// we must have Paid content with no adverts eg MTV...
+        if(sectionCount == 1 && !adsEnabled)  mainContentCount++;  playingMainContent = true;/// we must have Paid content with no adverts eg MTV...
 
         var number:Number = resumeService.getResumeCookie();
         if (number == 0) {
