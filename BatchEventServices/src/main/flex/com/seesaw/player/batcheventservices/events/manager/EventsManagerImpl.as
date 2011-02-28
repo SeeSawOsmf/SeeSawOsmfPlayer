@@ -47,6 +47,7 @@ public class EventsManagerImpl implements EventsManager {
 
     private var flushing:Boolean = false;
     private var allowEvent:Boolean = true;
+    private var maxIsFlushing:Boolean = false;
 
     public function EventsManagerImpl(view:ViewEvent, previewMode:String, batchUrl:String, cumulativeUrl:String) {
         this.view = view;
@@ -68,7 +69,7 @@ public class EventsManagerImpl implements EventsManager {
         contentEvents = [];
         userEventCount = 0;
         contentEventCount = 0;
-        flushing = false;
+        maxIsFlushing = flushing = false;
     }
 
 
@@ -76,7 +77,10 @@ public class EventsManagerImpl implements EventsManager {
         userEventCount++;
         userEvents.push(userEvent);
         if (userEventCount >= 10) {
-            flushAll();
+            if (!maxIsFlushing) {
+                maxIsFlushing = true;
+                flushAll();
+            }
         }
     }
 
@@ -84,13 +88,16 @@ public class EventsManagerImpl implements EventsManager {
         contentEventCount++;
         contentEvents.push(contentEvent);
         if (contentEventCount >= 10) {
-            flushAll();
+            if (!maxIsFlushing) {
+                maxIsFlushing = true;
+                flushAll();
+            }
         }
     }
 
     public function flushAll():void {
 
-        if (allowEvent) {
+        if (allowEvent && !flushing) {
 
             flushing = true;
 
@@ -104,7 +111,7 @@ public class EventsManagerImpl implements EventsManager {
             var post_data:URLVariables = new URLVariables();
             post_data.data = JSON.encode(eventsArray);
             request.submit(post_data);
-        } else {
+        } else if (!allowEvent) {
             userEvents = [];
             contentEvents = [];
             userEventCount = 0;

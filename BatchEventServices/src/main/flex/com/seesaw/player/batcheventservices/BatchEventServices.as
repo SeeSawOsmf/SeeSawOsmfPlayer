@@ -33,6 +33,7 @@ import com.seesaw.player.batcheventservices.events.manager.EventsManagerImpl;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.services.ResumeService;
+import com.seesaw.player.utils.HelperUtils;
 
 import flash.events.TimerEvent;
 import flash.external.ExternalInterface;
@@ -161,7 +162,6 @@ public class BatchEventServices extends ProxyElement {
             playerMetadata.addEventListener(MediaElementEvent.METADATA_ADD, playerMetaChanged);
 
 
-
             adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
             adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
 
@@ -184,42 +184,62 @@ public class BatchEventServices extends ProxyElement {
                 availabilityType = videoInfo.availabilityType;
                 previewMode = contentInfo.preview;
 
-                if (adMode != AdMetadata.LR_AD_TYPE && adMode != AdMetadata.AUDITUDE_AD_TYPE) {
+                if (!adsEnabled) createView();
 
-                    viewEvent = new ViewEvent(transactionItemId, serverTimeStamp, sectionCount, mainAssetId, userId, anonymousUserId);
-                    eventsManager = new EventsManagerImpl(viewEvent, previewMode, batchEventURL, cumulativeDurationURL);
+                if (adsEnabled && adMode != AdMetadata.LR_AD_TYPE && adMode != AdMetadata.AUDITUDE_AD_TYPE) createView();
 
-                    var number:Number = resumeService.getResumeCookie();
-                    if (number == 0) {
-                        userEvent = buildAndReturnUserEvent(UserEventTypes.AUTO_PLAY);
-                    } else {
-                        userEvent = buildAndReturnUserEvent(UserEventTypes.AUTO_RESUME);
-                    }
-                    eventsManager.addUserEvent(userEvent);
-                    eventsManager.flushAll();
-                }
+
             }
         }
 
     }
+
+    private function createView():void {
+        if (eventsManager) throw ArgumentError("Event Manager Already Exists");
+
+        viewEvent = new ViewEvent(transactionItemId, serverTimeStamp, sectionCount, mainAssetId, userId, anonymousUserId);
+        eventsManager = new EventsManagerImpl(viewEvent, previewMode, batchEventURL, cumulativeDurationURL);
+
+        var number:Number = resumeService.getResumeCookie();
+        if (number == 0) {
+            userEvent = buildAndReturnUserEvent(UserEventTypes.AUTO_PLAY);
+        } else {
+            userEvent = buildAndReturnUserEvent(UserEventTypes.AUTO_RESUME);
+        }
+        eventsManager.addUserEvent(userEvent);
+        eventsManager.flushAll();
+    }
+
+    public function get adsEnabled():Boolean {
+        // This has been expanded to make it easy to debug as e4x can't be expanded in the debugger
+        var tvVodPlayable:Boolean = HelperUtils.getBoolean(playerMetadata.getValue("videoInfo").availability.tvodPlayable);
+        var svodPlayable:Boolean = HelperUtils.getBoolean(playerMetadata.getValue("videoInfo").availability.svodPlayable);
+        var preview:Boolean = HelperUtils.getBoolean(playerMetadata.getValue("contentInfo").preview);
+        var noAds:Boolean = HelperUtils.getBoolean(playerMetadata.getValue("videoInfo").availability.noAdsPlayable);
+        var exceededDrm:Boolean = HelperUtils.getBoolean(playerMetadata.getValue("videoInfo").availability.exceededDrmRule);
+        if (tvVodPlayable) {
+            return false;
+        } else if (svodPlayable) {
+            return false;
+        } else if (preview) {
+            return false
+        } else if (noAds && !exceededDrm) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
 
     private function playerMetaChanged(event:MetadataEvent):void {
         //TODO  lIVERAIL METDATA CHANGE AGAINST THE SECTIONCOUNT BEFORE THIS IS FIRED......
         if (adMode == AdMetadata.LR_AD_TYPE || AdMetadata.AUDITUDE_AD_TYPE) {
             if (event.key == AdMetadata.SECTION_COUNT) {
                 sectionCount = evaluateNewSectionCount(event.value);
-                viewEvent = new ViewEvent(transactionItemId, serverTimeStamp, sectionCount, mainAssetId, userId, anonymousUserId);
-                eventsManager = new EventsManagerImpl(viewEvent, previewMode, batchEventURL, cumulativeDurationURL);
-                var number:Number = resumeService.getResumeCookie();
-                if (number == 0) {
-                    userEvent = buildAndReturnUserEvent(UserEventTypes.AUTO_PLAY);
-                } else {
-                    userEvent = buildAndReturnUserEvent(UserEventTypes.AUTO_RESUME);
-                }
-                eventsManager.addUserEvent(userEvent);
-                eventsManager.flushAll();
+                createView();
             }
-        }if(event.key == PlayerConstants.USEREVENTS_METADATA_NAMESPACE) {
+        }
+        if (event.key == PlayerConstants.USEREVENTS_METADATA_NAMESPACE) {
             userEventMetadata = playerMetadata.getValue(PlayerConstants.USEREVENTS_METADATA_NAMESPACE) as Metadata;
             userEventMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, userEventMetaChanged);
             userEventMetadata.addEventListener(MetadataEvent.VALUE_ADD, userEventMetaChanged);
@@ -228,7 +248,7 @@ public class BatchEventServices extends ProxyElement {
     }
 
 
-        private function userEventMetaChanged(event:MetadataEvent):void {
+    private function userEventMetaChanged(event:MetadataEvent):void {
         var userEventType:String;
         if (event.key == "subtitlesVisible" && event.type != MetadataEvent.VALUE_ADD) {
             if (event.value) {
@@ -283,7 +303,7 @@ public class BatchEventServices extends ProxyElement {
     }
 
     private function onMetaDataRemove(event:MediaElementEvent):void {
-         if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
+        if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
             adMetadata.removeEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
             adMetadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onAdsMetaDataChange);
         }
@@ -291,7 +311,7 @@ public class BatchEventServices extends ProxyElement {
 
     private function onMetaDataAdd(event:MediaElementEvent):void {
         var metadata:Metadata;
-if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
+        if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
 
             if (adMetadata) {
                 adMetadata.removeEventListener(MetadataEvent.VALUE_ADD, onAdsMetaDataAdd);
@@ -366,20 +386,20 @@ if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
         } else if (value == AdMetadata.CLICK_THRU) {
             eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.CLICK));
         } else if (value == "mainContent") {
-             if (playingMainContent) {
+            if (playingMainContent) {
 
-            if (!cumulativeDurationMonitor.running) cumulativeDurationMonitor.start();    // this should only fire when the main content starts...
+                if (!cumulativeDurationMonitor.running) cumulativeDurationMonitor.start();    // this should only fire when the main content starts...
 
-            contentUrl = "mainResource";
-            defineContentUrl(false);
+                contentUrl = "mainResource";
+                defineContentUrl(false);
 
-            contentViewingSequenceNumber++;        // content sequence has changed by 1. same occurs when an advert starts
-            currentAdBreakSequenceNumber = 0;     ///we are not in an adBreak so set it to 0
-            mainContentCount++;
+                contentViewingSequenceNumber++;        // content sequence has changed by 1. same occurs when an advert starts
+                currentAdBreakSequenceNumber = 0;     ///we are not in an adBreak so set it to 0
+                mainContentCount++;
 
-            eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.MAIN_CONTENT));
-            eventsManager.flushAll();
-        }
+                eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.MAIN_CONTENT));
+                eventsManager.flushAll();
+            }
         }
     }
 
