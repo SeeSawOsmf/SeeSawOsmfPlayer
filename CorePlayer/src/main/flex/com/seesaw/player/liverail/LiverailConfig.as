@@ -30,18 +30,18 @@ public class LiverailConfig extends Configuration {
     private var genres:Array;
     private var ageRating:int;
     private var adSlots:int = 0;
+    private var resumePoint:Number;
 
     use namespace contentinfo;
 
-    public function LiverailConfig(contentInfoXml:XML) {
+    public function LiverailConfig(contentInfoXml:XML, resumePoint = 0) {
         contentInfo = contentInfoXml as XML;
+        this.resumePoint = resumePoint;
         generateMap();
         createConfig();
     }
 
     public override function generateMap():void {
-        var autoResumePoint:Number = 0;
-
         liveRailAdMap = "";
         liveRailTags = "";
 
@@ -70,7 +70,7 @@ public class LiverailConfig extends Configuration {
                     case "break":
                         if (item.breakOffset != null) {
                             var pos:Number = convertDuration(item.breakOffset);
-                            if (!(pos < autoResumePoint)) {
+                            if (!(pos < resumePoint)) {
 
                                 liveRailAdMap += "in::" + pos.toString();
 
@@ -87,7 +87,7 @@ public class LiverailConfig extends Configuration {
             }
 
             //hardcode the preroll if not exist in string already
-            if (!liveRailAdMap.match("in::0")) {
+            if (resumePoint <= 0 && !liveRailAdMap.match("in::0")) {
                 liveRailAdMap = "in::0;" + liveRailAdMap + "in::100%;";
                 totalAdPositions.push(0);
             }

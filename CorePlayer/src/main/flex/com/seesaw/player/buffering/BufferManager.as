@@ -64,17 +64,12 @@ public class BufferManager extends ProxyElement {
 
         element.addEventListener(MediaElementEvent.TRAIT_ADD, processTraitAdd);
         dispatcher.addEventListener(BufferEvent.BUFFERING_CHANGE, processBufferingChange);
-        dispatcher.addEventListener(BufferEvent.BUFFER_TIME_CHANGE, onBufferTimeChange);
         dispatcher.addEventListener(SeekEvent.SEEKING_CHANGE, processSeekingChange);
         dispatcher.addEventListener(PlayEvent.PLAY_STATE_CHANGE, processPlayStateChange);
 
         timer = new Timer(UPDATE_INTERVAL);
         timer.repeatCount = expandedBufferTime;
         timer.addEventListener(TimerEvent.TIMER, onTimer);
-    }
-
-    private function onBufferTimeChange(event:BufferEvent):void {
-        logger.debug("buffer has reached maximum time of {0} ", event.bufferTime);
     }
 
     private function processTraitAdd(event:MediaElementEvent):void {
@@ -89,27 +84,20 @@ public class BufferManager extends ProxyElement {
         // As soon as we stop buffering, make sure our buffer time is
         // set to the maximum.
         var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
-           logger.debug("buffer TIME {0} ", bufferTrait.bufferTime);
         if (event.buffering == false) {
-
-              timer.start();
-            //  bufferTrait.bufferTime = expandedBufferTime;
-
+            timer.start();
         } else {
             bufferTrait.bufferTime = initialBufferTime;
-
-
         }
-
     }
 
     private function onTimer(event:TimerEvent = null):void {
         var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
         if (bufferTrait) {
             if (bufferTrait.bufferLength > 5) {
-                  bufferTrait.bufferTime += 1;
-            }else if(bufferTrait.bufferLength < 5) {
-                    timer.stop();
+                bufferTrait.bufferTime += 1;
+            } else if (bufferTrait.bufferLength < 5) {
+                timer.stop();
                 bufferTrait.bufferTime = initialBufferTime;
             }
         }

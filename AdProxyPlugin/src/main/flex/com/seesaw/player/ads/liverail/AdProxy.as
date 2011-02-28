@@ -287,6 +287,7 @@ public class AdProxy extends ProxyElement {
     private function onPrerollComplete(event:Event):void {
         logger.debug("onPrerollComplete");
         setTraitsToBlock();
+        play();
     }
 
     private function adbreakStart(event:Object):void {

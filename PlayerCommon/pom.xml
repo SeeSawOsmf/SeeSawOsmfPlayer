@@ -83,5 +83,11 @@
             <type>swc</type>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.osmf</groupId>
+            <artifactId>osmftest</artifactId>
+            <type>swc</type>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

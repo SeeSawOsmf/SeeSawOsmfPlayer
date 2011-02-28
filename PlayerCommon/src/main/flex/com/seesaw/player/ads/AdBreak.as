@@ -22,6 +22,8 @@ package com.seesaw.player.ads {
 import flash.events.EventDispatcher;
 
 import org.osmf.elements.SerialElement;
+import org.osmf.traits.MediaTraitType;
+import org.osmf.traits.TimeTrait;
 
 public class AdBreak extends EventDispatcher {
 
@@ -45,13 +47,12 @@ public class AdBreak extends EventDispatcher {
 
     private var _seekOffset:Number = 0;
 
-
     public function AdBreak(startTime:Number = NaN) {
         _startTime = startTime;
     }
 
     public function get queueAdsTotal():uint {
-        return _queueAdsTotal;
+        return _adPlaylist ? _adPlaylist.numChildren : _queueAdsTotal;
     }
 
     public function set queueAdsTotal(value:uint):void {
@@ -59,6 +60,10 @@ public class AdBreak extends EventDispatcher {
     }
 
     public function get queueDuration():Number {
+        if (_adPlaylist) {
+            var timeTrait:TimeTrait = _adPlaylist.getTrait(MediaTraitType.TIME) as TimeTrait;
+            return timeTrait ? timeTrait.duration : NaN;
+        }
         return _queueDuration;
     }
 
@@ -121,18 +126,17 @@ public class AdBreak extends EventDispatcher {
         _seekOffset = value;
     }
 
-    public override function toString():String {
-        return "[startTime=" + String(_startTime) +
-                ",queueAdsTotal=" + String(_queueAdsTotal) + ",complete=" + String(_complete) + "]";
+    public function get canPlayAdPlaylist():Boolean {
+        return !complete && adPlaylist && adPlaylist.numChildren > 0;
     }
 
     public function get canShowBlip():Boolean {
-        if (complete || startTime == 0 || (startTime == 100 && startTimeIsPercent)){
-            return false;
-        } else {
-            return true;
-        }
+        return !(complete || startTime == 0 || (startTime == 100 && startTimeIsPercent));
+    }
 
+    public override function toString():String {
+        return "[startTime=" + String(_startTime) +
+                ",queueAdsTotal=" + String(_queueAdsTotal) + ",complete=" + String(_complete) + "]";
     }
 }
 }

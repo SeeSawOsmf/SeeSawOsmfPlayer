@@ -99,9 +99,11 @@ public class Player extends Sprite {
     private var config:PlayerConfiguration;
     private var playButtonMode:String;
     private var errorPanel:NotAvailablePanel;
+    private var resumeService:ResumeService;
 
     private var testApi:TestApi;
     private var devConfig:XML;
+    private var playButton:PlayStartButton;
 
     public function Player() {
         super();
@@ -193,7 +195,11 @@ public class Player extends Sprite {
 
         var availability:XMLList = userInit.availability;
 
-        var JSONString:String = '{ "playerMessage": "' + availability.playerMessage + '", "seriesEntitled": ' + availability.seriesEntitled + ', "isSubscriptionEntitled" : ' + availability.subscriptionEntitled + ', "episodeEntitled" : ' + availability.episodeEntitled + ', "available" : ' + availability.available + ', "showPreviewClip" : ' + availability.showPreviewClip + ', "statusMessage" : "' + availability.statusMessage + '" }';
+        var JSONString:String = '{ "playerMessage": "' + availability.playerMessage + '", ' +
+                '"seriesEntitled": ' + availability.seriesEntitled + ', "isSubscriptionEntitled" : ' +
+                availability.subscriptionEntitled + ', "episodeEntitled" : ' + availability.episodeEntitled + ', ' +
+                '"available" : ' + availability.available + ', "showPreviewClip" : ' + availability.showPreviewClip + ', ' +
+                '"statusMessage" : "' + availability.statusMessage + '" }';
         return JSONString;
     }
 
@@ -240,7 +246,7 @@ public class Player extends Sprite {
         // if playButtonMode is null, this indicates that the user has no entitlement to play the video
         if (playButtonMode != null) {
             // assume the resume overrides other play button modes
-            if (getResumePosition() > 0) {
+            if (resumeService.resumable) {
                 if (playButtonMode == PlayStartButton.PLAY_SUBSCRIBED) {
                     var mode:String = PlayStartButton.RESUME_SVOD;
                 } else {
@@ -249,7 +255,7 @@ public class Player extends Sprite {
             } else {
                 var mode:String = playButtonMode;
             }
-            var playButton:PlayStartButton = new PlayStartButton(mode);
+            playButton = new PlayStartButton(mode);
             playButton.addEventListener(PlayStartButton.PROCEED, onNextInitialisationState);
             addChild(playButton);
         }
@@ -406,11 +412,11 @@ public class Player extends Sprite {
         playerInit = xmlDoc;
         setupExternalInterface();
 
-        ///adModulePlayableEvaluation
-        if (playerInit.adMode != AdMetadata.CHANNEL_4_AD_TYPE) {
-            resetInitialisationStages();
-            nextInitialisationStage();
-        }
+        resumeService.programmeId = playerInit.programmeId;
+
+
+        resetInitialisationStages();
+        nextInitialisationStage();
     }
 
     private function requestProgrammeData(videoInfoUrl:String):void {
@@ -492,7 +498,7 @@ public class Player extends Sprite {
         }
 
         removePosterFrame();
-
+        removeChild(playButton);
         addChild(videoPlayer);
 
         videoPlayer.init();
@@ -531,6 +537,8 @@ public class Player extends Sprite {
         metadata.addValue(PlayerConstants.USER_INFO, userInit);
         resource.addMetadataValue(PlayerConstants.METADATA_NAMESPACE, metadata);
 
+        var resumePosition:Number = getResumePosition();
+
         metadata = new Metadata();
         resource.addMetadataValue(ScrubPreventionConstants.SETTINGS_NAMESPACE, metadata);
 
@@ -546,8 +554,8 @@ public class Player extends Sprite {
                 metadata = new Metadata();
                 metadata.addValue(LiverailConstants.VERSION, playerInit.liverail.version);
                 metadata.addValue(LiverailConstants.PUBLISHER_ID, playerInit.liverail.publisherId);
-                metadata.addValue(LiverailConstants.CONFIG_OBJECT, new LiverailConfig(playerInit));
-                metadata.addValue(LiverailConstants.RESUME_POSITION, getResumePosition());
+                metadata.addValue(LiverailConstants.CONFIG_OBJECT, new LiverailConfig(playerInit, resumePosition));
+                metadata.addValue(LiverailConstants.RESUME_POSITION, resumePosition);
                 metadata.addValue(LiverailConstants.ADMANAGER_URL, LiverailConstants.LIVERAIL_PLUGIN_URL);
                 resource.addMetadataValue(LiverailConstants.SETTINGS_NAMESPACE, metadata);
             } else if (playerInit.adMode == AuditudeConstants.AD_MODE_ID) {
@@ -568,7 +576,7 @@ public class Player extends Sprite {
                 // any additional metadata can be passed to the Auditude plug-in through this key.
                 metadata.addValue(AuditudeOSMFConstants.USER_DATA, null);
 
-                metadata.addValue(AuditudeConstants.RESUME_POSITION, getResumePosition());
+                metadata.addValue(AuditudeConstants.RESUME_POSITION, resumePosition);
                 resource.addMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE, metadata)
             }
         }
@@ -599,7 +607,7 @@ public class Player extends Sprite {
     private function registerServices():void {
         logger.debug("registering services");
         var provider:ObjectProvider = ObjectProvider.getInstance();
-        provider.register(ResumeService, new ResumeServiceImpl());
+        provider.register(ResumeService, resumeService = new ResumeServiceImpl());
         provider.register(PlayerExternalInterface, new PlayerExternalInterfaceImpl());
     }
 
@@ -612,8 +620,6 @@ public class Player extends Sprite {
     }
 
     private function getResumePosition():Number {
-        var resumeService:ResumeService = ObjectProvider.getInstance().getObject(ResumeService);
-        resumeService.programmeId = playerInit.programmeId;
         return resumeService.getResumeCookie();
     }
 

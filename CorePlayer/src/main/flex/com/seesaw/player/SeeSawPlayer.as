@@ -43,6 +43,7 @@ import com.seesaw.player.namespaces.smil;
 import com.seesaw.player.netstatus.NetStatusMetadata;
 import com.seesaw.player.panels.BufferingPanel;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
+import com.seesaw.player.services.ResumeService;
 import com.seesaw.player.smil.SMILConstants;
 import com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo;
 import com.seesaw.player.smil.SMILParser;
@@ -129,10 +130,14 @@ public class SeeSawPlayer extends Sprite {
     private var currentAdBreak:AdBreak;
     private var controlBarMetadata:Metadata;
 
+    private var resumeService:ResumeService;
+
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
 
-        xi = ObjectProvider.getInstance().getObject(PlayerExternalInterface);
+        var provider:ObjectProvider = ObjectProvider.getInstance();
+        xi = provider.getObject(PlayerExternalInterface);
+        resumeService = provider.getObject(ResumeService);
 
         config = playerConfig;
 
@@ -257,7 +262,7 @@ public class SeeSawPlayer extends Sprite {
             var cuePoint:CuePoint = event.marker as CuePoint;
             if (cuePoint.name == AdMetadata.AD_BREAK_CUE) {
                 var adBreak:AdBreak = cuePoint.parameters as AdBreak;
-                if (adPlayer && adBreak && !adBreak.complete && adBreak.adPlaylist && adBreak.adPlaylist.numChildren > 0) {
+                if (adPlayer && adBreak && adBreak.canPlayAdPlaylist) {
                     player.pause();
                     mainContainer.visible = false;
 

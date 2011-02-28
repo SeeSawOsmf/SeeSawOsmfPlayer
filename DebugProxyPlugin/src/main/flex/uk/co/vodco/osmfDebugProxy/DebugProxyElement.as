@@ -247,11 +247,11 @@ public class DebugProxyElement extends ProxyElement {
     }
 
     private function onBufferingChange(event:BufferEvent):void {
-        logger.debug("On Buffering Change:{0} Length: {1}", event.buffering, event.currentTarget.bufferLength);
+        logger.debug("On Buffering Change: Buffering {0} Length: {1}", event.buffering, event.currentTarget.bufferLength);
     }
 
     private function onBufferTimeChange(event:BufferEvent):void {
-        logger.debug("On Buffer Time Change:{0} LEngth:{1}", event.bufferTime, event.currentTarget.bufferLength);
+//        logger.debug("On Buffer Time Change: Time {0} Length:{1}", event.bufferTime, event.currentTarget.bufferLength);
     }
 
     private function togglePlayListeners(added:Boolean):void {
