@@ -19,6 +19,7 @@
  */
 
 package com.seesaw.player.autoresume {
+import com.seesaw.player.ads.AdBreak;
 import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.ads.AdState;
 import com.seesaw.player.ioc.ObjectProvider;
@@ -57,7 +58,7 @@ public class AutoResumeProxy extends ProxyElement {
 
     private var resumeService:ResumeService;
     private var timer:Timer;
-    private var hasBeenSeeking:Boolean;
+    private var seekTime:Number;
 
     public function AutoResumeProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -96,6 +97,16 @@ public class AutoResumeProxy extends ProxyElement {
         }
     }
 
+    private function isAdBreakAtTime(time:Number):Boolean {
+        var result:Boolean = false;
+        var adMetadata:AdMetadata = getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+        if (!isNaN(time) && adMetadata) {
+            var adBreak:AdBreak = adMetadata.getAdBreakWithTime(time);
+            result = adBreak != null;
+        }
+        return result;
+    }
+
     private function setupAdEventListener(metadata:Metadata, add:Boolean):void {
         if (add) {
             metadata.addEventListener(MetadataEvent.VALUE_ADD, onAdMetadataChange);
@@ -123,10 +134,13 @@ public class AutoResumeProxy extends ProxyElement {
 
     private function onAdMetadataChange(event:MetadataEvent):void {
         if (event.key == AdMetadata.AD_STATE) {
+            // If the ad break started but did not complete then we need to write a resume
+            // point slightly before so that the break is triggered again when the user returns.
+            // Otherwise place the resume point slightly ahead of the break so that it is not triggered again.
             if (event.value == AdState.AD_BREAK_START)
-                writeResumePosition(timeTrait.currentTime - 0.5);
+                writeResumePosition(timeTrait.currentTime - 0.1);
             else if (event.value == AdState.AD_BREAK_COMPLETE)
-                writeResumePosition(timeTrait.currentTime + 0.5);
+                writeResumePosition(timeTrait.currentTime + 0.1);
         }
     }
 
@@ -137,7 +151,7 @@ public class AutoResumeProxy extends ProxyElement {
     }
 
     private function onSeekingChange(event:SeekEvent):void {
-        hasBeenSeeking = true;
+        seekTime = event.time;
     }
 
     private function onComplete(event:TimeEvent):void {
@@ -150,9 +164,10 @@ public class AutoResumeProxy extends ProxyElement {
                 timer.stop();
                 break;
             case PlayState.PLAYING:
-                if (hasBeenSeeking) {
-                    writeResumePosition(timeTrait.currentTime);
-                    hasBeenSeeking = false;
+                // If we've been seeking write a resume point when playing again
+                if (!isNaN(seekTime) && seekTime > 0) {
+                    writeResumePosition(seekTime);
+                    seekTime = NaN;
                 }
                 timer.start();
                 break;
@@ -166,7 +181,7 @@ public class AutoResumeProxy extends ProxyElement {
 
     private function seekToResumePosition():void {
         var resume:Number = resumeService.getResumeCookie();
-        if (seekTrait && seekTrait.canSeekTo(resume)) {
+        if (resume > 0 && seekTrait && seekTrait.canSeekTo(resume)) {
             logger.debug("seeking to resume point at: {0}", resume);
             seekTrait.seek(resume);
         }
@@ -180,9 +195,9 @@ public class AutoResumeProxy extends ProxyElement {
     }
 
     private function writeResumePosition(time:Number):void {
-        // there should be at least MIN_INTERVAL_BETWEEN_WRITE seconds difference between the new resume point
-        // and the old
-        if (time > 0) {
+        // Don't write resume points exactly on ad breaks since the resume points have to be
+        // offset from ad breaks a little depending on whether the break has been seen or not
+        if (time > 0 && !isAdBreakAtTime(time)) {
             logger.debug("recording resume point at: {0}", time);
             resumeService.writeResumeCookie(time);
         }

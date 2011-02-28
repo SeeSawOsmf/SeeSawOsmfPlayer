@@ -36,10 +36,6 @@ public class AutoResumeProxyTest {
     private var seekTime:Number;
 
     public function AutoResumeProxyTest() {
-    }
-
-    [Before]
-    public function beforeEveryTest():void {
         ObjectProvider.getInstance().register(ResumeService, resumeService);
     }
 
