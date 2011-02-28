@@ -200,6 +200,8 @@ public class BatchEventServices extends ProxyElement {
         viewEvent = new ViewEvent(transactionItemId, serverTimeStamp, sectionCount, mainAssetId, userId, anonymousUserId);
         eventsManager = new EventsManagerImpl(viewEvent, previewMode, batchEventURL, cumulativeDurationURL);
 
+        if(sectionCount == 1 && !adsEnabled)  playingMainContent = true;/// we must have Paid content with no adverts eg MTV...
+
         var number:Number = resumeService.getResumeCookie();
         if (number == 0) {
             userEvent = buildAndReturnUserEvent(UserEventTypes.AUTO_PLAY);
@@ -363,9 +365,6 @@ public class BatchEventServices extends ProxyElement {
     private function AdMetaEvaluation(value:*):void {
         if (value == AdState.AD_BREAK_COMPLETE) {
             playingMainContent = true;
-            /*contentViewingSequenceNumber++;
-             eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.MAIN_CONTENT));
-             eventsManager.flushAll();*/   //todo this event is triggered from the durationChange, need to check if auditude triggers the durationChange
 
         } else if (value == AdState.AD_BREAK_START) {
             playingMainContent = false;
@@ -558,11 +557,10 @@ public class BatchEventServices extends ProxyElement {
                     contentViewingSequenceNumber = evaluateContentViewingSeqNum();
 
                     eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.SCRUB));
-                    seeking = event.seeking;
+
                 }
-            } else {
-                seeking = event.seeking;
             }
+           seeking = event.seeking;
         }
         logger.debug("------------On Seek Change:{0}", event.seeking);
     }
@@ -577,12 +575,16 @@ public class BatchEventServices extends ProxyElement {
     }
 
     private function onComplete(event:TimeEvent):void {
-
+        evaluateMainContentCount();
         if (mainContentCount * 2 == sectionCount || (/*sectionCount == 1 &&*/ previewMode == "true")) {
             eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.END));
             eventsManager.flushAll();
             playerMetadata.addValue(PlayerConstants.DESTROY, true);   //// main content has finished so we need to reInit the Player... This might not be the best location for this event, but we can look at moving it in the future.
         }
+    }
+
+    private function evaluateMainContentCount():void {
+
     }
 
 
@@ -624,13 +626,13 @@ public class BatchEventServices extends ProxyElement {
         return contentEventId;
     }
 
+
     private function buildAndReturnUserEvent(userEventType:String):UserEvent {
         generateAssociatedContentEvent();
         return new UserEvent(incrementAndGetUserEventId(), cumulativeDurationCount, userEventType, programmeId);
     }
 
     private function generateAssociatedContentEvent():void {
-        /// this is to tie the userEvent to a piece of content..  todo this might give false info due the autoResume. as we set the playingMainContent from the metdata.. which is currently busted...
         playingMainContent ? eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.MAIN_CONTENT)) : eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.AD_BREAK));
     }
 

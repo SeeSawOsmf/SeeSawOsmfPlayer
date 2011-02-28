@@ -343,7 +343,7 @@ public class SeeSawPlayer extends Sprite {
             // Set the main content to ad mode just like liverail and auditude do
             var adMetadata:AdMetadata = mainElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
             adMetadata.adState = AdState.AD_BREAK_COMPLETE;
-            adMetadata.adMode = AdMode.MAIN_CONTENT;
+
 
             mainContainer.visible = true;
 

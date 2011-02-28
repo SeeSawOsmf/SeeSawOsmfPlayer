@@ -173,16 +173,18 @@ public class VolumeScrubBar extends Widget implements IWidget {
     }
 
     private function setVolume(newVolumeDisplay:Number):void {
-        audible.volume = newVolumeDisplay / 10;
+        if (audible) {
+            audible.volume = newVolumeDisplay / 10;
 
-        if (audible.volume < 0.05) {
-            audible.volume = 0;
-            logger.debug('MUTE');
+            if (audible.volume < 0.05) {
+                audible.volume = 0;
+                logger.debug('MUTE');
+            }
+
+            this.setCookieVolume();
+
+            logger.debug('New audible.volume: ' + audible.volume);
         }
-
-        this.setCookieVolume();
-
-        logger.debug('New audible.volume: ' + audible.volume);
         //this.volumeDisplay = newVolumeDisplay;
     }
 
