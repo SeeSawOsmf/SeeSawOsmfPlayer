@@ -19,14 +19,49 @@
  */
 
 package com.seesaw.player.autoresume {
+import com.seesaw.player.ioc.ObjectProvider;
+import com.seesaw.player.services.ResumeService;
+
+import org.hamcrest.assertThat;
+import org.hamcrest.object.equalTo;
+import org.osmf.events.SeekEvent;
+import org.osmf.traits.MediaTraitType;
+import org.osmf.traits.SeekTrait;
+import org.osmf.utils.DynamicMediaElement;
+import org.osmf.utils.DynamicTimeTrait;
+
 public class AutoResumeProxyTest {
 
+    private var resumeService:MockResumeService = new MockResumeService();
+    private var seekTime:Number;
+
     public function AutoResumeProxyTest() {
+        ObjectProvider.getInstance().register(ResumeService, resumeService);
     }
 
     [Test]
-    public function canWriteResumePosition():void {
+    public function canSeekToResumePosition():void {
+        var media:DynamicMediaElement = new DynamicMediaElement(null, null, null, true);
+        var autoResumeProxy:AutoResumeProxy = new AutoResumeProxy(media);
 
+        var timeTrait:DynamicTimeTrait = new DynamicTimeTrait();
+        timeTrait.currentTime = 0;
+        timeTrait.duration = 100;
+
+        var seekTrait:SeekTrait = new SeekTrait(timeTrait);
+
+        seekTrait.addEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
+
+        media.doAddTrait(MediaTraitType.TIME, timeTrait);
+
+        resumeService.cookieToReturn = 50;
+        media.doAddTrait(MediaTraitType.SEEK, seekTrait);
+
+        assertThat(seekTime, equalTo(50));
+    }
+
+    private function onSeekingChange(event:SeekEvent):void {
+        seekTime = event.time;
     }
 }
 }
