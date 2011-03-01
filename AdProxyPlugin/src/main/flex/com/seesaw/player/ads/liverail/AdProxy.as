@@ -66,7 +66,7 @@ public class AdProxy extends ProxyElement {
 
     private var adManager:*;
     private var config:Configuration;
-    private var resumePosition:int;
+    private var resumePosition:Number;
     private var timer:Timer;
     private var playerMetadata:Metadata;
     private var currentAdBreak:AdBreak;
@@ -113,7 +113,7 @@ public class AdProxy extends ProxyElement {
             adManager.addEventListener(LiveRailEvent.CLICK_THRU, onClickThru);
 
             config = getSetting(LiverailConstants.CONFIG_OBJECT) as Configuration;
-            resumePosition = getSetting(LiverailConstants.RESUME_POSITION) as int;
+            resumePosition = getSetting(LiverailConstants.RESUME_POSITION) as Number;
 
             // block these until the liverail events kick in
             setTraitsToBlock(MediaTraitType.PLAY, MediaTraitType.TIME, MediaTraitType.DISPLAY_OBJECT);

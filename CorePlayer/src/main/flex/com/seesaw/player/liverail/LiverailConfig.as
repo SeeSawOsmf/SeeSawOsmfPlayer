@@ -34,7 +34,7 @@ public class LiverailConfig extends Configuration {
 
     use namespace contentinfo;
 
-    public function LiverailConfig(contentInfoXml:XML, resumePoint = 0) {
+    public function LiverailConfig(contentInfoXml:XML, resumePoint:Number = 0) {
         contentInfo = contentInfoXml as XML;
         this.resumePoint = resumePoint;
         generateMap();
@@ -88,7 +88,7 @@ public class LiverailConfig extends Configuration {
 
             //hardcode the preroll if not exist in string already
             if (resumePoint <= 0 && !liveRailAdMap.match("in::0")) {
-                liveRailAdMap = "in::0;" + liveRailAdMap + "in::100%;";
+                liveRailAdMap = "in::0;" + liveRailAdMap;
                 totalAdPositions.push(0);
             }
 

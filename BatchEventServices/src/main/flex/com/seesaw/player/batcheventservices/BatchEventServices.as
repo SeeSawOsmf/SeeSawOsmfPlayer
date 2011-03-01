@@ -20,6 +20,7 @@
 
 package com.seesaw.player.batcheventservices {
 import com.seesaw.player.PlayerConstants;
+import com.seesaw.player.ads.AdBreak;
 import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.ads.AdState;
 import com.seesaw.player.batcheventservices.events.ContentEvent;
@@ -107,8 +108,6 @@ public class BatchEventServices extends ProxyElement {
     private var mainContentCount:int;
     private var playable:PlayTrait;
     private var loadable:LoadTrait;
-    /// private var adMetadata:Metadata;
-    private var SMILMetadata:Metadata;
     private var playerMetadata:Metadata;
     private var dynamicStream:DynamicStreamTrait;
     private var adMode:String;
@@ -119,6 +118,8 @@ public class BatchEventServices extends ProxyElement {
     private var oldUserEventId:int = 0;
     private var previewMode:String;
     private var userEventMetadata:Metadata;
+    private var adBreaks:Vector.<AdBreak>;
+    private var timeTrait:TimeTrait;
 
     public function BatchEventServices(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -200,7 +201,8 @@ public class BatchEventServices extends ProxyElement {
         viewEvent = new ViewEvent(transactionItemId, serverTimeStamp, sectionCount, mainAssetId, userId, anonymousUserId);
         eventsManager = new EventsManagerImpl(viewEvent, previewMode, batchEventURL, cumulativeDurationURL);
 
-        if(sectionCount == 1 && !adsEnabled)  mainContentCount++;  playingMainContent = true;/// we must have Paid content with no adverts eg MTV...
+        if (sectionCount == 1 && !adsEnabled)  mainContentCount++;
+        playingMainContent = true;/// we must have Paid content with no adverts eg MTV...
 
         var number:Number = resumeService.getResumeCookie();
         if (number == 0) {
@@ -347,8 +349,7 @@ public class BatchEventServices extends ProxyElement {
         if (event.key == AdMetadata.AD_STATE) {
             AdMetaEvaluation(event.value);
         } else if (event.key == AdMetadata.AD_BREAKS) {
-            trace(event.value);
-            //// AdMetaEvaluation(event.key);  ///todo se if we need anything related to the adBreaks changing...
+            adBreaks = event.key as Vector.<AdBreak>;
         } else {
             AdMetaEvaluation(event.key);
         }
@@ -357,6 +358,8 @@ public class BatchEventServices extends ProxyElement {
     private function onAdsMetaDataChange(event:MetadataEvent):void {
         if (event.key == AdMetadata.AD_STATE || event.key == AdMetadata.AD_MODE) {
             AdMetaEvaluation(event.value);
+        }else if (event.key == AdMetadata.AD_BREAKS) {
+            adBreaks = event.key as Vector.<AdBreak>;
         } else {
             AdMetaEvaluation(event.key);
         }
@@ -392,7 +395,7 @@ public class BatchEventServices extends ProxyElement {
                 contentUrl = "mainResource";
                 defineContentUrl(false);
 
-                contentViewingSequenceNumber++;        // content sequence has changed by 1. same occurs when an advert starts
+                contentViewingSequenceNumber = evaluateMainContentCount;        // content sequence has changed by 1. same occurs when an advert starts
                 currentAdBreakSequenceNumber = 0;     ///we are not in an adBreak so set it to 0
                 mainContentCount++;
 
@@ -554,37 +557,49 @@ public class BatchEventServices extends ProxyElement {
                 if (!seeking) {
                     cumulativeDurationMonitor.stop(); //todo check this checker is actually working accurately....
 
-                    contentViewingSequenceNumber = evaluateContentViewingSeqNum();
+                    contentViewingSequenceNumber = evaluateMainContentCount;
 
                     eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.SCRUB));
 
                 }
             }
-           seeking = event.seeking;
+            seeking = event.seeking;
         }
         logger.debug("------------On Seek Change:{0}", event.seeking);
     }
 
     private function toggleTimeListeners(added:Boolean):void {
-        var time:TimeTrait = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
-        if (time) {
-            time.addEventListener(TimeEvent.COMPLETE, onComplete);
+        timeTrait = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
+        if (timeTrait) {
+            timeTrait.addEventListener(TimeEvent.COMPLETE, onComplete);
         } else {
-            time.removeEventListener(TimeEvent.COMPLETE, onComplete);
+            timeTrait.removeEventListener(TimeEvent.COMPLETE, onComplete);
         }
     }
 
     private function onComplete(event:TimeEvent):void {
-        evaluateMainContentCount();
-        if (mainContentCount * 2 == sectionCount || (/*sectionCount == 1 &&*/ previewMode == "true")) {
+        if (playingMainContent && evaluateMainContentCount == sectionCount) {
             eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.END));
             eventsManager.flushAll();
             playerMetadata.addValue(PlayerConstants.DESTROY, true);   //// main content has finished so we need to reInit the Player... This might not be the best location for this event, but we can look at moving it in the future.
         }
     }
 
-    private function evaluateMainContentCount():void {
+    private function get evaluateMainContentCount():int {
+        var currentSection:int;
+        if (adBreaks) {
 
+            for each (var breakItem:AdBreak in adBreaks) {
+
+                if (timeTrait.currentTime >= breakItem.startTime) {
+                    currentSection = currentSection + 2;// since we are checking adBreaks, we need to increment twice (once for the ad, once into the current content...
+                }
+            }
+
+        }else{
+            currentSection = 1;
+        }
+        return currentSection;
     }
 
 
@@ -633,11 +648,14 @@ public class BatchEventServices extends ProxyElement {
     }
 
     private function generateAssociatedContentEvent():void {
-        playingMainContent ? eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.MAIN_CONTENT)) : eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.AD_BREAK));
+        playingMainContent ? eventsManager.addContentEvent(buildAndReturnMainContentEvent(ContentTypes.MAIN_CONTENT)) : eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.AD_BREAK));
     }
 
     private function buildAndReturnContentEvent(contentType:String):ContentEvent {
         return new ContentEvent(isPopupInteractive, mainAssetId, new Date(), isOverlayInteractive, contentViewingSequenceNumber, incrementAndGetContentEventId(), campaignId, cumulativeDurationCount, userEventId, cumulativeDurationCount, contentType, currentAdBreakSequenceNumber, contentUrl);
+    }
+        private function buildAndReturnMainContentEvent(contentType:String):ContentEvent {
+        return new ContentEvent(isPopupInteractive, mainAssetId, new Date(), isOverlayInteractive, evaluateMainContentCount, incrementAndGetContentEventId(), campaignId, cumulativeDurationCount, userEventId, cumulativeDurationCount, contentType, currentAdBreakSequenceNumber, contentUrl);
     }
 }
 }
