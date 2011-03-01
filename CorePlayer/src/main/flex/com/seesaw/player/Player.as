@@ -531,7 +531,7 @@ public class Player extends Sprite {
         metadata = new Metadata();
         resource.addMetadataValue(ScrubPreventionConstants.SETTINGS_NAMESPACE, metadata);
 
-        if(playerInit.preview == "false") {
+        if(!HelperUtils.getBoolean(playerInit.preview)) {
             metadata = new Metadata();
             resource.addMetadataValue(AutoResumeConstants.SETTINGS_NAMESPACE, metadata);
         }
