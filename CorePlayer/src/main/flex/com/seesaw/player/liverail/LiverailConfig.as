@@ -87,7 +87,7 @@ public class LiverailConfig extends Configuration {
             }
 
             //hardcode the preroll if not exist in string already
-            if (resumePoint <= 0 && !liveRailAdMap.match("in::0")) {
+            if (!liveRailAdMap.match("in::0")) {
                 liveRailAdMap = "in::0;" + liveRailAdMap;
                 totalAdPositions.push(0);
             }
