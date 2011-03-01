@@ -53,7 +53,6 @@ public class AdProxy extends ProxyElement {
     private var logger:ILogger = LoggerFactory.getClassLogger(AdProxy);
 
     private var config:Configuration;
-    private var resumePosition:int;
     private var adTimeTrait:AdTimeTrait;
     private var playerMetadata:Metadata;
     private var adBreakCount:int;
@@ -79,8 +78,6 @@ public class AdProxy extends ProxyElement {
             metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onMetaDataChange);
             metadata.addEventListener(MetadataEvent.VALUE_ADD, onMetaDataChange);
 
-            //config = getSetting(AuditudeConstants.CONFIG_OBJECT) as Configuration;
-            resumePosition = getSetting(AuditudeConstants.RESUME_POSITION) as int;
         }
     }
 

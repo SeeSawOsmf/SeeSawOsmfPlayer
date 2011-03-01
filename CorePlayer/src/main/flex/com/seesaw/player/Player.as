@@ -566,13 +566,19 @@ public class Player extends Sprite {
                 metadata.addValue(AuditudeOSMFConstants.DOMAIN, "auditude.com");
                 metadata.addValue(AuditudeOSMFConstants.ZONE_ID, 9575);
                 metadata.addValue(AuditudeOSMFConstants.MEDIA_ID, "717670423001"); //playerInit.programmeId
-                // pass the mediaplayer instance to Auditude. This is required to listen for audio and content progress updates
-                //metadata.addValue(AuditudeOSMFConstants.PLAYER_INSTANCE, videoPlayer.mediaPlayer());
 
                 // any additional metadata can be passed to the Auditude plug-in through this key.
                 metadata.addValue(AuditudeOSMFConstants.USER_DATA, null);
 
-                metadata.addValue(AuditudeConstants.RESUME_POSITION, resumePosition);
+                // Disable postrolls
+                metadata.addValue(AuditudeOSMFConstants.DISABLE_POST_ROLL, true);
+
+                // Set up resume
+                if (resumePosition > 0) {
+                    metadata.addValue(AuditudeOSMFConstants.RESUME_TIME_IN_SECONDS, resumePosition);
+                    metadata.addValue(AuditudeOSMFConstants.SKIP_BREAKS_BEFORE_RESUME_TIME, true);
+                }
+
                 resource.addMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE, metadata)
             }
         }
