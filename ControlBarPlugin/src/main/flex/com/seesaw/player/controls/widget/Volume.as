@@ -23,6 +23,8 @@ import controls.seesaw.widget.interfaces.IWidget;
 
 import flash.events.MouseEvent;
 
+import flash.external.ExternalInterface;
+
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.events.AudioEvent;
@@ -32,6 +34,9 @@ import org.osmf.traits.MediaTraitType;
 
 public class Volume extends ButtonWidget implements IWidget {
     private var logger:ILogger = LoggerFactory.getClassLogger(Volume);
+
+    public static const EXTERNAL_SET_COOKIE_FUNCTION_NAME:String = "SEESAW.Utils.setCookie";
+    public static const PLAYER_VOLUME_COOKIE:String = "seesaw.player.volume";
 
     public function Volume() {
     }
@@ -62,16 +67,28 @@ public class Volume extends ButtonWidget implements IWidget {
     }
 
     override protected function onMouseClick(event:MouseEvent):void {
+        logger.debug("MUTE CLICK");
         logger.debug("audible.volume = " + audible.volume);
         if (audible.volume != 0) {
             storedVolume = audible.volume;
             audible.volume = Math.min(0, 0);
             enabled = false;
+            this.setCookieVolume();
         } else {
             audible.volume = storedVolume;
             enabled = true;
+            this.setCookieVolume();
         }
+
         super.processEnabledChange();
+    }
+
+    private function setCookieVolume():void {
+        logger.debug("MUTE BUTTON SET COOKIE");
+        if (ExternalInterface.available) {
+            logger.debug("SET VOLUME COOKIE TO: " + (audible.volume * 10));
+            ExternalInterface.call(EXTERNAL_SET_COOKIE_FUNCTION_NAME, PLAYER_VOLUME_COOKIE, (audible.volume * 10), false, "/");
+        }
     }
 
     override protected function onMouseClick_internal(event:MouseEvent):void {

@@ -53,6 +53,7 @@ public class VolumeScrubBar extends Widget implements IWidget {
     public static const PLAYER_VOLUME_COOKIE:String = "seesaw.player.volume";
 
     public function VolumeScrubBar() {
+        logger.debug("VOLUMESCRUB VolumeScrubBar");
         scrubBarClickArea = new Sprite();
         scrubBarClickArea.addEventListener(MouseEvent.MOUSE_DOWN, onTrackMouseDown);
         addChild(scrubBarClickArea);
@@ -63,6 +64,7 @@ public class VolumeScrubBar extends Widget implements IWidget {
     //
 
     override public function layout(availableWidth:Number, availableHeight:Number, deep:Boolean = true):void {
+        logger.debug("VOLUMESCRUB layout");
         if (lastWidth != availableWidth || lastHeight != availableHeight) {
             lastWidth = availableWidth;
             lastHeight = availableHeight;
@@ -93,6 +95,7 @@ public class VolumeScrubBar extends Widget implements IWidget {
 
 
     override public function configure(xml:XML, assetManager:AssetsManager):void {
+        logger.debug("VOLUMESCRUB configure");
         super.configure(xml, assetManager);
 
         maxWidth = Number(xml.@width || 10);
@@ -127,6 +130,7 @@ public class VolumeScrubBar extends Widget implements IWidget {
     }
 
     private function scrubberAddedToStage(event:Event) {
+        logger.debug("VOLUMESCRUB layout");
         stage.addChild(this.toolTip);
         if (ExternalInterface.available) {
             this.checkCookieVolume();
@@ -173,6 +177,7 @@ public class VolumeScrubBar extends Widget implements IWidget {
     }
 
     private function setVolume(newVolumeDisplay:Number):void {
+        logger.debug("VOLUMESCRUB setVolume");
         if (audible) {
             audible.volume = newVolumeDisplay / 10;
 
@@ -214,6 +219,7 @@ public class VolumeScrubBar extends Widget implements IWidget {
     }
 
     private function onScrubberUpdate(event:ScrubberEvent = null):void {
+        logger.debug("VOLUMESCRUB onScrubberUpdate");
 
         audible = media.getTrait(MediaTraitType.AUDIO) as AudioTrait;
 
@@ -247,6 +253,7 @@ public class VolumeScrubBar extends Widget implements IWidget {
     }
 
     protected function onVolumeChange(event:AudioEvent = null):void {
+        logger.debug("VOLUMESCRUB onVolumeChange");
         scrubber.x = audible.volume * scrubBarWidth - scrubber.width / 2;
         this.volumeDisplay = Math.round(audible.volume * 12);
         this.toolTip.updateToolTip("Volume: " + this.volumeDisplay);
