@@ -581,7 +581,7 @@ public class BatchEventServices extends ProxyElement {
         if (playingMainContent && evaluateMainContentCount == sectionCount) {
             eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.END));
             eventsManager.flushAll();
-            playerMetadata.addValue(PlayerConstants.DESTROY, true);   //// main content has finished so we need to reInit the Player... This might not be the best location for this event, but we can look at moving it in the future.
+            playerMetadata.addValue(PlayerConstants.REINITIALISE_PLAYER, true);   //// main content has finished so we need to reInit the Player... This might not be the best location for this event, but we can look at moving it in the future.
         }
     }
 
