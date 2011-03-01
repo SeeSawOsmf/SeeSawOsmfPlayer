@@ -245,17 +245,7 @@ public class Player extends Sprite {
     private function showPlayPanel():void {
         // if playButtonMode is null, this indicates that the user has no entitlement to play the video
         if (playButtonMode != null) {
-            // assume the resume overrides other play button modes
-            if (resumeService.resumable) {
-                if (playButtonMode == PlayStartButton.PLAY_SUBSCRIBED) {
-                    var mode:String = PlayStartButton.RESUME_SVOD;
-                } else {
-                    var mode:String = PlayStartButton.RESUME;
-                }
-            } else {
-                var mode:String = playButtonMode;
-            }
-            playButton = new PlayStartButton(mode);
+            playButton = new PlayStartButton(playButtonMode);
             playButton.addEventListener(PlayStartButton.PROCEED, onNextInitialisationState);
             addChild(playButton);
         }
@@ -374,18 +364,16 @@ public class Player extends Sprite {
         if (userInit.preview == "true") {
             playButtonMode = PlayStartButton.PREVIEW;
         }
+        else if (resumeService.resumable) {
+            playButtonMode = availability.svodPlayable == "true" ?
+                    PlayStartButton.RESUME_SVOD : PlayStartButton.RESUME;
+        }
         else {
             var availability:XMLList = userInit.availability;
             if (availability.svodPlayable == "true") {
                 playButtonMode = PlayStartButton.PLAY_SUBSCRIBED;
             }
-            else if (availability.tvodPlayable == "true") {
-                playButtonMode = PlayStartButton.PLAY;
-            }
-            else if (availability.availabilityType == "AVOD") {
-                playButtonMode = PlayStartButton.PLAY;
-            }
-            else if (availability.availabilityType == "SVOD" && availability.noAdsPlayable == "true") {
+            else {
                 playButtonMode = PlayStartButton.PLAY;
             }
         }
@@ -543,9 +531,10 @@ public class Player extends Sprite {
         metadata = new Metadata();
         resource.addMetadataValue(ScrubPreventionConstants.SETTINGS_NAMESPACE, metadata);
 
-        metadata = new Metadata();
-        resource.addMetadataValue(AutoResumeConstants.SETTINGS_NAMESPACE, metadata);
-
+        if(!HelperUtils.getBoolean(playerInit.preview)) {
+            metadata = new Metadata();
+            resource.addMetadataValue(AutoResumeConstants.SETTINGS_NAMESPACE, metadata);
+        }
 
         metadata = new Metadata();
         resource.addMetadataValue(BatchEventContants.SETTINGS_NAMESPACE, metadata);
