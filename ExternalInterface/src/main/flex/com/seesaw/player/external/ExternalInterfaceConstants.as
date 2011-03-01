@@ -20,6 +20,8 @@
 
 package com.seesaw.player.external {
 public class ExternalInterfaceConstants {
+    public static const RELOAD:String = "function(){location.reload(true)}";
+
     public static const LIGHTS_DOWN:String = "VODCO.ads.player.onPlayerLightsDown";
     public static const LIGHTS_UP:String = "VODCO.ads.player.onPlayerLightsUp";
 

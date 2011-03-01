@@ -23,6 +23,8 @@ public interface PlayerExternalInterface {
 
     function get available():Boolean;
 
+    function reload():void;
+
     function callLightsDown():void;
 
     function callLightsUp():void;
