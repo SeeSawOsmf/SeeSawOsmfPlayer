@@ -90,6 +90,8 @@ import org.osmf.traits.PlayState;
 import org.osmf.traits.PlayTrait;
 import org.osmf.traits.TimeTrait;
 
+import org.osmf.traits.TraitEventDispatcher;
+
 import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
 
 public class SeeSawPlayer extends Sprite {
@@ -143,9 +145,6 @@ public class SeeSawPlayer extends Sprite {
 
         var metadata:Metadata = config.resource.getMetadataValue(PlayerConstants.METADATA_NAMESPACE) as Metadata;
 
-        metadata.addEventListener(MetadataEvent.VALUE_ADD, playerMetaChange);
-        metadata.addEventListener(MetadataEvent.VALUE_CHANGE, playerMetaChange);
-
         playerInit = metadata.getValue(PlayerConstants.CONTENT_INFO) as XML;
         videoInfo = metadata.getValue(PlayerConstants.VIDEO_INFO) as XML;
         userInfo = metadata.getValue(PlayerConstants.USER_INFO) as XML;
@@ -168,6 +167,10 @@ public class SeeSawPlayer extends Sprite {
         container = new MediaContainer();
 
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+    }
+
+    private function onComplete(event:TimeEvent):void {
+        dispatchEvent(new Event(PlayerConstants.REINITIALISE_PLAYER));
     }
 
     private function onAddedToStage(event:Event):void {
@@ -502,6 +505,10 @@ public class SeeSawPlayer extends Sprite {
         factory.removeEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onSmilElementCreated);
 
         if (mediaElement) {
+            var dispatcher:TraitEventDispatcher = new TraitEventDispatcher();
+            dispatcher.media = mediaElement;
+            dispatcher.addEventListener(TimeEvent.COMPLETE, onComplete);
+
             mainElement.addChild(new BufferManager(PlayerConstants.MIN_BUFFER_SIZE_SECONDS,
                     PlayerConstants.MAX_BUFFER_SIZE_SECONDS, mediaElement));
 
@@ -736,25 +743,6 @@ public class SeeSawPlayer extends Sprite {
                 logger.debug("calling lights up");
                 xi.callLightsUp();
                 metadata.addValue(ExternalInterfaceMetadata.LIGHTS_DOWN, false);
-            }
-        }
-    }
-
-    private function playerMetaChange(event:MetadataEvent):void {
-        if (event.key == PlayerConstants.DESTROY) {
-            if (event.value) {
-                // wipe out the objects from memory and off the displayList
-                // removeChild seems to throw errors when trying to removeChild( container ) etc..
-                mainContainer.removeMediaElement(mainElement);
-                mainContainer = null;
-                bufferingContainer = null;
-                subtitlesContainer = null;
-                controlbarContainer = null;
-                mainElement = null;
-                player = null;
-                container = null;
-
-                dispatchEvent(new Event(PlayerConstants.DESTROY));
             }
         }
     }

@@ -245,6 +245,10 @@ public class Player extends Sprite {
     private function showPlayPanel():void {
         // if playButtonMode is null, this indicates that the user has no entitlement to play the video
         if (playButtonMode != null) {
+            if (resumeService.resumable) {
+                playButtonMode = userInit.availability.svodPlayable == "true" ?
+                        PlayStartButton.RESUME_SVOD : PlayStartButton.RESUME;
+            }
             playButton = new PlayStartButton(playButtonMode);
             playButton.addEventListener(PlayStartButton.PROCEED, onNextInitialisationState);
             addChild(playButton);
@@ -364,16 +368,18 @@ public class Player extends Sprite {
         if (userInit.preview == "true") {
             playButtonMode = PlayStartButton.PREVIEW;
         }
-        else if (resumeService.resumable) {
-            playButtonMode = availability.svodPlayable == "true" ?
-                    PlayStartButton.RESUME_SVOD : PlayStartButton.RESUME;
-        }
         else {
             var availability:XMLList = userInit.availability;
             if (availability.svodPlayable == "true") {
                 playButtonMode = PlayStartButton.PLAY_SUBSCRIBED;
             }
-            else {
+            else if (availability.tvodPlayable == "true") {
+                playButtonMode = PlayStartButton.PLAY;
+            }
+            else if (availability.availabilityType == "AVOD") {
+                playButtonMode = PlayStartButton.PLAY;
+            }
+            else if (availability.availabilityType == "SVOD" && availability.noAdsPlayable == "true") {
                 playButtonMode = PlayStartButton.PLAY;
             }
         }
@@ -402,10 +408,10 @@ public class Player extends Sprite {
 
         resumeService.programmeId = playerInit.programmeId;
 
-       if (playerInit.adMode != AdMetadata.CHANNEL_4_AD_TYPE) {
-        resetInitialisationStages();
-        nextInitialisationStage();
-         }
+        if (playerInit.adMode != AdMetadata.CHANNEL_4_AD_TYPE) {
+            resetInitialisationStages();
+            nextInitialisationStage();
+        }
     }
 
     private function requestProgrammeData(videoInfoUrl:String):void {
@@ -474,7 +480,7 @@ public class Player extends Sprite {
         //var config:PlayerConfiguration = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, content);
         config = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, content);
         videoPlayer = new SeeSawPlayer(config);
-        videoPlayer.addEventListener(PlayerConstants.DESTROY, reBuildPlayer);
+        videoPlayer.addEventListener(PlayerConstants.REINITIALISE_PLAYER, reBuildPlayer);
         videoPlayer.mediaPlayer.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onMediaPlayerStateChange);
 
         // Since we have autoPlay to false for liverail, we need to manually call play for C4:
@@ -531,7 +537,7 @@ public class Player extends Sprite {
         metadata = new Metadata();
         resource.addMetadataValue(ScrubPreventionConstants.SETTINGS_NAMESPACE, metadata);
 
-        if(!HelperUtils.getBoolean(playerInit.preview)) {
+        if (!HelperUtils.getBoolean(playerInit.preview)) {
             metadata = new Metadata();
             resource.addMetadataValue(AutoResumeConstants.SETTINGS_NAMESPACE, metadata);
         }
