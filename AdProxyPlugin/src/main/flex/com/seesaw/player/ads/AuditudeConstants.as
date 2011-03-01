@@ -22,11 +22,6 @@ package com.seesaw.player.ads {
 public class AuditudeConstants {
     //public static const SETTINGS_NAMESPACE:String = "http://www.seesaw.com/player/plugins/auditude/settings";
     public static const AD_MODE_ID:String = "auditude";
-    public static const PUBLISHER_ID:String = "publisher";
-    public static const VERSION:String = "version";
-    public static const CONFIG_OBJECT:String = "config";
-    public static const RESUME_POSITION:String = "resume";
-    public static const MEDIA_FACTORY = "mediaFactory";
     public static const PLUGIN_INSTANCE = "auditudePlugin";
 }
 }
