@@ -18,21 +18,21 @@
  *   Contributor(s):  Adobe Systems Incorporated
  */
 
-package com.seesaw.player.batcheventservices.events.manager {
-import com.seesaw.player.batcheventservices.events.ContentEvent;
-import com.seesaw.player.batcheventservices.events.CumulativeDurationEvent;
-import com.seesaw.player.batcheventservices.events.UserEvent;
+package com.seesaw.player.utils {
+public class AjaxRequestType
+	{
+		private var item:String;
+		public static var GET:AjaxRequestType = new AjaxRequestType("GET");
+		public static var POST:AjaxRequestType = new AjaxRequestType("POST");
 
-public interface EventsManager {
+		public function AjaxRequestType(item:String=null)
+		{
+			this.item = item;
+		}
 
-    function addUserEvent(userEvent:UserEvent):void;
-
-    function addContentEvent(contentEvent:ContentEvent):void;
-
-    function flushAll():void;
-
-    function flushExitEvent():void;
-
-    function flushCumulativeDuration(cumulativeDuration:CumulativeDurationEvent):void;
-}
+		public function toString():String
+		{
+			return this.item;
+		}
+	}
 }
