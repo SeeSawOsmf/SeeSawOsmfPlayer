@@ -170,6 +170,8 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onComplete(event:TimeEvent):void {
+        logger.debug("onComplete: requesting player re-initialisation");
+        removeChild(container);
         dispatchEvent(new Event(PlayerConstants.REINITIALISE_PLAYER));
     }
 
@@ -316,7 +318,6 @@ public class SeeSawPlayer extends Sprite {
             }
         }
     }
-
 
     private function adBreakCompleted(event:Event = null):void {
         logger.debug("ad break complete");
@@ -621,7 +622,7 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function netStatusChanged(event:NetStatusEvent):void {
-        logger.debug("-----------------------------------------------------------------" + event.info as String);
+        logger.debug(event.info as String);
         if (event.info == "NetConnection.Connect.NetworkChange") {
 
             factory.removeEventListener(NetStatusEvent.NET_STATUS, netStatusChanged);

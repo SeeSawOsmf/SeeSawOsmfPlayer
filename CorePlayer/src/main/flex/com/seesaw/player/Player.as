@@ -469,18 +469,14 @@ public class Player extends Sprite {
     private function loadVideo(content:MediaResourceBase):void {
         logger.debug("loading video");
 
-        if (videoPlayer) {
-            logger.debug("destroying existing player");
-            removeChild(videoPlayer);
-            videoPlayer = null;
-        }
+        destroyPlayer();
 
         logger.debug("creating player");
 
         //var config:PlayerConfiguration = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, content);
         config = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, content);
         videoPlayer = new SeeSawPlayer(config);
-        videoPlayer.addEventListener(PlayerConstants.REINITIALISE_PLAYER, reBuildPlayer);
+        videoPlayer.addEventListener(PlayerConstants.REINITIALISE_PLAYER, onReinitialisePlayer);
         videoPlayer.mediaPlayer.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onMediaPlayerStateChange);
 
         // Since we have autoPlay to false for liverail, we need to manually call play for C4:
@@ -518,8 +514,17 @@ public class Player extends Sprite {
         }
     }
 
-    private function reBuildPlayer(event:Event):void {
-        onAddedToStage(event);
+    private function onReinitialisePlayer(event:Event):void {
+        // reload the page to re-initialise the player
+        xi.reload();
+    }
+
+    private function destroyPlayer():void {
+        if (videoPlayer) {
+            logger.debug("destroying player");
+            removeChild(videoPlayer);
+            videoPlayer = null;
+        }
     }
 
     private function createMediaResource(videoInfo:XML):MediaResourceBase {
