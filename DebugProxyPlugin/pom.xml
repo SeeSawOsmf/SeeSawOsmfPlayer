@@ -25,7 +25,7 @@
     <parent>
         <artifactId>player</artifactId>
         <groupId>com.seesaw</groupId>
-        <version>7.0.0</version>
+        <version>7.1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <name>DebugProxyPlugin</name>
