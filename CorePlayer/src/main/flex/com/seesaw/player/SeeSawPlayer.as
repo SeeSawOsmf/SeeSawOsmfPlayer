@@ -566,9 +566,13 @@ public class SeeSawPlayer extends Sprite {
      * @param event
      */
     private function onTraitAdd(event:MediaElementEvent) {
-        
+
+        logger.debug("On Trait add");
+
         if(event.traitType == MediaTraitType.DRM) {
             event.target.removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
+
+            logger.debug("Adding DRM trait listener");
             
             // Add a listener to the DRM trait so we know what is going on
             (event.target as MediaElement).getTrait(MediaTraitType.DRM).addEventListener(DRMEvent.DRM_STATE_CHANGE, onDRMStateChange);
@@ -582,7 +586,7 @@ public class SeeSawPlayer extends Sprite {
         switch(event.drmState) {
 
             case DRMState.AUTHENTICATION_NEEDED:
-                logger.info("DRM Authentication needed");
+                logger.debug("DRM Authentication needed");
                 var entitlement:String = videoInfo.entitlement;
                 var signature:String = videoInfo.signature;
                 var authToken:String = signature+","+entitlement;
@@ -590,15 +594,18 @@ public class SeeSawPlayer extends Sprite {
                 var byteArray:ByteArray = new ByteArray();
                 byteArray.writeUTFBytes(authToken);
 
-                logger.info("DRM Sending token to license server");
+                logger.debug("DRM Sending token to license server");
                 (event.target as DRMTrait).authenticateWithToken(byteArray);
                 break;
 
 
             case DRMState.AUTHENTICATION_ERROR:
-                logger.info("DRMError {}",event.mediaError);
+                logger.debug("DRMError {}",event.mediaError);
                 break;
 
+            default:
+                logger.debug("DRM Some other DRM state");
+                break;
         }
 
     }
