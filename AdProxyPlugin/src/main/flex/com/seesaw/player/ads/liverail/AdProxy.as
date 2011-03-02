@@ -1,23 +1,21 @@
 /*
- * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
+ * The contents of this file are subject to the Mozilla Public License
+ *   Version 1.1 (the "License"); you may not use this file except in
+ *   compliance with the License. You may obtain a copy of the License at
+ *   http://www.mozilla.org/MPL/
  *
- *    The contents of this file are subject to the Mozilla Public License
- *    Version 1.1 (the "License"); you may not use this file except in
- *    compliance with the License. You may obtain a copy of the
- *    License athttp://www.mozilla.org/MPL/
+ *   Software distributed under the License is distributed on an "AS IS"
+ *   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *   License for the specific language governing rights and limitations
+ *   under the License.
  *
- *    Software distributed under the License is distributed on an "AS IS"
- *    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- *    License for the specific language governing rights and limitations
- *    under the License.
+ *   The Initial Developer of the Original Code is Arqiva Ltd.
+ *   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+ *   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+ * 	Systems Incorporated.
+ *   All Rights Reserved.
  *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
- *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
+ *   Contributor(s):  Adobe Systems Incorporated
  */
 
 package com.seesaw.player.ads.liverail {
@@ -26,12 +24,12 @@ package com.seesaw.player.ads.liverail {
 import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.ads.AdBreak;
 import com.seesaw.player.ads.AdMetadata;
+import com.seesaw.player.ads.AdMode;
 import com.seesaw.player.ads.AdState;
 import com.seesaw.player.ads.LiverailConstants;
 import com.seesaw.player.ads.events.LiveRailEvent;
 import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.traits.ads.AdPlayTrait;
-import com.seesaw.player.traits.ads.AdTimeTrait;
 
 import flash.events.Event;
 import flash.events.TimerEvent;
@@ -68,10 +66,10 @@ public class AdProxy extends ProxyElement {
 
     private var adManager:*;
     private var config:Configuration;
-    private var resumePosition:int;
+    private var resumePosition:Number;
     private var timer:Timer;
-    private var adTimeTrait:AdTimeTrait;
     private var playerMetadata:Metadata;
+    private var currentAdBreak:AdBreak;
 
     public function AdProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -115,12 +113,12 @@ public class AdProxy extends ProxyElement {
             adManager.addEventListener(LiveRailEvent.CLICK_THRU, onClickThru);
 
             config = getSetting(LiverailConstants.CONFIG_OBJECT) as Configuration;
-            resumePosition = getSetting(LiverailConstants.RESUME_POSITION) as int;
+            resumePosition = getSetting(LiverailConstants.RESUME_POSITION) as Number;
 
             // block these until the liverail events kick in
-            setTraitsToBlock(MediaTraitType.PLAY, MediaTraitType.TIME);
+            setTraitsToBlock(MediaTraitType.PLAY, MediaTraitType.TIME, MediaTraitType.DISPLAY_OBJECT);
 
-            // After calling initAds(config), the main video player�s controls should be disabled and any requests to
+            // After calling initAds(config), the main video playerï¿½s controls should be disabled and any requests to
             // play a movie should be cancelled or delayed until the initComplete (or the initError) event is received
             // from the ad manager. If initComplete has been received, first call lrAdManager.onContentStart() and only
             // resume your main video after prerollComplete event is triggered.
@@ -135,10 +133,16 @@ public class AdProxy extends ProxyElement {
         }
     }
 
-    public override function set proxiedElement(proxiedElement:MediaElement):void {
-        if (proxiedElement) {
-            logger.debug("proxiedElement: " + proxiedElement);
-            super.proxiedElement = proxiedElement;
+    public override function set proxiedElement(value:MediaElement):void {
+        if (value) {
+            logger.debug("proxiedElement: " + value);
+
+            if (proxiedElement) {
+                proxiedElement.removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
+                proxiedElement.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
+            }
+
+            super.proxiedElement = value;
 
             proxiedElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
             proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
@@ -229,14 +233,16 @@ public class AdProxy extends ProxyElement {
             metadataAdBreak.startTimeIsPercent = startTimeIsPercent;
 
             // Dont add the break if it has no ads, eg no content to play, so we don't want a blip for this item
-            if (hasAds)
+            if (hasAds) {
+                metadataAdBreak.seekOffset = 0.5; // seek back half a second to trigger the ads
                 metadataAdBreaks[i] = metadataAdBreak;
+            }
         }
+        adMetadata.adBreaks = metadataAdBreaks;
 
         // section count need to occur before we start the adContent. as this is required for the first view to be registered.
         playerMetadata.addValue(AdMetadata.SECTION_COUNT, metadataAdBreaks.length);
         adManager.onContentStart();
-        adMetadata.adBreaks = metadataAdBreaks;
     }
 
     private function onInitError(ev:Object):void {
@@ -251,8 +257,6 @@ public class AdProxy extends ProxyElement {
     }
 
     private function onAdProgress(event:Object):void {
-        adTimeTrait.adDuration = event.data.duration;
-        adTimeTrait.adTime = event.data.time;
     }
 
     private function onAdStart(event:Object):void {
@@ -265,9 +269,6 @@ public class AdProxy extends ProxyElement {
         dataObject["creativeId"] = event.data.ad.creativeID;
 
         adMetadata.adState = dataObject;
-        /*     event.data.ad.clickThruUrl
-
-         event.data.ad.creativeID*/
         play();
     }
 
@@ -281,26 +282,24 @@ public class AdProxy extends ProxyElement {
         dataObject["creativeId"] = event.data.ad.creativeID;
 
         adMetadata.adState = dataObject;
-
-        adTimeTrait.adDuration = 0;
-        adTimeTrait.adTime = 0;
     }
 
     private function onPrerollComplete(event:Event):void {
         logger.debug("onPrerollComplete");
         setTraitsToBlock();
-        //play(); //adbreakComplete will handle this
+        play();
     }
 
     private function adbreakStart(event:Object):void {
         logger.debug("adbreakStart");
-        trace(event);
         adMetadata.adState = AdState.AD_BREAK_START;
+        adMetadata.adMode = AdMode.AD;
+        currentAdBreak = adMetadata.getAdBreakWithTime(event.data.breakTime);
 
         setTraitsToBlock(MediaTraitType.SEEK, MediaTraitType.TIME);
         // Perhaps this is needed for mid-rolls
-         if(event.data.breakTime > 0)   /// not to pause for preROll...
-          pause();
+        if (event.data.breakTime > 0)   /// not to pause for preROll...
+            pause();
 
         // mask the existing play trait so we get the play state changes here
         var adPlayTrait:AdPlayTrait = new AdPlayTrait();
@@ -309,9 +308,6 @@ public class AdProxy extends ProxyElement {
 
         // add a display trait that will display the ads
         addTrait(MediaTraitType.DISPLAY_OBJECT, new DisplayObjectTrait(adManager));
-
-        adTimeTrait = new AdTimeTrait();
-        addTrait(MediaTraitType.TIME, adTimeTrait);
     }
 
     private function adbreakComplete(event:Object):void {
@@ -319,16 +315,17 @@ public class AdProxy extends ProxyElement {
         removeTrait(MediaTraitType.PLAY);
         removeTrait(MediaTraitType.DISPLAY_OBJECT);
         removeTrait(MediaTraitType.TIME);
-        adTimeTrait = null;
 
         adMetadata.adState = AdState.AD_BREAK_COMPLETE;
+        adMetadata.adMode = AdMode.MAIN_CONTENT;
+
+        if (currentAdBreak) {
+            // This dispatches an event that seeks to the user's final seek point
+            currentAdBreak.complete = true;
+        }
 
         setTraitsToBlock();
         play();
-    }
-
-    private function volume(vol:Number):void {
-        adManager.setVolume(vol);
     }
 
     private function onContentUpdate(time:Number, duration:Number):void {

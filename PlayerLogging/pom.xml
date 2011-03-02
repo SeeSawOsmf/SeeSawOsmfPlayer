@@ -22,9 +22,9 @@
   ~    Incorporated. All Rights Reserved.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.seesaw</groupId>
@@ -35,7 +35,7 @@
     <parent>
         <artifactId>player</artifactId>
         <groupId>com.seesaw</groupId>
-        <version>7.0.0-SNAPSHOT</version>
+        <version>7.0.0</version>
     </parent>
 
     <build>

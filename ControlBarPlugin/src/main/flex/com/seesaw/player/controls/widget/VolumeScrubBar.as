@@ -1,23 +1,21 @@
 /*
- * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
+ * The contents of this file are subject to the Mozilla Public License
+ *   Version 1.1 (the "License"); you may not use this file except in
+ *   compliance with the License. You may obtain a copy of the License at
+ *   http://www.mozilla.org/MPL/
  *
- *    The contents of this file are subject to the Mozilla Public License
- *    Version 1.1 (the "License"); you may not use this file except in
- *    compliance with the License. You may obtain a copy of the
- *    License athttp://www.mozilla.org/MPL/
+ *   Software distributed under the License is distributed on an "AS IS"
+ *   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *   License for the specific language governing rights and limitations
+ *   under the License.
  *
- *    Software distributed under the License is distributed on an "AS IS"
- *    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- *    License for the specific language governing rights and limitations
- *    under the License.
+ *   The Initial Developer of the Original Code is Arqiva Ltd.
+ *   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+ *   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+ * 	Systems Incorporated.
+ *   All Rights Reserved.
  *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
- *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
+ *   Contributor(s):  Adobe Systems Incorporated
  */
 package com.seesaw.player.controls.widget {
 import com.seesaw.player.ui.PlayerToolTip;
@@ -28,9 +26,10 @@ import flash.display.DisplayObject;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
-
 import flash.external.ExternalInterface;
 
+import org.as3commons.logging.ILogger;
+import org.as3commons.logging.LoggerFactory;
 import org.osmf.chrome.assets.AssetsManager;
 import org.osmf.chrome.assets.FontAsset;
 import org.osmf.chrome.events.ScrubberEvent;
@@ -40,8 +39,6 @@ import org.osmf.events.MediaElementEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.traits.AudioTrait;
 import org.osmf.traits.MediaTraitType;
-import org.as3commons.logging.ILogger;
-import org.as3commons.logging.LoggerFactory;
 
 public class VolumeScrubBar extends Widget implements IWidget {
 
@@ -49,7 +46,14 @@ public class VolumeScrubBar extends Widget implements IWidget {
 
     private var volumeDisplay:Number;
 
+    private var defaultVolume:Number = 6;
+
+    public static const EXTERNAL_GET_COOKIE_FUNCTION_NAME:String = "SEESAW.Utils.getCookie";
+    public static const EXTERNAL_SET_COOKIE_FUNCTION_NAME:String = "SEESAW.Utils.setCookie";
+    public static const PLAYER_VOLUME_COOKIE:String = "seesaw.player.volume";
+
     public function VolumeScrubBar() {
+        logger.debug("VOLUMESCRUB VolumeScrubBar");
         scrubBarClickArea = new Sprite();
         scrubBarClickArea.addEventListener(MouseEvent.MOUSE_DOWN, onTrackMouseDown);
         addChild(scrubBarClickArea);
@@ -60,6 +64,7 @@ public class VolumeScrubBar extends Widget implements IWidget {
     //
 
     override public function layout(availableWidth:Number, availableHeight:Number, deep:Boolean = true):void {
+        logger.debug("VOLUMESCRUB layout");
         if (lastWidth != availableWidth || lastHeight != availableHeight) {
             lastWidth = availableWidth;
             lastHeight = availableHeight;
@@ -90,6 +95,7 @@ public class VolumeScrubBar extends Widget implements IWidget {
 
 
     override public function configure(xml:XML, assetManager:AssetsManager):void {
+        logger.debug("VOLUMESCRUB configure");
         super.configure(xml, assetManager);
 
         maxWidth = Number(xml.@width || 10);
@@ -122,10 +128,12 @@ public class VolumeScrubBar extends Widget implements IWidget {
         updateState();
 
     }
-    
+
     private function scrubberAddedToStage(event:Event) {
+        logger.debug("VOLUMESCRUB layout");
         stage.addChild(this.toolTip);
         if (ExternalInterface.available) {
+            this.checkCookieVolume();
             ExternalInterface.addCallback("getVolume", this.getVolume);
             ExternalInterface.addCallback("setVolume", this.setVolume);
         }
@@ -150,9 +158,38 @@ public class VolumeScrubBar extends Widget implements IWidget {
         return this.volumeDisplay;
     }
 
+    private function checkCookieVolume():void {
+        var tmpVol:*;
+        tmpVol = ExternalInterface.call(EXTERNAL_GET_COOKIE_FUNCTION_NAME, PLAYER_VOLUME_COOKIE);
+        if (tmpVol != "" && tmpVol != null) {
+            logger.debug("VALUE OF VOLUME COOKIE: " + tmpVol);
+            setVolume(tmpVol);
+        } else {
+            setVolume(defaultVolume);
+        }
+    }
+
+    private function setCookieVolume():void {
+        if (ExternalInterface.available) {
+            logger.debug("SET VOLUME COOKIE TO: " + (audible.volume * 10));
+            ExternalInterface.call(EXTERNAL_SET_COOKIE_FUNCTION_NAME, PLAYER_VOLUME_COOKIE, (audible.volume * 10), false, "/");
+        }
+    }
+
     private function setVolume(newVolumeDisplay:Number):void {
-        audible.volume = newVolumeDisplay / 10;
-        logger.debug('New audible.volume: ' + audible.volume);
+        logger.debug("VOLUMESCRUB setVolume");
+        if (audible) {
+            audible.volume = newVolumeDisplay / 10;
+
+            if (audible.volume < 0.05) {
+                audible.volume = 0;
+                logger.debug('MUTE');
+            }
+
+            this.setCookieVolume();
+
+            logger.debug('New audible.volume: ' + audible.volume);
+        }
         //this.volumeDisplay = newVolumeDisplay;
     }
 
@@ -182,15 +219,21 @@ public class VolumeScrubBar extends Widget implements IWidget {
     }
 
     private function onScrubberUpdate(event:ScrubberEvent = null):void {
+        logger.debug("VOLUMESCRUB onScrubberUpdate");
 
         audible = media.getTrait(MediaTraitType.AUDIO) as AudioTrait;
 
         var percentage:Number = ((scrubber.x - scrubberStart) / scrubBarWidth);
 
         audible.volume = Math.min(percentage, percentage);
-
+        if (audible.volume < 0.05) {
+            audible.volume = 0;
+            logger.debug('MUTE');
+        }
+        logger.debug("New Volume: audible.volume : " + audible.volume);
         this.volumeDisplay = Math.round(audible.volume * 12);
 
+        this.setCookieVolume();
     }
 
 
@@ -210,6 +253,7 @@ public class VolumeScrubBar extends Widget implements IWidget {
     }
 
     protected function onVolumeChange(event:AudioEvent = null):void {
+        logger.debug("VOLUMESCRUB onVolumeChange");
         scrubber.x = audible.volume * scrubBarWidth - scrubber.width / 2;
         this.volumeDisplay = Math.round(audible.volume * 12);
         this.toolTip.updateToolTip("Volume: " + this.volumeDisplay);

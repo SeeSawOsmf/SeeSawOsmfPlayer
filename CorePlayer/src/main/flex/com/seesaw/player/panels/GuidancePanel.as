@@ -1,23 +1,21 @@
 /*
- * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
+ * The contents of this file are subject to the Mozilla Public License
+ *   Version 1.1 (the "License"); you may not use this file except in
+ *   compliance with the License. You may obtain a copy of the License at
+ *   http://www.mozilla.org/MPL/
  *
- *    The contents of this file are subject to the Mozilla Public License
- *    Version 1.1 (the "License"); you may not use this file except in
- *    compliance with the License. You may obtain a copy of the
- *    License athttp://www.mozilla.org/MPL/
+ *   Software distributed under the License is distributed on an "AS IS"
+ *   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *   License for the specific language governing rights and limitations
+ *   under the License.
  *
- *    Software distributed under the License is distributed on an "AS IS"
- *    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- *    License for the specific language governing rights and limitations
- *    under the License.
+ *   The Initial Developer of the Original Code is Arqiva Ltd.
+ *   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+ *   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+ * 	Systems Incorporated.
+ *   All Rights Reserved.
  *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
- *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
+ *   Contributor(s):  Adobe Systems Incorporated
  */
 
 package com.seesaw.player.panels {
@@ -31,7 +29,6 @@ import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.external.ExternalInterface;
 import flash.net.URLRequest;
-import flash.net.getClassByAlias;
 import flash.net.navigateToURL;
 import flash.system.Security;
 import flash.text.StyleSheet;
@@ -53,13 +50,17 @@ public class GuidancePanel extends Sprite {
 
     private var assetWarning:String = "This %TYPE_TOKEN% isn't suitable for younger viewers.<br/><br/>";
     private var ageMessage:String = "Please confirm you are aged %AGE_TOKEN% or older " +
-				"and accept our <a href=\"%TERMSURL%\"><font color=\"#00A88E\">Terms and Conditions.</font></a>";
+            "and accept our <a href=\"%TERMSURL%\"><font color=\"#00A88E\">Terms and Conditions.</font></a>";
 
     //components which need tooltips
     private var acceptButton:Sprite = new Sprite();
     private var cancelButton:Sprite = new Sprite();
     private var parentalControlsButton:Sprite = new Sprite();
     private var findOutMoreButton:Sprite = new Sprite();
+    private var warningLabel:StyledTextField = new StyledTextField();
+
+    //layout info
+    private var yFill:Number = 0;
 
     //Embed images
     [Embed(source="resources/accept_up.png")]
@@ -138,17 +139,15 @@ public class GuidancePanel extends Sprite {
     private function buildPanel():Sprite {
         var panel:Sprite = new Sprite();
 
-        panel.addChild(this.buildPanelBG());
-
         var contentContainer:Sprite = this.buildContentContainer();
         contentContainer.addChild(this.buildWarning());
         contentContainer.addChild(this.buildWarningIcon());
         contentContainer.addChild(this.buildExplanation());
         contentContainer.addChild(this.buildConfirmationMessage());
-        contentContainer.addChild(this.buildAcceptButton("Accept"));
-        contentContainer.addChild(this.buildDeclineButton("Decline"));
-        contentContainer.addChild(this.buildParentalControlsLink());
-        contentContainer.addChild(this.buildFindOutMoreLink());
+        contentContainer.addChild(this.buildActions());
+
+        panel.addChild(this.buildPanelBG());
+
         panel.addChild(contentContainer);
 
         return panel;
@@ -160,7 +159,7 @@ public class GuidancePanel extends Sprite {
 
         with (panelBG.graphics) {
             beginFill(0x000000, 0.8);
-            drawRoundRect(0, 0, 525, 253, 10);
+            drawRoundRect(0, 0, 525, (this.yFill + 60), 10);
             endFill();
         }
 
@@ -176,13 +175,16 @@ public class GuidancePanel extends Sprite {
     }
 
     private function buildWarning():TextField {
-        var warningLabel = new StyledTextField();
-        warningLabel.width = 540;
-        warningLabel.htmlText = this.guidanceWarning;
-        warningLabel.y = 0;
-        var formattedWarningLabel:TextField = this.applyWarningFormat(warningLabel);
+        this.warningLabel.width = 460;
+        this.warningLabel.htmlText = this.guidanceWarning;
+        this.warningLabel.wordWrap = true;
+        this.warningLabel.multiline = true;
+        this.warningLabel.y = 0;
+        var formattedWarningLabel:TextField = this.applyWarningFormat(this.warningLabel);
 
-        return warningLabel;
+        this.yFill += this.warningLabel.height;
+
+        return this.warningLabel;
     }
 
     private function buildWarningIcon():Sprite {
@@ -199,8 +201,13 @@ public class GuidancePanel extends Sprite {
         explanationLabel.width = 500;
         explanationLabel.wordWrap = true;
         explanationLabel.htmlText = this.assetWarning.replace("%TYPE_TOKEN%", this.assetType);
-        explanationLabel.y = 32;
-        var formattedWarningLabel:TextField = this.applyInfoFormat(explanationLabel);
+
+        this.yFill += 15;
+
+        explanationLabel.y = this.yFill;
+        var formattedWarningLabel:TextField = this.applyInfoFormat(explanationLabel)
+
+        this.yFill += explanationLabel.height;
 
         return explanationLabel;
     }
@@ -211,10 +218,15 @@ public class GuidancePanel extends Sprite {
         confirmationLabel.width = 500;
         confirmationLabel.wordWrap = true;
         confirmationLabel.htmlText = this.ageMessage.replace("%TYPE_TOKEN%", this.assetType).replace("%AGE_TOKEN%", this.age).replace("%TERMSURL%", this.termsURL);
-        confirmationLabel.y = 66;
+
+        this.yFill += 15;
+
+        confirmationLabel.y = this.yFill;
         var formattedWarningLabel:TextField = this.applyInfoFormat(confirmationLabel);
 
         confirmationLabel.styleSheet = this.css;
+
+        this.yFill += confirmationLabel.height;
 
         return confirmationLabel;
     }
@@ -264,6 +276,7 @@ public class GuidancePanel extends Sprite {
         textToFormat.setTextFormat(textFormat);
     }
 
+
     private function buildAcceptButton(label:String):Sprite {
 
         //setup the hand cursor
@@ -292,7 +305,7 @@ public class GuidancePanel extends Sprite {
 
         //position the button
         this.acceptButton.x = -5;
-        this.acceptButton.y = 102;
+        this.acceptButton.y = 0;
         this.acceptButton.height = 48;
         this.acceptButton.width = 108;
 
@@ -313,6 +326,22 @@ public class GuidancePanel extends Sprite {
     private function onAcceptClick(event:MouseEvent = null):void {
         this.visible = false;
         this.dispatchEvent(new Event(GUIDANCE_ACCEPTED));
+    }
+
+    private function buildActions():Sprite {
+        var actionsContainer:Sprite = new Sprite();
+
+        actionsContainer.addChild(this.buildAcceptButton("Accept"));
+        actionsContainer.addChild(this.buildDeclineButton("Decline"));
+        actionsContainer.addChild(this.buildParentalControlsLink());
+        actionsContainer.addChild(this.buildFindOutMoreLink());
+
+        this.yFill += 15;
+        actionsContainer.y = this.yFill;
+
+        this.yFill += actionsContainer.height;
+
+        return actionsContainer;
     }
 
     private function buildDeclineButton(label:String):Sprite {
@@ -343,7 +372,7 @@ public class GuidancePanel extends Sprite {
         }
 
         //position the button
-        this.cancelButton.y = 102;
+        this.cancelButton.y = 0;
         this.cancelButton.x = 109;
 
         return this.cancelButton;
@@ -392,7 +421,7 @@ public class GuidancePanel extends Sprite {
         this.parentalControlsButton.addEventListener(MouseEvent.CLICK, this.onParentalControlClick);
 
         //position the button
-        this.parentalControlsButton.y = 175;
+        this.parentalControlsButton.y = 73;
         this.parentalControlsButton.x = 0;
 
         return this.parentalControlsButton;
@@ -434,7 +463,7 @@ public class GuidancePanel extends Sprite {
         this.findOutMoreButton.addEventListener(MouseEvent.CLICK, this.onFindOutMoreClick);
 
         //position the button
-        this.findOutMoreButton.y = 175;
+        this.findOutMoreButton.y = 73;
         this.findOutMoreButton.x = 147;
 
         return this.findOutMoreButton;
@@ -453,6 +482,7 @@ public class GuidancePanel extends Sprite {
     public function getAcceptButton():Sprite {
         return acceptButton;
     }
+
     public function getCancelButton():Sprite {
         return cancelButton;
     }

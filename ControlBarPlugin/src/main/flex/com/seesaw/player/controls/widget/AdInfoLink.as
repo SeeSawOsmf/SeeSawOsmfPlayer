@@ -1,28 +1,25 @@
 /*
- * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
- *
  * The contents of this file are subject to the Mozilla Public License
- * Version 1.1 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the
- * License athttp://www.mozilla.org/MPL/
+ *   Version 1.1 (the "License"); you may not use this file except in
+ *   compliance with the License. You may obtain a copy of the License at
+ *   http://www.mozilla.org/MPL/
  *
- * Software distributed under the License is distributed on an "AS IS"
- * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- * License for the specific language governing rights and limitations
- * under the License.
+ *   Software distributed under the License is distributed on an "AS IS"
+ *   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *   License for the specific language governing rights and limitations
+ *   under the License.
  *
- * The Initial Developer of the Original Code is ioko365 Ltd.
- * Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- * Incorporated. All Rights Reserved.
+ *   The Initial Developer of the Original Code is Arqiva Ltd.
+ *   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+ *   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+ * 	Systems Incorporated.
+ *   All Rights Reserved.
  *
- * The Initial Developer of the Original Code is ioko365 Ltd.
- * Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- * Incorporated. All Rights Reserved.
+ *   Contributor(s):  Adobe Systems Incorporated
  */
 
 package com.seesaw.player.controls.widget {
 import com.seesaw.player.ads.AdMetadata;
-import com.seesaw.player.ads.AdMode;
 import com.seesaw.player.external.PlayerExternalInterface;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.ui.PlayerToolTip;
@@ -119,7 +116,7 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
 
     private function updateFromAdMetadata():void {
         var adMetadata:AdMetadata = media.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
-        if (adMetadata && adMetadata.adMode == AdMode.AD) {
+        if (adMetadata) {
             interactiveAdvertisingUrl = adMetadata.clickThru;
             visible = interactiveAdvertisingUrl != null;
         }
@@ -140,7 +137,7 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
 
     private function pause():void {
         var playTrait:PlayTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
-        if(playTrait) {
+        if (playTrait) {
             playTrait.pause();
         }
     }

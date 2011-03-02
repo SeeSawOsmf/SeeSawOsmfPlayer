@@ -1,23 +1,23 @@
 /*
- * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
+ * Copyright 2011 ioko365 Ltd.  All Rights Reserved.
  *
- *    The contents of this file are subject to the Mozilla Public License
- *    Version 1.1 (the "License"); you may not use this file except in
- *    compliance with the License. You may obtain a copy of the
- *    License athttp://www.mozilla.org/MPL/
+ * The contents of this file are subject to the Mozilla Public License
+ * Version 1.1 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the
+ * License athttp://www.mozilla.org/MPL/
  *
- *    Software distributed under the License is distributed on an "AS IS"
- *    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- *    License for the specific language governing rights and limitations
- *    under the License.
+ * Software distributed under the License is distributed on an "AS IS"
+ * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ * License for the specific language governing rights and limitations
+ * under the License.
  *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
+ * The Initial Developer of the Original Code is ioko365 Ltd.
+ * Portions created by ioko365 Ltd are Copyright (C) 2011 ioko365 Ltd
+ * Incorporated. All Rights Reserved.
  *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
+ * The Initial Developer of the Original Code is ioko365 Ltd.
+ * Portions created by ioko365 Ltd are Copyright (C) 2011 ioko365 Ltd
+ * Incorporated. All Rights Reserved.
  */
 package com.seesaw.player.impl.services {
 import com.hurlant.crypto.symmetric.TripleDESKey;
@@ -33,7 +33,7 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 
 public class ResumeServiceImpl implements ResumeService {
-    
+
     private var logger:ILogger = LoggerFactory.getClassLogger(ResumeServiceImpl);
 
     private var _programmeId:String = "default";
@@ -48,11 +48,11 @@ public class ResumeServiceImpl implements ResumeService {
     }
 
     public function get programmeId():String {
-      return _programmeId;
+        return _programmeId;
     }
 
     public function set programmeId(value:String):void {
-      _programmeId = value;
+        _programmeId = value;
     }
 
     public function getResumeCookie():Number {
@@ -73,7 +73,7 @@ public class ResumeServiceImpl implements ResumeService {
         } catch (error:Error) {
             logger.error("could not write SharedObject to disk: " + error.message);
         }
-        
+
         if (flushStatus != null) {
             switch (flushStatus) {
                 case SharedObjectFlushStatus.PENDING:
@@ -114,6 +114,10 @@ public class ResumeServiceImpl implements ResumeService {
         var decryptedValue:String = data.readUTFBytes(data.length);
 
         return decryptedValue;
+    }
+
+    public function get resumable():Boolean {
+        return getResumeCookie() > 0;
     }
 }
 }

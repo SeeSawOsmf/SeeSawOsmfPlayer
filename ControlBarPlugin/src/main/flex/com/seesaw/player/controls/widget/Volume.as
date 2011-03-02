@@ -1,29 +1,29 @@
 /*
- * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
+ * The contents of this file are subject to the Mozilla Public License
+ *   Version 1.1 (the "License"); you may not use this file except in
+ *   compliance with the License. You may obtain a copy of the License at
+ *   http://www.mozilla.org/MPL/
  *
- *    The contents of this file are subject to the Mozilla Public License
- *    Version 1.1 (the "License"); you may not use this file except in
- *    compliance with the License. You may obtain a copy of the
- *    License athttp://www.mozilla.org/MPL/
+ *   Software distributed under the License is distributed on an "AS IS"
+ *   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *   License for the specific language governing rights and limitations
+ *   under the License.
  *
- *    Software distributed under the License is distributed on an "AS IS"
- *    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- *    License for the specific language governing rights and limitations
- *    under the License.
+ *   The Initial Developer of the Original Code is Arqiva Ltd.
+ *   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+ *   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+ * 	Systems Incorporated.
+ *   All Rights Reserved.
  *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
- *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
+ *   Contributor(s):  Adobe Systems Incorporated
  */
 
 package com.seesaw.player.controls.widget {
 import controls.seesaw.widget.interfaces.IWidget;
 
 import flash.events.MouseEvent;
+
+import flash.external.ExternalInterface;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -34,6 +34,9 @@ import org.osmf.traits.MediaTraitType;
 
 public class Volume extends ButtonWidget implements IWidget {
     private var logger:ILogger = LoggerFactory.getClassLogger(Volume);
+
+    public static const EXTERNAL_SET_COOKIE_FUNCTION_NAME:String = "SEESAW.Utils.setCookie";
+    public static const PLAYER_VOLUME_COOKIE:String = "seesaw.player.volume";
 
     public function Volume() {
     }
@@ -64,16 +67,28 @@ public class Volume extends ButtonWidget implements IWidget {
     }
 
     override protected function onMouseClick(event:MouseEvent):void {
+        logger.debug("MUTE CLICK");
         logger.debug("audible.volume = " + audible.volume);
         if (audible.volume != 0) {
             storedVolume = audible.volume;
             audible.volume = Math.min(0, 0);
             enabled = false;
+            this.setCookieVolume();
         } else {
             audible.volume = storedVolume;
             enabled = true;
+            this.setCookieVolume();
         }
+
         super.processEnabledChange();
+    }
+
+    private function setCookieVolume():void {
+        logger.debug("MUTE BUTTON SET COOKIE");
+        if (ExternalInterface.available) {
+            logger.debug("SET VOLUME COOKIE TO: " + (audible.volume * 10));
+            ExternalInterface.call(EXTERNAL_SET_COOKIE_FUNCTION_NAME, PLAYER_VOLUME_COOKIE, (audible.volume * 10), false, "/");
+        }
     }
 
     override protected function onMouseClick_internal(event:MouseEvent):void {

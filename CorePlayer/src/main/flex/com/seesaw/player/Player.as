@@ -1,23 +1,21 @@
 /*
- * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
+ * The contents of this file are subject to the Mozilla Public License
+ *   Version 1.1 (the "License"); you may not use this file except in
+ *   compliance with the License. You may obtain a copy of the License at
+ *   http://www.mozilla.org/MPL/
  *
- *    The contents of this file are subject to the Mozilla Public License
- *    Version 1.1 (the "License"); you may not use this file except in
- *    compliance with the License. You may obtain a copy of the
- *    License athttp://www.mozilla.org/MPL/
+ *   Software distributed under the License is distributed on an "AS IS"
+ *   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *   License for the specific language governing rights and limitations
+ *   under the License.
  *
- *    Software distributed under the License is distributed on an "AS IS"
- *    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- *    License for the specific language governing rights and limitations
- *    under the License.
+ *   The Initial Developer of the Original Code is Arqiva Ltd.
+ *   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+ *   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+ * 	Systems Incorporated.
+ *   All Rights Reserved.
  *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
- *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
+ *   Contributor(s):  Adobe Systems Incorporated
  */
 
 package com.seesaw.player {
@@ -26,6 +24,7 @@ import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.ads.AuditudeConstants;
 import com.seesaw.player.ads.LiverailConstants;
 import com.seesaw.player.autoresume.AutoResumeConstants;
+import com.seesaw.player.batcheventservices.BatchEventContants;
 import com.seesaw.player.buttons.PlayStartButton;
 import com.seesaw.player.external.PlayerExternalInterface;
 import com.seesaw.player.external.PlayerExternalInterfaceImpl;
@@ -46,6 +45,7 @@ import com.seesaw.player.panels.PosterFrame;
 import com.seesaw.player.preloader.Preloader;
 import com.seesaw.player.preventscrub.ScrubPreventionConstants;
 import com.seesaw.player.services.ResumeService;
+import com.seesaw.player.utils.HelperUtils;
 import com.seesaw.player.utils.ServiceRequest;
 
 import flash.display.LoaderInfo;
@@ -54,7 +54,11 @@ import flash.display.StageAlign;
 import flash.display.StageScaleMode;
 import flash.events.Event;
 import flash.external.ExternalInterface;
+import flash.net.URLRequest;
 import flash.net.URLVariables;
+import flash.net.navigateToURL;
+import flash.ui.ContextMenu;
+import flash.ui.ContextMenuItem;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -63,7 +67,6 @@ import org.osmf.logging.Log;
 import org.osmf.media.MediaPlayerState;
 import org.osmf.media.MediaResourceBase;
 import org.osmf.metadata.Metadata;
-import org.osmf.smil.SMILConstants;
 
 [SWF(width=PLAYER::Width, height=PLAYER::Height, backgroundColor="#000000")]
 public class Player extends Sprite {
@@ -96,9 +99,11 @@ public class Player extends Sprite {
     private var config:PlayerConfiguration;
     private var playButtonMode:String;
     private var errorPanel:NotAvailablePanel;
+    private var resumeService:ResumeService;
 
     private var testApi:TestApi;
     private var devConfig:XML;
+    private var playButton:PlayStartButton;
 
     public function Player() {
         super();
@@ -121,6 +126,14 @@ public class Player extends Sprite {
     private function onAddedToStage(event:Event):void {
         logger.debug("added to stage");
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+
+        if (PLAYER::V && PLAYER::BUILD_TIMESTAMP) {
+            var menu:ContextMenu = new ContextMenu();
+            menu.hideBuiltInItems();
+            menu.customItems.push(new ContextMenuItem("Version: " + PLAYER::V));
+            menu.customItems.push(new ContextMenuItem("Built: " + PLAYER::BUILD_TIMESTAMP));
+            contextMenu = menu;
+        }
 
         if (PLAYER::DEV_MODE) {
             loadDevConfiguration();
@@ -152,6 +165,7 @@ public class Player extends Sprite {
             xi.addGetGuidanceCallback(checkGuidance);
             xi.addGetCurrentItemTitleCallback(getCurrentItemTitle);
             xi.addGetCurrentItemDurationCallback(getCurrentItemDuration);
+            xi.addGetEntitlementCallback(getEntitlement);
             xi.addSetPlaylistCallback(setPlaylist);   /// todo this might not be needed anymore as the playlist is already set...
             // Let JS know we're ready to receive calls (e.g. C4 ad script):
             xi.callSWFInit(); /// noAdsCTA will call prematurely in this instance..
@@ -177,6 +191,18 @@ public class Player extends Sprite {
         return 0;
     }
 
+    private function getEntitlement():String {
+
+        var availability:XMLList = userInit.availability;
+
+        var JSONString:String = '{ "playerMessage": "' + availability.playerMessage + '", ' +
+                '"seriesEntitled": ' + availability.seriesEntitled + ', "isSubscriptionEntitled" : ' +
+                availability.subscriptionEntitled + ', "episodeEntitled" : ' + availability.episodeEntitled + ', ' +
+                '"available" : ' + availability.available + ', "showPreviewClip" : ' + availability.showPreviewClip + ', ' +
+                '"statusMessage" : "' + availability.statusMessage + '" }';
+        return JSONString;
+    }
+
     private function resetInitialisationStages():void {
         // sets the order of stuff to evaluate during initialisation
         initStages = new Vector.<Function>();
@@ -193,17 +219,21 @@ public class Player extends Sprite {
 
     private function showPosterFrame():void {
         //Play / resume / preview button
-        posterFrame = new PosterFrame(playerInit.largeImageUrl);
-        posterFrame.addEventListener(PosterFrame.LOADED, function(event:Event):void {
-            nextInitialisationStage();
-        });
+        if (posterFrame == null) {
+            posterFrame = new PosterFrame(playerInit.largeImageUrl);
+            posterFrame.addEventListener(PosterFrame.LOADED, function(event:Event):void {
+                nextInitialisationStage();
+            });
 
-        //if there is guidance, show the guidance bar
-        if (playerInit.guidance.length() > 0) {
-            guidanceBar = new GuidanceBar(playerInit.guidance.message);
-            posterFrame.addChild(guidanceBar);
+            //if there is guidance, show the guidance bar
+            if (playerInit.guidance.length() > 0) {
+                guidanceBar = new GuidanceBar(playerInit.guidance.message);
+                posterFrame.addChild(guidanceBar);
+            }
+            addChild(posterFrame);
+        } else {
+            nextInitialisationStage();
         }
-        addChild(posterFrame);
     }
 
     private function removePosterFrame():void {
@@ -215,9 +245,11 @@ public class Player extends Sprite {
     private function showPlayPanel():void {
         // if playButtonMode is null, this indicates that the user has no entitlement to play the video
         if (playButtonMode != null) {
-            // assume the resume overrides other play button modes
-            var mode:String = getResumePosition() > 0 ? PlayStartButton.RESUME : playButtonMode;
-            var playButton:PlayStartButton = new PlayStartButton(mode);
+            if (resumeService.resumable) {
+                playButtonMode = userInit.availability.svodPlayable == "true" ?
+                        PlayStartButton.RESUME_SVOD : PlayStartButton.RESUME;
+            }
+            playButton = new PlayStartButton(playButtonMode);
             playButton.addEventListener(PlayStartButton.PROCEED, onNextInitialisationState);
             addChild(playButton);
         }
@@ -234,50 +266,65 @@ public class Player extends Sprite {
     }
 
     private function showGuidancePanel():void {
+        getEntitlement();
         if (playerInit.tvAgeRating && playerInit.tvAgeRating >= 16 && playerInit.guidance) {
             if (guidanceBar) {
                 guidanceBar.visible = false;
             }
-
-            if (ExternalInterface.available) {
-                var hashedPassword:String = ParentalControlsPanel.getHashedPassword();
-                logger.debug("COOKIE PASSWORD: " + hashedPassword);
+            if (userInit.ageBlockUrl.toString()) {
+                logger.debug("URL: " + userInit.ageBlockUrl.toString());
+                var request:URLRequest = new URLRequest(userInit.ageBlockUrl);
+                try {
+                    navigateToURL(request, "_self");
+                } catch (e:Error) {
+                    trace("Error occurred!");
+                }
+                return;
             }
+            if (userInit.showGuidance == true) {
 
-            var assetType:String = "programme";
+                if (ExternalInterface.available) {
+                    var hashedPassword:String = ParentalControlsPanel.getHashedPassword();
+                    logger.debug("COOKIE PASSWORD: " + hashedPassword);
+                }
 
-            if (playerInit.guidance.type != "tv" && playerInit.guidance.type != "TV") {
-                assetType = "film";
-            }
+                var assetType:String = "programme";
 
-            if (hashedPassword) {
-                var parentalControlsPanel:ParentalControlsPanel = new ParentalControlsPanel(
-                        hashedPassword,
-                        playerInit.guidance.message,
-                        assetType,
-                        playerInit.guidance.age,
-                        playerInit.parentalControls.parentalControlsPageURL,
-                        playerInit.parentalControls.whatsThisLinkURL
-                        );
+                if (playerInit.guidance.type != "tv" && playerInit.guidance.type != "TV") {
+                    assetType = "film";
+                }
 
-                parentalControlsPanel.addEventListener(ParentalControlsPanel.PARENTAL_CHECK_PASSED, onNextInitialisationState);
-                parentalControlsPanel.addEventListener(ParentalControlsPanel.PARENTAL_CHECK_FAILED, onResetInitialisationState);
+                if (hashedPassword) {
+                    var parentalControlsPanel:ParentalControlsPanel = new ParentalControlsPanel(
+                            hashedPassword,
+                            playerInit.guidance.message,
+                            assetType,
+                            playerInit.guidance.age,
+                            playerInit.parentalControls.parentalControlsPageURL,
+                            playerInit.parentalControls.whatsThisLinkURL
+                            );
 
-                addChild(parentalControlsPanel);
+                    parentalControlsPanel.addEventListener(ParentalControlsPanel.PARENTAL_CHECK_PASSED, onNextInitialisationState);
+                    parentalControlsPanel.addEventListener(ParentalControlsPanel.PARENTAL_CHECK_FAILED, onResetInitialisationState);
+
+                    addChild(parentalControlsPanel);
+                } else {
+                    var guidancePanel:GuidancePanel = new GuidancePanel(
+                            playerInit.guidance.message,
+                            assetType,
+                            playerInit.guidance.age,
+                            playerInit.parentalControls.parentalControlsPageURL,
+                            playerInit.parentalControls.whatsThisLinkURL,
+                            playerInit.parentalControls.termsAndConditionsLinkURL
+                            );
+
+                    guidancePanel.addEventListener(GuidancePanel.GUIDANCE_ACCEPTED, onNextInitialisationState);
+                    guidancePanel.addEventListener(GuidancePanel.GUIDANCE_DECLINED, onResetInitialisationState);
+
+                    addChild(guidancePanel);
+                }
             } else {
-                var guidancePanel:GuidancePanel = new GuidancePanel(
-                        playerInit.guidance.message,
-                        assetType,
-                        playerInit.guidance.age,
-                        playerInit.parentalControls.parentalControlsPageURL,
-                        playerInit.parentalControls.whatsThisLinkURL,
-                        playerInit.parentalControls.termsAndConditionsLinkURL
-                        );
-
-                guidancePanel.addEventListener(GuidancePanel.GUIDANCE_ACCEPTED, onNextInitialisationState);
-                guidancePanel.addEventListener(GuidancePanel.GUIDANCE_DECLINED, onResetInitialisationState);
-
-                addChild(guidancePanel);
+                nextInitialisationStage();
             }
 
         }
@@ -332,6 +379,9 @@ public class Player extends Sprite {
             else if (availability.availabilityType == "AVOD") {
                 playButtonMode = PlayStartButton.PLAY;
             }
+            else if (availability.availabilityType == "SVOD" && availability.noAdsPlayable == "true") {
+                playButtonMode = PlayStartButton.PLAY;
+            }
         }
         // Note that if none of the conditions above are met, we should not show
         // the play button at all.  Leave playButtonMode as null in this case.
@@ -356,7 +406,8 @@ public class Player extends Sprite {
         playerInit = xmlDoc;
         setupExternalInterface();
 
-        ///adModulePlayableEvaluation
+        resumeService.programmeId = playerInit.programmeId;
+
         if (playerInit.adMode != AdMetadata.CHANNEL_4_AD_TYPE) {
             resetInitialisationStages();
             nextInitialisationStage();
@@ -387,6 +438,7 @@ public class Player extends Sprite {
         // we need to evaluate if ads are not required for SVOD, TVOD and NO_ADS and adjust the
         // adMode which is then persisted as metaData
         playerInit.adMode[0] = adModulePlayableEvaluation();
+        playerInit.preview[0] = userInit.preview;
 
         if (videoInfo.geoblocked == "true") {
             var geoBlockPanel:GeoBlockPanel = new GeoBlockPanel();
@@ -417,18 +469,14 @@ public class Player extends Sprite {
     private function loadVideo(content:MediaResourceBase):void {
         logger.debug("loading video");
 
-        if (videoPlayer) {
-            logger.debug("destroying existing player");
-            removeChild(videoPlayer);
-            videoPlayer = null;
-        }
+        destroyPlayer();
 
         logger.debug("creating player");
 
         //var config:PlayerConfiguration = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, content);
         config = new PlayerConfiguration(PLAYER_WIDTH, PLAYER_HEIGHT, content);
         videoPlayer = new SeeSawPlayer(config);
-        videoPlayer.addEventListener(PlayerConstants.DESTROY, reBuildPlayer);
+        videoPlayer.addEventListener(PlayerConstants.REINITIALISE_PLAYER, onReinitialisePlayer);
         videoPlayer.mediaPlayer.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onMediaPlayerStateChange);
 
         // Since we have autoPlay to false for liverail, we need to manually call play for C4:
@@ -441,7 +489,7 @@ public class Player extends Sprite {
         }
 
         removePosterFrame();
-
+        removeChild(playButton);
         addChild(videoPlayer);
 
         videoPlayer.init();
@@ -466,8 +514,17 @@ public class Player extends Sprite {
         }
     }
 
-    private function reBuildPlayer(event:Event):void {
-        onAddedToStage(event);
+    private function onReinitialisePlayer(event:Event):void {
+        // reload the page to re-initialise the player
+        xi.reload();
+    }
+
+    private function destroyPlayer():void {
+        if (videoPlayer) {
+            logger.debug("destroying player");
+            removeChild(videoPlayer);
+            videoPlayer = null;
+        }
     }
 
     private function createMediaResource(videoInfo:XML):MediaResourceBase {
@@ -477,47 +534,54 @@ public class Player extends Sprite {
         var metadata:Metadata = new Metadata();
         metadata.addValue(PlayerConstants.CONTENT_INFO, playerInit);
         metadata.addValue(PlayerConstants.VIDEO_INFO, videoInfo);
+        metadata.addValue(PlayerConstants.USER_INFO, userInit);
         resource.addMetadataValue(PlayerConstants.METADATA_NAMESPACE, metadata);
 
-        metadata = new Metadata();
-        metadata.addValue(SMILConstants.SMIL_DOCUMENT, videoInfo.smil);
-        resource.addMetadataValue(SMILConstants.SMIL_METADATA_NS, metadata);
+        var resumePosition:Number = getResumePosition();
 
         metadata = new Metadata();
         resource.addMetadataValue(ScrubPreventionConstants.SETTINGS_NAMESPACE, metadata);
 
+        if (!HelperUtils.getBoolean(playerInit.preview)) {
+            metadata = new Metadata();
+            resource.addMetadataValue(AutoResumeConstants.SETTINGS_NAMESPACE, metadata);
+        }
+
         metadata = new Metadata();
-        resource.addMetadataValue(AutoResumeConstants.SETTINGS_NAMESPACE, metadata);
+        resource.addMetadataValue(BatchEventContants.SETTINGS_NAMESPACE, metadata);
 
-        if (playerInit && playerInit.adMode == LiverailConstants.AD_MODE_ID) {
-            metadata = new Metadata();
-            metadata.addValue(LiverailConstants.VERSION, playerInit.liverail.version);
-            metadata.addValue(LiverailConstants.PUBLISHER_ID, playerInit.liverail.publisherId);
-            metadata.addValue(LiverailConstants.CONFIG_OBJECT, new LiverailConfig(playerInit));
-            metadata.addValue(LiverailConstants.RESUME_POSITION, getResumePosition());
-            metadata.addValue(LiverailConstants.ADMANAGER_URL, LiverailConstants.LIVERAIL_PLUGIN_URL);
-            resource.addMetadataValue(LiverailConstants.SETTINGS_NAMESPACE, metadata);
-        } else if (playerInit && playerInit.adMode == AuditudeConstants.AD_MODE_ID) {
-            metadata = new Metadata();
+        if (playerInit && !HelperUtils.getBoolean(playerInit.preview)) {
+            if (playerInit.adMode == LiverailConstants.AD_MODE_ID) {
+                metadata = new Metadata();
+                metadata.addValue(LiverailConstants.VERSION, playerInit.liverail.version);
+                metadata.addValue(LiverailConstants.PUBLISHER_ID, playerInit.liverail.publisherId);
+                metadata.addValue(LiverailConstants.CONFIG_OBJECT, new LiverailConfig(playerInit, resumePosition));
+                metadata.addValue(LiverailConstants.RESUME_POSITION, resumePosition);
+                metadata.addValue(LiverailConstants.ADMANAGER_URL, LiverailConstants.LIVERAIL_PLUGIN_URL);
+                resource.addMetadataValue(LiverailConstants.SETTINGS_NAMESPACE, metadata);
+            } else if (playerInit.adMode == AuditudeConstants.AD_MODE_ID) {
+                metadata = new Metadata();
 
-            // the following 4 keys are required attributes for the Auditude plug-in
-            // a) version: version of auditude plug-in
-            // b) domain: adserver domain
-            // c) zone-id: zone id assigned by Auditude
-            // d) media-id: The video id of the currently playing content
-            metadata.addValue(AuditudeOSMFConstants.VERSION, "adunitv2-1.0");
-            metadata.addValue(AuditudeOSMFConstants.DOMAIN, "sandbox.auditude.com");
-            metadata.addValue(AuditudeOSMFConstants.ZONE_ID, 1947);
-            metadata.addValue(AuditudeOSMFConstants.MEDIA_ID, "GcE_e7ewtw2lMJVbDEJClpllo6mVJXSb"); //playerInit.programmeId
 
-            // pass the mediaplayer instance to Auditude. This is required to listen for audio and content progress updates
-            //metadata.addValue(AuditudeOSMFConstants.PLAYER_INSTANCE, videoPlayer.mediaPlayer());
+                metadata.addValue(AuditudeOSMFConstants.VERSION, playerInit.auditude.version);
+                metadata.addValue(AuditudeOSMFConstants.DOMAIN, playerInit.auditude.domain);
+                metadata.addValue(AuditudeOSMFConstants.ZONE_ID, playerInit.auditude.zoneId);
+                metadata.addValue(AuditudeOSMFConstants.MEDIA_ID, playerInit.auditude.mediaId);
 
-            // any additional metadata can be passed to the Auditude plug-in through this key.
-            metadata.addValue(AuditudeOSMFConstants.USER_DATA, null);
+                // any additional metadata can be passed to the Auditude plug-in through this key.
+                metadata.addValue(AuditudeOSMFConstants.USER_DATA, null);
 
-            metadata.addValue(AuditudeConstants.RESUME_POSITION, getResumePosition());
-            resource.addMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE, metadata)
+                // Disable postrolls
+                metadata.addValue(AuditudeOSMFConstants.DISABLE_POST_ROLL, true);
+
+                // Set up resume
+                if (resumePosition > 0) {
+                    metadata.addValue(AuditudeOSMFConstants.RESUME_TIME_IN_SECONDS, resumePosition);
+                    metadata.addValue(AuditudeOSMFConstants.SKIP_BREAKS_BEFORE_RESUME_TIME, true);
+                }
+
+                resource.addMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE, metadata)
+            }
         }
 
         return resource;
@@ -546,7 +610,7 @@ public class Player extends Sprite {
     private function registerServices():void {
         logger.debug("registering services");
         var provider:ObjectProvider = ObjectProvider.getInstance();
-        provider.register(ResumeService, new ResumeServiceImpl());
+        provider.register(ResumeService, resumeService = new ResumeServiceImpl());
         provider.register(PlayerExternalInterface, new PlayerExternalInterfaceImpl());
     }
 
@@ -559,8 +623,6 @@ public class Player extends Sprite {
     }
 
     private function getResumePosition():Number {
-        var resumeService:ResumeService = ObjectProvider.getInstance().getObject(ResumeService);
-        resumeService.programmeId = playerInit.programmeId;
         return resumeService.getResumeCookie();
     }
 

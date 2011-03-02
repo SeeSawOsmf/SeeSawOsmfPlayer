@@ -1,23 +1,21 @@
 /*
- * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
+ * The contents of this file are subject to the Mozilla Public License
+ *   Version 1.1 (the "License"); you may not use this file except in
+ *   compliance with the License. You may obtain a copy of the License at
+ *   http://www.mozilla.org/MPL/
  *
- *    The contents of this file are subject to the Mozilla Public License
- *    Version 1.1 (the "License"); you may not use this file except in
- *    compliance with the License. You may obtain a copy of the
- *    License athttp://www.mozilla.org/MPL/
+ *   Software distributed under the License is distributed on an "AS IS"
+ *   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *   License for the specific language governing rights and limitations
+ *   under the License.
  *
- *    Software distributed under the License is distributed on an "AS IS"
- *    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- *    License for the specific language governing rights and limitations
- *    under the License.
+ *   The Initial Developer of the Original Code is Arqiva Ltd.
+ *   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+ *   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+ * 	Systems Incorporated.
+ *   All Rights Reserved.
  *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
- *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
+ *   Contributor(s):  Adobe Systems Incorporated
  */
 
 package com.seesaw.player.panels {
@@ -51,19 +49,19 @@ public class OverUsePanel extends Sprite {
 
     private var nonStopTitle:String = "<b>We're sorry...</b><br>You've exceeded your maximum daily viewing allowance for NonStop.";
     private var nonStopText:String = "Your NonStop subscription is for individual use only. " +
-        "This means you can watch programmes without adverts for a maximum of 24 hours a day. See our " +
-        "<a href='event:"+termsAndConditionsLinkURL+"'><font color=\"#00A88E\">Terms and Conditions.</font></a>" +
-        "<br>" +
-        "<br>" +
-        "Would you like to continue watching programmes with adverts?";
+            "This means you can watch programmes without adverts for a maximum of 24 hours a day. See our " +
+            "<a href='event:" + termsAndConditionsLinkURL + "'><font color=\"#00A88E\">Terms and Conditions.</font></a>" +
+            "<br>" +
+            "<br>" +
+            "Would you like to continue watching programmes with adverts?";
 
     private var subsTitle:String = "<b>We're sorry...</b><br>You've now exceeded the maximum daily viewing allowance for this Pack.";
 
     private var subsText:String = "Your subscription is for individual use only. This means you can watch programmes" +
-        " in this Pack for a maximum of 24 hours a day. See our " +
-        "<a href='event:"+termsAndConditionsLinkURL+"'><font color=\"#00A88E\">Terms and Conditions.</font></a>" +
-        "<br>";
-    
+            " in this Pack for a maximum of 24 hours a day. See our " +
+            "<a href='event:" + termsAndConditionsLinkURL + "'><font color=\"#00A88E\">Terms and Conditions.</font></a>" +
+            "<br>";
+
     //components which need tooltips
     private var acceptButton:Sprite = new Sprite();
     private var cancelButton:Sprite = new Sprite();
@@ -174,7 +172,7 @@ public class OverUsePanel extends Sprite {
             contentContainer.addChild(this.buildAcceptButton("Accept"));
             contentContainer.addChild(this.buildDeclineButton("Decline"));
         } else {
-            contentContainer.addChild(this.buildOkButton("Ok"));            
+            contentContainer.addChild(this.buildOkButton("Ok"));
         }
         panel.addChild(contentContainer);
 
@@ -420,6 +418,7 @@ public class OverUsePanel extends Sprite {
     public function getAcceptButton():Sprite {
         return acceptButton;
     }
+
     public function getCancelButton():Sprite {
         return cancelButton;
     }

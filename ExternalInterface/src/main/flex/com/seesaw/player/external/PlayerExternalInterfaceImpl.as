@@ -1,23 +1,21 @@
 /*
- * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
- *
  * The contents of this file are subject to the Mozilla Public License
- * Version 1.1 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the
- * License athttp://www.mozilla.org/MPL/
+ *   Version 1.1 (the "License"); you may not use this file except in
+ *   compliance with the License. You may obtain a copy of the License at
+ *   http://www.mozilla.org/MPL/
  *
- * Software distributed under the License is distributed on an "AS IS"
- * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- * License for the specific language governing rights and limitations
- * under the License.
+ *   Software distributed under the License is distributed on an "AS IS"
+ *   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *   License for the specific language governing rights and limitations
+ *   under the License.
  *
- * The Initial Developer of the Original Code is ioko365 Ltd.
- * Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- * Incorporated. All Rights Reserved.
+ *   The Initial Developer of the Original Code is Arqiva Ltd.
+ *   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+ *   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+ * 	Systems Incorporated.
+ *   All Rights Reserved.
  *
- * The Initial Developer of the Original Code is ioko365 Ltd.
- * Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- * Incorporated. All Rights Reserved.
+ *   Contributor(s):  Adobe Systems Incorporated
  */
 
 package com.seesaw.player.external {
@@ -57,6 +55,10 @@ public class PlayerExternalInterfaceImpl implements PlayerExternalInterface {
         addCallback(ExternalInterfaceConstants.GET_CURRENT_ITEM_DURATION, callback);
     }
 
+    public function addGetEntitlementCallback(callback:Function):void {
+        addCallback(ExternalInterfaceConstants.GET_ENTITLEMENT, callback);
+    }
+
     public function addHideDogCallback(callback:Function):void {
         addCallback(ExternalInterfaceConstants.SHOW_DOG, callback);
     }
@@ -75,14 +77,20 @@ public class PlayerExternalInterfaceImpl implements PlayerExternalInterface {
             ExternalInterface.addCallback(name, callback);
         }
     }
-    public function baynoteVideoTrack():void{
-          call(ExternalInterfaceConstants.BAYNOTE_VIDEO_TRACKER);
+
+    public function baynoteVideoTrack():void {
+        call(ExternalInterfaceConstants.BAYNOTE_VIDEO_TRACKER);
     }
+
     private function call(...args) {
         if (available) {
             logger.debug("calling {0}", args[0].toString());
             ExternalInterface.call.apply(null, args);
         }
+    }
+
+    public function reload():void {
+        call(ExternalInterfaceConstants.RELOAD);
     }
 }
 }

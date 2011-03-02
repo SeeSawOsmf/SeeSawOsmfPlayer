@@ -1,23 +1,21 @@
 /*
- * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
+ * The contents of this file are subject to the Mozilla Public License
+ *   Version 1.1 (the "License"); you may not use this file except in
+ *   compliance with the License. You may obtain a copy of the License at
+ *   http://www.mozilla.org/MPL/
  *
- *    The contents of this file are subject to the Mozilla Public License
- *    Version 1.1 (the "License"); you may not use this file except in
- *    compliance with the License. You may obtain a copy of the
- *    License athttp://www.mozilla.org/MPL/
+ *   Software distributed under the License is distributed on an "AS IS"
+ *   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *   License for the specific language governing rights and limitations
+ *   under the License.
  *
- *    Software distributed under the License is distributed on an "AS IS"
- *    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- *    License for the specific language governing rights and limitations
- *    under the License.
+ *   The Initial Developer of the Original Code is Arqiva Ltd.
+ *   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+ *   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+ * 	Systems Incorporated.
+ *   All Rights Reserved.
  *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
- *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
+ *   Contributor(s):  Adobe Systems Incorporated
  */
 
 package com.seesaw.player.buttons {
@@ -41,6 +39,7 @@ public class PlayStartButton extends Sprite {
     public static const PLAY_SUBSCRIBED:String = "playSubscribed";
     public static const PREVIEW:String = "preview";
     public static const RESUME:String = "resume";
+    public static const RESUME_SVOD:String = "resumeSVOD";
 
 
     // Requested button type - play, resume or preview
@@ -58,6 +57,9 @@ public class PlayStartButton extends Sprite {
     [Embed(source="resources/resumePreplayButton.png")]
     private var resumeButtonImageEmbed:Class;
     private var resumeButtonImage:Bitmap = new resumeButtonImageEmbed();
+    [Embed(source="resources/resumePreplayButtonS.png")]
+    private var resumeSVODButtonImageEmbed:Class;
+    private var resumeSVODButtonImage:Bitmap = new resumeSVODButtonImageEmbed();
     [Embed(source="resources/Player_Preview.png")]
     private var previewButtonImageEmbed:Class;
     private var previewButtonImage:Bitmap = new previewButtonImageEmbed();
@@ -118,6 +120,10 @@ public class PlayStartButton extends Sprite {
                 proceedButton.addChild(this.resumeButtonImage);
                 this.toolTip = new PlayerToolTip(this, "Resume");
                 break;
+            case "resumeSVOD":
+                proceedButton.addChild(this.resumeSVODButtonImage);
+                this.toolTip = new PlayerToolTip(this, "Resume");
+                break;
             default:
                 // setting an invalid button type is a coding error so throw an exception
                 throw new ArgumentError("button type not recognised: " + buttonType);
@@ -134,7 +140,7 @@ public class PlayStartButton extends Sprite {
         return proceedButton;
     }
 
-    private function onProceedClick(event:MouseEvent=null):void {
+    private function onProceedClick(event:MouseEvent = null):void {
         this.visible = false;
         this.dispatchEvent(new Event(PROCEED));
     }

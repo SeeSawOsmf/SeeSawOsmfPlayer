@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  ~ The contents of this file are subject to the Mozilla Public License
+  ~   Version 1.1 (the "License"); you may not use this file except in
+  ~   compliance with the License. You may obtain a copy of the License at
+  ~   http://www.mozilla.org/MPL/
+  ~
+  ~   Software distributed under the License is distributed on an "AS IS"
+  ~   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+  ~   License for the specific language governing rights and limitations
+  ~   under the License.
+  ~
+  ~   The Initial Developer of the Original Code is Arqiva Ltd.
+  ~   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+  ~   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+  ~ 	Systems Incorporated.
+  ~   All Rights Reserved.
+  ~
+  ~   Contributor(s):  Adobe Systems Incorporated
+  -->
+
+<contentInfo xmlns:ns2="http://www.w3.org/ns/SMIL" xmlns="http://www.seesaw.com/api/contentinfo/v1.0">
+    <primaryGenre>TV:FACTUAL:ADVENTURE_AND_EXPLORATION</primaryGenre>
+    <sourceId>BBC_WORLDWIDE</sourceId>
+    <firstPresentationBrand>BBC</firstPresentationBrand>
+    <brandId>dd3e18e4-7817-4744-a252-b1fdb2669770</brandId>
+    <brandTitle>Ray Mears' Wild Food</brandTitle>
+    <seriesId>25928</seriesId>
+    <seriesTitle>Ray Mears' Wild Foods</seriesTitle>
+    <programmeId>ABEA638J-04</programmeId>
+    <programmeTitle>Summer Harvest</programmeTitle>
+    <tvAgeRating>0</tvAgeRating>
+    <duration>3529</duration>
+    <adRule>NEVER</adRule>
+    <catchup>false</catchup>
+    <loggingSheet>
+        <break>
+            <breakOffset>00:15:48.64</breakOffset>
+            <resumeOffset>00:15:48.68</resumeOffset>
+            <data>RSTRCT=NONE</data>
+        </break>
+        <break>
+            <breakOffset>00:32:15.24</breakOffset>
+            <resumeOffset>00:32:15.28</resumeOffset>
+            <data>RSTRCT=NONE</data>
+        </break>
+        <break>
+            <breakOffset>00:45:11.80</breakOffset>
+            <resumeOffset>00:45:11.84</resumeOffset>
+            <data>RSTRCT=NONE</data>
+        </break>
+    </loggingSheet>
+    <parentalControls>
+        <parentalControlsPageURL>http://localhost:8080/ParentalControls</parentalControlsPageURL>
+        <termsAndConditionsLinkURL>http://localhost:8080/TermsAndConditions</termsAndConditionsLinkURL>
+        <helpSectionLinkURL>http://localhost:8080/help/watchingtv/aboutparentalcontrols</helpSectionLinkURL>
+        <lostPinLinkURL>http://localhost:8080/technicalproblems/parental</lostPinLinkURL>
+        <whatsThisLinkURL>http://localhost:8080/help/watchingtv/aboutparentalcontrols</whatsThisLinkURL>
+    </parentalControls>
+    <unavailablePageUrl>http://localhost:8080/unavailable</unavailablePageUrl>
+    <videoInfoUrl>../src/test/resources/videoInfo.tvod.xml</videoInfoUrl>
+    <largeImageUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/i/ccp/00000178/17883.jpg</largeImageUrl>
+    <batchEventUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player/initinfo:registerbatchevent?t:ac=26772
+    </batchEventUrl>
+    <playIntervalEventUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player/initinfo:playintervalevent?t:ac=26772
+    </playIntervalEventUrl>
+    <adMode>liverail</adMode>
+    <liverail>
+        <version>4.1</version>
+        <publisherId>1332</publisherId>
+    </liverail>
+    <programme>25931</programme>
+</contentInfo>

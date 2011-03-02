@@ -1,28 +1,24 @@
 /*
-* Copyright 2010 ioko365 Ltd.  All Rights Reserved.
-*
-*    The contents of this file are subject to the Mozilla Public License
-*    Version 1.1 (the "License"); you may not use this file except in
-*    compliance with the License. You may obtain a copy of the
-*    License athttp://www.mozilla.org/MPL/
-*
-*    Software distributed under the License is distributed on an "AS IS"
-*    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
-*    License for the specific language governing rights and limitations
-*    under the License.
-*
-*    The Initial Developer of the Original Code is ioko365 Ltd.
-*    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
-*    Incorporated. All Rights Reserved.
-*
-*    The Initial Developer of the Original Code is ioko365 Ltd.
-*    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
-*    Incorporated. All Rights Reserved.
-*/
+ * The contents of this file are subject to the Mozilla Public License
+ *   Version 1.1 (the "License"); you may not use this file except in
+ *   compliance with the License. You may obtain a copy of the License at
+ *   http://www.mozilla.org/MPL/
+ *
+ *   Software distributed under the License is distributed on an "AS IS"
+ *   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *   License for the specific language governing rights and limitations
+ *   under the License.
+ *
+ *   The Initial Developer of the Original Code is Arqiva Ltd.
+ *   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+ *   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+ * 	Systems Incorporated.
+ *   All Rights Reserved.
+ *
+ *   Contributor(s):  Adobe Systems Incorporated
+ */
 
 package com.seesaw.player.panels {
-import com.seesaw.player.ui.StyledTextField;
-
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.system.Security;
@@ -46,8 +42,7 @@ public class GeoBlockPanel extends Sprite {
     public function GeoBlockPanel() {
 
         //set the private variables
-        this.guidanceWarning = "<p><font color='#FFFFFF'>We're sorry...</font></p><br /><p><font color='#FFFFFF'>You need to be located in the UK to watch programmes on SeeSaw. This is because we haven't been given permission by the programme makers and rights holders to show the content outside of the UK.</p><br /><p>If you're located in the UK and think that you've received this message in error, there may be a problem with your Internet Service Provider (ISP).</font></p>";
-        this.findOutMore = "<font color='#00A88E'><a href='/help'>Find out more</a></font>.";
+        this.guidanceWarning = "<p><font color='#FFFFFF'>We're sorry...</font></p><br /><p><font color='#FFFFFF'>You need to be located in the UK to watch programmes on SeeSaw. This is because we haven't been given permission by the programme makers and rights holders to show the content outside of the UK.</p><br /><p>If you're located in the UK and think that you've received this message in error, there may be a problem with your Internet Service Provider (ISP). </font><font color='#00A88E'><a href='/help'>Find out more</a></font>.</p>";
         Security.allowDomain("*");
         super();
 
@@ -88,7 +83,6 @@ public class GeoBlockPanel extends Sprite {
 
         var contentContainer:Sprite = this.buildContentContainer();
         contentContainer.addChild(this.buildWarning());
-        contentContainer.addChild(this.buildFindOutMoreLink());
 
         panel.addChild(contentContainer);
 
@@ -113,7 +107,7 @@ public class GeoBlockPanel extends Sprite {
         //the x and y of this container are the equivalent to padding in CSS
         contentContainer.x = 20;
         contentContainer.y = 20;
-        
+
         return contentContainer;
     }
 
@@ -133,41 +127,10 @@ public class GeoBlockPanel extends Sprite {
         return warningLabel;
     }
 
-    private function buildFindOutMoreLink():TextField {
-        var findOutMoreLink = new TextField();
-        findOutMoreLink.width = 90;
-        findOutMoreLink.height = 20;
-        findOutMoreLink.wordWrap = true;
-        findOutMoreLink.htmlText = this.findOutMore;
-        //warningLabel.styleSheet = this.css;
-        findOutMoreLink.x = 34;
-        findOutMoreLink.y = 187;
-
-        this.applyLinkFormat(findOutMoreLink);
-        //var formattedWarningLabel:TextField = this.applyWarningFormat(warningLabel);
-
-        return findOutMoreLink;
-    }
-
     private function applyWarningFormat(textToFormat:TextField):TextField {
         var textFormat:TextFormat = new TextFormat();
         textFormat.size = 12;
         textFormat.font = "Arial";
-        textFormat.color = 0xFFFFFF;
-        textFormat.align = "left";
-        textFormat.leading = 3;
-
-        textToFormat.setTextFormat(textFormat);
-
-        return textToFormat;
-
-    }
-
-    private function applyLinkFormat(textToFormat:TextField):TextField {
-        var textFormat:TextFormat = new TextFormat();
-        textFormat.size = 12;
-        textFormat.font = "Arial";
-        textFormat.color = 0x00A88E;
         textFormat.align = "left";
         textFormat.leading = 3;
 
@@ -185,5 +148,5 @@ public class GeoBlockPanel extends Sprite {
     }
 
 }
- 
+
 }

@@ -1,108 +1,127 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <artifactId>player</artifactId>
-    <groupId>com.seesaw</groupId>
-    <version>7.0.0-SNAPSHOT</version>
-  </parent>
-  <artifactId>IntegrationTests</artifactId>
-  <packaging>swc</packaging>
-  <name>IntegrationTests</name>
-  <build>
-    <sourceDirectory>src/main/flex</sourceDirectory>
-    <testSourceDirectory>src/test/flex</testSourceDirectory>
-    <plugins>
-      <plugin>
-        <groupId>org.sonatype.flexmojos</groupId>
-        <artifactId>flexmojos-maven-plugin</artifactId>
-        <configuration>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-  <dependencies>
-    <dependency>
-      <groupId>com.adobe.flex.framework</groupId>
-      <artifactId>flex-framework</artifactId>
-      <version>${flex.sdk.version}</version>
-      <type>pom</type>
-      <exclusions>
-        <exclusion>
-          <artifactId>osmf</artifactId>
-          <groupId>com.adobe.flex.framework</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.osmf</groupId>
-      <artifactId>osmf</artifactId>
-      <type>swc</type>
-    </dependency>
-    <dependency>
-      <groupId>org.as3commons</groupId>
-      <artifactId>as3commons-logging</artifactId>
-      <type>swc</type>
-    </dependency>
-    <dependency>
-      <groupId>com.adobe.flexunit</groupId>
-      <artifactId>flexunit</artifactId>
-      <version>4.0-rc-1</version>
-      <type>swc</type>
-    </dependency>
-      <dependency>
-  <groupId>junit</groupId>
-  <artifactId>junit</artifactId>
-  <version>3.8.2</version>
-          <scope>test</scope>
+<!--
+  ~ The contents of this file are subject to the Mozilla Public License
+  ~   Version 1.1 (the "License"); you may not use this file except in
+  ~   compliance with the License. You may obtain a copy of the License at
+  ~   http://www.mozilla.org/MPL/
+  ~
+  ~   Software distributed under the License is distributed on an "AS IS"
+  ~   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+  ~   License for the specific language governing rights and limitations
+  ~   under the License.
+  ~
+  ~   The Initial Developer of the Original Code is Arqiva Ltd.
+  ~   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+  ~   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+  ~ 	Systems Incorporated.
+  ~   All Rights Reserved.
+  ~
+  ~   Contributor(s):  Adobe Systems Incorporated
+  -->
 
-  </dependency>
-<dependency>
-<groupId>org.seleniumhq.selenium</groupId>
-<artifactId>selenium-server</artifactId>
-<version>1.0.3</version>
-<scope>test</scope>
-</dependency>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>player</artifactId>
+        <groupId>com.seesaw</groupId>
+        <version>7.0.0</version>
+    </parent>
+    <artifactId>IntegrationTests</artifactId>
+    <packaging>swc</packaging>
+    <name>IntegrationTests</name>
+    <build>
+        <sourceDirectory>src/main/flex</sourceDirectory>
+        <testSourceDirectory>src/test/flex</testSourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.sonatype.flexmojos</groupId>
+                <artifactId>flexmojos-maven-plugin</artifactId>
+                <configuration>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>com.adobe.flex.framework</groupId>
+            <artifactId>flex-framework</artifactId>
+            <version>${flex.sdk.version}</version>
+            <type>pom</type>
+            <exclusions>
+                <exclusion>
+                    <artifactId>osmf</artifactId>
+                    <groupId>com.adobe.flex.framework</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.osmf</groupId>
+            <artifactId>osmf</artifactId>
+            <type>swc</type>
+        </dependency>
+        <dependency>
+            <groupId>org.as3commons</groupId>
+            <artifactId>as3commons-logging</artifactId>
+            <type>swc</type>
+        </dependency>
+        <dependency>
+            <groupId>com.adobe.flexunit</groupId>
+            <artifactId>flexunit</artifactId>
+            <version>4.0-rc-1</version>
+            <type>swc</type>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.2</version>
+            <scope>test</scope>
 
-<dependency>
-<groupId>org.seleniumhq.selenium</groupId>
-<artifactId>selenium-java-client-driver</artifactId>
-<version>1.0.1</version>
-<scope>test</scope>
-</dependency>
+        </dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-server</artifactId>
+            <version>1.0.3</version>
+            <scope>test</scope>
+        </dependency>
 
-<dependency>
-<groupId>org.flashselenium</groupId>
-<artifactId>flashselenium-java-client-extension</artifactId>
-<version>1.0</version>
-</dependency>
-<dependency>
-<groupId>org.flashselenium</groupId>
-<artifactId>flashselenium</artifactId>
-<version>1.0</version>
-</dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java-client-driver</artifactId>
+            <version>1.0.1</version>
+            <scope>test</scope>
+        </dependency>
 
-      <dependency>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>jetty</artifactId>
-                <version>6.1.7</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>jetty-servlet-tester</artifactId>
-                <version>6.1.7</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>maven-jetty-plugin</artifactId>
-                <version>6.1.22</version>
-                <scope>test</scope>
-            </dependency>
+        <dependency>
+            <groupId>org.flashselenium</groupId>
+            <artifactId>flashselenium-java-client-extension</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flashselenium</groupId>
+            <artifactId>flashselenium</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jetty</artifactId>
+            <version>6.1.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jetty-servlet-tester</artifactId>
+            <version>6.1.7</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>maven-jetty-plugin</artifactId>
+            <version>6.1.22</version>
+            <scope>test</scope>
+        </dependency>
 
 
-
-   
-  </dependencies>
+    </dependencies>
 </project>

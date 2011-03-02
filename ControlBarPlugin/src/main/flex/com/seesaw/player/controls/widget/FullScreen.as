@@ -1,27 +1,25 @@
 /*
- * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
+ * The contents of this file are subject to the Mozilla Public License
+ *   Version 1.1 (the "License"); you may not use this file except in
+ *   compliance with the License. You may obtain a copy of the License at
+ *   http://www.mozilla.org/MPL/
  *
- *    The contents of this file are subject to the Mozilla Public License
- *    Version 1.1 (the "License"); you may not use this file except in
- *    compliance with the License. You may obtain a copy of the
- *    License athttp://www.mozilla.org/MPL/
+ *   Software distributed under the License is distributed on an "AS IS"
+ *   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *   License for the specific language governing rights and limitations
+ *   under the License.
  *
- *    Software distributed under the License is distributed on an "AS IS"
- *    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- *    License for the specific language governing rights and limitations
- *    under the License.
+ *   The Initial Developer of the Original Code is Arqiva Ltd.
+ *   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+ *   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+ * 	Systems Incorporated.
+ *   All Rights Reserved.
  *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
- *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
+ *   Contributor(s):  Adobe Systems Incorporated
  */
 
 package com.seesaw.player.controls.widget {
-import com.seesaw.player.controls.ControlBarMetadata;
+import com.seesaw.player.controls.ControlBarConstants;
 import com.seesaw.player.ui.PlayerToolTip;
 import com.seesaw.player.ui.StyledTextField;
 
@@ -71,12 +69,12 @@ public class FullScreen extends ButtonWidget implements IWidget {
     override public function set media(value:MediaElement):void {
         super.media = value;
         if (media) {
-            metadata = media.getMetadata(ControlBarMetadata.CONTROL_BAR_METADATA);
+            metadata = media.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
             if (metadata == null) {
                 metadata = new Metadata();
-                media.addMetadata(ControlBarMetadata.CONTROL_BAR_METADATA, metadata);
+                media.addMetadata(ControlBarConstants.CONTROL_BAR_METADATA, metadata);
             }
-            metadata.addValue(ControlBarMetadata.FULL_SCREEN, false);
+            metadata.addValue(ControlBarConstants.FULL_SCREEN, false);
         }
     }
 
@@ -84,6 +82,8 @@ public class FullScreen extends ButtonWidget implements IWidget {
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
         stage.addChild(toolTip);
         stage.addEventListener(FullScreenEvent.FULL_SCREEN, onFullScreen);
+        //stage.doubleClickEnabled = true;
+        //stage.addEventListener(MouseEvent.DOUBLE_CLICK, onDoubleClick);
     }
 
     private function onMouseOver(event:MouseEvent):void {
@@ -92,6 +92,12 @@ public class FullScreen extends ButtonWidget implements IWidget {
 
     private function onMouseOut(event:MouseEvent):void {
         formatLabelFont();
+    }
+
+    private function onDoubleClick(event:MouseEvent):void {
+        if (stage) {
+            setFullScreen(stage.displayState == StageDisplayState.NORMAL);
+        }
     }
 
     override protected function get requiredTraits():Vector.<String> {
@@ -138,7 +144,7 @@ public class FullScreen extends ButtonWidget implements IWidget {
             fullScreenLabel.text = FULLSCREEN_LABEL;
             toolTip.updateToolTip(FULLSCREEN_LABEL);
         }
-        metadata.addValue(ControlBarMetadata.FULL_SCREEN, event.fullScreen);
+        metadata.addValue(ControlBarConstants.FULL_SCREEN, event.fullScreen);
     }
 
     public function get classDefinition():String {

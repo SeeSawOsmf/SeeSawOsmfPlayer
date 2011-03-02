@@ -1,26 +1,27 @@
 /*
- * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
+ * The contents of this file are subject to the Mozilla Public License
+ *   Version 1.1 (the "License"); you may not use this file except in
+ *   compliance with the License. You may obtain a copy of the License at
+ *   http://www.mozilla.org/MPL/
  *
- *    The contents of this file are subject to the Mozilla Public License
- *    Version 1.1 (the "License"); you may not use this file except in
- *    compliance with the License. You may obtain a copy of the
- *    License athttp://www.mozilla.org/MPL/
+ *   Software distributed under the License is distributed on an "AS IS"
+ *   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *   License for the specific language governing rights and limitations
+ *   under the License.
  *
- *    Software distributed under the License is distributed on an "AS IS"
- *    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- *    License for the specific language governing rights and limitations
- *    under the License.
+ *   The Initial Developer of the Original Code is Arqiva Ltd.
+ *   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+ *   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+ * 	Systems Incorporated.
+ *   All Rights Reserved.
  *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
- *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
+ *   Contributor(s):  Adobe Systems Incorporated
  */
 
 package com.seesaw.player.autoresume {
+import com.seesaw.player.ads.AdBreak;
+import com.seesaw.player.ads.AdMetadata;
+import com.seesaw.player.ads.AdState;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.services.ResumeService;
 
@@ -32,10 +33,12 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ProxyElement;
 import org.osmf.events.MediaElementEvent;
+import org.osmf.events.MetadataEvent;
 import org.osmf.events.PlayEvent;
 import org.osmf.events.SeekEvent;
 import org.osmf.events.TimeEvent;
 import org.osmf.media.MediaElement;
+import org.osmf.metadata.Metadata;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.PlayTrait;
@@ -45,7 +48,7 @@ import org.osmf.traits.TimeTrait;
 public class AutoResumeProxy extends ProxyElement {
 
     private static const TIMER_UPDATE_INTERVAL:int = 30000;
-    private static const MIN_INTERVAL_BETWEEN_WRITE:int = 5;
+    private static const MIN_INTERVAL_BETWEEN_WRITE:int = 1;
 
     private var logger:ILogger = LoggerFactory.getClassLogger(AutoResumeProxy);
 
@@ -54,11 +57,8 @@ public class AutoResumeProxy extends ProxyElement {
     private var timeTrait:TimeTrait;
 
     private var resumeService:ResumeService;
-
-    private var currentPositionTimer:Timer;
-    private var seeking:Boolean;
-    private var lastResume:Number = 0.0;
-    private var seekTime:Number = 0.0;
+    private var timer:Timer;
+    private var seekTime:Number;
 
     public function AutoResumeProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -70,32 +70,87 @@ public class AutoResumeProxy extends ProxyElement {
             throw ArgumentError("no resume service implementation provided");
         }
 
-        currentPositionTimer = new Timer(TIMER_UPDATE_INTERVAL);
-        currentPositionTimer.addEventListener(TimerEvent.TIMER, onTimerTick);
+        timer = new Timer(TIMER_UPDATE_INTERVAL);
+        timer.addEventListener(TimerEvent.TIMER, onTimerTick);
     }
 
     public override function set proxiedElement(element:MediaElement):void {
         if (element) {
-            if(proxiedElement) {
-                proxiedElement.removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
-                proxiedElement.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
+            if (proxiedElement) {
+                removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
+                removeEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
+                removeEventListener(MediaElementEvent.METADATA_ADD, onMetadataAdd);
+                removeEventListener(MediaElementEvent.METADATA_REMOVE, onMetadataRemove);
             }
 
             super.proxiedElement = element;
 
-            proxiedElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
-            proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
+            addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
+            addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
+            addEventListener(MediaElementEvent.METADATA_ADD, onMetadataAdd);
+            addEventListener(MediaElementEvent.METADATA_REMOVE, onMetadataRemove);
+
+            var adMetadata:AdMetadata = getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+            if (adMetadata) {
+                setupAdEventListener(adMetadata, true);
+            }
+        }
+    }
+
+    private function isAdBreakAtTime(time:Number):Boolean {
+        var result:Boolean = false;
+        var adMetadata:AdMetadata = getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+        if (!isNaN(time) && adMetadata) {
+            var adBreak:AdBreak = adMetadata.getAdBreakWithTime(time);
+            result = adBreak != null;
+        }
+        return result;
+    }
+
+    private function setupAdEventListener(metadata:Metadata, add:Boolean):void {
+        if (add) {
+            metadata.addEventListener(MetadataEvent.VALUE_ADD, onAdMetadataChange);
+            metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdMetadataChange);
+            metadata.addEventListener(MetadataEvent.VALUE_REMOVE, onAdMetadataChange);
+        }
+        else {
+            metadata.removeEventListener(MetadataEvent.VALUE_ADD, onAdMetadataChange);
+            metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onAdMetadataChange);
+            metadata.removeEventListener(MetadataEvent.VALUE_REMOVE, onAdMetadataChange);
+        }
+    }
+
+    private function onMetadataRemove(event:MediaElementEvent):void {
+        if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
+            setupAdEventListener(event.metadata, false);
+        }
+    }
+
+    private function onMetadataAdd(event:MediaElementEvent):void {
+        if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
+            setupAdEventListener(event.metadata, true);
+        }
+    }
+
+    private function onAdMetadataChange(event:MetadataEvent):void {
+        if (event.key == AdMetadata.AD_STATE) {
+            // If the ad break started but did not complete then we need to write a resume
+            // point slightly before so that the break is triggered again when the user returns.
+            // Otherwise place the resume point slightly ahead of the break so that it is not triggered again.
+            if (event.value == AdState.AD_BREAK_START)
+                writeResumePosition(timeTrait.currentTime - 0.1);
+            else if (event.value == AdState.AD_BREAK_COMPLETE)
+                writeResumePosition(timeTrait.currentTime + 0.1);
         }
     }
 
     private function onDurationChange(event:TimeEvent):void {
-        if (!currentPositionTimer.running) {
-            currentPositionTimer.start();
+        if (!timer.running) {
+            timer.start();
         }
     }
 
     private function onSeekingChange(event:SeekEvent):void {
-        seeking = event.seeking;
         seekTime = event.time;
     }
 
@@ -106,57 +161,45 @@ public class AutoResumeProxy extends ProxyElement {
     private function onPlayStateChanged(event:PlayEvent):void {
         switch (event.playState) {
             case PlayState.PAUSED:
-                currentPositionTimer.stop();
-                if (!seeking) {
-                    // if the user has simply paused but this pause is not triggered by a seek
-                    // then write a resume cookie
-                    writeResumePosition();
-                }
+                timer.stop();
                 break;
             case PlayState.PLAYING:
-                if (seeking) {
-                    // we have reached the end of a seek and the video is playing again
-                    // so write a resume cookie at this point
-                    writeResumePosition();
+                // If we've been seeking write a resume point when playing again
+                if (!isNaN(seekTime) && seekTime > 0) {
+                    writeResumePosition(seekTime);
+                    seekTime = NaN;
                 }
-                seeking = false;
-                currentPositionTimer.start();
+                timer.start();
                 break;
             case PlayState.STOPPED:
-                currentPositionTimer.stop();
+                timer.stop();
                 // reset the resume point to the start
-                resumeService.writeResumeCookie(0.0);
+                resumeService.writeResumeCookie(0);
                 break;
         }
     }
 
     private function seekToResumePosition():void {
         var resume:Number = resumeService.getResumeCookie();
-        if (seekTrait && seekTrait.canSeekTo(resume)) {
+        if (resume > 0 && seekTrait && seekTrait.canSeekTo(resume)) {
+            logger.debug("seeking to resume point at: {0}", resume);
             seekTrait.seek(resume);
-            lastResume = resume;
         }
     }
 
     private function onTimerTick(event:Event = null):void {
-        if (playTrait && playTrait.playState == PlayState.PLAYING) {
+        if (timeTrait && playTrait && playTrait.playState == PlayState.PLAYING) {
             // if the video is playing attempt to write at TIMER_UPDATE_INTERVAL intervals
-            writeResumePosition();
+            writeResumePosition(timeTrait.currentTime);
         }
     }
 
-    private function writeResumePosition():void {
-        if (timeTrait && seekTrait && seekTrait.canSeekTo(timeTrait.currentTime)) {
-            // there should be at least MIN_INTERVAL_BETWEEN_WRITE seconds difference between the new resume point 
-            // and the old
-            if (Math.abs(timeTrait.currentTime - lastResume) > MIN_INTERVAL_BETWEEN_WRITE) {
-                var time:Number = seeking ? seekTime : timeTrait.currentTime;
-                if (time > 0) {
-                    logger.debug("recording resume point at: " + time);
-                    resumeService.writeResumeCookie(time);
-                    lastResume = time;
-                }
-            }
+    private function writeResumePosition(time:Number):void {
+        // Don't write resume points exactly on ad breaks since the resume points have to be
+        // offset from ad breaks a little depending on whether the break has been seen or not
+        if (time > 0 && !isAdBreakAtTime(time)) {
+            logger.debug("recording resume point at: {0}", time);
+            resumeService.writeResumeCookie(time);
         }
     }
 

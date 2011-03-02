@@ -1,23 +1,21 @@
 /*
- * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
+ * The contents of this file are subject to the Mozilla Public License
+ *   Version 1.1 (the "License"); you may not use this file except in
+ *   compliance with the License. You may obtain a copy of the License at
+ *   http://www.mozilla.org/MPL/
  *
- *    The contents of this file are subject to the Mozilla Public License
- *    Version 1.1 (the "License"); you may not use this file except in
- *    compliance with the License. You may obtain a copy of the
- *    License athttp://www.mozilla.org/MPL/
+ *   Software distributed under the License is distributed on an "AS IS"
+ *   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *   License for the specific language governing rights and limitations
+ *   under the License.
  *
- *    Software distributed under the License is distributed on an "AS IS"
- *    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- *    License for the specific language governing rights and limitations
- *    under the License.
+ *   The Initial Developer of the Original Code is Arqiva Ltd.
+ *   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+ *   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+ * 	Systems Incorporated.
+ *   All Rights Reserved.
  *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
- *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
+ *   Contributor(s):  Adobe Systems Incorporated
  */
 
 package com.seesaw.player.liverail {
@@ -32,18 +30,18 @@ public class LiverailConfig extends Configuration {
     private var genres:Array;
     private var ageRating:int;
     private var adSlots:int = 0;
+    private var resumePoint:Number;
 
     use namespace contentinfo;
 
-    public function LiverailConfig(contentInfoXml:XML) {
+    public function LiverailConfig(contentInfoXml:XML, resumePoint:Number = 0) {
         contentInfo = contentInfoXml as XML;
+        this.resumePoint = resumePoint;
         generateMap();
         createConfig();
     }
 
     public override function generateMap():void {
-        var autoResumePoint:Number = 0;
-
         liveRailAdMap = "";
         liveRailTags = "";
 
@@ -72,7 +70,7 @@ public class LiverailConfig extends Configuration {
                     case "break":
                         if (item.breakOffset != null) {
                             var pos:Number = convertDuration(item.breakOffset);
-                            if (!(pos < autoResumePoint)) {
+                            if (!(pos < resumePoint)) {
 
                                 liveRailAdMap += "in::" + pos.toString();
 
@@ -89,8 +87,8 @@ public class LiverailConfig extends Configuration {
             }
 
             //hardcode the preroll if not exist in string already
-            if (!liveRailAdMap.match("in::0")) {
-                liveRailAdMap = "in::0;" + liveRailAdMap + "in::100%;";
+            if (resumePoint <= 0 && !liveRailAdMap.match("in::0")) {
+                liveRailAdMap = "in::0;" + liveRailAdMap;
                 totalAdPositions.push(0);
             }
 
@@ -162,6 +160,7 @@ public class LiverailConfig extends Configuration {
             "LR_BUMPER_PREROLL_PRE_HIGH" :    "default"   ,
             "LR_BUMPER_PREROLL_PRE_LOW" :    "default"    ,
             "LR_BUMPER_PREROLL_PRE_MED" :    "default"   ,
+            "LR_ALLOWDUPLICATES"        :    true,
             "LR_LAYOUT_LINEAR_PAUSEONCLICKTHRU" :    false  ,
             "LR_LAYOUT_SKIN_ID" :    1 ,
             "LR_PARTNERS" :    "SHERBET" ,

@@ -1,23 +1,21 @@
 /*
- * Copyright 2010 ioko365 Ltd.  All Rights Reserved.
+ * The contents of this file are subject to the Mozilla Public License
+ *   Version 1.1 (the "License"); you may not use this file except in
+ *   compliance with the License. You may obtain a copy of the License at
+ *   http://www.mozilla.org/MPL/
  *
- *    The contents of this file are subject to the Mozilla Public License
- *    Version 1.1 (the "License"); you may not use this file except in
- *    compliance with the License. You may obtain a copy of the
- *    License athttp://www.mozilla.org/MPL/
+ *   Software distributed under the License is distributed on an "AS IS"
+ *   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ *   License for the specific language governing rights and limitations
+ *   under the License.
  *
- *    Software distributed under the License is distributed on an "AS IS"
- *    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- *    License for the specific language governing rights and limitations
- *    under the License.
+ *   The Initial Developer of the Original Code is Arqiva Ltd.
+ *   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+ *   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+ * 	Systems Incorporated.
+ *   All Rights Reserved.
  *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
- *
- *    The Initial Developer of the Original Code is ioko365 Ltd.
- *    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
- *    Incorporated. All Rights Reserved.
+ *   Contributor(s):  Adobe Systems Incorporated
  */
 
 package uk.co.vodco.osmfDebugProxy {
@@ -138,8 +136,15 @@ public class DebugProxyElement extends ProxyElement {
 
     private function onSwitchingChange(event:DynamicStreamEvent):void {
         var trait:DynamicStreamTrait = getTrait(MediaTraitType.DYNAMIC_STREAM) as DynamicStreamTrait;
-        if (trait && trait.switching) {
-            logger.debug("Switching dynamic stream: bitrate = {0}", trait.getBitrateForIndex(trait.currentIndex));
+        if (trait) {
+            if (trait.switching) {
+                logger.debug("Switching dynamic stream from bitrate = {0}",
+                        trait.getBitrateForIndex(trait.currentIndex));
+            }
+            else {
+                logger.debug("Completed dynamic stream switch to bitrate = {0}",
+                        trait.getBitrateForIndex(trait.currentIndex));
+            }
         }
     }
 
@@ -232,6 +237,7 @@ public class DebugProxyElement extends ProxyElement {
             if (added) {
                 buffer.addEventListener(BufferEvent.BUFFER_TIME_CHANGE, onBufferTimeChange);
                 buffer.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
+
             }
             else {
                 buffer.removeEventListener(BufferEvent.BUFFER_TIME_CHANGE, onBufferTimeChange);
@@ -241,11 +247,11 @@ public class DebugProxyElement extends ProxyElement {
     }
 
     private function onBufferingChange(event:BufferEvent):void {
-        logger.debug("On Buffering Change:{0}", event.buffering);
+        logger.debug("On Buffering Change: Buffering {0} Length: {1}", event.buffering, event.currentTarget.bufferLength);
     }
 
     private function onBufferTimeChange(event:BufferEvent):void {
-        logger.debug("On Buffer Time Change:{0}", event.bufferTime);
+//        logger.debug("On Buffer Time Change: Time {0} Length:{1}", event.bufferTime, event.currentTarget.bufferLength);
     }
 
     private function togglePlayListeners(added:Boolean):void {
@@ -282,7 +288,7 @@ public class DebugProxyElement extends ProxyElement {
     }
 
     private function onSeekingChange(event:SeekEvent):void {
-          logger.debug("On Seek Change:{0}", event.seeking);
+        logger.debug("On Seek Change:{0}", event.seeking);
     }
 
     private function toggleTimeListeners(added:Boolean):void {
