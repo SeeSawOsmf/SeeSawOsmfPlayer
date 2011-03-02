@@ -67,7 +67,8 @@ public class BatchEventServices extends ProxyElement {
     use namespace contentinfo;
 
     private static const CUMULATIVE_DURATION_MONITOR_TIMER_DELAY_INTERVAL = 500;
-    private static const CUMULATIVE_DURATION_FLUSH_DELAY_INTERVAL:int = 300000;
+    private static const CUMULATIVE_DURATION_FLUSH_TIMER_MAX = 300000;
+    private static const CUMULATIVE_DURATION_FLUSH_DELAY_INTERVAL:int = 10000;
 
     private var userEventId:int = 0;
     private var contentEventId:int = 0;
@@ -120,6 +121,7 @@ public class BatchEventServices extends ProxyElement {
     private var userEventMetadata:Metadata;
     private var adBreaks:Vector.<AdBreak>;
     private var timeTrait:TimeTrait;
+    private var cumulativeFlushCounter:int;
 
     public function BatchEventServices(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -407,7 +409,11 @@ public class BatchEventServices extends ProxyElement {
 
 
     private function onTimerTick(event:TimerEvent):void {
-        eventsManager.flushCumulativeDuration(new CumulativeDurationEvent(programmeId, transactionItemId));
+        cumulativeFlushCounter += CUMULATIVE_DURATION_FLUSH_DELAY_INTERVAL;
+        if(cumulativeFlushCounter == CUMULATIVE_DURATION_FLUSH_TIMER_MAX){
+            cumulativeFlushCounter = 0;
+            eventsManager.flushCumulativeDuration(new CumulativeDurationEvent(programmeId, transactionItemId));
+        }
     }
 
     private function onBufferingChange(event:BufferEvent):void {
@@ -613,6 +619,7 @@ public class BatchEventServices extends ProxyElement {
 
     private function exitEvent():void {
         eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.EXIT));
+        eventsManager.flushAll();
     }
 
     private function evaluateContentViewingSeqNum():int {

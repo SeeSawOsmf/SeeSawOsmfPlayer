@@ -165,7 +165,7 @@ public class ContentEvent {
     }
 
     public function get getEventOccured():Date {
-        return new Date();
+        return eventOccured;
     }
 
     public function get getIsOverlayInteractive():Boolean {

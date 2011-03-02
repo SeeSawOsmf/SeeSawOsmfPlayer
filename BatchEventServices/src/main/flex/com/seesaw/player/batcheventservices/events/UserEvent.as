@@ -26,12 +26,14 @@ public class UserEvent {
     private var cumulativeViewDuration:int;
     private var eventType:String;
     private var _programmeId:int;
+    private var eventOccured:Date;
 
     public function UserEvent(userEventId:int, cumulativeViewDuration:int, eventType:String, programmeId:int) {
         this._programmeId = programmeId;
         this.userEventId = userEventId;
         this.cumulativeViewDuration = cumulativeViewDuration;
         this.eventType = eventType;
+        this.eventOccured = new Date();
     }
 
     public function get getUserEventId():int {
@@ -47,7 +49,7 @@ public class UserEvent {
     }
 
     public function get getEventOccured():Date {
-        return new Date();
+        return eventOccured;
     }
 
     public function get getProgrammeId():int {
