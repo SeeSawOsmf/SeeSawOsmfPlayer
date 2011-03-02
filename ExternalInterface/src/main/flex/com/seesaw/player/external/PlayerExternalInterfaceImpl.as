@@ -88,5 +88,9 @@ public class PlayerExternalInterfaceImpl implements PlayerExternalInterface {
             ExternalInterface.call.apply(null, args);
         }
     }
+
+    public function reload():void {
+        call(ExternalInterfaceConstants.RELOAD);
+    }
 }
 }

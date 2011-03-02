@@ -358,7 +358,7 @@ public class BatchEventServices extends ProxyElement {
     private function onAdsMetaDataChange(event:MetadataEvent):void {
         if (event.key == AdMetadata.AD_STATE || event.key == AdMetadata.AD_MODE) {
             AdMetaEvaluation(event.value);
-        }else if (event.key == AdMetadata.AD_BREAKS) {
+        } else if (event.key == AdMetadata.AD_BREAKS) {
             adBreaks = event.key as Vector.<AdBreak>;
         } else {
             AdMetaEvaluation(event.key);
@@ -578,11 +578,8 @@ public class BatchEventServices extends ProxyElement {
     }
 
     private function onComplete(event:TimeEvent):void {
-        if (playingMainContent && evaluateMainContentCount == sectionCount) {
-            eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.END));
-            eventsManager.flushAll();
-            playerMetadata.addValue(PlayerConstants.REINITIALISE_PLAYER, true);   //// main content has finished so we need to reInit the Player... This might not be the best location for this event, but we can look at moving it in the future.
-        }
+        eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.END));
+        eventsManager.flushAll();
     }
 
     private function get evaluateMainContentCount():int {
@@ -596,7 +593,7 @@ public class BatchEventServices extends ProxyElement {
                 }
             }
 
-        }else{
+        } else {
             currentSection = 1;
         }
         return currentSection;
@@ -654,7 +651,8 @@ public class BatchEventServices extends ProxyElement {
     private function buildAndReturnContentEvent(contentType:String):ContentEvent {
         return new ContentEvent(isPopupInteractive, mainAssetId, new Date(), isOverlayInteractive, contentViewingSequenceNumber, incrementAndGetContentEventId(), campaignId, cumulativeDurationCount, userEventId, cumulativeDurationCount, contentType, currentAdBreakSequenceNumber, contentUrl);
     }
-        private function buildAndReturnMainContentEvent(contentType:String):ContentEvent {
+
+    private function buildAndReturnMainContentEvent(contentType:String):ContentEvent {
         return new ContentEvent(isPopupInteractive, mainAssetId, new Date(), isOverlayInteractive, evaluateMainContentCount, incrementAndGetContentEventId(), campaignId, cumulativeDurationCount, userEventId, cumulativeDurationCount, contentType, currentAdBreakSequenceNumber, contentUrl);
     }
 }
