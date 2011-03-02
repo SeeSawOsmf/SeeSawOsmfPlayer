@@ -562,15 +562,11 @@ public class Player extends Sprite {
             } else if (playerInit.adMode == AuditudeConstants.AD_MODE_ID) {
                 metadata = new Metadata();
 
-                // the following 4 keys are required attributes for the Auditude plug-in
-                // a) version: version of auditude plug-in
-                // b) domain: adserver domain
-                // c) zone-id: zone id assigned by Auditude
-                // d) media-id: The video id of the currently playing content
-                metadata.addValue(AuditudeOSMFConstants.VERSION, "adunitv2-1.0");
-                metadata.addValue(AuditudeOSMFConstants.DOMAIN, "auditude.com");
-                metadata.addValue(AuditudeOSMFConstants.ZONE_ID, 9575);
-                metadata.addValue(AuditudeOSMFConstants.MEDIA_ID, "717670423001"); //playerInit.programmeId
+
+                metadata.addValue(AuditudeOSMFConstants.VERSION, playerInit.auditude.version);
+                metadata.addValue(AuditudeOSMFConstants.DOMAIN, playerInit.auditude.domain);
+                metadata.addValue(AuditudeOSMFConstants.ZONE_ID, playerInit.auditude.zoneId);
+                metadata.addValue(AuditudeOSMFConstants.MEDIA_ID, playerInit.auditude.mediaId);
 
                 // any additional metadata can be passed to the Auditude plug-in through this key.
                 metadata.addValue(AuditudeOSMFConstants.USER_DATA, null);
