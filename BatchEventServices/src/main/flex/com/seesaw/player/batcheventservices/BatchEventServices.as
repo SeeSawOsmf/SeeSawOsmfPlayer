@@ -619,7 +619,7 @@ public class BatchEventServices extends ProxyElement {
 
     private function exitEvent():void {
         eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.EXIT));
-        eventsManager.flushAll();
+        eventsManager.flushExitEvent();
     }
 
     private function evaluateContentViewingSeqNum():int {
