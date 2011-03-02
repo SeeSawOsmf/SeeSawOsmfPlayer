@@ -72,7 +72,9 @@ public class MainContentElement extends ParallelElement {
         }
 
         for each (var adBreak:AdBreak in adBreaks) {
-            timelineMetadata.addMarker(new CuePoint(CuePointType.EVENT, adBreak.startTime, AdMetadata.AD_BREAK_CUE, adBreak));
+            if(!adBreak.complete)
+                timelineMetadata.addMarker(
+                        new CuePoint(CuePointType.EVENT, adBreak.startTime, AdMetadata.AD_BREAK_CUE, adBreak));
         }
     }
 

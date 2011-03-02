@@ -60,7 +60,6 @@ public class ButtonWidget extends Widget {
     //
 
     private function onMouseOver(event:MouseEvent):void {
-        logger.debug("MOUSE OVER");
         mouseOver = true;
         setFace(enabled ? down : disabled);
     }

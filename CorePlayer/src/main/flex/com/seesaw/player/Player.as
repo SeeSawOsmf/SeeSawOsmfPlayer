@@ -245,7 +245,7 @@ public class Player extends Sprite {
     private function showPlayPanel():void {
         // if playButtonMode is null, this indicates that the user has no entitlement to play the video
         if (playButtonMode != null) {
-            if (resumeService.resumable) {
+            if (playButtonMode != PlayStartButton.PREVIEW && resumeService.resumable) {
                 playButtonMode = userInit.availability.svodPlayable == "true" ?
                         PlayStartButton.RESUME_SVOD : PlayStartButton.RESUME;
             }

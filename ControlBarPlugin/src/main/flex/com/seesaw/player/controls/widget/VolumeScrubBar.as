@@ -64,7 +64,6 @@ public class VolumeScrubBar extends Widget implements IWidget {
     //
 
     override public function layout(availableWidth:Number, availableHeight:Number, deep:Boolean = true):void {
-        logger.debug("VOLUMESCRUB layout");
         if (lastWidth != availableWidth || lastHeight != availableHeight) {
             lastWidth = availableWidth;
             lastHeight = availableHeight;
