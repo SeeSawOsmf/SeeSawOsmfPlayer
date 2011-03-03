@@ -32,6 +32,8 @@ public class PlayerConstants {
     public static const CONTENT_TYPE:String = "contentType";
     public static const SUBTITLE_LOCATION:String = "subtitleLocation";
     public static const REINITIALISE_PLAYER:String = "destroyPlayer";
+    public static const BUFFER_MESSAGE_SHOW:String = "bufferMessageShow";
+    public static const BUFFER_MESSAGE_HIDE:String = "bufferMessageHide";
 
     public static const MAIN_CONTENT_ID:String = "mainContent";
     public static const AD_CONTENT_ID:String = "advert";

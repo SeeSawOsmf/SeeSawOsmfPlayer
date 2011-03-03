@@ -89,7 +89,6 @@ import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.PlayTrait;
 import org.osmf.traits.TimeTrait;
-
 import org.osmf.traits.TraitEventDispatcher;
 
 import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
@@ -418,7 +417,20 @@ public class SeeSawPlayer extends Sprite {
     private function createBufferingPanel():void {
         //Create the Buffering Panel
         bufferingPanel = new BufferingPanel(bufferingContainer);
+        bufferingPanel.addEventListener(PlayerConstants.BUFFER_MESSAGE_HIDE, updateBufferMetaData)
+        bufferingPanel.addEventListener(PlayerConstants.BUFFER_MESSAGE_SHOW, updateBufferMetaData);
         bufferingContainer.addMediaElement(bufferingPanel);
+    }
+
+    private function updateBufferMetaData(event:Event):void {
+        var metadata:Metadata = userEventMetaData as Metadata;
+        if(metadata){
+          if(event.type == PlayerConstants.BUFFER_MESSAGE_SHOW){
+              metadata.addValue(PlayerConstants.BUFFER_MESSAGE_SHOW, true);
+          }else if(event.type == PlayerConstants.BUFFER_MESSAGE_HIDE){
+              metadata.addValue(PlayerConstants.BUFFER_MESSAGE_SHOW, false);
+          }
+        }
     }
 
     private function onBufferingChange(event:BufferEvent):void {
@@ -427,6 +439,16 @@ public class SeeSawPlayer extends Sprite {
         } else {
             bufferingPanel.hide();
         }
+    }
+
+    private function get userEventMetaData():Metadata{
+        var playerMetadata:Metadata = config.resource.getMetadataValue(PlayerConstants.METADATA_NAMESPACE) as Metadata;
+        var metadata:Metadata = playerMetadata.getValue(PlayerConstants.USEREVENTS_METADATA_NAMESPACE);
+        if(!metadata){
+            metadata = new Metadata();
+            playerMetadata.addValue(PlayerConstants.USEREVENTS_METADATA_NAMESPACE, metadata);
+        }
+        return metadata;
     }
 
     private function createSubtitleElement():void {
@@ -669,13 +691,10 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function generateUserEventMetadata(event:MetadataEvent):void {
-        var playerMetadata:Metadata = config.resource.getMetadataValue(PlayerConstants.METADATA_NAMESPACE) as Metadata;
-        var metadata:Metadata = playerMetadata.getValue(PlayerConstants.USEREVENTS_METADATA_NAMESPACE);
-        if(!metadata){
-            metadata = new Metadata();
-            playerMetadata.addValue(PlayerConstants.USEREVENTS_METADATA_NAMESPACE, metadata);
+        var metadata:Metadata = userEventMetaData as Metadata;
+        if(metadata){
+              metadata.addValue(event.key, event.value);
         }
-        metadata.addValue(event.key, event.value);
     }
 
     private function updateSubtitlePosition():void {

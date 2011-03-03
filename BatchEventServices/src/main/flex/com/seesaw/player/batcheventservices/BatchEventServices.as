@@ -43,7 +43,6 @@ import flash.utils.Timer;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ProxyElement;
-import org.osmf.events.BufferEvent;
 import org.osmf.events.DynamicStreamEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MetadataEvent;
@@ -53,7 +52,6 @@ import org.osmf.events.TimeEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.metadata.Metadata;
 import org.osmf.net.StreamingURLResource;
-import org.osmf.traits.BufferTrait;
 import org.osmf.traits.DynamicStreamTrait;
 import org.osmf.traits.LoadTrait;
 import org.osmf.traits.MediaTraitType;
@@ -281,6 +279,8 @@ public class BatchEventServices extends ProxyElement {
             if (event.value == "paused") {
                 userEventType = UserEventTypes.PAUSE;
             }
+        } else if (event.key == PlayerConstants.BUFFER_MESSAGE_SHOW && event.value) {
+            eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.BUFFERING));
         }
         if (userEventType != null) {
             eventsManager.addUserEvent(buildAndReturnUserEvent(userEventType));
@@ -426,17 +426,6 @@ public class BatchEventServices extends ProxyElement {
         eventsManager.flushAll();
     }
 
-    private function onBufferingChange(event:BufferEvent):void {
-        if (playingMainContent) {
-            if (event.buffering) {
-                tooSlowTimer = new Timer(2500, 1);
-                tooSlowTimer.start();
-                tooSlowTimer.addEventListener(TimerEvent.TIMER_COMPLETE, bufferShowEvent);
-            } else {
-                tooSlowTimer.stop();
-            }
-        }
-    }
 
     private function bufferShowEvent(event:TimerEvent):void {
         eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.BUFFERING));
@@ -444,9 +433,6 @@ public class BatchEventServices extends ProxyElement {
 
     private function processTrait(traitType:String, added:Boolean):void {
         switch (traitType) {
-            case MediaTraitType.BUFFER:
-                toggleBufferListeners(added);
-                break;
             case MediaTraitType.SEEK:
                 toggleSeekListeners(added);
                 break;
@@ -546,16 +532,6 @@ public class BatchEventServices extends ProxyElement {
         }
     }
 
-    private function toggleBufferListeners(added:Boolean):void {
-        var buffer:BufferTrait = proxiedElement.getTrait(MediaTraitType.BUFFER) as BufferTrait;
-        if (buffer) {
-            if (added) {
-                buffer.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
-            } else {
-                buffer.removeEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
-            }
-        }
-    }
 
     private function toggleSeekListeners(added:Boolean):void {
         var seek:SeekTrait = proxiedElement.getTrait(MediaTraitType.SEEK) as SeekTrait;
@@ -632,12 +608,6 @@ public class BatchEventServices extends ProxyElement {
         eventsManager.flushExitEvent();
     }
 
-    private function evaluateContentViewingSeqNum():int {
-        //// TODO match the sequence number against the seekPosition using the adMap.. this could be done in the scrubPreventionProxy  -  NICE TO HAVE
-        var value:int;
-
-        return value;
-    }
 
     private function incrementAndGetUserEventId():int {
         userEventId++;
