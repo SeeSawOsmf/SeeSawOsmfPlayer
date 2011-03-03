@@ -89,6 +89,7 @@ import org.osmf.traits.DRMTrait;
 import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.LoadState;
 import org.osmf.traits.LoadTrait;
+import org.osmf.traits.MediaTraitBase;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.PlayTrait;
@@ -575,7 +576,8 @@ public class SeeSawPlayer extends Sprite {
             logger.debug("Adding DRM trait listener");
             
             // Add a listener to the DRM trait so we know what is going on
-            (event.target as MediaElement).getTrait(MediaTraitType.DRM).addEventListener(DRMEvent.DRM_STATE_CHANGE, onDRMStateChange);
+            var drmTrait:MediaTraitBase = (event.target as MediaElement).getTrait(MediaTraitType.DRM);
+            drmTrait.addEventListener(DRMEvent.DRM_STATE_CHANGE, onDRMStateChange);
         }
 
     }
@@ -600,11 +602,12 @@ public class SeeSawPlayer extends Sprite {
 
 
             case DRMState.AUTHENTICATION_ERROR:
-                logger.debug("DRMError {}",event.mediaError);
+                logger.debug("DRM Authentication error: " + event.mediaError.message);
+                logger.debug("DRM Authentication error: " + event.mediaError.getStackTrace());
                 break;
 
             default:
-                logger.debug("DRM Some other DRM state");
+                logger.debug("DRM Some other DRM state: " + event.drmState);
                 break;
         }
 
