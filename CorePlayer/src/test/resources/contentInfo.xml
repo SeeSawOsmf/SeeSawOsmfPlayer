@@ -64,7 +64,7 @@
     </batchEventUrl>
     <playIntervalEventUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player/initinfo:playintervalevent?t:ac=26772
     </playIntervalEventUrl>
-    <largeImageUrl>http://kgd-blue-test-preview-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/E4_LARGE.png
+    <largeImageUrl>http://seesaw.stage.vodco.co.uk/i/ccp/00000182/18284.jpg
     </largeImageUrl>
     <liverail>
         <version>4.1</version>

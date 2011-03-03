@@ -28,7 +28,9 @@ import com.seesaw.player.ads.AdMode;
 import com.seesaw.player.ads.AdState;
 import com.seesaw.player.ads.LiverailConstants;
 import com.seesaw.player.ads.events.LiveRailEvent;
+import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.namespaces.contentinfo;
+import com.seesaw.player.services.ResumeService;
 import com.seesaw.player.traits.ads.AdPlayTrait;
 
 import flash.events.Event;
@@ -43,6 +45,7 @@ import org.osmf.events.AudioEvent;
 import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.PlayEvent;
+import org.osmf.events.SeekEvent;
 import org.osmf.events.TimeEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaResourceBase;
@@ -70,10 +73,21 @@ public class AdProxy extends ProxyElement {
     private var timer:Timer;
     private var playerMetadata:Metadata;
     private var currentAdBreak:AdBreak;
+    private var resumeService:ResumeService;
 
     public function AdProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
+
+        var provider:ObjectProvider = ObjectProvider.getInstance();
+        resumeService = provider.getObject(ResumeService);
+
+        if (resumeService == null) {
+            throw ArgumentError("no resume service implementation provided");
+        }
+        resumePosition = resumeService.getResumeCookie();
+
         Security.allowDomain("vox-static.liverail.com");
+
         timer = new Timer(CONTENT_UPDATE_INTERVAL);
         timer.addEventListener(TimerEvent.TIMER, onTimerTick);
     }
@@ -113,7 +127,6 @@ public class AdProxy extends ProxyElement {
             adManager.addEventListener(LiveRailEvent.CLICK_THRU, onClickThru);
 
             config = getSetting(LiverailConstants.CONFIG_OBJECT) as Configuration;
-            resumePosition = getSetting(LiverailConstants.RESUME_POSITION) as Number;
 
             // block these until the liverail events kick in
             setTraitsToBlock(MediaTraitType.PLAY, MediaTraitType.TIME, MediaTraitType.DISPLAY_OBJECT);
@@ -157,6 +170,7 @@ public class AdProxy extends ProxyElement {
                     timer = new Timer(CONTENT_UPDATE_INTERVAL);
                     timer.addEventListener(TimerEvent.TIMER, onTimerTick);
                 }
+
                 timer.start();
             }
             else {
@@ -242,7 +256,12 @@ public class AdProxy extends ProxyElement {
 
         // section count need to occur before we start the adContent. as this is required for the first view to be registered.
         playerMetadata.addValue(AdMetadata.SECTION_COUNT, metadataAdBreaks.length);
-        adManager.onContentStart();
+        if (resumePosition <= 0) {
+            adManager.onContentStart();
+        } else {
+            setTraitsToBlock();
+            play();
+        }
     }
 
     private function onInitError(ev:Object):void {
@@ -406,7 +425,14 @@ public class AdProxy extends ProxyElement {
             case MediaTraitType.TIME:
                 changeListeners(element, add, traitType, TimeEvent.COMPLETE, onComplete);
                 break;
+            case MediaTraitType.SEEK:
+                if (resumePosition > 0)    changeListeners(element, add, traitType, SeekEvent.SEEKING_CHANGE, onSeekChange);
+                break;
         }
+    }
+
+    private function onSeekChange(event:SeekEvent):void {
+        trace(event.target);
     }
 
     private function changeListeners(element:MediaElement, add:Boolean, traitType:String, event:String, listener:Function):void {

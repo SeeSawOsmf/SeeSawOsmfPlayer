@@ -649,7 +649,6 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onControlBarMetadataChange(event:MetadataEvent):void {
-        logger.debug("control bar metadata change: {0} = {1}", event.key, event.value);
         switch (event.key) {
             case ControlBarConstants.CONTROL_BAR_HIDDEN:
                 updateSubtitlePosition();

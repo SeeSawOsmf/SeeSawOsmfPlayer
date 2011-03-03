@@ -209,12 +209,11 @@ public class SMILParser extends EventDispatcher {
             var contentType:String = video..meta.(@name == SMILConstants.CONTENT_TYPE).@content;
             if (contentType == "advert" || contentType == "sting") {
                 if (!adBreak || adBreak.startTime != adStart) {
-                    if (adStart >= resumePoint) {
-                        adBreak = new AdBreak();
-                        adBreak.adPlaylist = new SerialElement();
-                        adBreak.startTime = adStart;
-                        adBreaks.push(adBreak);
-                    }
+                    adBreak = new AdBreak();
+                    adBreak.adPlaylist = new SerialElement();
+                    adBreak.startTime = adStart;
+                    adBreak.complete = adStart < resumePoint;
+                    adBreaks.push(adBreak);
                 }
                 if (adBreak) {
                     var mediaElement:MediaElement = parseVideo(video);
