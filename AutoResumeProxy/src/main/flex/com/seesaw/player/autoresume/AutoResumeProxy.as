@@ -57,7 +57,6 @@ public class AutoResumeProxy extends ProxyElement {
     private var requestedSeekPoint:Number;
     private var resumeService:ResumeService;
     private var timer:Timer;
-    private var contentHasEnded:Boolean = false;
 
     public function AutoResumeProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
