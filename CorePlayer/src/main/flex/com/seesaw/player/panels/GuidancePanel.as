@@ -48,6 +48,10 @@ public class GuidancePanel extends Sprite {
     private var findOutMoreLink:String;
     private var termsURL:String;
 
+    private var urlPathPortion:String;
+
+    public static const COOKIE_PATH_NAME_PORTION:String = "window.location.pathname.toString";
+
     private var assetWarning:String = "This %TYPE_TOKEN% isn't suitable for younger viewers.<br/><br/>";
     private var ageMessage:String = "Please confirm you are aged %AGE_TOKEN% or older " +
             "and accept our <a href=\"%TERMSURL%\"><font color=\"#00A88E\">Terms and Conditions.</font></a>";
@@ -92,6 +96,10 @@ public class GuidancePanel extends Sprite {
         this.parentalControlsSetupLink = parentalControlsSetup;
         this.findOutMoreLink = findOutMore;
         this.termsURL = termsURL;
+
+        if (ExternalInterface.available) {
+            this.urlPathPortion = ExternalInterface.call(COOKIE_PATH_NAME_PORTION);
+        }
 
         Security.allowDomain("*");
         super();
@@ -428,7 +436,7 @@ public class GuidancePanel extends Sprite {
     }
 
     private function onParentalControlClick(event:Event):void {
-        var request:URLRequest = new URLRequest(this.parentalControlsSetupLink);
+        var request:URLRequest = new URLRequest(this.parentalControlsSetupLink + this.urlPathPortion);
         try {
             navigateToURL(request, "_self");
         } catch (e:Error) {

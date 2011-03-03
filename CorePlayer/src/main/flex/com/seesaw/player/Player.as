@@ -197,7 +197,7 @@ public class Player extends Sprite {
 
         var JSONString:String = '{ "playerMessage": "' + availability.playerMessage + '", ' +
                 '"seriesEntitled": ' + availability.seriesEntitled + ', "isSubscriptionEntitled" : ' +
-                availability.subscriptionEntitled + ', "episodeEntitled" : ' + availability.episodeEntitled + ', ' +
+                availability.subscriptionEntitled + ', "noAdsPlayable" : ' + availability.noAdsPlayable + ', "episodeEntitled" : ' + availability.episodeEntitled + ', ' +
                 '"available" : ' + availability.available + ', "showPreviewClip" : ' + availability.showPreviewClip + ', ' +
                 '"statusMessage" : "' + availability.statusMessage + '" }';
         return JSONString;

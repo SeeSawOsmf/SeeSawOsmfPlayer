@@ -59,6 +59,8 @@ public class ParentalControlsPanel extends Sprite {
     private var moreAboutParentalControlsLink:String;
     private var turnOffParentalControlsLink:String;
 
+    private var urlPathPortion:String;
+
     private var forgotPasswordButton:Sprite = new Sprite();
     private var acceptButton:Sprite = new Sprite();
     private var declineButton:Sprite = new Sprite();
@@ -76,6 +78,8 @@ public class ParentalControlsPanel extends Sprite {
     private var hashedPassword:String;
     private var enteredPassword:String;
     private var attempts:int = 0;
+
+    public static const COOKIE_PATH_NAME_PORTION:String = "window.location.pathname.toString";
 
     //Embed images
     [Embed(source="resources/enter_up.png")]
@@ -107,6 +111,10 @@ public class ParentalControlsPanel extends Sprite {
         this.guidanceWarning = warning;
         this.moreAboutParentalControlsLink = moreAboutParentalControlsLink;
         this.turnOffParentalControlsLink = turnOffParentalControlsLink;
+
+        if (ExternalInterface.available) {
+            this.urlPathPortion = ExternalInterface.call(COOKIE_PATH_NAME_PORTION);
+        }
 
         Security.allowDomain("*");
         super();
@@ -657,7 +665,7 @@ public class ParentalControlsPanel extends Sprite {
     }
 
     private function onFindOutMoreClick(event:Event):void {
-        var request:URLRequest = new URLRequest(this.turnOffParentalControlsLink);
+        var request:URLRequest = new URLRequest(this.turnOffParentalControlsLink + this.urlPathPortion);
         try {
             navigateToURL(request, "_self");
         } catch (e:Error) {
