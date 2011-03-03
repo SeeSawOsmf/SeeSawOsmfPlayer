@@ -81,6 +81,8 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
     override public function layout(availableWidth:Number, availableHeight:Number, deep:Boolean = true):void {
         super.layout(availableWidth, availableHeight, deep);
 
+        logger.debug("availableWidth: " + availableWidth + " captionFieldWidth: " + captionField.width);
+
         if (availableWidth != captionField.width) {
 
             var goLarge:Boolean = availableWidth >= captionField.width;
