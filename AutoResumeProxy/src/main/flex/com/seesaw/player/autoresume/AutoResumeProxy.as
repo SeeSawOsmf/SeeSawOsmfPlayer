@@ -57,6 +57,7 @@ public class AutoResumeProxy extends ProxyElement {
     private var requestedSeekPoint:Number;
     private var resumeService:ResumeService;
     private var timer:Timer;
+    private var contentHasEnded:Boolean = false;
 
     public function AutoResumeProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -156,6 +157,9 @@ public class AutoResumeProxy extends ProxyElement {
     }
 
     private function onComplete(event:TimeEvent):void {
+        /*Due to the seek timer stangeness in OSMF we would get the seekChanges after the asset has completed/STOP etc..
+        so lets remove the listener the write the resume cookie as 0*/
+        changeListeners(false, MediaTraitType.SEEK, SeekEvent.SEEKING_CHANGE, onSeekingChange);
         resumeService.writeResumeCookie(0);
     }
 
@@ -205,7 +209,7 @@ public class AutoResumeProxy extends ProxyElement {
 
         if (seekTrait && seekTrait.canSeekTo(timeToWrite)) {
             logger.debug("recording resume point: requested = {0}, written = {1}", time, timeToWrite);
-            resumeService.writeResumeCookie(timeToWrite);
+           resumeService.writeResumeCookie(timeToWrite);
         }
     }
 
