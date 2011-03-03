@@ -21,7 +21,7 @@
 <videoInfo xmlns:ns2="http://www.w3.org/ns/SMIL" xmlns="http://www.seesaw.com/api/contentinfo/v1.0">
     <ns2:smil>
         <ns2:head>
-            <ns2:meta base="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703"/>
+            <ns2:meta base="rtmpe://cdn-flash-blue-dev.vodco.co.uk/a2703"/>
         </ns2:head>
         <ns2:body>
             <ns2:seq>
@@ -58,7 +58,7 @@
                 <ns2:par>
                     <ns2:switch>
                         <ns2:video clipEnd="677" clipBegin="0"
-                                   src="mp4:e5/test/ccp/p/LOW_RES/test/test_asset.mp4?s=1297940772&amp;e=1297984272&amp;h=fe9b9279224451c2b13cb405659cc33a"
+                                   src="mp4:e4/test/ccp/p/LOW_RES/00000418/41804.mp4?s=1297940772&amp;e=1297984272&amp;h=fe9b9279224451c2b13cb405659cc33a"
                                    system-bitrate="500000" dur="1319">
                             <ns2:metadata>
                                 <ns2:meta content="mainContent" name="contentType"/>
@@ -66,7 +66,7 @@
                         </ns2:video>
                     </ns2:switch>
                     <ns2:img
-                            src="http://kgd-red-test-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png">
+                            src="http://seesaw.stage.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png">
                         <ns2:metadata>
                             <ns2:meta content="dogImage" name="contentType"/>
                         </ns2:metadata>
@@ -98,7 +98,7 @@
                 <ns2:par>
                     <ns2:switch>
                         <ns2:video clipEnd="1319" clipBegin="677"
-                                   src="mp4:e5/test/ccp/p/LOW_RES/test/test_asset.mp4?s=1297940772&amp;e=1297984272&amp;h=fe9b9279224451c2b13cb405659cc33a"
+                                   src="mp4:e4/test/ccp/p/LOW_RES/00000418/41804.mp4?s=1297940772&amp;e=1297984272&amp;h=fe9b9279224451c2b13cb405659cc33a"
                                    system-bitrate="500000" dur="1319">
                             <ns2:metadata>
                                 <ns2:meta content="mainContent" name="contentType"/>
@@ -106,7 +106,7 @@
                         </ns2:video>
                     </ns2:switch>
                     <ns2:img
-                            src="http://kgd-red-test-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png">
+                            src="http://seesaw.stage.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png">
                         <ns2:metadata>
                             <ns2:meta content="dogImage" name="contentType"/>
                         </ns2:metadata>

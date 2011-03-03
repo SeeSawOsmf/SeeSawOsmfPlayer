@@ -26,7 +26,6 @@ import flash.display.DisplayObject;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
-import flash.external.ExternalInterface;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -45,12 +44,6 @@ public class VolumeScrubBar extends Widget implements IWidget {
     private var logger:ILogger = LoggerFactory.getClassLogger(VolumeScrubBar);
 
     private var volumeDisplay:Number;
-
-    private var defaultVolume:Number = 6;
-
-    public static const EXTERNAL_GET_COOKIE_FUNCTION_NAME:String = "SEESAW.Utils.getCookie";
-    public static const EXTERNAL_SET_COOKIE_FUNCTION_NAME:String = "SEESAW.Utils.setCookie";
-    public static const PLAYER_VOLUME_COOKIE:String = "seesaw.player.volume";
 
     public function VolumeScrubBar() {
         logger.debug("VOLUMESCRUB VolumeScrubBar");
@@ -131,11 +124,6 @@ public class VolumeScrubBar extends Widget implements IWidget {
     private function scrubberAddedToStage(event:Event) {
         logger.debug("VOLUMESCRUB layout");
         stage.addChild(this.toolTip);
-        if (ExternalInterface.available) {
-            this.checkCookieVolume();
-            ExternalInterface.addCallback("getVolume", this.getVolume);
-            ExternalInterface.addCallback("setVolume", this.setVolume);
-        }
     }
 
     override protected function get requiredTraits():Vector.<String> {
@@ -147,8 +135,6 @@ public class VolumeScrubBar extends Widget implements IWidget {
         audible = media.getTrait(MediaTraitType.AUDIO) as AudioTrait;
         if (audible) {
             audible.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
-        }
-        if (audible.volume) {
             onVolumeChange();
         }
     }
@@ -157,23 +143,6 @@ public class VolumeScrubBar extends Widget implements IWidget {
         return this.volumeDisplay;
     }
 
-    private function checkCookieVolume():void {
-        var tmpVol:*;
-        tmpVol = ExternalInterface.call(EXTERNAL_GET_COOKIE_FUNCTION_NAME, PLAYER_VOLUME_COOKIE);
-        if (tmpVol != "" && tmpVol != null) {
-            logger.debug("VALUE OF VOLUME COOKIE: " + tmpVol);
-            setVolume(tmpVol);
-        } else {
-            setVolume(defaultVolume);
-        }
-    }
-
-    private function setCookieVolume():void {
-        if (ExternalInterface.available) {
-            logger.debug("SET VOLUME COOKIE TO: " + (audible.volume * 10));
-            ExternalInterface.call(EXTERNAL_SET_COOKIE_FUNCTION_NAME, PLAYER_VOLUME_COOKIE, (audible.volume * 10), false, "/");
-        }
-    }
 
     private function setVolume(newVolumeDisplay:Number):void {
         logger.debug("VOLUMESCRUB setVolume");
@@ -184,8 +153,6 @@ public class VolumeScrubBar extends Widget implements IWidget {
                 audible.volume = 0;
                 logger.debug('MUTE');
             }
-
-            this.setCookieVolume();
 
             logger.debug('New audible.volume: ' + audible.volume);
         }
@@ -232,7 +199,6 @@ public class VolumeScrubBar extends Widget implements IWidget {
         logger.debug("New Volume: audible.volume : " + audible.volume);
         this.volumeDisplay = Math.round(audible.volume * 12);
 
-        this.setCookieVolume();
     }
 
 

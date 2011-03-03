@@ -19,6 +19,7 @@
  */
 
 package com.seesaw.player.controls.widget {
+import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.utils.CookieHelper;
 
 import controls.seesaw.widget.interfaces.IWidget;
@@ -35,8 +36,6 @@ import org.osmf.traits.MediaTraitType;
 public class Volume extends ButtonWidget implements IWidget {
     private var logger:ILogger = LoggerFactory.getClassLogger(Volume);
 
-    public static const PLAYER_VOLUME_COOKIE:String = "seesaw.player.volume";
-
     /* static */
     private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.Volume";
     private static const _requiredTraits:Vector.<String> = new Vector.<String>;
@@ -44,9 +43,11 @@ public class Volume extends ButtonWidget implements IWidget {
 
     private var cookie:CookieHelper;
     private var audible:AudioTrait;
+    private var mutedVolume:Number;
+
 
     public function Volume() {
-        cookie = new CookieHelper(PLAYER_VOLUME_COOKIE);
+        cookie = new CookieHelper(PlayerConstants.PLAYER_VOLUME_COOKIE);
     }
 
     override protected function get requiredTraits():Vector.<String> {
@@ -57,6 +58,9 @@ public class Volume extends ButtonWidget implements IWidget {
         visible = true;
         audible = element.getTrait(MediaTraitType.AUDIO) as AudioTrait;
         audible.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
+        if(cookie.localSharedObject.data.volume == null)
+        cookie.localSharedObject.data.volume = PlayerConstants.DEFAULT_VOLUME;
+
         audible.volume = cookie.localSharedObject.data.volume;
     }
 
@@ -77,11 +81,13 @@ public class Volume extends ButtonWidget implements IWidget {
     private function toggleMuteState():void {
         logger.debug("toggleMuteState: " + audible.volume);
         if (audible.volume != 0) {
-            cookie.localSharedObject.data.volume = audible.volume;
+            mutedVolume = audible.volume;
             audible.volume = 0;
+            cookie.localSharedObject.data.volume = audible.volume;
             enabled = false;
         } else {
-            audible.volume = cookie.localSharedObject.data.volume;
+            audible.volume = mutedVolume;
+            cookie.localSharedObject.data.volume = audible.volume;
             enabled = true;
         }
     }
