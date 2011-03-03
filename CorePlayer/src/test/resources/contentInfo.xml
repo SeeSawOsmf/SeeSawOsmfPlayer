@@ -70,7 +70,7 @@
         <version>4.1</version>
         <publisherId>4819</publisherId>
     </liverail>
-    <adMode>none</adMode>
+    <adMode>liverail</adMode>
     <dogImage>http://seesaw.stage.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png
     </dogImage>
     <programme>33535</programme>

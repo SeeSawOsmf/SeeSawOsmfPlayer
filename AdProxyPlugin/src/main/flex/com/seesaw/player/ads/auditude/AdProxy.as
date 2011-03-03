@@ -56,6 +56,7 @@ public class AdProxy extends ProxyElement {
     private var adTimeTrait:AdTimeTrait;
     private var playerMetadata:Metadata;
     private var adBreakCount:int;
+    private var currentAdBreak:AdBreak;
 
     public function AdProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -142,18 +143,18 @@ public class AdProxy extends ProxyElement {
 
     private function toggleLoadListeners(added:Boolean):void {
         var loadable:LoadTrait = proxiedElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
-        trace(loadable)
+        logger.debug("Load trait found {0}",loadable);
     }
 
     private function onMetaDataRemove(event:MediaElementEvent):void {
         if (event.namespaceURL == AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) {
-            logger.debug("AUDITUDE METADATA REMOVED");
+            logger.debug("AUDITUDE METADATA REMOVED {0}", event);
         }
     }
 
     private function onMetaDataAdd(event:MediaElementEvent):void {
         if (event.namespaceURL == AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) {
-            trace(event);
+            logger.debug("Auditude metadata added {0}", event);
         }
     }
 
@@ -244,11 +245,10 @@ public class AdProxy extends ProxyElement {
     private function onBreakBegin(event:AdPluginEvent):void {
         logger.debug("AD BREAK BEGIN");
 
+        // Is this the best way to get the breakTime
+        currentAdBreak = adMetadata.getAdBreakWithTime(event.data.breakTime);
         adBreakCount++;
-        // Perhaps this is needed for mid-rolls
-        //pause();
 
-        // mask the existing play trait so we get the play state changes here
         adMetadata.adState = AdState.AD_BREAK_START;
         adMetadata.adMode = AdMode.AD;
         setTraitsToBlock(MediaTraitType.SEEK, MediaTraitType.TIME);
@@ -258,7 +258,12 @@ public class AdProxy extends ProxyElement {
         logger.debug("AD BREAK END");
         adMetadata.adState = AdState.AD_BREAK_COMPLETE;
         adMetadata.adMode = AdMode.MAIN_CONTENT;
-//        adMetadata.markNextUnseenAdBreakAsSeen();
+
+        if (currentAdBreak) {
+            // This dispatches an event that seeks to the user's final seek point
+            currentAdBreak.complete = true;
+        }
+
         setTraitsToBlock();
     }
 
