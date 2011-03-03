@@ -203,7 +203,7 @@ public class AutoResumeProxy extends ProxyElement {
             logger.debug("ad break at requested resume point {0}: complete = {1}", time, adBreak.complete);
         }
 
-        if (seekTrait.canSeekTo(timeToWrite)) {
+        if (seekTrait && seekTrait.canSeekTo(timeToWrite)) {
             logger.debug("recording resume point: requested = {0}, written = {1}", time, timeToWrite);
             resumeService.writeResumeCookie(timeToWrite);
         }
