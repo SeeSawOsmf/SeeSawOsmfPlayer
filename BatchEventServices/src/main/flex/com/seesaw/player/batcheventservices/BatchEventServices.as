@@ -68,6 +68,7 @@ public class BatchEventServices extends ProxyElement {
 
     private static const CUMULATIVE_DURATION_MONITOR_TIMER_DELAY_INTERVAL = 500;
     private static const CUMULATIVE_DURATION_FLUSH_TIMER_MAX = 300000;
+    private static const AUTO_FLUSH_TIMER_MAX = 300000;
     private static const CUMULATIVE_DURATION_FLUSH_DELAY_INTERVAL:int = 10000;
 
     private var userEventId:int = 0;
@@ -122,6 +123,7 @@ public class BatchEventServices extends ProxyElement {
     private var adBreaks:Vector.<AdBreak>;
     private var timeTrait:TimeTrait;
     private var cumulativeFlushCounter:int;
+    private var AutoFlushTimer:Timer;
 
     public function BatchEventServices(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -158,6 +160,10 @@ public class BatchEventServices extends ProxyElement {
             cumulativeDurationFlushTimer = new Timer(CUMULATIVE_DURATION_FLUSH_DELAY_INTERVAL, 0);
             cumulativeDurationFlushTimer.addEventListener(TimerEvent.TIMER, onTimerTick);
             cumulativeDurationFlushTimer.start();
+
+            AutoFlushTimer = new Timer(AUTO_FLUSH_TIMER_MAX, 0);
+            AutoFlushTimer.addEventListener(TimerEvent.TIMER, autoFlush);
+            AutoFlushTimer.start();
 
             playerMetadata = proxiedElement.resource.getMetadataValue(PlayerConstants.METADATA_NAMESPACE) as Metadata;
             playerMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, playerMetaChanged);
@@ -410,10 +416,14 @@ public class BatchEventServices extends ProxyElement {
 
     private function onTimerTick(event:TimerEvent):void {
         cumulativeFlushCounter += CUMULATIVE_DURATION_FLUSH_DELAY_INTERVAL;
-        if(cumulativeFlushCounter == CUMULATIVE_DURATION_FLUSH_TIMER_MAX){
+        if (cumulativeFlushCounter == CUMULATIVE_DURATION_FLUSH_TIMER_MAX) {
             cumulativeFlushCounter = 0;
             eventsManager.flushCumulativeDuration(new CumulativeDurationEvent(programmeId, transactionItemId));
         }
+    }
+
+    private function autoFlush(event:TimerEvent):void {
+        eventsManager.flushAll();
     }
 
     private function onBufferingChange(event:BufferEvent):void {
