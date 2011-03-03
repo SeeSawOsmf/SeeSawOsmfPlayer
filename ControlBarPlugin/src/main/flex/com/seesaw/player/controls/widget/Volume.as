@@ -19,11 +19,11 @@
  */
 
 package com.seesaw.player.controls.widget {
+import com.seesaw.player.utils.CookieHelper;
+
 import controls.seesaw.widget.interfaces.IWidget;
 
 import flash.events.MouseEvent;
-
-import flash.external.ExternalInterface;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -35,14 +35,19 @@ import org.osmf.traits.MediaTraitType;
 public class Volume extends ButtonWidget implements IWidget {
     private var logger:ILogger = LoggerFactory.getClassLogger(Volume);
 
-    public static const EXTERNAL_SET_COOKIE_FUNCTION_NAME:String = "SEESAW.Utils.setCookie";
     public static const PLAYER_VOLUME_COOKIE:String = "seesaw.player.volume";
 
-    public function Volume() {
-    }
+    /* static */
+    private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.Volume";
+    private static const _requiredTraits:Vector.<String> = new Vector.<String>;
+    _requiredTraits[0] = MediaTraitType.AUDIO;
 
-    // Overrides
-    //
+    private var cookie:CookieHelper;
+    private var audible:AudioTrait;
+
+    public function Volume() {
+        cookie = new CookieHelper(PLAYER_VOLUME_COOKIE);
+    }
 
     override protected function get requiredTraits():Vector.<String> {
         return _requiredTraits;
@@ -51,11 +56,8 @@ public class Volume extends ButtonWidget implements IWidget {
     override protected function processRequiredTraitsAvailable(element:MediaElement):void {
         visible = true;
         audible = element.getTrait(MediaTraitType.AUDIO) as AudioTrait;
-        if (audible) {
-            audible.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
-        }
-        onVolumeChange();
-
+        audible.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
+        audible.volume = cookie.localSharedObject.data.volume;
     }
 
     override protected function processRequiredTraitsUnavailable(element:MediaElement):void {
@@ -64,30 +66,23 @@ public class Volume extends ButtonWidget implements IWidget {
             audible.removeEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
             audible = null;
         }
+        cookie.flush();
     }
 
     override protected function onMouseClick(event:MouseEvent):void {
-        logger.debug("MUTE CLICK");
-        logger.debug("audible.volume = " + audible.volume);
-        if (audible.volume != 0) {
-            storedVolume = audible.volume;
-            audible.volume = Math.min(0, 0);
-            enabled = false;
-            this.setCookieVolume();
-        } else {
-            audible.volume = storedVolume;
-            enabled = true;
-            this.setCookieVolume();
-        }
-
+        toggleMuteState();
         super.processEnabledChange();
     }
 
-    private function setCookieVolume():void {
-        logger.debug("MUTE BUTTON SET COOKIE");
-        if (ExternalInterface.available) {
-            logger.debug("SET VOLUME COOKIE TO: " + (audible.volume * 10));
-            ExternalInterface.call(EXTERNAL_SET_COOKIE_FUNCTION_NAME, PLAYER_VOLUME_COOKIE, (audible.volume * 10), false, "/");
+    private function toggleMuteState():void {
+        logger.debug("toggleMuteState: " + audible.volume);
+        if (audible.volume != 0) {
+            cookie.localSharedObject.data.volume = audible.volume;
+            audible.volume = 0;
+            enabled = false;
+        } else {
+            audible.volume = cookie.localSharedObject.data.volume;
+            enabled = true;
         }
     }
 
@@ -95,14 +90,8 @@ public class Volume extends ButtonWidget implements IWidget {
         onMouseClick(event);
     }
 
-    // Internals
-    //
-
-    protected var audible:AudioTrait;
-    private var storedVolume:Number;
-
     protected function onVolumeChange(event:AudioEvent = null):void {
-        ///	enabled = audible ? audible.volume != 0 : false;
+        cookie.localSharedObject.data.volume = audible.volume;
         if (audible.volume < 0.05) {
             enabled = false;
         } else {
@@ -110,18 +99,10 @@ public class Volume extends ButtonWidget implements IWidget {
         }
 
         super.processEnabledChange();
-
-
-        //TODO external interface module needs to update the audio cookie
     }
 
     public function get classDefinition():String {
         return QUALIFIED_NAME;
     }
-
-    /* static */
-    private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.Volume";
-    private static const _requiredTraits:Vector.<String> = new Vector.<String>;
-    _requiredTraits[0] = MediaTraitType.AUDIO;
 }
 }
