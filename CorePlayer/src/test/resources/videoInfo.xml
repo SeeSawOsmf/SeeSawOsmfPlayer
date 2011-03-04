@@ -60,6 +60,8 @@
             </ns2:seq>
         </ns2:body>
     </ns2:smil>
+    <entitlement>0187698769865,89709809870900</entitlement>
+    <signature>3c f1 7e dd 7c f4 98 4a aa e3 df a5 d9 92 e2 3b 0a 76 c9 e2 e8 93 2c 5f e5 db 2f de d8 bd 4c c3 25 46 b2 85 24 6f ef 15 cf db 57 5d 58 64 19 0c ce be df 47 84 15 bc 22 9b 2b dd 0f f6 35 5e e1 dc 92 7f 4e 28 24 bf d4 2c 5b 74 59 23 3d 92 97 9b c6 f1 ec 1c 96 a5 77 1e dc 49 20 63 39 be 58 8c 2a 14 2d 11 f7 4b 44 e0 e2 38 e7 b5 f0 80 3d 64 75 19 2d 50 1d 82 01 e6 a4 bd 75 3e fe 29 fe 9c a2 69 bf 5d e2 44 fe 20 7b f4 56 2d 2f 8a b3 93 d0 a0 61 36 ac b5 b1 ef 90 fa 43 c2 19 51 d0 6e 62 5d f2 8b 2b 7b 81 d3 a6 39 2e bc 4a a1 71 ab 81 da 59 5c e2 39 76 ef a9 0d 9e eb 15 a5 32 c7 75 52 02 67 1c 8a 98 5f 1a e4 5a 67 82 a8 dc 14 12 26 54 db f4 a7 57 88 72 99 db 65 0d 4d b3 a7 54 cc f2 ce 9a 6b 16 32 37 82 b9 1a ee 48 e2 5f e9 50 e8 29 a7 6b 66 ad fb 49 d1 ba a9 e5 4d</signature>
     <geoblocked>false</geoblocked>
     <serverTimestamp>1295949842789</serverTimestamp>
     <anonymousUserId>231266723204534</anonymousUserId>
