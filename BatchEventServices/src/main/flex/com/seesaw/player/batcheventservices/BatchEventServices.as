@@ -66,8 +66,7 @@ public class BatchEventServices extends ProxyElement {
 
     private static const CUMULATIVE_DURATION_MONITOR_TIMER_DELAY_INTERVAL = 500;
     private static const CUMULATIVE_DURATION_FLUSH_TIMER_MAX = 300000;
-    private static const AUTO_FLUSH_TIMER_MAX = 300000;
-    private static const CUMULATIVE_DURATION_FLUSH_DELAY_INTERVAL:int = 10000;
+    private static const AUTO_FLUSH_TIMER_MAX = CUMULATIVE_DURATION_FLUSH_TIMER_MAX ;
 
     private var userEventId:int = 0;
     private var contentEventId:int = 0;
@@ -76,7 +75,6 @@ public class BatchEventServices extends ProxyElement {
 
     public var resumeService:ResumeService;
 
-    private var cumulativeDurationFlushTimer:Timer;
     private var cumulativeDurationCount:Number;
     private var cumulativeDurationMonitor:Timer;
 
@@ -104,7 +102,6 @@ public class BatchEventServices extends ProxyElement {
     private var contentUrl:String;
 
     public var eventsManager:EventsManager;
-    private var tooSlowTimer:Timer;
     private var mainContentCount:int;
     private var playable:PlayTrait;
     private var loadable:LoadTrait;
@@ -115,13 +112,14 @@ public class BatchEventServices extends ProxyElement {
     private var userEvent:UserEvent;
     private var availabilityType:String;
     private var adUrlResource:String;
-    private var oldUserEventId:int = 0;
+    private var oldUserEventId:int = -1;   /// this is to prevent the first oldUserEventId to == userEventID which would start at 0....
     private var previewMode:String;
     private var userEventMetadata:Metadata;
     private var adBreaks:Vector.<AdBreak>;
     private var timeTrait:TimeTrait;
     private var cumulativeFlushCounter:int;
     private var AutoFlushTimer:Timer;
+    private var finalEventTriggered:Boolean = false;
 
     public function BatchEventServices(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -155,9 +153,6 @@ public class BatchEventServices extends ProxyElement {
             cumulativeDurationMonitor = new Timer(CUMULATIVE_DURATION_MONITOR_TIMER_DELAY_INTERVAL, 0);
             cumulativeDurationMonitor.addEventListener(TimerEvent.TIMER, incrementCumulativeDurationCounter);
 
-            cumulativeDurationFlushTimer = new Timer(CUMULATIVE_DURATION_FLUSH_DELAY_INTERVAL, 0);
-            cumulativeDurationFlushTimer.addEventListener(TimerEvent.TIMER, onTimerTick);
-            cumulativeDurationFlushTimer.start();
 
             AutoFlushTimer = new Timer(AUTO_FLUSH_TIMER_MAX, 0);
             AutoFlushTimer.addEventListener(TimerEvent.TIMER, autoFlush);
@@ -280,7 +275,7 @@ public class BatchEventServices extends ProxyElement {
                 userEventType = UserEventTypes.PAUSE;
             }
         } else if (event.key == PlayerConstants.BUFFER_MESSAGE_SHOW && event.value) {
-            eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.BUFFERING));
+            userEventType = UserEventTypes.BUFFERING;
         }
         if (userEventType != null) {
             eventsManager.addUserEvent(buildAndReturnUserEvent(userEventType));
@@ -312,6 +307,10 @@ public class BatchEventServices extends ProxyElement {
 
     private function incrementCumulativeDurationCounter(event:TimerEvent):void {
         cumulativeDurationCount += CUMULATIVE_DURATION_MONITOR_TIMER_DELAY_INTERVAL;
+        if ((cumulativeFlushCounter - cumulativeDurationCount) >= CUMULATIVE_DURATION_FLUSH_TIMER_MAX) {
+            cumulativeFlushCounter = cumulativeDurationCount;
+            eventsManager.flushCumulativeDuration(new CumulativeDurationEvent(programmeId, transactionItemId));
+        }
     }
 
     private function onMetaDataRemove(event:MediaElementEvent):void {
@@ -413,23 +412,11 @@ public class BatchEventServices extends ProxyElement {
         }
     }
 
-
-    private function onTimerTick(event:TimerEvent):void {
-        cumulativeFlushCounter += CUMULATIVE_DURATION_FLUSH_DELAY_INTERVAL;
-        if (cumulativeFlushCounter == CUMULATIVE_DURATION_FLUSH_TIMER_MAX) {
-            cumulativeFlushCounter = 0;
-            eventsManager.flushCumulativeDuration(new CumulativeDurationEvent(programmeId, transactionItemId));
-        }
-    }
-
     private function autoFlush(event:TimerEvent):void {
         eventsManager.flushAll();
     }
 
 
-    private function bufferShowEvent(event:TimerEvent):void {
-        eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.BUFFERING));
-    }
 
     private function processTrait(traitType:String, added:Boolean):void {
         switch (traitType) {
@@ -498,18 +485,15 @@ public class BatchEventServices extends ProxyElement {
             switch (event.playState) {
                 case PlayState.PAUSED:
                     cumulativeDurationMonitor.stop();
-                    cumulativeDurationFlushTimer.stop();
                     break;
                 case PlayState.PLAYING:
                     if (!cumulativeDurationMonitor.running) {
                         cumulativeDurationMonitor.start();
-                        cumulativeDurationFlushTimer.start();
                     }
                     break;
                 case PlayState.STOPPED:
                     if (cumulativeDurationMonitor.running) {
                         cumulativeDurationMonitor.stop();
-                        cumulativeDurationFlushTimer.stop();
                     }
                     break;
             }
@@ -547,7 +531,7 @@ public class BatchEventServices extends ProxyElement {
         if (playingMainContent) {
             if (event.seeking) {
                 if (!seeking) {
-                    cumulativeDurationMonitor.stop(); //todo check this checker is actually working accurately....
+                   if (cumulativeDurationMonitor.running) cumulativeDurationMonitor.stop();
 
                     contentViewingSequenceNumber = evaluateMainContentCount;
 
@@ -563,14 +547,15 @@ public class BatchEventServices extends ProxyElement {
     private function toggleTimeListeners(added:Boolean):void {
         timeTrait = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
         if (timeTrait) {
-            timeTrait.addEventListener(TimeEvent.COMPLETE, onComplete);
+            timeTrait.addEventListener(TimeEvent.COMPLETE, onComplete, false, 1 );
         } else {
-            timeTrait.removeEventListener(TimeEvent.COMPLETE, onComplete);
+            timeTrait.removeEventListener(TimeEvent.COMPLETE, onComplete,  false);
         }
     }
 
     private function onComplete(event:TimeEvent):void {
         eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.END));
+        finalEventTriggered = true;
         eventsManager.flushAll();
     }
 
@@ -605,6 +590,7 @@ public class BatchEventServices extends ProxyElement {
 
     private function exitEvent():void {
         eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.EXIT));
+        finalEventTriggered = true;
         eventsManager.flushExitEvent();
     }
 
@@ -627,8 +613,11 @@ public class BatchEventServices extends ProxyElement {
 
 
     private function buildAndReturnUserEvent(userEventType:String):UserEvent {
+        if(!finalEventTriggered){
         generateAssociatedContentEvent();
         return new UserEvent(incrementAndGetUserEventId(), cumulativeDurationCount, userEventType, programmeId);
+            }
+        return null;
     }
 
     private function generateAssociatedContentEvent():void {
@@ -636,11 +625,20 @@ public class BatchEventServices extends ProxyElement {
     }
 
     private function buildAndReturnContentEvent(contentType:String):ContentEvent {
-        return new ContentEvent(isPopupInteractive, mainAssetId, new Date(), isOverlayInteractive, contentViewingSequenceNumber, incrementAndGetContentEventId(), campaignId, cumulativeDurationCount, userEventId, cumulativeDurationCount, contentType, currentAdBreakSequenceNumber, contentUrl);
+        return new ContentEvent(isPopupInteractive, mainAssetId, new Date(), isOverlayInteractive, contentViewingSequenceNumber, incrementAndGetContentEventId(), campaignId, cumulativeDurationCount, userEventId, contentDurationTotal, contentType, currentAdBreakSequenceNumber, contentUrl);
     }
 
     private function buildAndReturnMainContentEvent(contentType:String):ContentEvent {
-        return new ContentEvent(isPopupInteractive, mainAssetId, new Date(), isOverlayInteractive, evaluateMainContentCount, incrementAndGetContentEventId(), campaignId, cumulativeDurationCount, userEventId, cumulativeDurationCount, contentType, currentAdBreakSequenceNumber, contentUrl);
+        return new ContentEvent(isPopupInteractive, mainAssetId, new Date(), isOverlayInteractive, evaluateMainContentCount, incrementAndGetContentEventId(), campaignId, cumulativeDurationCount, userEventId, contentDurationTotal, contentType, currentAdBreakSequenceNumber, contentUrl);
+    }
+
+    private function get contentDurationTotal():int {
+        if (timeTrait != null) {
+            return timeTrait.duration;
+        } else {
+            return 0;
+        }
+
     }
 }
 }
