@@ -66,7 +66,7 @@ public class BatchEventServices extends ProxyElement {
 
     private static const CUMULATIVE_DURATION_MONITOR_TIMER_DELAY_INTERVAL = 500;
     private static const CUMULATIVE_DURATION_FLUSH_TIMER_MAX = 300000;
-    private static const AUTO_FLUSH_TIMER_MAX = CUMULATIVE_DURATION_FLUSH_TIMER_MAX ;
+    private static const AUTO_FLUSH_TIMER_MAX = CUMULATIVE_DURATION_FLUSH_TIMER_MAX;
 
     private var userEventId:int = 0;
     private var contentEventId:int = 0;
@@ -202,8 +202,7 @@ public class BatchEventServices extends ProxyElement {
         viewEvent = new ViewEvent(transactionItemId, serverTimeStamp, sectionCount, mainAssetId, userId, anonymousUserId);
         eventsManager = new EventsManagerImpl(viewEvent, previewMode, batchEventURL, cumulativeDurationURL);
 
-        if (sectionCount == 1 && !adsEnabled)  mainContentCount++;
-        playingMainContent = true;/// we must have Paid content with no adverts eg MTV...
+        if (sectionCount == 1 && !adsEnabled)  playingMainContent = true;/// we must have Paid content with no adverts eg MTV...
 
         var number:Number = resumeService.getResumeCookie();
         if (number == 0) {
@@ -307,7 +306,7 @@ public class BatchEventServices extends ProxyElement {
 
     private function incrementCumulativeDurationCounter(event:TimerEvent):void {
         cumulativeDurationCount += CUMULATIVE_DURATION_MONITOR_TIMER_DELAY_INTERVAL;
-        if ((cumulativeFlushCounter - cumulativeDurationCount) >= CUMULATIVE_DURATION_FLUSH_TIMER_MAX) {
+        if ((cumulativeDurationCount - cumulativeFlushCounter) >= CUMULATIVE_DURATION_FLUSH_TIMER_MAX) {
             cumulativeFlushCounter = cumulativeDurationCount;
             eventsManager.flushCumulativeDuration(new CumulativeDurationEvent(programmeId, transactionItemId));
         }
@@ -344,8 +343,7 @@ public class BatchEventServices extends ProxyElement {
         if (event.value == "NetConnection.Connect.NetworkChange")
             eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.CONNECTION_CLOSED));
 
-        if (event.value == "NetConnection.Connect.Reconnection") // Todo this event does not exist yet...
-        {
+        if (event.value == "NetConnection.Connect.Reconnection") {
             eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.CONNECTION_RESTART));
             eventsManager.flushAll();        /// since we have just lost connection and reconnected we want to force an event record..
 
@@ -366,7 +364,9 @@ public class BatchEventServices extends ProxyElement {
         if (event.key == AdMetadata.AD_STATE || event.key == AdMetadata.AD_MODE) {
             AdMetaEvaluation(event.value);
         } else if (event.key == AdMetadata.AD_BREAKS) {
-            adBreaks = event.key as Vector.<AdBreak>;
+
+            var metadataAdBreaks:Vector.<AdBreak> = event.value;
+            adBreaks = metadataAdBreaks;
         } else {
             AdMetaEvaluation(event.key);
         }
@@ -377,6 +377,7 @@ public class BatchEventServices extends ProxyElement {
             playingMainContent = true;
 
         } else if (value == AdState.AD_BREAK_START) {
+            if (cumulativeDurationMonitor.running) cumulativeDurationMonitor.stop();
             playingMainContent = false;
             contentViewingSequenceNumber++;
 
@@ -402,9 +403,8 @@ public class BatchEventServices extends ProxyElement {
                 contentUrl = "mainResource";
                 defineContentUrl(false);
 
-                contentViewingSequenceNumber = evaluateMainContentCount;        // content sequence has changed by 1. same occurs when an advert starts
+                contentViewingSequenceNumber = evaluateMainContentCount();        // content sequence has changed by 1. same occurs when an advert starts
                 currentAdBreakSequenceNumber = 0;     ///we are not in an adBreak so set it to 0
-                mainContentCount++;
 
                 eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.MAIN_CONTENT));
                 eventsManager.flushAll();
@@ -415,7 +415,6 @@ public class BatchEventServices extends ProxyElement {
     private function autoFlush(event:TimerEvent):void {
         eventsManager.flushAll();
     }
-
 
 
     private function processTrait(traitType:String, added:Boolean):void {
@@ -531,9 +530,8 @@ public class BatchEventServices extends ProxyElement {
         if (playingMainContent) {
             if (event.seeking) {
                 if (!seeking) {
-                   if (cumulativeDurationMonitor.running) cumulativeDurationMonitor.stop();
-
-                    contentViewingSequenceNumber = evaluateMainContentCount;
+                    if (cumulativeDurationMonitor.running) cumulativeDurationMonitor.stop();
+                    contentViewingSequenceNumber = evaluateMainContentCount(event.time, true);
 
                     eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.SCRUB));
 
@@ -547,9 +545,9 @@ public class BatchEventServices extends ProxyElement {
     private function toggleTimeListeners(added:Boolean):void {
         timeTrait = proxiedElement.getTrait(MediaTraitType.TIME) as TimeTrait;
         if (timeTrait) {
-            timeTrait.addEventListener(TimeEvent.COMPLETE, onComplete, false, 1 );
+            timeTrait.addEventListener(TimeEvent.COMPLETE, onComplete, false, 1);
         } else {
-            timeTrait.removeEventListener(TimeEvent.COMPLETE, onComplete,  false);
+            timeTrait.removeEventListener(TimeEvent.COMPLETE, onComplete, false);
         }
     }
 
@@ -559,13 +557,19 @@ public class BatchEventServices extends ProxyElement {
         eventsManager.flushAll();
     }
 
-    private function get evaluateMainContentCount():int {
+    private function evaluateMainContentCount(seekTime:Number = 0, seekTriggered:Boolean = false):int {
         var currentSection:int;
         if (adBreaks) {
 
             for each (var breakItem:AdBreak in adBreaks) {
 
-                if (timeTrait.currentTime >= breakItem.startTime) {
+                if (seekTriggered) {
+
+                    if (seekTime >= breakItem.startTime)
+                    {
+                        currentSection = currentSection + 2; /// to ge the seek value as opposed to the current time......
+                    }
+                } else if (timeTrait.currentTime >= breakItem.startTime) {
                     currentSection = currentSection + 2;// since we are checking adBreaks, we need to increment twice (once for the ad, once into the current content...
                 }
             }
@@ -607,16 +611,16 @@ public class BatchEventServices extends ProxyElement {
             contentEventId = 0;
         }
         oldUserEventId = userEventId;
-
         return contentEventId;
     }
 
 
     private function buildAndReturnUserEvent(userEventType:String):UserEvent {
-        if(!finalEventTriggered){
-        generateAssociatedContentEvent();
-        return new UserEvent(incrementAndGetUserEventId(), cumulativeDurationCount, userEventType, programmeId);
-            }
+        if (!finalEventTriggered) {
+            var userEvent:UserEvent = new UserEvent(incrementAndGetUserEventId(), cumulativeDurationCount, userEventType, programmeId);
+            generateAssociatedContentEvent();
+            return userEvent;
+        }
         return null;
     }
 
@@ -629,7 +633,7 @@ public class BatchEventServices extends ProxyElement {
     }
 
     private function buildAndReturnMainContentEvent(contentType:String):ContentEvent {
-        return new ContentEvent(isPopupInteractive, mainAssetId, new Date(), isOverlayInteractive, evaluateMainContentCount, incrementAndGetContentEventId(), campaignId, cumulativeDurationCount, userEventId, contentDurationTotal, contentType, currentAdBreakSequenceNumber, contentUrl);
+        return new ContentEvent(isPopupInteractive, mainAssetId, new Date(), isOverlayInteractive, evaluateMainContentCount(), incrementAndGetContentEventId(), campaignId, cumulativeDurationCount, userEventId, contentDurationTotal, contentType, currentAdBreakSequenceNumber, contentUrl);
     }
 
     private function get contentDurationTotal():int {
