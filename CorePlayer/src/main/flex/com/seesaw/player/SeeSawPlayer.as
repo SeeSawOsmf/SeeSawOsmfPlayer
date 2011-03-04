@@ -55,12 +55,15 @@ import flash.events.Event;
 import flash.events.FullScreenEvent;
 import flash.events.NetStatusEvent;
 
+import flash.utils.ByteArray;
+
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
 import org.osmf.elements.SerialElement;
 import org.osmf.events.BufferEvent;
+import org.osmf.events.DRMEvent;
 import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MediaFactoryEvent;
@@ -82,9 +85,12 @@ import org.osmf.media.URLResource;
 import org.osmf.metadata.CuePoint;
 import org.osmf.metadata.Metadata;
 import org.osmf.metadata.TimelineMetadata;
+import org.osmf.traits.DRMState;
+import org.osmf.traits.DRMTrait;
 import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.LoadState;
 import org.osmf.traits.LoadTrait;
+import org.osmf.traits.MediaTraitBase;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.PlayTrait;
@@ -513,6 +519,8 @@ public class SeeSawPlayer extends Sprite {
             mainElement.addChild(new BufferManager(PlayerConstants.MIN_BUFFER_SIZE_SECONDS,
                     PlayerConstants.MAX_BUFFER_SIZE_SECONDS, mediaElement));
 
+            mediaElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
+            
             var timelineMetadata:TimelineMetadata =
                     mediaElement.getMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) as TimelineMetadata;
             if (timelineMetadata) {
@@ -566,6 +574,58 @@ public class SeeSawPlayer extends Sprite {
             }
         }
     }
+
+    /**
+     * Used to find out when the DRM trait is added to the media element
+     * @param event
+     */
+    private function onTraitAdd(event:MediaElementEvent) {
+
+        logger.debug("On Trait add");
+
+        if(event.traitType == MediaTraitType.DRM) {
+            event.target.removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
+
+            logger.debug("Adding DRM trait listener");
+            
+            // Add a listener to the DRM trait so we know what is going on
+            var drmTrait:MediaTraitBase = (event.target as MediaElement).getTrait(MediaTraitType.DRM);
+            drmTrait.addEventListener(DRMEvent.DRM_STATE_CHANGE, onDRMStateChange);
+        }
+
+    }
+
+
+    private function onDRMStateChange(event:DRMEvent) {
+
+        switch(event.drmState) {
+
+            case DRMState.AUTHENTICATION_NEEDED:
+                logger.debug("DRM Authentication needed");
+                var entitlement:String = videoInfo.entitlement;
+                var signature:String = videoInfo.signature;
+                var authToken:String = signature+","+entitlement;
+
+                var byteArray:ByteArray = new ByteArray();
+                byteArray.writeUTFBytes(authToken);
+
+                logger.debug("DRM Sending token to license server");
+                (event.target as DRMTrait).authenticateWithToken(byteArray);
+                break;
+
+
+            case DRMState.AUTHENTICATION_ERROR:
+                logger.debug("DRM Authentication error: " + event.mediaError.message);
+                logger.debug("DRM Authentication error: " + event.mediaError.getStackTrace());
+                break;
+
+            default:
+                logger.debug("DRM Some other DRM state: " + event.drmState);
+                break;
+        }
+
+    }
+
 
     private function setMediaLayout(element:MediaElement):void {
         var layout:LayoutMetadata = element.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
