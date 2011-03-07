@@ -39,9 +39,11 @@ public class CookieHelper {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(CookieHelper);
 
+    private var _id:String;
     private var _localSharedObject:SharedObject;
 
     public function CookieHelper(id:String) {
+        _id = id;
         _localSharedObject = SharedObject.getLocal(id);
     }
 
@@ -56,24 +58,24 @@ public class CookieHelper {
         if (flushStatus != null) {
             switch (flushStatus) {
                 case SharedObjectFlushStatus.PENDING:
-                    logger.debug("Requesting permission to save object..");
+                    logger.debug("Requesting permission to save object: {0}", _id);
                     localSharedObject.addEventListener(NetStatusEvent.NET_STATUS, onFlushStatus);
                     break;
                 case SharedObjectFlushStatus.FLUSHED:
-                    logger.debug("Value flushed to disk.");
+                    logger.debug("Value flushed to disk: {0}", _id);
                     break;
             }
         }
     }
 
     private function onFlushStatus(event:NetStatusEvent):void {
-        logger.debug("User closed permission dialog...");
+        logger.debug("User closed permission dialog: {0}", _id);
         switch (event.info.code) {
             case "SharedObject.Flush.Success":
-                logger.debug("User granted permission -- value saved.");
+                logger.debug("User granted permission -- value saved: {0}", _id);
                 break;
             case "SharedObject.Flush.Failed":
-                logger.debug("User denied permission -- value not saved.");
+                logger.debug("User denied permission -- value not saved: {0}", _id);
                 break;
         }
         localSharedObject.removeEventListener(NetStatusEvent.NET_STATUS, onFlushStatus);
@@ -81,6 +83,10 @@ public class CookieHelper {
 
     public function get localSharedObject():SharedObject {
         return _localSharedObject;
+    }
+
+    public function get id():String {
+        return _id;
     }
 }
 }

@@ -27,6 +27,7 @@ import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.ads.AdMode;
 import com.seesaw.player.ads.AdState;
 import com.seesaw.player.ads.AuditudeConstants;
+import com.seesaw.player.ads.auditude.AdProxy;
 import com.seesaw.player.ads.auditude.AdProxyPluginInfo;
 import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
@@ -49,6 +50,8 @@ import com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo;
 import com.seesaw.player.smil.SMILParser;
 import com.seesaw.player.utils.HelperUtils;
 
+import com.seesaw.player.utils.LoggerUtils;
+
 import flash.display.Sprite;
 import flash.display.StageDisplayState;
 import flash.events.Event;
@@ -60,7 +63,9 @@ import flash.utils.ByteArray;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.containers.MediaContainer;
+import org.osmf.elements.CompositeElement;
 import org.osmf.elements.ParallelElement;
+import org.osmf.elements.ProxyElement;
 import org.osmf.elements.SerialElement;
 import org.osmf.events.BufferEvent;
 import org.osmf.events.DRMEvent;
@@ -306,7 +311,6 @@ public class SeeSawPlayer extends Sprite {
         }
     }
 
-
     private function adPlayStateChange(event:PlayEvent):void {
         if (!currentAdBreak.complete) {
             if (event.playState == PlayState.STOPPED) {
@@ -371,11 +375,13 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function loadAuditude():void {
-        factory.loadPlugin(new URLResource(AUDITUDE_PLUGIN_URL));
+        var auditudeResource:URLResource = new URLResource(AUDITUDE_PLUGIN_URL);
+        auditudeResource.addMetadataValue("auditudeNamespaceUrl", "auditudeNamespaceUrlValue");
+        factory.loadPlugin(auditudeResource);
     }
 
     private function onPluginLoaded(event:MediaFactoryEvent):void {
-        logger.debug("Loaded plugin " + event.resource);
+        logger.debug("Loaded plugin: {0}", flash.utils.getQualifiedClassName(event.resource));
 
         if (--pluginsToLoad <= 0) {
             logger.debug("All plugins loaded");
@@ -512,6 +518,9 @@ public class SeeSawPlayer extends Sprite {
         factory.removeEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onSmilElementCreated);
 
         if (mediaElement) {
+            if (logger.debugEnabled)
+                LoggerUtils.logWhenLoaded(logger, mediaElement);
+
             var dispatcher:TraitEventDispatcher = new TraitEventDispatcher();
             dispatcher.media = mediaElement;
             dispatcher.addEventListener(TimeEvent.COMPLETE, onComplete);
@@ -592,12 +601,9 @@ public class SeeSawPlayer extends Sprite {
             var drmTrait:MediaTraitBase = (event.target as MediaElement).getTrait(MediaTraitType.DRM);
             drmTrait.addEventListener(DRMEvent.DRM_STATE_CHANGE, onDRMStateChange);
         }
-
     }
 
-
     private function onDRMStateChange(event:DRMEvent) {
-
         switch(event.drmState) {
 
             case DRMState.AUTHENTICATION_NEEDED:
@@ -613,7 +619,6 @@ public class SeeSawPlayer extends Sprite {
                 (event.target as DRMTrait).authenticateWithToken(byteArray);
                 break;
 
-
             case DRMState.AUTHENTICATION_ERROR:
                 logger.debug("DRM Authentication error: " + event.mediaError.message);
                 logger.debug("DRM Authentication error: " + event.mediaError.getStackTrace());
@@ -623,9 +628,7 @@ public class SeeSawPlayer extends Sprite {
                 logger.debug("DRM Some other DRM state: " + event.drmState);
                 break;
         }
-
     }
-
 
     private function setMediaLayout(element:MediaElement):void {
         var layout:LayoutMetadata = element.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
