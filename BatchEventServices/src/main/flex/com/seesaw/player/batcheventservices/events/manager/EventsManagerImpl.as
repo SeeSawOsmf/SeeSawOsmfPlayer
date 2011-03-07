@@ -76,6 +76,7 @@ public class EventsManagerImpl implements EventsManager {
 
 
     public function addUserEvent(userEvent:UserEvent):void {
+        if(userEvent) {
         userEventCount++;
         userEvents.push(userEvent);
         if (userEventCount >= 10) {
@@ -84,6 +85,7 @@ public class EventsManagerImpl implements EventsManager {
                 flushAll();
             }
         }
+    }
     }
 
     public function addContentEvent(contentEvent:ContentEvent):void {
