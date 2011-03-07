@@ -69,8 +69,13 @@ public class AdBreakTriggeringSeekTrait extends SeekTrait {
             var nextBreak:AdBreak = null;
 
             for each (var breakItem:AdBreak in _adBreaks) {
-                if (!breakItem.complete && timeTrait.currentTime <= breakItem.startTime && time >= breakItem.startTime) {
+                if (!breakItem.complete && time >= breakItem.startTime) {
                     nextBreak = breakItem;
+                }
+                if(nextBreak){
+                    if(breakItem.complete && time >= breakItem.startTime &&  time >= nextBreak.startTime){
+                        nextBreak = null;
+                    }
                 }
             }
 

@@ -54,7 +54,6 @@ import flash.display.StageDisplayState;
 import flash.events.Event;
 import flash.events.FullScreenEvent;
 import flash.events.NetStatusEvent;
-
 import flash.utils.ByteArray;
 
 import org.as3commons.logging.ILogger;
@@ -70,6 +69,7 @@ import org.osmf.events.MediaFactoryEvent;
 import org.osmf.events.MediaPlayerStateChangeEvent;
 import org.osmf.events.MetadataEvent;
 import org.osmf.events.PlayEvent;
+import org.osmf.events.SeekEvent;
 import org.osmf.events.TimeEvent;
 import org.osmf.events.TimelineMetadataEvent;
 import org.osmf.layout.HorizontalAlign;
@@ -94,6 +94,7 @@ import org.osmf.traits.MediaTraitBase;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.PlayTrait;
+import org.osmf.traits.SeekTrait;
 import org.osmf.traits.TimeTrait;
 import org.osmf.traits.TraitEventDispatcher;
 
@@ -440,6 +441,7 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onBufferingChange(event:BufferEvent):void {
+        var seeking:SeekTrait = mainElement.getTrait(MediaTraitType.SEEK) as SeekTrait;
         if (event.currentTarget.bufferLength < 0.1) {
             (event.buffering) ? bufferingPanel.show() : bufferingPanel.hide();
         } else {
@@ -537,6 +539,7 @@ public class SeeSawPlayer extends Sprite {
             var dispatcher:TraitEventDispatcher = new TraitEventDispatcher();
             dispatcher.media = mediaElement;
             dispatcher.addEventListener(TimeEvent.COMPLETE, onComplete);
+            dispatcher.addEventListener(SeekEvent.SEEKING_CHANGE, mainElementSeekChange);
 
             mainElement.addChild(new BufferManager(PlayerConstants.MIN_BUFFER_SIZE_SECONDS,
                     PlayerConstants.MAX_BUFFER_SIZE_SECONDS, mediaElement));
@@ -566,6 +569,14 @@ public class SeeSawPlayer extends Sprite {
 
         // get the control bar to point at the main content
         setControlBarTarget(mainElement);
+    }
+
+    private function mainElementSeekChange(event:SeekEvent):void {
+       if(event.seeking){
+            player.removeEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
+       }else if(!event.seeking){
+            player.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
+       }
     }
 
     private function onSmilElementCreated(event:MediaFactoryEvent):void {
