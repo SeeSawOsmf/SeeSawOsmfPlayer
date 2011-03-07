@@ -21,17 +21,14 @@
 package com.seesaw.player {
 import com.auditude.ads.AuditudePlugin;
 import com.auditude.ads.osmf.IAuditudeMediaElement;
-import com.auditude.ads.osmf.constants.AuditudeOSMFConstants;
 import com.seesaw.player.ads.AdBreak;
 import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.ads.AdMode;
 import com.seesaw.player.ads.AdState;
 import com.seesaw.player.ads.AuditudeConstants;
 import com.seesaw.player.ads.auditude.AdProxy;
-import com.seesaw.player.ads.auditude.AdProxyPluginInfo;
 import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
-import com.seesaw.player.batcheventservices.BatchEventServicePlugin;
 import com.seesaw.player.buffering.BufferManager;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.controls.ControlBarConstants;
@@ -49,7 +46,6 @@ import com.seesaw.player.smil.SMILConstants;
 import com.seesaw.player.smil.SMILContentCapabilitiesPluginInfo;
 import com.seesaw.player.smil.SMILParser;
 import com.seesaw.player.utils.HelperUtils;
-
 import com.seesaw.player.utils.LoggerUtils;
 
 import flash.display.Sprite;
@@ -57,15 +53,13 @@ import flash.display.StageDisplayState;
 import flash.events.Event;
 import flash.events.FullScreenEvent;
 import flash.events.NetStatusEvent;
-
 import flash.utils.ByteArray;
+import flash.utils.getQualifiedClassName;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.containers.MediaContainer;
-import org.osmf.elements.CompositeElement;
 import org.osmf.elements.ParallelElement;
-import org.osmf.elements.ProxyElement;
 import org.osmf.elements.SerialElement;
 import org.osmf.events.BufferEvent;
 import org.osmf.events.DRMEvent;
@@ -100,7 +94,6 @@ import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.PlayTrait;
 import org.osmf.traits.TimeTrait;
-
 import org.osmf.traits.TraitEventDispatcher;
 
 import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
@@ -376,12 +369,11 @@ public class SeeSawPlayer extends Sprite {
 
     private function loadAuditude():void {
         var auditudeResource:URLResource = new URLResource(AUDITUDE_PLUGIN_URL);
-        auditudeResource.addMetadataValue("auditudeNamespaceUrl", "auditudeNamespaceUrlValue");
         factory.loadPlugin(auditudeResource);
     }
 
     private function onPluginLoaded(event:MediaFactoryEvent):void {
-        logger.debug("Loaded plugin: {0}", flash.utils.getQualifiedClassName(event.resource));
+        logger.debug("Loaded plugin: {0}", getQualifiedClassName(event.resource));
 
         if (--pluginsToLoad <= 0) {
             logger.debug("All plugins loaded");
@@ -397,7 +389,7 @@ public class SeeSawPlayer extends Sprite {
 
         setupAdProvider();
 
-        factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
+//        factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
         factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
@@ -415,11 +407,9 @@ public class SeeSawPlayer extends Sprite {
 
         if (adMode == AdMetadata.LR_AD_TYPE) {
             logger.debug("configuring liverail ads");
-            factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.liverail.AdProxyPluginInfo()));
+            factory.loadPlugin(new PluginInfoResource(new AdProxyPluginInfo()));
         } else if (adMode == AdMetadata.CHANNEL_4_AD_TYPE) {
             logger.debug("configuring playlist ads");
-        } else if (adMode == AdMetadata.AUDITUDE_AD_TYPE) {
-            factory.loadPlugin(new PluginInfoResource(new com.seesaw.player.ads.auditude.AdProxyPluginInfo()));
         }
     }
 
@@ -518,18 +508,11 @@ public class SeeSawPlayer extends Sprite {
         factory.removeEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onSmilElementCreated);
 
         if (mediaElement) {
-            if (logger.debugEnabled)
-                LoggerUtils.logWhenLoaded(logger, mediaElement);
-
-            var dispatcher:TraitEventDispatcher = new TraitEventDispatcher();
-            dispatcher.media = mediaElement;
-            dispatcher.addEventListener(TimeEvent.COMPLETE, onComplete);
-
             mainElement.addChild(new BufferManager(PlayerConstants.MIN_BUFFER_SIZE_SECONDS,
                     PlayerConstants.MAX_BUFFER_SIZE_SECONDS, mediaElement));
 
             mediaElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
-            
+
             var timelineMetadata:TimelineMetadata =
                     mediaElement.getMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) as TimelineMetadata;
             if (timelineMetadata) {
@@ -547,8 +530,19 @@ public class SeeSawPlayer extends Sprite {
 
             createBufferingPanel();
             createControlBarElement();
-            if (adMode == AdMetadata.AUDITUDE_AD_TYPE)  configureAuditude(mediaElement);
+
+            if (adMode == AdMetadata.AUDITUDE_AD_TYPE) {
+                mediaElement = createAuditudeElement(mediaElement);
+            }
+
             createSubtitleElement();
+
+            if (logger.debugEnabled)
+                LoggerUtils.logWhenLoaded(logger, mediaElement);
+
+            var dispatcher:TraitEventDispatcher = new TraitEventDispatcher();
+            dispatcher.media = mediaElement;
+            dispatcher.addEventListener(TimeEvent.COMPLETE, onComplete);
         }
 
         // get the control bar to point at the main content
@@ -592,11 +586,11 @@ public class SeeSawPlayer extends Sprite {
 
         logger.debug("On Trait add");
 
-        if(event.traitType == MediaTraitType.DRM) {
+        if (event.traitType == MediaTraitType.DRM) {
             event.target.removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
 
             logger.debug("Adding DRM trait listener");
-            
+
             // Add a listener to the DRM trait so we know what is going on
             var drmTrait:MediaTraitBase = (event.target as MediaElement).getTrait(MediaTraitType.DRM);
             drmTrait.addEventListener(DRMEvent.DRM_STATE_CHANGE, onDRMStateChange);
@@ -604,13 +598,13 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onDRMStateChange(event:DRMEvent) {
-        switch(event.drmState) {
+        switch (event.drmState) {
 
             case DRMState.AUTHENTICATION_NEEDED:
                 logger.debug("DRM Authentication needed");
                 var entitlement:String = videoInfo.entitlement;
                 var signature:String = videoInfo.signature;
-                var authToken:String = signature+","+entitlement;
+                var authToken:String = signature + "," + entitlement;
 
                 var byteArray:ByteArray = new ByteArray();
                 byteArray.writeUTFBytes(authToken);
@@ -642,15 +636,18 @@ public class SeeSawPlayer extends Sprite {
         layout.horizontalAlign = HorizontalAlign.CENTER;
     }
 
-    private function configureAuditude(mediaElement:MediaElement):void {
+    private function createAuditudeElement(mediaElement:MediaElement):MediaElement {
         if (mediaElement is IAuditudeMediaElement) {
-            logger.debug("configuring Auditude");
-            var _auditude:AuditudePlugin = IAuditudeMediaElement(mediaElement).plugin;
+            logger.debug("configuring Auditude proxy");
+            var auditude:AuditudePlugin = IAuditudeMediaElement(mediaElement).plugin;
+            mediaElement = new AdProxy(mediaElement);
 
-            // We set this in the metadata so the auditude AdProxy can pick up the plugin
-            var metadata:Metadata = config.resource.getMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) as Metadata;
-            metadata.addValue(AuditudeConstants.PLUGIN_INSTANCE, _auditude);
+            var metadata:Metadata = new Metadata();
+            mediaElement.addMetadata(AuditudeConstants.SETTINGS_NAMESPACE, metadata);
+
+            metadata.addValue(AuditudeConstants.PLUGIN_INSTANCE, auditude);
         }
+        return mediaElement;
     }
 
     private function onAdElementTraitAdd(event:MediaElementEvent):void {
@@ -734,7 +731,7 @@ public class SeeSawPlayer extends Sprite {
     private function generateUserEventMetadata(event:MetadataEvent):void {
         var playerMetadata:Metadata = config.resource.getMetadataValue(PlayerConstants.METADATA_NAMESPACE) as Metadata;
         var metadata:Metadata = playerMetadata.getValue(PlayerConstants.USEREVENTS_METADATA_NAMESPACE);
-        if(!metadata){
+        if (!metadata) {
             metadata = new Metadata();
             playerMetadata.addValue(PlayerConstants.USEREVENTS_METADATA_NAMESPACE, metadata);
         }

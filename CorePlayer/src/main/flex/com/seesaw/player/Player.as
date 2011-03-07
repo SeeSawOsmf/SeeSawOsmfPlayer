@@ -562,7 +562,6 @@ public class Player extends Sprite {
             } else if (playerInit.adMode == AuditudeConstants.AD_MODE_ID) {
                 metadata = new Metadata();
 
-
                 metadata.addValue(AuditudeOSMFConstants.VERSION, playerInit.auditude.version);
                 metadata.addValue(AuditudeOSMFConstants.DOMAIN, playerInit.auditude.domain);
                 metadata.addValue(AuditudeOSMFConstants.ZONE_ID, playerInit.auditude.zoneId);
