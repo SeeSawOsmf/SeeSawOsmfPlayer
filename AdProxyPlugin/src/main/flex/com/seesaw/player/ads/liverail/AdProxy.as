@@ -240,11 +240,14 @@ public class AdProxy extends ProxyElement {
             //start time value converted to Number: 0, 768.52, 100
             var startTimeValue:Number = adBreak.startTimeValue;
 
+
+
             //specifies whether the startTimeValue is Percent (true) or  seconds (false)
             var startTimeIsPercent:Boolean = adBreak.startTimeIsPercent;
 
             // sets the ad breaks as metadata on the element
             var metadataAdBreak:AdBreak = new AdBreak();
+            metadataAdBreak.complete = (resumePosition > startTimeValue)? true : false;
             metadataAdBreak.queueAdsTotal = queueAdsTotal;
             metadataAdBreak.queueDuration = queueDuration;
             metadataAdBreak.startTime = startTimeValue;

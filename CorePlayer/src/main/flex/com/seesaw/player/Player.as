@@ -166,7 +166,7 @@ public class Player extends Sprite {
             xi.addGetCurrentItemTitleCallback(getCurrentItemTitle);
             xi.addGetCurrentItemDurationCallback(getCurrentItemDuration);
             xi.addGetEntitlementCallback(getEntitlement);
-            xi.addSetPlaylistCallback(setPlaylist);   /// todo this might not be needed anymore as the playlist is already set...
+            xi.addSetPlaylistCallback(setPlaylist);
             // Let JS know we're ready to receive calls (e.g. C4 ad script):
             xi.callSWFInit(); /// noAdsCTA will call prematurely in this instance..
         }

@@ -69,6 +69,7 @@ import org.osmf.events.MediaFactoryEvent;
 import org.osmf.events.MediaPlayerStateChangeEvent;
 import org.osmf.events.MetadataEvent;
 import org.osmf.events.PlayEvent;
+import org.osmf.events.SeekEvent;
 import org.osmf.events.TimeEvent;
 import org.osmf.events.TimelineMetadataEvent;
 import org.osmf.layout.HorizontalAlign;
@@ -93,6 +94,7 @@ import org.osmf.traits.MediaTraitBase;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.PlayTrait;
+import org.osmf.traits.SeekTrait;
 import org.osmf.traits.TimeTrait;
 import org.osmf.traits.TraitEventDispatcher;
 
@@ -304,6 +306,7 @@ public class SeeSawPlayer extends Sprite {
         }
     }
 
+
     private function adPlayStateChange(event:PlayEvent):void {
         if (!currentAdBreak.complete) {
             if (event.playState == PlayState.STOPPED) {
@@ -436,6 +439,7 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onBufferingChange(event:BufferEvent):void {
+        var seeking:SeekTrait = mainElement.getTrait(MediaTraitType.SEEK) as SeekTrait;
         if (event.currentTarget.bufferLength < 0.1) {
             (event.buffering) ? bufferingPanel.show() : bufferingPanel.hide();
         } else {
@@ -569,6 +573,14 @@ public class SeeSawPlayer extends Sprite {
 
         // get the control bar to point at the main content
         setControlBarTarget(mainElement);
+    }
+
+    private function mainElementSeekChange(event:SeekEvent):void {
+       if(event.seeking){
+            player.removeEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
+       }else if(!event.seeking){
+            player.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
+       }
     }
 
     private function onSmilElementCreated(event:MediaFactoryEvent):void {
@@ -751,11 +763,9 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function generateUserEventMetadata(event:MetadataEvent):void {
-        var playerMetadata:Metadata = config.resource.getMetadataValue(PlayerConstants.METADATA_NAMESPACE) as Metadata;
-        var metadata:Metadata = playerMetadata.getValue(PlayerConstants.USEREVENTS_METADATA_NAMESPACE);
-        if (!metadata) {
-            metadata = new Metadata();
-            playerMetadata.addValue(PlayerConstants.USEREVENTS_METADATA_NAMESPACE, metadata);
+        var metadata:Metadata = userEventMetaData as Metadata;
+        if(metadata){
+              metadata.addValue(event.key, event.value);
         }
     }
 

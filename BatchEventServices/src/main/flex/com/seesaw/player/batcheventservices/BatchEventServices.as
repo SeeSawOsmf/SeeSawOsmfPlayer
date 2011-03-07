@@ -236,7 +236,6 @@ public class BatchEventServices extends ProxyElement {
 
 
     private function playerMetaChanged(event:MetadataEvent):void {
-        //TODO  lIVERAIL METDATA CHANGE AGAINST THE SECTIONCOUNT BEFORE THIS IS FIRED......
         if (adMode == AdMetadata.LR_AD_TYPE || AdMetadata.AUDITUDE_AD_TYPE) {
             if (event.key == AdMetadata.SECTION_COUNT) {
                 sectionCount = evaluateNewSectionCount(event.value);
