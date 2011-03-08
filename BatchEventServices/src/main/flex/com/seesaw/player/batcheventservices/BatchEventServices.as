@@ -120,6 +120,7 @@ public class BatchEventServices extends ProxyElement {
     private var cumulativeFlushCounter:int;
     private var AutoFlushTimer:Timer;
     private var finalEventTriggered:Boolean = false;
+    private var scrubbingActive:Boolean;
 
     public function BatchEventServices(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -209,6 +210,7 @@ public class BatchEventServices extends ProxyElement {
             userEvent = buildAndReturnUserEvent(UserEventTypes.AUTO_PLAY);
         } else {
             userEvent = buildAndReturnUserEvent(UserEventTypes.AUTO_RESUME);
+            playingMainContent = true;
         }
         eventsManager.addUserEvent(userEvent);
         eventsManager.flushAll();
@@ -274,6 +276,9 @@ public class BatchEventServices extends ProxyElement {
             }
         } else if (event.key == PlayerConstants.BUFFER_MESSAGE_SHOW && event.value) {
             userEventType = UserEventTypes.BUFFERING;
+
+        }  else if (event.key == UserEventTypes.USER_SCRUB_ACTIVATED) {
+            scrubbingActive = event.value;
         }
         if (userEventType != null) {
             eventsManager.addUserEvent(buildAndReturnUserEvent(userEventType));
@@ -482,7 +487,9 @@ public class BatchEventServices extends ProxyElement {
         if (playingMainContent) {
             switch (event.playState) {
                 case PlayState.PAUSED:
+                          if (cumulativeDurationMonitor.running) {
                     cumulativeDurationMonitor.stop();
+                          }
                     break;
                 case PlayState.PLAYING:
                     if (!cumulativeDurationMonitor.running) {
@@ -532,9 +539,11 @@ public class BatchEventServices extends ProxyElement {
                     if (cumulativeDurationMonitor.running) cumulativeDurationMonitor.stop();
                     contentViewingSequenceNumber = evaluateMainContentCount(event.time, true);
 
-                    eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.SCRUB));
+                 scrubbingActive ? eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.SCRUB)) : null;
 
                 }
+            }else{
+                 if (!cumulativeDurationMonitor.running) cumulativeDurationMonitor.start();
             }
             seeking = event.seeking;
         }

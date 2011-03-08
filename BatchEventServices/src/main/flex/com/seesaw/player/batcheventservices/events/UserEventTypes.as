@@ -54,5 +54,7 @@ public class UserEventTypes {
     public static const BUFFERING:String = "BUFFERING";
     public static const SUBTITLES_ON:String = "SUBTITLES_ON";
     public static const SUBTITLES_OFF:String = "SUBTITLES_OFF";
+
+     public static const USER_SCRUB_ACTIVATED:String = "userScrubActivated";
 }
 }

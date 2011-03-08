@@ -28,6 +28,7 @@ public class ControlBarConstants {
     public static const SUBTITLES_VISIBLE:String = "subtitlesVisible";
     public static const SUBTITLE_BUTTON_ENABLED:String = "subtitleButtonEnabled";
     public static const FULL_SCREEN:String = "fullScreen";
+    public static const USER_SCRUB_ACTIVATED:String = "userScrubActivated";
     public static const USER_CLICK_STATE:String = "userClickState";
 }
 }
