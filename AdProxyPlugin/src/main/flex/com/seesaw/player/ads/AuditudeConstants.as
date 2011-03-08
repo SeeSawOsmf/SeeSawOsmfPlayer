@@ -23,5 +23,6 @@ public class AuditudeConstants {
     public static const SETTINGS_NAMESPACE:String = "http://www.seesaw.com/player/plugins/auditude/settings";
     public static const AD_MODE_ID:String = "auditude";
     public static const PLUGIN_INSTANCE = "auditudePlugin";
+    public static const AUDITUDE_PLUGIN_URL:String = "http://asset.cdn.auditude.com/flash/plugin/osmf/1.0/AuditudeOSMFProxyPlugin.swf";
 }
 }

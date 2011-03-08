@@ -105,8 +105,6 @@ public class SeeSawPlayer extends Sprite {
     use namespace contentinfo;
     use namespace smil;
 
-    private static const AUDITUDE_PLUGIN_URL:String = "http://asset.cdn.auditude.com/flash/sandbox/plugin/osmf/AuditudeOSMFProxyPlugin.swf";
-
     private var logger:ILogger = LoggerFactory.getClassLogger(SeeSawPlayer);
 
     private var config:PlayerConfiguration;
@@ -371,7 +369,7 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function loadAuditude():void {
-        factory.loadPlugin(new URLResource(AUDITUDE_PLUGIN_URL));
+        factory.loadPlugin(new URLResource(AuditudeConstants.AUDITUDE_PLUGIN_URL));
     }
 
     private function onPluginLoaded(event:MediaFactoryEvent):void {
