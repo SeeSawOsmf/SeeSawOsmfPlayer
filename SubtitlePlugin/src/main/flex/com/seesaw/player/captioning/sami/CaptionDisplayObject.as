@@ -81,9 +81,12 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
     override public function layout(availableWidth:Number, availableHeight:Number, deep:Boolean = true):void {
         super.layout(availableWidth, availableHeight, deep);
 
+        logger.debug("CAPTION: " + captionField.htmlText);
+
         logger.debug("availableWidth: " + availableWidth + " captionFieldWidth: " + captionField.width);
 
-        if (availableWidth != captionField.width) {
+        //we check the captionField.html to make sure the subtitles have arrived - this prevents random resizing during stings etc
+        if ((availableWidth != captionField.width) && (captionField.htmlText.length > 0)) {
 
             var goLarge:Boolean = availableWidth >= captionField.width;
 

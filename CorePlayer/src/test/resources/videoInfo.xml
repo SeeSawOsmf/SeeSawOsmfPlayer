@@ -23,6 +23,8 @@
     <ns2:smil>
         <ns2:head>
             <ns2:meta base="rtmpe://cdn-flash-blue-dev.vodco.co.uk/a2703"/>
+            <ns2:meta content="http://kgd-blue-test-zxtm01.dev.vodco.co.uk/s/ccp/00000002/298.smi"
+                      name="subtitleLocation"/>
         </ns2:head>
         <ns2:body>
             <ns2:seq>
