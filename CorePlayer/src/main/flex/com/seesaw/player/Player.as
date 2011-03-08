@@ -579,7 +579,7 @@ public class Player extends Sprite {
                     metadata.addValue(AuditudeOSMFConstants.SKIP_BREAKS_BEFORE_RESUME_TIME, true);
                 }
 
-                resource.addMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE, metadata)
+                resource.addMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE, metadata);
             }
         }
 

@@ -206,10 +206,8 @@ public class AutoResumeProxy extends ProxyElement {
             logger.debug("ad break at requested resume point {0}: complete = {1}", time, adBreak.complete);
         }
 
-        if (seekTrait && seekTrait.canSeekTo(timeToWrite)) {
-            logger.debug("recording resume point: requested = {0}, written = {1}", time, timeToWrite);
-           resumeService.writeResumeCookie(timeToWrite);
-        }
+        logger.debug("recording resume point: requested = {0}, written = {1}", time, timeToWrite);
+        resumeService.writeResumeCookie(timeToWrite);
     }
 
     private function onTraitAdd(event:MediaElementEvent):void {
@@ -241,9 +239,11 @@ public class AutoResumeProxy extends ProxyElement {
 
     private function changeListeners(add:Boolean, traitType:String, event:String, listener:Function):void {
         if (add) {
+            logger.debug("trait added: {0}", traitType);
             getTrait(traitType).addEventListener(event, listener);
         }
         else if (hasTrait(traitType)) {
+            logger.debug("trait removed: {0}", traitType);
             getTrait(traitType).removeEventListener(event, listener);
         }
     }

@@ -547,7 +547,6 @@ public class BatchEventServices extends ProxyElement {
             }
             seeking = event.seeking;
         }
-        logger.debug("------------On Seek Change:{0}", event.seeking);
     }
 
     private function toggleTimeListeners(added:Boolean):void {

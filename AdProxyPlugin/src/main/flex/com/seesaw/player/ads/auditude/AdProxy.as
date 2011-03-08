@@ -25,6 +25,7 @@ import com.auditude.ads.event.AdClickThroughEvent;
 import com.auditude.ads.event.AdPluginEvent;
 import com.auditude.ads.event.LinearAdEvent;
 import com.auditude.ads.event.NonLinearAdEvent;
+import com.auditude.ads.osmf.constants.AuditudeOSMFConstants;
 import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.ads.AdBreak;
 import com.seesaw.player.ads.AdMetadata;
@@ -50,7 +51,9 @@ public class AdProxy extends ProxyElement {
     private var logger:ILogger = LoggerFactory.getClassLogger(AdProxy);
 
     private var playerMetadata:Metadata;
+    private var auditudeMetadata:Metadata;
     private var currentAdBreak:AdBreak;
+    private var metadataAdBreaks:Vector.<AdBreak>;
 
     public function AdProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -68,6 +71,7 @@ public class AdProxy extends ProxyElement {
 
             super.proxiedElement = value;
 
+            auditudeMetadata = resource.getMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) as Metadata;
             playerMetadata = proxiedElement.resource.getMetadataValue(PlayerConstants.METADATA_NAMESPACE) as Metadata;
 
             proxiedElement.addEventListener(MediaElementEvent.METADATA_ADD, onMetadataAdd);
@@ -109,9 +113,12 @@ public class AdProxy extends ProxyElement {
     }
 
     private function onAuditudeInit(event:AdPluginEvent):void {
-        var metadataAdBreaks:Vector.<AdBreak> = new Vector.<AdBreak>();
+        metadataAdBreaks = new Vector.<AdBreak>();
         var adBreaks:Array = event.data.breaks;
-
+        var skipBreaksBeforeResume:Boolean = auditudeMetadata ?
+                auditudeMetadata.getValue(AuditudeOSMFConstants.SKIP_BREAKS_BEFORE_RESUME_TIME) : false;
+        var resumePoint:Number = auditudeMetadata ?
+                auditudeMetadata.getValue(AuditudeOSMFConstants.RESUME_TIME_IN_SECONDS) : 0;
         for (var i:uint = 0; i < adBreaks.length; i++) {
             var adBreak:Object = adBreaks[i];
 
@@ -137,6 +144,7 @@ public class AdProxy extends ProxyElement {
             metadataAdBreak.queueDuration = queueDuration;
             metadataAdBreak.startTime = startTimeValue;
             metadataAdBreak.startTimeIsPercent = startTimeIsPercent;
+            metadataAdBreak.complete = skipBreaksBeforeResume && startTimeValue < resumePoint;
 
             // Dont add the break if it has no ads, eg no content to play, so we don't want a blip for this item
             if (hasAds) {
@@ -210,10 +218,11 @@ public class AdProxy extends ProxyElement {
     // Auditude Event Handlers
 
     private function onBreakBegin(event:AdPluginEvent):void {
-        logger.debug("AD BREAK BEGIN");
+        logger.debug("AD BREAK BEGIN: time = {0}, index = {1}, duration = {2}, empty = {3}", event.data.startTime,
+                event.data.breakIndex, event.data.breakDuration, event.data.isEmpty);
 
         // Is this the best way to get the breakTime
-        currentAdBreak = adMetadata.getAdBreakWithTime(event.data.breakTime);
+        currentAdBreak = metadataAdBreaks[event.data.breakIndex];
 
         adMetadata.adState = AdState.AD_BREAK_START;
         adMetadata.adMode = AdMode.AD;
@@ -222,15 +231,16 @@ public class AdProxy extends ProxyElement {
 
     private function onBreakEnd(event:AdPluginEvent):void {
         logger.debug("AD BREAK END");
+        setTraitsToBlock();
+
         adMetadata.adState = AdState.AD_BREAK_COMPLETE;
         adMetadata.adMode = AdMode.MAIN_CONTENT;
 
         if (currentAdBreak) {
             // This dispatches an event that seeks to the user's final seek point
             currentAdBreak.complete = true;
+            logger.debug("ad break watched: {0}", currentAdBreak);
         }
-
-        setTraitsToBlock();
     }
 
     private function onLinearAdBegin(event:LinearAdEvent):void {
