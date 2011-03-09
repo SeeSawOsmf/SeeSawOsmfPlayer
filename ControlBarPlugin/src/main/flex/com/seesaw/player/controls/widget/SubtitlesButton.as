@@ -22,6 +22,8 @@ package com.seesaw.player.controls.widget {
 import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.ads.AdState;
 import com.seesaw.player.controls.ControlBarConstants;
+import com.seesaw.player.ioc.ObjectProvider;
+import com.seesaw.player.services.ResumeService;
 import com.seesaw.player.ui.PlayerToolTip;
 import com.seesaw.player.ui.StyledTextField;
 
@@ -50,7 +52,7 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
     private var mouseOverLabel:Boolean = false;
 
     private var toolTip:PlayerToolTip;
-
+    private var resumeService:ResumeService;
     /* static */
     private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.SubtitlesButton";
 
@@ -59,6 +61,7 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
     _requiredTraits[1] = MediaTraitType.PLAY;
 
     private var metadata:Metadata;
+    private var autoResumed:Boolean;
 
     public function SubtitlesButton() {
         subtitlesLabel = new StyledTextField();
@@ -74,7 +77,16 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
 
         addChild(subtitlesLabel);
 
+        autoResumed = checkAutoResume;
         this.subtitlesLabel.visible = false;
+    }
+
+    private function get checkAutoResume():Boolean {
+        var provider:ObjectProvider = ObjectProvider.getInstance();
+        resumeService = provider.getObject(ResumeService);
+
+        return (resumeService && resumeService.getResumeCookie() > 0) ? true : false;
+
     }
 
     override protected function processMediaElementChange(oldMediaElement:MediaElement):void {
@@ -83,6 +95,11 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
             if (metadata == null) {
                 metadata = new Metadata();
                 media.addMetadata(ControlBarConstants.CONTROL_BAR_METADATA, metadata);
+            }
+            if (autoResumed) {
+                metadata.addEventListener(MetadataEvent.VALUE_ADD, metadataChange);
+                metadata.addEventListener(MetadataEvent.VALUE_CHANGE, metadataChange);
+                metadata.addEventListener(MetadataEvent.VALUE_REMOVE, metadataChange);
             }
 
             var adMetadata:AdMetadata = media.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
@@ -94,11 +111,19 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
         }
     }
 
+    private function metadataChange(event:MetadataEvent):void {
+        if (metadata.getValue(ControlBarConstants.SUBTITLE_BUTTON_ENABLED)) {
+            this.subtitlesLabel.visible = true;
+            metadata.removeEventListener(MetadataEvent.VALUE_ADD, metadataChange);
+            metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, metadataChange);
+            metadata.removeEventListener(MetadataEvent.VALUE_REMOVE, metadataChange);
+        }
+    }
 
     private function onAdMetadataChange(event:MetadataEvent):void {
         if (metadata.getValue(ControlBarConstants.SUBTITLE_BUTTON_ENABLED)) {
             if (event.key == AdMetadata.AD_STATE && event.value == AdState.AD_BREAK_COMPLETE) {
-                this.subtitlesLabel.visible = true
+                this.subtitlesLabel.visible = true;
             } else if (event.key == AdMetadata.AD_STATE && event.value == AdState.AD_BREAK_START) {
                 this.subtitlesLabel.visible = false;
             }
