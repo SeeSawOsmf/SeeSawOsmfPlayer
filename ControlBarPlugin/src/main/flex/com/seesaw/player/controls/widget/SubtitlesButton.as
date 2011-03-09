@@ -88,8 +88,7 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
             }
 
                 metadata.addEventListener(MetadataEvent.VALUE_ADD, metadataChange);
-                metadata.addEventListener(MetadataEvent.VALUE_CHANGE, metadataChange);
-                metadata.addEventListener(MetadataEvent.VALUE_REMOVE, metadataChange);
+
 
 
             var adMetadata:AdMetadata = media.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
@@ -102,11 +101,9 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
     }
 
     private function metadataChange(event:MetadataEvent):void {
-        if (metadata.getValue(ControlBarConstants.SUBTITLE_BUTTON_ENABLED)) {
+        if (event.key == ControlBarConstants.SUBTITLE_BUTTON_ENABLED && event.value) {
             this.subtitlesLabel.visible = true;
             metadata.removeEventListener(MetadataEvent.VALUE_ADD, metadataChange);
-            metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, metadataChange);
-            metadata.removeEventListener(MetadataEvent.VALUE_REMOVE, metadataChange);
         }
     }
 

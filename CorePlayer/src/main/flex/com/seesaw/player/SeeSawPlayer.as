@@ -356,6 +356,8 @@ public class SeeSawPlayer extends Sprite {
             mainContainer.visible = true;
 
             player.play();
+
+            adMetadata.adMode = AdMode.MAIN_CONTENT;        /// notify the bachEvents tht we have transitioned to main content..
         }
     }
 
