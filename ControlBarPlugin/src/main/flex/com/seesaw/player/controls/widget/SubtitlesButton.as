@@ -59,7 +59,6 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
     _requiredTraits[1] = MediaTraitType.PLAY;
 
     private var metadata:Metadata;
-    private var autoResumed:Boolean;
 
     public function SubtitlesButton() {
         subtitlesLabel = new StyledTextField();
