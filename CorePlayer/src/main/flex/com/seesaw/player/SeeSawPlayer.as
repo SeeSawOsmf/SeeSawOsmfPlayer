@@ -308,7 +308,9 @@ public class SeeSawPlayer extends Sprite {
         if (!currentAdBreak.complete) {
             if (event.playState == PlayState.STOPPED) {
                 var adMetadata:AdMetadata = mainElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
-                adMetadata.adState = AdState.STOPPED;
+                var dataObject:Object = new Object();
+                dataObject["state"] = AdState.STOPPED;
+                adMetadata.adState = dataObject;
             }
         }
     }
@@ -317,7 +319,10 @@ public class SeeSawPlayer extends Sprite {
         if (!currentAdBreak.complete) {
             if (event.type == TimeEvent.DURATION_CHANGE) {
                 var adMetadata:AdMetadata = mainElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
-                adMetadata.adState = AdState.STARTED;
+                var dataObject:Object = new Object();
+                dataObject["state"] = AdState.STARTED;
+                dataObject["contentUrl"] = URLResource(adPlayer.media.resource).url;
+                adMetadata.adState = dataObject;
             }
         }
     }
@@ -490,6 +495,8 @@ public class SeeSawPlayer extends Sprite {
             loadTrait.addEventListener(LoadEvent.LOAD_STATE_CHANGE, onSubtitleLoadStateChange);
 
             mainElement.addChild(subtitleElement);
+        }else{
+           setSubtitlesButtonEnabled(false);
         }
     }
 
