@@ -94,7 +94,6 @@ import org.osmf.traits.MediaTraitBase;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.PlayTrait;
-import org.osmf.traits.SeekTrait;
 import org.osmf.traits.TimeTrait;
 import org.osmf.traits.TraitEventDispatcher;
 
@@ -439,7 +438,6 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onBufferingChange(event:BufferEvent):void {
-        var seeking:SeekTrait = mainElement.getTrait(MediaTraitType.SEEK) as SeekTrait;
         if (event.currentTarget.bufferLength < 0.1) {
             (event.buffering) ? bufferingPanel.show() : bufferingPanel.hide();
         } else {
@@ -569,6 +567,7 @@ public class SeeSawPlayer extends Sprite {
             var dispatcher:TraitEventDispatcher = new TraitEventDispatcher();
             dispatcher.media = mediaElement;
             dispatcher.addEventListener(TimeEvent.COMPLETE, onComplete);
+            dispatcher.addEventListener(SeekEvent.SEEKING_CHANGE, mainElementSeekChange);
         }
 
         // get the control bar to point at the main content
@@ -576,11 +575,11 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function mainElementSeekChange(event:SeekEvent):void {
-       if(event.seeking){
+        if (event.seeking) {
             player.removeEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
-       }else if(!event.seeking){
+        } else if (!event.seeking) {
             player.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
-       }
+        }
     }
 
     private function onSmilElementCreated(event:MediaFactoryEvent):void {
@@ -717,13 +716,13 @@ public class SeeSawPlayer extends Sprite {
 
     private function netStatusChanged(event:NetStatusEvent):void {
 
-            var metadata:Metadata = mainElement.getMetadata(NetStatusMetadata.NET_STATUS_METADATA);
-            if (metadata == null) {
-                metadata = new Metadata();
-                mainElement.addMetadata(NetStatusMetadata.NET_STATUS_METADATA, metadata);
-            }
+        var metadata:Metadata = mainElement.getMetadata(NetStatusMetadata.NET_STATUS_METADATA);
+        if (metadata == null) {
+            metadata = new Metadata();
+            mainElement.addMetadata(NetStatusMetadata.NET_STATUS_METADATA, metadata);
+        }
 
-            metadata.addValue(NetStatusMetadata.STATUS, event.info);
+        metadata.addValue(NetStatusMetadata.STATUS, event.info);
 
     }
 
@@ -760,8 +759,8 @@ public class SeeSawPlayer extends Sprite {
 
     private function generateUserEventMetadata(event:MetadataEvent):void {
         var metadata:Metadata = userEventMetaData as Metadata;
-        if(metadata){
-              metadata.addValue(event.key, event.value);
+        if (metadata) {
+            metadata.addValue(event.key, event.value);
         }
     }
 
