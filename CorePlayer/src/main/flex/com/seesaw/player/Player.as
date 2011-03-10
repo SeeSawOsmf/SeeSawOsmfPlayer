@@ -35,6 +35,7 @@ import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.namespaces.smil;
+import com.seesaw.player.netstatus.NetStatusMetadata;
 import com.seesaw.player.panels.GeoBlockPanel;
 import com.seesaw.player.panels.GuidanceBar;
 import com.seesaw.player.panels.GuidancePanel;
@@ -548,6 +549,9 @@ public class Player extends Sprite {
 
         metadata = new Metadata();
         resource.addMetadataValue(BatchEventContants.SETTINGS_NAMESPACE, metadata);
+
+        metadata = new Metadata();
+        resource.addMetadataValue(NetStatusMetadata.NET_STATUS_METADATA, metadata);
 
         if (playerInit && !HelperUtils.getBoolean(playerInit.preview)) {
             if (playerInit.adMode == LiverailConstants.AD_MODE_ID) {

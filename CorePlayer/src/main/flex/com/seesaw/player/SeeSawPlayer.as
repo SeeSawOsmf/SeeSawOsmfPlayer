@@ -356,6 +356,8 @@ public class SeeSawPlayer extends Sprite {
             mainContainer.visible = true;
 
             player.play();
+
+            adMetadata.adMode = AdMode.MAIN_CONTENT;        /// notify the bachEvents tht we have transitioned to main content..
         }
     }
 
@@ -714,9 +716,6 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function netStatusChanged(event:NetStatusEvent):void {
-        if (event.info == "NetConnection.Connect.NetworkChange") {
-
-            factory.removeEventListener(NetStatusEvent.NET_STATUS, netStatusChanged);
 
             var metadata:Metadata = mainElement.getMetadata(NetStatusMetadata.NET_STATUS_METADATA);
             if (metadata == null) {
@@ -725,7 +724,7 @@ public class SeeSawPlayer extends Sprite {
             }
 
             metadata.addValue(NetStatusMetadata.STATUS, event.info);
-        }
+
     }
 
     private function onFullscreen(event:FullScreenEvent):void {

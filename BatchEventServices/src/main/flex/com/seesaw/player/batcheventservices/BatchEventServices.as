@@ -346,11 +346,10 @@ public class BatchEventServices extends ProxyElement {
     private function onNetstatusMetadataChange(event:MetadataEvent):void {
         if (event.value == "NetConnection.Connect.NetworkChange")
             eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.CONNECTION_CLOSED));
-
+            eventsManager.flushAll();
         if (event.value == "NetConnection.Connect.Reconnection") {
             eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.CONNECTION_RESTART));
             eventsManager.flushAll();        /// since we have just lost connection and reconnected we want to force an event record..
-
         }
     }
 
