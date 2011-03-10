@@ -838,7 +838,7 @@ public class SeeSawPlayer extends Sprite {
         // This has been expanded to make it easy to debug as e4x can't be expanded in the debugger
         var tvVodPlayable:Boolean = HelperUtils.getBoolean(userInfo.availability.tvodPlayable);
         var svodPlayable:Boolean = HelperUtils.getBoolean(userInfo.availability.svodPlayable);
-        var preview:Boolean = HelperUtils.getBoolean(playerInit.preview);
+        var preview:Boolean = HelperUtils.getBoolean(playerInit.showPreview);
         var noAds:Boolean = HelperUtils.getBoolean(userInfo.availability.noAdsPlayable);
         var exceededDrm:Boolean = HelperUtils.getBoolean(userInfo.availability.exceededDrmRule);
         if (tvVodPlayable) {
