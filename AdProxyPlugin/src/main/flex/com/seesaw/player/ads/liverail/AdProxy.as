@@ -28,8 +28,11 @@ import com.seesaw.player.ads.AdMode;
 import com.seesaw.player.ads.AdState;
 import com.seesaw.player.ads.LiverailConstants;
 import com.seesaw.player.ads.events.LiveRailEvent;
+import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.namespaces.contentinfo;
+import com.seesaw.player.services.ResumeService;
 import com.seesaw.player.traits.ads.AdPlayTrait;
+import com.seesaw.player.utils.CookieHelper;
 
 import flash.events.Event;
 import flash.events.TimerEvent;
@@ -43,6 +46,7 @@ import org.osmf.events.AudioEvent;
 import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.PlayEvent;
+import org.osmf.events.SeekEvent;
 import org.osmf.events.TimeEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaResourceBase;
@@ -70,10 +74,24 @@ public class AdProxy extends ProxyElement {
     private var timer:Timer;
     private var playerMetadata:Metadata;
     private var currentAdBreak:AdBreak;
+    private var resumeService:ResumeService;
+    private var cookie:CookieHelper;
 
     public function AdProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
+
+        var provider:ObjectProvider = ObjectProvider.getInstance();
+        resumeService = provider.getObject(ResumeService);
+
+        if (resumeService == null) {
+            throw ArgumentError("no resume service implementation provided");
+        }
+        resumePosition = resumeService.getResumeCookie();
+
         Security.allowDomain("vox-static.liverail.com");
+
+        cookie = new CookieHelper(PlayerConstants.PLAYER_VOLUME_COOKIE);
+
         timer = new Timer(CONTENT_UPDATE_INTERVAL);
         timer.addEventListener(TimerEvent.TIMER, onTimerTick);
     }
@@ -113,12 +131,11 @@ public class AdProxy extends ProxyElement {
             adManager.addEventListener(LiveRailEvent.CLICK_THRU, onClickThru);
 
             config = getSetting(LiverailConstants.CONFIG_OBJECT) as Configuration;
-            resumePosition = getSetting(LiverailConstants.RESUME_POSITION) as Number;
 
             // block these until the liverail events kick in
             setTraitsToBlock(MediaTraitType.PLAY, MediaTraitType.TIME, MediaTraitType.DISPLAY_OBJECT);
 
-            // After calling initAds(config), the main video playerï¿½s controls should be disabled and any requests to
+            // After calling initAds(config), the main video playerÃ¯Â¿Â½s controls should be disabled and any requests to
             // play a movie should be cancelled or delayed until the initComplete (or the initError) event is received
             // from the ad manager. If initComplete has been received, first call lrAdManager.onContentStart() and only
             // resume your main video after prerollComplete event is triggered.
@@ -157,6 +174,7 @@ public class AdProxy extends ProxyElement {
                     timer = new Timer(CONTENT_UPDATE_INTERVAL);
                     timer.addEventListener(TimerEvent.TIMER, onTimerTick);
                 }
+
                 timer.start();
             }
             else {
@@ -222,11 +240,14 @@ public class AdProxy extends ProxyElement {
             //start time value converted to Number: 0, 768.52, 100
             var startTimeValue:Number = adBreak.startTimeValue;
 
+
+
             //specifies whether the startTimeValue is Percent (true) or  seconds (false)
             var startTimeIsPercent:Boolean = adBreak.startTimeIsPercent;
 
             // sets the ad breaks as metadata on the element
             var metadataAdBreak:AdBreak = new AdBreak();
+            metadataAdBreak.complete = (resumePosition > startTimeValue)? true : false;
             metadataAdBreak.queueAdsTotal = queueAdsTotal;
             metadataAdBreak.queueDuration = queueDuration;
             metadataAdBreak.startTime = startTimeValue;
@@ -242,7 +263,12 @@ public class AdProxy extends ProxyElement {
 
         // section count need to occur before we start the adContent. as this is required for the first view to be registered.
         playerMetadata.addValue(AdMetadata.SECTION_COUNT, metadataAdBreaks.length);
-        adManager.onContentStart();
+        if (resumePosition <= 0) {
+            adManager.onContentStart();
+        } else {
+            setTraitsToBlock();
+            play();
+        }
     }
 
     private function onInitError(ev:Object):void {
@@ -300,6 +326,11 @@ public class AdProxy extends ProxyElement {
         // Perhaps this is needed for mid-rolls
         if (event.data.breakTime > 0)   /// not to pause for preROll...
             pause();
+
+        if(cookie.localSharedObject.data.volume == null)
+           cookie.localSharedObject.data.volume = PlayerConstants.DEFAULT_VOLUME;
+
+        adManager.setVolume(cookie.localSharedObject.data.volume);
 
         // mask the existing play trait so we get the play state changes here
         var adPlayTrait:AdPlayTrait = new AdPlayTrait();
@@ -406,7 +437,14 @@ public class AdProxy extends ProxyElement {
             case MediaTraitType.TIME:
                 changeListeners(element, add, traitType, TimeEvent.COMPLETE, onComplete);
                 break;
+            case MediaTraitType.SEEK:
+                if (resumePosition > 0)    changeListeners(element, add, traitType, SeekEvent.SEEKING_CHANGE, onSeekChange);
+                break;
         }
+    }
+
+    private function onSeekChange(event:SeekEvent):void {
+        trace(event.target);
     }
 
     private function changeListeners(element:MediaElement, add:Boolean, traitType:String, event:String, listener:Function):void {

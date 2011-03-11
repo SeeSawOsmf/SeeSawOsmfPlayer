@@ -112,7 +112,7 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
         super.media = value;
 
         if (media) {
-            this.metadata = media.getMetadata(ExternalInterfaceMetadata.EXTERNAL_INTERFACE_METADATA);
+            metadata = media.getMetadata(ExternalInterfaceMetadata.EXTERNAL_INTERFACE_METADATA);
             if (metadata == null) {
                 metadata = new Metadata();
                 media.addMetadata(ExternalInterfaceMetadata.EXTERNAL_INTERFACE_METADATA, metadata);

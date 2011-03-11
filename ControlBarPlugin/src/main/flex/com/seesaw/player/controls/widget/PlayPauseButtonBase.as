@@ -40,20 +40,7 @@ public class PlayPauseButtonBase extends ButtonWidget {
     private var _requiredTraits:Vector.<String> = new Vector.<String>;
 
     private var metadata:Metadata;
-
-    override public function set media(value:MediaElement):void {
-
-        super.media = value;
-
-        if (media) {
-            metadata = media.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
-            if (metadata == null) {
-                metadata = new Metadata();
-                media.addMetadata(ControlBarConstants.CONTROL_BAR_METADATA, metadata);
-            }
-        }
-    }
-
+    protected var playTrait:PlayTrait
 
     public function PlayPauseButtonBase() {
         logger.debug("PlayPauseButtonBase()");
@@ -75,7 +62,6 @@ public class PlayPauseButtonBase extends ButtonWidget {
         else {
             playTrait.play();
         }
-
     }
 
     public function updateMetadata():void {
@@ -87,28 +73,34 @@ public class PlayPauseButtonBase extends ButtonWidget {
     }
 
     override protected function onMediaElementTraitAdd(event:MediaElementEvent):void {
-        if (event.traitType == MediaTraitType.PLAY) {
-            var trait:PlayTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
-            trait.addEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
-            trait.addEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
-        }
         updateVisibility();
     }
 
     override protected function onMediaElementTraitRemove(event:MediaElementEvent):void {
-        if (event.traitType == MediaTraitType.PLAY) {
-            var trait:PlayTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
-            trait.removeEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
-            trait.removeEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
-        }
         updateVisibility();
     }
 
+    override protected function processMediaElementChange(oldMediaElement:MediaElement):void {
+        metadata = media.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
+        if (metadata == null) {
+            metadata = new Metadata();
+            media.addMetadata(ControlBarConstants.CONTROL_BAR_METADATA, metadata);
+        }
+    }
+
     override protected function processRequiredTraitsAvailable(element:MediaElement):void {
+        playTrait = element.getTrait(MediaTraitType.PLAY) as PlayTrait;
+        playTrait.addEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
+        playTrait.addEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
         updateVisibility();
     }
 
     override protected function processRequiredTraitsUnavailable(element:MediaElement):void {
+        if (playTrait) {
+            playTrait.removeEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
+            playTrait.removeEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
+            playTrait = null;
+        }
         updateVisibility();
     }
 
@@ -129,10 +121,6 @@ public class PlayPauseButtonBase extends ButtonWidget {
 
     protected function get playing():Boolean {
         return playTrait && playTrait.playState == PlayState.PLAYING;
-    }
-
-    public function get playTrait():PlayTrait {
-        return media ? media.getTrait(MediaTraitType.PLAY) as PlayTrait : null;
     }
 }
 }

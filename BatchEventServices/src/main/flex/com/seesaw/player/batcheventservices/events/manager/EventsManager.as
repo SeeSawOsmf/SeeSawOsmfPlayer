@@ -31,6 +31,8 @@ public interface EventsManager {
 
     function flushAll():void;
 
+    function flushExitEvent():void;
+
     function flushCumulativeDuration(cumulativeDuration:CumulativeDurationEvent):void;
 }
 }

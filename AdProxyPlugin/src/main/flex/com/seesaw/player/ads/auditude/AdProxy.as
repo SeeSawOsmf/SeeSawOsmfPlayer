@@ -32,7 +32,6 @@ import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.ads.AdMode;
 import com.seesaw.player.ads.AdState;
 import com.seesaw.player.ads.AuditudeConstants;
-import com.seesaw.player.traits.ads.AdTimeTrait;
 
 import flash.system.Security;
 
@@ -43,7 +42,6 @@ import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MetadataEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.metadata.Metadata;
-import org.osmf.traits.LoadTrait;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayTrait;
 
@@ -52,41 +50,75 @@ public class AdProxy extends ProxyElement {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(AdProxy);
 
-    private var config:Configuration;
-    private var adTimeTrait:AdTimeTrait;
     private var playerMetadata:Metadata;
-    private var adBreakCount:int;
+    private var auditudeMetadata:Metadata;
+    private var currentAdBreak:AdBreak;
+    private var metadataAdBreaks:Vector.<AdBreak>;
 
     public function AdProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
         Security.allowDomain("sandbox.auditude.com");
     }
 
-    public override function set proxiedElement(proxiedElement:MediaElement):void {
-        if (proxiedElement) {
-            logger.debug("proxiedElement: " + proxiedElement);
-            super.proxiedElement = proxiedElement;
+    public override function set proxiedElement(value:MediaElement):void {
+        if (value) {
+            logger.debug("proxiedElement: " + value);
 
+            if (proxiedElement) {
+                proxiedElement.removeEventListener(MediaElementEvent.METADATA_ADD, onMetadataAdd);
+                proxiedElement.removeEventListener(MediaElementEvent.METADATA_REMOVE, onMetadataRemove);
+            }
+
+            super.proxiedElement = value;
+
+            auditudeMetadata = resource.getMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) as Metadata;
             playerMetadata = proxiedElement.resource.getMetadataValue(PlayerConstants.METADATA_NAMESPACE) as Metadata;
 
-            proxiedElement.addEventListener(MediaElementEvent.METADATA_ADD, onMetaDataAdd);
-            proxiedElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onMetaDataRemove);
-            proxiedElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdded);
-            logger.debug("SET PROXIEDELEMENT");
-            logger.debug(getSetting(AuditudeConstants.PLUGIN_INSTANCE));
-            var metadata:Metadata = proxiedElement.resource.getMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) as Metadata;
-            metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onMetaDataChange);
-            metadata.addEventListener(MetadataEvent.VALUE_ADD, onMetaDataChange);
+            proxiedElement.addEventListener(MediaElementEvent.METADATA_ADD, onMetadataAdd);
+            proxiedElement.addEventListener(MediaElementEvent.METADATA_REMOVE, onMetadataRemove);
+        }
+    }
 
+    private function onMetadataRemove(event:MediaElementEvent):void {
+        if (event.namespaceURL == AuditudeConstants.SETTINGS_NAMESPACE) {
+            event.metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onSettingsChange);
+            event.metadata.removeEventListener(MetadataEvent.VALUE_ADD, onSettingsChange);
+        }
+    }
+
+    private function onMetadataAdd(event:MediaElementEvent):void {
+        if (event.namespaceURL == AuditudeConstants.SETTINGS_NAMESPACE) {
+            event.metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onSettingsChange);
+            event.metadata.addEventListener(MetadataEvent.VALUE_ADD, onSettingsChange);
+        }
+    }
+
+    private function onSettingsChange(event:MetadataEvent):void {
+        if (event.key == AuditudeConstants.PLUGIN_INSTANCE) {
+            logger.debug("Got plugin instance: " + event.key);
+            var auditude:AuditudePlugin = event.value;
+            auditude.addEventListener(AdPluginEvent.INIT_COMPLETE, onAuditudeInit);
+            auditude.addEventListener(AdPluginEvent.BREAK_BEGIN, onBreakBegin);
+            auditude.addEventListener(AdPluginEvent.BREAK_END, onBreakEnd);
+
+            auditude.addEventListener(AdClickThroughEvent.AD_CLICK, onAdClickThrough);
+            auditude.addEventListener(LinearAdEvent.AD_BEGIN, onLinearAdBegin);
+            auditude.addEventListener(LinearAdEvent.AD_END, onLinearAdEnd);
+            auditude.addEventListener(NonLinearAdEvent.AD_BEGIN, onNonLinearAdBegin);
+            auditude.addEventListener(NonLinearAdEvent.AD_END, onNonLinearAdEnd);
+
+            auditude.addEventListener(AdPluginEvent.PAUSE_PLAYBACK, triggerPause);
+            auditude.addEventListener(AdPluginEvent.RESUME_PLAYBACK, triggerPlay)
         }
     }
 
     private function onAuditudeInit(event:AdPluginEvent):void {
-
-        var metadataAdBreaks:Vector.<AdBreak> = new Vector.<AdBreak>();
+        metadataAdBreaks = new Vector.<AdBreak>();
         var adBreaks:Array = event.data.breaks;
-
-
+        var skipBreaksBeforeResume:Boolean = auditudeMetadata ?
+                auditudeMetadata.getValue(AuditudeOSMFConstants.SKIP_BREAKS_BEFORE_RESUME_TIME) : false;
+        var resumePoint:Number = auditudeMetadata ?
+                auditudeMetadata.getValue(AuditudeOSMFConstants.RESUME_TIME_IN_SECONDS) : 0;
         for (var i:uint = 0; i < adBreaks.length; i++) {
             var adBreak:Object = adBreaks[i];
 
@@ -112,68 +144,18 @@ public class AdProxy extends ProxyElement {
             metadataAdBreak.queueDuration = queueDuration;
             metadataAdBreak.startTime = startTimeValue;
             metadataAdBreak.startTimeIsPercent = startTimeIsPercent;
+            metadataAdBreak.complete = skipBreaksBeforeResume && startTimeValue < resumePoint;
 
             // Dont add the break if it has no ads, eg no content to play, so we don't want a blip for this item
             if (hasAds) {
                 metadataAdBreaks[i] = metadataAdBreak;
+                logger.debug("ad break created at {0}s", startTimeValue);
             }
         }
         adMetadata.adBreaks = metadataAdBreaks;
 
         // section count need to occur before we start the adContent. as this is required for the first view to be registered.
         playerMetadata.addValue(AdMetadata.SECTION_COUNT, metadataAdBreaks.length);
-
-    }
-
-    private function onTraitAdded(event:MediaElementEvent):void {
-        var traitType:String;
-        for each (traitType in event.target.traitTypes) {
-            processTrait(traitType, true);
-        }
-    }
-
-    private function processTrait(traitType:String, added:Boolean):void {
-        switch (traitType) {
-            case MediaTraitType.LOAD:
-                toggleLoadListeners(added);
-                break;
-        }
-    }
-
-    private function toggleLoadListeners(added:Boolean):void {
-        var loadable:LoadTrait = proxiedElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
-        trace(loadable)
-    }
-
-    private function onMetaDataRemove(event:MediaElementEvent):void {
-        if (event.namespaceURL == AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) {
-            logger.debug("AUDITUDE METADATA REMOVED");
-        }
-    }
-
-    private function onMetaDataAdd(event:MediaElementEvent):void {
-        if (event.namespaceURL == AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) {
-            trace(event);
-        }
-    }
-
-    private function onMetaDataChange(event:MetadataEvent):void {
-        logger.debug("METADATA CHANGED: " + event.key);
-        if (event.key == AuditudeConstants.PLUGIN_INSTANCE) {
-            var _auditude:AuditudePlugin = event.value;
-            _auditude.addEventListener(AdPluginEvent.INIT_COMPLETE, onAuditudeInit);
-            _auditude.addEventListener(AdPluginEvent.BREAK_BEGIN, onBreakBegin);
-            _auditude.addEventListener(AdPluginEvent.BREAK_END, onBreakEnd);
-
-            _auditude.addEventListener(AdClickThroughEvent.AD_CLICK, onAdClickThrough);
-            _auditude.addEventListener(LinearAdEvent.AD_BEGIN, onLinearAdBegin);
-            _auditude.addEventListener(LinearAdEvent.AD_END, onLinearAdEnd);
-            _auditude.addEventListener(NonLinearAdEvent.AD_BEGIN, onNonLinearAdBegin);
-            _auditude.addEventListener(NonLinearAdEvent.AD_END, onNonLinearAdEnd);
-
-            _auditude.addEventListener(AdPluginEvent.PAUSE_PLAYBACK, triggerPause);
-            _auditude.addEventListener(AdPluginEvent.RESUME_PLAYBACK, triggerPlay)
-        }
     }
 
     private function triggerPause(event:AdPluginEvent):void {
@@ -190,12 +172,6 @@ public class AdProxy extends ProxyElement {
             // pauses the main content or the ads depending on the current adtrait
             playTrait.play();
         }
-    }
-
-
-    private function getSetting(key:String):* {
-        var metadata:Metadata = proxiedElement.resource.getMetadataValue(AuditudeOSMFConstants.AUDITUDE_METADATA_NAMESPACE) as Metadata;
-        return metadata ? metadata.getValue(key) : null;
     }
 
     private function setTraitsToBlock(...traitTypes):void {
@@ -242,13 +218,12 @@ public class AdProxy extends ProxyElement {
     // Auditude Event Handlers
 
     private function onBreakBegin(event:AdPluginEvent):void {
-        logger.debug("AD BREAK BEGIN");
+        logger.debug("AD BREAK BEGIN: time = {0}, index = {1}, duration = {2}, empty = {3}", event.data.startTime,
+                event.data.breakIndex, event.data.breakDuration, event.data.isEmpty);
 
-        adBreakCount++;
-        // Perhaps this is needed for mid-rolls
-        //pause();
+        // Is this the best way to get the breakTime
+        currentAdBreak = metadataAdBreaks[event.data.breakIndex];
 
-        // mask the existing play trait so we get the play state changes here
         adMetadata.adState = AdState.AD_BREAK_START;
         adMetadata.adMode = AdMode.AD;
         setTraitsToBlock(MediaTraitType.SEEK, MediaTraitType.TIME);
@@ -256,16 +231,21 @@ public class AdProxy extends ProxyElement {
 
     private function onBreakEnd(event:AdPluginEvent):void {
         logger.debug("AD BREAK END");
+        setTraitsToBlock();
+
         adMetadata.adState = AdState.AD_BREAK_COMPLETE;
         adMetadata.adMode = AdMode.MAIN_CONTENT;
-//        adMetadata.markNextUnseenAdBreakAsSeen();
-        setTraitsToBlock();
+
+        if (currentAdBreak) {
+            // This dispatches an event that seeks to the user's final seek point
+            currentAdBreak.complete = true;
+            logger.debug("ad break watched: {0}", currentAdBreak);
+        }
     }
 
     private function onLinearAdBegin(event:LinearAdEvent):void {
         logger.debug("AD BEGIN");
         processAdStateMeta(AdState.STARTED, event);
-
     }
 
     private function onLinearAdEnd(event:LinearAdEvent):void {
@@ -296,6 +276,5 @@ public class AdProxy extends ProxyElement {
         dataObject["creativeId"] = event.asset.creativeType;
         adMetadata.adState = dataObject;
     }
-
 }
 }

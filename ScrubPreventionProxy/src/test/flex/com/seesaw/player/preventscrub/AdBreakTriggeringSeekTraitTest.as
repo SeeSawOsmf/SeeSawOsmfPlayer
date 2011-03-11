@@ -18,13 +18,6 @@
  *   Contributor(s):  Adobe Systems Incorporated
  */
 
-/**
- * Created by IntelliJ IDEA.
- * User: ibhana
- * Date: 08/02/11
- * Time: 13:45
-
- */
 package com.seesaw.player.preventscrub {
 import com.seesaw.player.ads.AdBreak;
 
@@ -72,13 +65,23 @@ public class AdBreakTriggeringSeekTraitTest {
         assertThat(adBreaks[1].complete, equalTo(false));
         assertThat(adBreaks[0].complete, equalTo(false));
 
-        // seek back but not before the ad break at 50s - no ad break is triggered
+         // seek forward 10, but make sure no scrubPrevention is triggered
+        timeTrait.mockCurrentTime = 85;
+        seekTrait.seek(95);
+        assertThat(innerSeekTrait.finalSeekPoint, equalTo(95));
+
+        // seek back but not before the ad break at 50s - adBreak is triggered
         timeTrait.mockCurrentTime = 85;
         seekTrait.seek(55);
+        assertThat(innerSeekTrait.finalSeekPoint, equalTo(50));
+
+        assertThat(adBreaks[1].seekPointAfterAdBreak, equalTo(55));
+        adBreaks[1].complete = true;
         assertThat(innerSeekTrait.finalSeekPoint, equalTo(55));
 
+
         assertThat(adBreaks[2].complete, equalTo(true));
-        assertThat(adBreaks[1].complete, equalTo(false));
+        assertThat(adBreaks[1].complete, equalTo(true));
         assertThat(adBreaks[0].complete, equalTo(false));
 
         // seek back to 10 - no ad break is triggered
@@ -87,15 +90,12 @@ public class AdBreakTriggeringSeekTraitTest {
         assertThat(innerSeekTrait.finalSeekPoint, equalTo(10));
 
         assertThat(adBreaks[2].complete, equalTo(true));
-        assertThat(adBreaks[1].complete, equalTo(false));
+        assertThat(adBreaks[1].complete, equalTo(true));
         assertThat(adBreaks[0].complete, equalTo(false));
 
-        // seek forward from 10 to 60 - the 50s ad break is triggered
+        // seek forward from 10 to 60
         timeTrait.mockCurrentTime = 10;
         seekTrait.seek(60);
-        assertThat(innerSeekTrait.finalSeekPoint, equalTo(50));
-        assertThat(adBreaks[1].seekPointAfterAdBreak, equalTo(60));
-        adBreaks[1].complete = true;
         assertThat(innerSeekTrait.finalSeekPoint, equalTo(60));
 
         assertThat(adBreaks[2].complete, equalTo(true));

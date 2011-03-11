@@ -25,7 +25,9 @@ import com.seesaw.player.batcheventservices.events.ContentEvent;
 import com.seesaw.player.batcheventservices.events.CumulativeDurationEvent;
 import com.seesaw.player.batcheventservices.events.UserEvent;
 import com.seesaw.player.batcheventservices.events.ViewEvent;
+import com.seesaw.player.utils.AjaxRequestType;
 import com.seesaw.player.utils.ServiceRequest;
+import com.seesaw.player.utils.SynchronousHTTPService;
 
 import flash.net.URLVariables;
 
@@ -74,6 +76,7 @@ public class EventsManagerImpl implements EventsManager {
 
 
     public function addUserEvent(userEvent:UserEvent):void {
+        if(userEvent) {
         userEventCount++;
         userEvents.push(userEvent);
         if (userEventCount >= 10) {
@@ -82,6 +85,7 @@ public class EventsManagerImpl implements EventsManager {
                 flushAll();
             }
         }
+    }
     }
 
     public function addContentEvent(contentEvent:ContentEvent):void {
@@ -116,6 +120,28 @@ public class EventsManagerImpl implements EventsManager {
             contentEvents = [];
             userEventCount = 0;
             contentEventCount = 0;
+        }
+    }
+
+    public function flushExitEvent():void {
+        if (allowEvent) {
+
+            var eventsArray:Array = new Array(4);
+            eventsArray[0] = view;
+            eventsArray[1] = userEvents;
+            eventsArray[2] = contentEvents;
+            eventsArray[3] = new BatchEvent(userEventCount, incrementAndGetBatchEventId(), contentEventCount);
+
+            var post_data:URLVariables = new URLVariables();
+            post_data.data = JSON.encode(eventsArray);
+
+            var paramStr:String = "";
+            paramStr = "data=" + String(encodeURIComponent(post_data.data));
+
+            var request:SynchronousHTTPService = new SynchronousHTTPService(batchEventURL + "&" + paramStr);
+            request.requestType = AjaxRequestType.POST;
+            request.async = false;
+            request.send();
         }
     }
 

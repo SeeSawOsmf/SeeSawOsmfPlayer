@@ -32,6 +32,8 @@ public class PlayerConstants {
     public static const CONTENT_TYPE:String = "contentType";
     public static const SUBTITLE_LOCATION:String = "subtitleLocation";
     public static const REINITIALISE_PLAYER:String = "destroyPlayer";
+    public static const BUFFER_MESSAGE_SHOW:String = "bufferMessageShow";
+    public static const BUFFER_MESSAGE_HIDE:String = "bufferMessageHide";
 
     public static const MAIN_CONTENT_ID:String = "mainContent";
     public static const AD_CONTENT_ID:String = "advert";
@@ -39,12 +41,13 @@ public class PlayerConstants {
     public static const DOG_CONTENT_ID:String = "dogImage";
 
     public static const MAIN_CONTENT_DURATION:String = "mainContentDuration";
-
+     public static const PLAYER_VOLUME_COOKIE:String = "seesaw.player.volume";
     public static const PROCEED_BUTTON_NAME:String = "PlayerStartButton.proceedButton";
     public static const GUIDANCE_PANEL_ACCEPT_BUTTON_NAME:String = "GuidancePanel.acceptButton";
     public static const GUIDANCE_PANEL_CANCEL_BUTTON_NAME:String = "GuidancePanel.cancelButton";
 
     public static const MIN_BUFFER_SIZE_SECONDS:Number = 0.05;
     public static const MAX_BUFFER_SIZE_SECONDS:Number = 40;
+    public static const  DEFAULT_VOLUME:Number = 0.6;
 }
 }

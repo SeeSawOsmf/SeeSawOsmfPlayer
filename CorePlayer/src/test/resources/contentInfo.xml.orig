@@ -40,11 +40,6 @@
             <resumeOffset>00:05:00.00</resumeOffset>
             <data>CEN:x01,x02,x92,x80,x81,x93</data>
         </break>
-         <break>
-            <breakOffset>00:08:00.00</breakOffset>
-            <resumeOffset>00:08:00.00</resumeOffset>
-            <data>CEN:x01,x02,x92,x80,x81,x93</data>
-        </break>
         <!-- <break>
             <breakOffset>00:08:00.00</breakOffset>
             <resumeOffset>00:08:00.00</resumeOffset>
@@ -67,16 +62,16 @@
     <videoInfoUrl>../src/test/resources/videoInfo.fa.xml</videoInfoUrl>
      <batchEventUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player/initinfo:registerbatchevent?t:ac=26772
     </batchEventUrl>
-    <playIntervalEventUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player/initinfo:playintervalevent?t:ac=26772
+    <playIntervalEventUrl>http://seesaw.stage.vodco.co.uk/player/initinfo:playintervalevent?t:ac=26772
     </playIntervalEventUrl>
-    <largeImageUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/i/ccp/00000120/12035.jpg
+    <largeImageUrl>http://seesaw.stage.vodco.co.uk/i/ccp/00000182/18284.jpg
     </largeImageUrl>
     <liverail>
         <version>4.1</version>
         <publisherId>4819</publisherId>
     </liverail>
-    <adMode>none</adMode>
-    <dogImage>http://kgd-red-test-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png
+    <adMode>liverail</adMode>
+    <dogImage>http://seesaw.stage.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png
     </dogImage>
     <programme>33535</programme>
     <userId>911112222</userId>

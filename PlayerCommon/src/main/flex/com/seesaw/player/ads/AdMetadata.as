@@ -34,6 +34,7 @@ public class AdMetadata extends Metadata {
     public static const AUDITUDE_AD_TYPE:String = "auditude";
     public static const CHANNEL_4_AD_TYPE:String = "channel4";
     public static const TRACK_BACK:String = "trackback";
+    public static const POPUP_AD_URL:String = "popupAdvertisingUrl";
 
     public function get adState():* {
         return getValue(AdMetadata.AD_STATE);

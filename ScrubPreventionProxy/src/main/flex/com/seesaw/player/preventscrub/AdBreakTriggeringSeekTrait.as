@@ -22,11 +22,15 @@ package com.seesaw.player.preventscrub {
 import com.seesaw.player.ads.AdBreak;
 import com.seesaw.player.ads.AdBreakEvent;
 
+import org.as3commons.logging.ILogger;
+import org.as3commons.logging.LoggerFactory;
 import org.osmf.events.SeekEvent;
 import org.osmf.traits.SeekTrait;
 import org.osmf.traits.TimeTrait;
 
 public class AdBreakTriggeringSeekTrait extends SeekTrait {
+
+    private var logger:ILogger = LoggerFactory.getClassLogger(AdBreakTriggeringSeekTrait);
 
     private var _seekTrait:SeekTrait;
     private var _adBreaks:Vector.<AdBreak>;
@@ -69,8 +73,13 @@ public class AdBreakTriggeringSeekTrait extends SeekTrait {
             var nextBreak:AdBreak = null;
 
             for each (var breakItem:AdBreak in _adBreaks) {
-                if (!breakItem.complete && timeTrait.currentTime <= breakItem.startTime && time >= breakItem.startTime) {
+                if (!breakItem.complete && time >= breakItem.startTime) {
                     nextBreak = breakItem;
+                }
+                if(nextBreak){
+                    if(breakItem.complete && time >= breakItem.startTime &&  time >= nextBreak.startTime){
+                        nextBreak = null;
+                    }
                 }
             }
 
@@ -90,6 +99,7 @@ public class AdBreakTriggeringSeekTrait extends SeekTrait {
     }
 
     private function onAdBreakCompleted(event:AdBreakEvent):void {
+        logger.debug("ad break completed, seeking to: {0}", event.adBreak.seekPointAfterAdBreak);
         event.adBreak.removeEventListener(AdBreakEvent.AD_BREAK_COMPLETED, onAdBreakCompleted);
         _seekTrait.seek(event.adBreak.seekPointAfterAdBreak);
     }

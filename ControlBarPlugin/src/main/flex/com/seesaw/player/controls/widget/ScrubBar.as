@@ -23,6 +23,7 @@ com.seesaw.player.controls.widget {
 import com.seesaw.player.ads.AdBreak;
 import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.ads.AdState;
+import com.seesaw.player.controls.ControlBarConstants;
 import com.seesaw.player.ui.StyledTextField;
 
 import controls.seesaw.widget.interfaces.IWidget;
@@ -49,6 +50,7 @@ import org.osmf.events.MediaElementEvent;
 import org.osmf.events.MetadataEvent;
 import org.osmf.events.SeekEvent;
 import org.osmf.media.MediaElement;
+import org.osmf.metadata.Metadata;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.PlayTrait;
@@ -61,6 +63,7 @@ public class ScrubBar extends Widget implements IWidget {
 
     private var markerContainer:Sprite;
     private var currentTimeInSeconds:Number = 0;
+    private var metadata:Metadata;
 
     public function ScrubBar() {
         currentTime = new StyledTextField();
@@ -183,6 +186,18 @@ public class ScrubBar extends Widget implements IWidget {
     override protected function onMediaElementTraitRemove(event:MediaElementEvent):void {
         updateState();
     }
+    override public function set media(value:MediaElement):void {
+
+           super.media = value;
+
+           if (media) {
+               metadata = media.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
+               if (metadata == null) {
+                   metadata = new Metadata();
+                   media.addMetadata(ControlBarConstants.CONTROL_BAR_METADATA, metadata);
+               }
+           }
+       }
 
     override protected function processMediaElementChange(oldMediaElement:MediaElement):void {
         if (oldMediaElement) {
@@ -292,6 +307,7 @@ public class ScrubBar extends Widget implements IWidget {
     }
 
     private function onScrubberStart(event:ScrubberEvent):void {
+        updateMetadata();
         var playable:PlayTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
         if (playable) {
             preScrubPlayState = playable.playState;
@@ -300,6 +316,11 @@ public class ScrubBar extends Widget implements IWidget {
                 currentPositionTimer.stop();
             }
         }
+    }
+
+    private function updateMetadata():void {
+        ///// this needs to be set as the BatchEvents won't trigger until the user, or JS has evoked a scrub.
+        metadata.addValue(ControlBarConstants.USER_SCRUB_ACTIVATED, true);
     }
 
     private function onScrubberUpdate(event:ScrubberEvent = null):void {
@@ -320,6 +341,7 @@ public class ScrubBar extends Widget implements IWidget {
     }
 
     private function seekTo(targetTime:Number):void {
+        updateMetadata();
         var seekable:SeekTrait = media ? media.getTrait(MediaTraitType.SEEK) as SeekTrait : null;
         seekToTime = targetTime;
         seekable.seek(targetTime);
@@ -353,6 +375,9 @@ public class ScrubBar extends Widget implements IWidget {
                             playable.play();
                             break;
                     }
+
+                } else if (playable.playState == PlayState.PAUSED) {
+                    playable.play();/// force the content to play when is paused.
                 }
             }
         }

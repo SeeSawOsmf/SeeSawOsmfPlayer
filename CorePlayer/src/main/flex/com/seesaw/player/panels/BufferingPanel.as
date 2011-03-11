@@ -19,6 +19,7 @@
  */
 
 package com.seesaw.player.panels {
+import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.preloader.Preloader;
 
 import flash.display.Sprite;
@@ -111,10 +112,12 @@ public class BufferingPanel extends MediaElement {
         parentContainer.backgroundAlpha = 0.8;
         parentContainer.layoutMetadata.includeInLayout = true;
         panel.visible = true;
+        dispatchEvent(new Event(PlayerConstants.BUFFER_MESSAGE_SHOW));
     }
 
     private function hideTooSlowMessage():void {
         parentContainer.backgroundAlpha = 0.0;
+        dispatchEvent(new Event(PlayerConstants.BUFFER_MESSAGE_HIDE));
     }
 
     private function buildCSS():void {

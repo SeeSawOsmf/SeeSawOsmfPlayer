@@ -84,8 +84,8 @@ public class FriendlyMediaFactory extends MediaFactory {
                                 )
                         );
 
-        dvrCastLoader = new DVRCastNetLoader();
-        addItem
+    dvrCastLoader = new DVRCastNetLoader();
+      addItem
                 (new MediaFactoryItem
                         ("org.osmf.elements.video.dvr.dvrcast"
                                 , dvrCastLoader.canHandleResource

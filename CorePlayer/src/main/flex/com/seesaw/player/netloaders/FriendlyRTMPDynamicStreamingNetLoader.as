@@ -18,16 +18,7 @@
  *   Contributor(s):  Adobe Systems Incorporated
  */
 
-/**
- * Created by IntelliJ IDEA.
- * User: bmeade
- * Date: 18/01/11
- * Time: 12:48
-
- */
 package com.seesaw.player.netloaders {
-import com.seesaw.player.PlayerConstants;
-
 import flash.events.NetStatusEvent;
 import flash.net.NetConnection;
 import flash.net.NetStream;
@@ -40,7 +31,6 @@ import org.osmf.net.NetStreamSwitchManagerBase;
 import org.osmf.net.SwitchingRuleBase;
 import org.osmf.net.rtmpstreaming.DroppedFramesRule;
 import org.osmf.net.rtmpstreaming.InsufficientBandwidthRule;
-import org.osmf.net.rtmpstreaming.InsufficientBufferRule;
 import org.osmf.net.rtmpstreaming.RTMPDynamicStreamingNetLoader;
 import org.osmf.net.rtmpstreaming.RTMPNetStreamMetrics;
 import org.osmf.net.rtmpstreaming.SufficientBandwidthRule;

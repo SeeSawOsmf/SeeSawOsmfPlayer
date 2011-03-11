@@ -18,11 +18,21 @@
  *   Contributor(s):  Adobe Systems Incorporated
  */
 
-package com.seesaw.player.ads {
-public class AuditudeConstants {
-    public static const SETTINGS_NAMESPACE:String = "http://www.seesaw.com/player/plugins/auditude/settings";
-    public static const AD_MODE_ID:String = "auditude";
-    public static const PLUGIN_INSTANCE = "auditudePlugin";
-    public static const AUDITUDE_PLUGIN_URL:String = "http://asset.cdn.auditude.com/flash/plugin/osmf/1.0/AuditudeOSMFProxyPlugin.swf";
-}
+package com.seesaw.player.utils {
+public class AjaxRequestType
+	{
+		private var item:String;
+		public static var GET:AjaxRequestType = new AjaxRequestType("GET");
+		public static var POST:AjaxRequestType = new AjaxRequestType("POST");
+
+		public function AjaxRequestType(item:String=null)
+		{
+			this.item = item;
+		}
+
+		public function toString():String
+		{
+			return this.item;
+		}
+	}
 }
