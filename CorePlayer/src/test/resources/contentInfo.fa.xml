@@ -52,7 +52,7 @@
         </whatsThisLinkURL>
     </parentalControls>
     <unavailablePageUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/unavailable</unavailablePageUrl>
-    <videoInfoUrl>../src/test/resources/videoInfo.fa.xml</videoInfoUrl>
+    <videoInfoUrl>../src/test/resources/videoInfo.fa-expired.xml</videoInfoUrl>
     <!--<videoInfoUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player/videoinitinfo/26772</videoInfoUrl>-->
     <batchEventUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player/initinfo:registerbatchevent?t:ac=26772
     </batchEventUrl>
