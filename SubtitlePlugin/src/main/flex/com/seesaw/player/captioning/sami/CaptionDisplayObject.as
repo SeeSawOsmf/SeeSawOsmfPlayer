@@ -49,6 +49,7 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
         captionField.htmlText = "";
         captionField.multiline = true;
         captionField.wordWrap = true;
+        captionField.selectable = false;
 
         var format:TextFormat = new TextFormat();
         format.align = TextFormatAlign.CENTER;
@@ -85,48 +86,29 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
     }
 
     override public function layout(availableWidth:Number, availableHeight:Number, deep:Boolean = true):void {
+        // needs rounding for some reason
+        var roundedWidth:int = Math.round(width);
+
+        // we are only interested in changing width
+        var changed:Boolean = availableWidth != roundedWidth;
+
+        // check that we have expanded by a minimum of 100 pixels before enlarging
+        var expanded:Boolean = availableWidth > roundedWidth && availableWidth - width > 100;
+
         super.layout(availableWidth, availableHeight, deep);
 
-        logger.debug("CALL TO SUBTITLE LAYOUT")
+        captionField.width = availableWidth;
+        captionField.height = availableHeight;
 
-        logger.debug("CAPTION SET: " + captionSet + " - CAPTION: " + captionField.htmlText);
-
-        logger.debug("availableWidth: " + availableWidth + " captionFieldWidth: " + captionField.width);
-
-        //we check the captionField.html to make sure the subtitles have arrived - this prevents random resizing during stings etc
-        if (captionSet == true) {
-            if (availableWidth != captionField.width) {
-
-                var goLarge:Boolean = availableWidth > captionField.width;
-
-                logger.debug("GO LARGE CALCULATION = " + goLarge);
-
-                captionField.width = availableWidth;
-                captionField.height = availableHeight;
-
-                if (captionFormatted == true) {
-                    if (goLarge) {
-                        applyLargeTextSize();
-                        logger.debug("APPLY LARGE SIZE");
-                    } else {
-                        applyStandardTextSize();
-                        logger.debug("APPLY STANDARD SIZE");
-                    }
-                } else {
-                    applyStandardTextSize();
-                    captionFormatted = true;
-                    logger.debug("CAPTION FORMATTED");
-                }
-
-            }
-        } else {
-            //ensure the width of the captionField is the full available width
-            captionField.width = availableWidth;
+        if (expanded) {
+            logger.debug("applying expanded size");
+            applyLargeTextSize();
+        }
+        else if (changed) {
+            logger.debug("applying standard size");
             applyStandardTextSize();
-            logger.debug("CAPTION NOT YET SET - APPLY STANDARD SIZE");
         }
     }
-
 
     private function positionSubtitles(event:Event):void {
         event.target.y = height - (event.target.height + 27);
