@@ -67,6 +67,7 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
         format.font = 'Arial';
         captionField.defaultTextFormat = format;
         captionField.htmlText = captionValue;
+        captionField.selectable = false;
     }
 
     private function applyLargeTextSize():void {
@@ -76,6 +77,7 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
         format.font = 'Arial';
         captionField.defaultTextFormat = format;
         captionField.htmlText = captionValue;
+        captionField.selectable = false;
     }
 
     override public function layout(availableWidth:Number, availableHeight:Number, deep:Boolean = true):void {
