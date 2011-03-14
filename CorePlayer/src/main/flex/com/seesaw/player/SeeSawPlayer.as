@@ -134,7 +134,6 @@ public class SeeSawPlayer extends Sprite {
 
     private var currentAdBreak:AdBreak;
     private var controlBarMetadata:Metadata;
-
     private var resumeService:ResumeService;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
@@ -243,7 +242,6 @@ public class SeeSawPlayer extends Sprite {
 
         //handler to show and hide the buffering panel
         player.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
-
         player.media = mainElement;
 
         player.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onMainPlayerStateChange);
@@ -495,8 +493,8 @@ public class SeeSawPlayer extends Sprite {
             loadTrait.addEventListener(LoadEvent.LOAD_STATE_CHANGE, onSubtitleLoadStateChange);
 
             mainElement.addChild(subtitleElement);
-        }else{
-           setSubtitlesButtonEnabled(false);
+        } else {
+            setSubtitlesButtonEnabled(false);
         }
     }
 
@@ -579,6 +577,12 @@ public class SeeSawPlayer extends Sprite {
 
         // get the control bar to point at the main content
         setControlBarTarget(mainElement);
+        container.validateNow();
+    }
+
+    private function setMediaSize():void {
+        container.height = contentHeight;
+        container.width = contentWidth;
     }
 
     private function mainElementSeekChange(event:SeekEvent):void {
@@ -613,6 +617,9 @@ public class SeeSawPlayer extends Sprite {
                 setMediaLayout(event.mediaElement);
             }
             else if (contentType == PlayerConstants.MAIN_CONTENT_ID) {
+                setMediaLayout(event.mediaElement);
+
+            } else if (contentType == PlayerConstants.CLIP_CONTENT_ID) {
                 setMediaLayout(event.mediaElement);
             }
         }
@@ -674,6 +681,7 @@ public class SeeSawPlayer extends Sprite {
         layout.percentHeight = 100;
         layout.verticalAlign = VerticalAlign.MIDDLE;
         layout.horizontalAlign = HorizontalAlign.CENTER;
+
     }
 
     private function createAuditudeElement(mediaElement:MediaElement):MediaElement {
@@ -801,13 +809,28 @@ public class SeeSawPlayer extends Sprite {
                 // This was the simplest fix I could find for FEEDBACK-2311.
                 container.validateNow();
                 toggleLights();
+                addEventListener(Event.ENTER_FRAME, updateMediaSize);
                 break;
             case MediaPlayerState.PAUSED:
                 toggleLights();
                 break;
-
         }
     }
+
+
+    function updateMediaSize(event:Event):void {
+        var displayTrait:DisplayObjectTrait =
+                mainElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
+        if (displayTrait) {
+            if (displayTrait.mediaHeight > 0 && displayTrait.mediaWidth > 0) {
+                removeEventListener(Event.ENTER_FRAME, updateMediaSize);
+            }
+            mainContainer.layoutRenderer.validateNow();
+            container.validateNow();
+        }
+
+    }
+
 
     private function toggleLights():void {
         var lightsDown:Boolean = false;

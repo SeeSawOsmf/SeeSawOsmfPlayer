@@ -590,7 +590,7 @@ public class BatchEventServices extends ProxyElement {
                     {
                         currentSection = currentSection + 2; /// to ge the seek value as opposed to the current time......
                     }
-                } else if (timeTrait.currentTime >= breakItem.startTime) {
+                } else if (timeTrait && timeTrait.currentTime >= breakItem.startTime) {
                     currentSection = currentSection + 2;// since we are checking adBreaks, we need to increment twice (once for the ad, once into the current content...
                 }
             }
