@@ -90,6 +90,10 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
 
         this.visible = false;
 
+        this.useHandCursor = true;
+        this.mouseChildren = false;
+        this.buttonMode = true;
+
         addChild(adInfoLabel);
     }
 
