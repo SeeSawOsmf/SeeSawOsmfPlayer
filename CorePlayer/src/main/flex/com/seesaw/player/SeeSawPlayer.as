@@ -580,10 +580,6 @@ public class SeeSawPlayer extends Sprite {
         container.validateNow();
     }
 
-    private function setMediaSize():void {
-        container.height = contentHeight;
-        container.width = contentWidth;
-    }
 
     private function mainElementSeekChange(event:SeekEvent):void {
         if (event.seeking) {
