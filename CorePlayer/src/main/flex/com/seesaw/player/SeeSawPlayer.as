@@ -476,8 +476,7 @@ public class SeeSawPlayer extends Sprite {
             subtitleElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
 
             layout.percentWidth = 100;
-            layout.height = 50;
-            layout.bottom = 100;
+            layout.height = 70;
             layout.horizontalAlign = HorizontalAlign.CENTER;
             layout.verticalAlign = VerticalAlign.BOTTOM;
             layout.index = 10;
