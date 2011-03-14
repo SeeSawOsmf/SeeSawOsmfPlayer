@@ -37,9 +37,6 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
 
     private var captionValue:String = "";
 
-    private var captionSet:Boolean = false;
-    private var captionFormatted:Boolean = false;
-
     private var logger:ILogger = LoggerFactory.getClassLogger(CaptionDisplayObject);
 
     public function CaptionDisplayObject(layoutMetadata:LayoutMetadata = null) {
@@ -48,7 +45,7 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
         captionField = new TextField();
         captionField.htmlText = "";
         captionField.multiline = true;
-        captionField.wordWrap = true;
+        //captionField.autoSize = TextFieldAutoSize.CENTER;
 
         var format:TextFormat = new TextFormat();
         format.align = TextFormatAlign.CENTER;
@@ -60,9 +57,6 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
         outline.quality = BitmapFilterQuality.MEDIUM;
 
         captionField.filters = [outline];
-
-        applyStandardTextSize();
-
         addChild(captionField);
     }
 
@@ -73,7 +67,6 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
         format.font = 'Arial';
         captionField.defaultTextFormat = format;
         captionField.htmlText = captionValue;
-        captionField.selectable = false;
     }
 
     private function applyLargeTextSize():void {
@@ -83,49 +76,31 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
         format.font = 'Arial';
         captionField.defaultTextFormat = format;
         captionField.htmlText = captionValue;
-        captionField.selectable = false;
     }
 
     override public function layout(availableWidth:Number, availableHeight:Number, deep:Boolean = true):void {
         super.layout(availableWidth, availableHeight, deep);
 
-        logger.debug("CALL TO SUBTITLE LAYOUT")
-
-        logger.debug("CAPTION SET: " + captionSet + " - CAPTION: " + captionField.htmlText);
+        logger.debug("CAPTION: " + captionField.htmlText);
 
         logger.debug("availableWidth: " + availableWidth + " captionFieldWidth: " + captionField.width);
 
         //we check the captionField.html to make sure the subtitles have arrived - this prevents random resizing during stings etc
-        if (captionSet == true) {
-            if (availableWidth != captionField.width) {
+        if ((availableWidth != captionField.width) && (captionField.htmlText.length > 0)) {
 
-                var goLarge:Boolean = availableWidth > captionField.width;
+            var goLarge:Boolean = availableWidth >= captionField.width;
 
-                logger.debug("GO LARGE CALCULATION = " + goLarge);
-
-                captionField.width = availableWidth;
-                captionField.height = availableHeight;
-
-                if (captionFormatted == true) {
-                    if (goLarge) {
-                        applyLargeTextSize();
-                        logger.debug("APPLY LARGE SIZE");
-                    } else {
-                        applyStandardTextSize();
-                        logger.debug("APPLY STANDARD SIZE");
-                    }
-                } else {
-                    applyStandardTextSize();
-                    captionFormatted = true;
-                    logger.debug("CAPTION FORMATTED");
-                }
-
-            }
-        } else {
-            //ensure the width of the captionField is the full available width
             captionField.width = availableWidth;
-            applyStandardTextSize();
-            logger.debug("CAPTION NOT YET SET - APPLY STANDARD SIZE");
+            captionField.height = availableHeight;
+
+            if (goLarge) {
+                applyLargeTextSize();
+                logger.debug("APPLY LARGE SIZE");
+            } else {
+                applyStandardTextSize();
+                logger.debug("APPLY STANDARD SIZE");
+            }
+
         }
     }
 
@@ -137,8 +112,6 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
     public function set text(value:String):void {
         if (captionField) {
             captionField.htmlText = captionValue = value;
-            captionSet = true;
-            logger.debug("CAPTION SET");
         }
     }
 }
