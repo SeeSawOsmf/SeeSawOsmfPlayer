@@ -89,7 +89,7 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
         var changed:Boolean = availableWidth != roundedWidth;
 
         // check that we have expanded by a minimum of 100 pixels before enlarging
-        var expanded:Boolean = availableWidth > roundedWidth && availableWidth - width > 100;
+        var expanded:Boolean = availableWidth > roundedWidth && availableWidth - roundedWidth > 100;
 
         super.layout(availableWidth, availableHeight, deep);
 
