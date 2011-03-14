@@ -35,6 +35,7 @@ import com.seesaw.player.logging.CommonsOsmfLoggerFactory;
 import com.seesaw.player.logging.TraceAndArthropodLoggerFactory;
 import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.namespaces.smil;
+import com.seesaw.player.netstatus.NetStatusMetadata;
 import com.seesaw.player.panels.GeoBlockPanel;
 import com.seesaw.player.panels.GuidanceBar;
 import com.seesaw.player.panels.GuidancePanel;
@@ -198,7 +199,7 @@ public class Player extends Sprite {
         var JSONString:String = '{ "playerMessage": "' + availability.playerMessage + '", ' +
                 '"seriesEntitled": ' + availability.seriesEntitled + ', "isSubscriptionEntitled" : ' +
                 availability.subscriptionEntitled + ', "noAdsPlayable" : ' + availability.noAdsPlayable + ', "episodeEntitled" : ' + availability.episodeEntitled + ', ' +
-                '"available" : ' + availability.available + ', "showPreviewClip" : ' + availability.showPreviewClip + ', ' +
+                '"available" : ' + availability.available + ', "showPreviewClip" : ' + availability.showPreview + ', ' +
                 '"statusMessage" : "' + availability.statusMessage + '" }';
         return JSONString;
     }
@@ -246,8 +247,7 @@ public class Player extends Sprite {
         // if playButtonMode is null, this indicates that the user has no entitlement to play the video
         if (playButtonMode != null) {
             if (playButtonMode != PlayStartButton.PREVIEW && resumeService.resumable) {
-                playButtonMode = userInit.availability.svodPlayable == "true" ?
-                        PlayStartButton.RESUME_SVOD : PlayStartButton.RESUME;
+                playButtonMode = PlayStartButton.RESUME;
             }
             playButton = new PlayStartButton(playButtonMode);
             playButton.addEventListener(PlayStartButton.PROCEED, onNextInitialisationState);
@@ -364,12 +364,12 @@ public class Player extends Sprite {
         xmlDoc.ignoreWhitespace = true;
 
         userInit = xmlDoc;
+        var availability:XMLList = userInit.availability;
 
-        if (userInit.preview == "true") {
+        if (availability.showPreview == "true") {
             playButtonMode = PlayStartButton.PREVIEW;
         }
         else {
-            var availability:XMLList = userInit.availability;
             if (availability.svodPlayable == "true") {
                 playButtonMode = PlayStartButton.PLAY_SUBSCRIBED;
             }
@@ -434,11 +434,12 @@ public class Player extends Sprite {
         xmlDoc.ignoreWhitespace = true;
 
         videoInfo = xmlDoc;
+        var availability:XMLList = videoInfo.availability;
 
         // we need to evaluate if ads are not required for SVOD, TVOD and NO_ADS and adjust the
         // adMode which is then persisted as metaData
         playerInit.adMode[0] = adModulePlayableEvaluation();
-        playerInit.preview[0] = userInit.preview;
+        playerInit.preview[0] = availability.showPreview;
 
         if (videoInfo.geoblocked == "true") {
             var geoBlockPanel:GeoBlockPanel = new GeoBlockPanel();
@@ -446,7 +447,6 @@ public class Player extends Sprite {
             return;
         }
 
-        var availability:XMLList = videoInfo.availability;
         if (availability.exceededDrmRule == "true" && availability.noAdsPlayable == "false" &&
                 availability.availabilityType == "AVOD") {
             this.showOverUsePanel("NO_ADS");
@@ -549,6 +549,9 @@ public class Player extends Sprite {
 
         metadata = new Metadata();
         resource.addMetadataValue(BatchEventContants.SETTINGS_NAMESPACE, metadata);
+
+        metadata = new Metadata();
+        resource.addMetadataValue(NetStatusMetadata.NET_STATUS_METADATA, metadata);
 
         if (playerInit && !HelperUtils.getBoolean(playerInit.preview)) {
             if (playerInit.adMode == LiverailConstants.AD_MODE_ID) {

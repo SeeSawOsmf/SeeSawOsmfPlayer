@@ -106,6 +106,7 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
         media.metadata.addEventListener(MetadataEvent.VALUE_ADD, onAdInfoMetadataChange);
         media.metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdInfoMetadataChange);
         media.metadata.addEventListener(MetadataEvent.VALUE_REMOVE, onAdInfoMetadataChange);
+        updateFromAdMetadata();
     }
 
     private function onAdInfoMetadataChange(event:MetadataEvent) {
@@ -118,7 +119,10 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
         var adMetadata:AdMetadata = media.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
         if (adMetadata) {
             interactiveAdvertisingUrl = adMetadata.clickThru;
-            visible = interactiveAdvertisingUrl != null;
+            if(interactiveAdvertisingUrl) {
+                visible = true;
+                logger.debug("set url: {0}", interactiveAdvertisingUrl);
+            }
         }
         else {
             visible = false;

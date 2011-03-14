@@ -209,8 +209,8 @@ public class BatchEventServices extends ProxyElement {
         if (number == 0) {
             userEvent = buildAndReturnUserEvent(UserEventTypes.AUTO_PLAY);
         } else {
-            userEvent = buildAndReturnUserEvent(UserEventTypes.AUTO_RESUME);
             playingMainContent = true;
+            userEvent = buildAndReturnUserEvent(UserEventTypes.AUTO_RESUME);
         }
         eventsManager.addUserEvent(userEvent);
         eventsManager.flushAll();
@@ -346,19 +346,16 @@ public class BatchEventServices extends ProxyElement {
     private function onNetstatusMetadataChange(event:MetadataEvent):void {
         if (event.value == "NetConnection.Connect.NetworkChange")
             eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.CONNECTION_CLOSED));
-
+            eventsManager.flushAll();
         if (event.value == "NetConnection.Connect.Reconnection") {
             eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.CONNECTION_RESTART));
             eventsManager.flushAll();        /// since we have just lost connection and reconnected we want to force an event record..
-
         }
     }
 
     private function onAdsMetaDataAdd(event:MetadataEvent):void {
         if (event.key == AdMetadata.AD_STATE) {
             AdMetaEvaluation(event.value);
-        } else if (event.key == AdMetadata.AD_BREAKS) {
-            adBreaks = event.key as Vector.<AdBreak>;
         } else {
             AdMetaEvaluation(event.key);
         }
@@ -367,10 +364,6 @@ public class BatchEventServices extends ProxyElement {
     private function onAdsMetaDataChange(event:MetadataEvent):void {
         if (event.key == AdMetadata.AD_STATE || event.key == AdMetadata.AD_MODE) {
             AdMetaEvaluation(event.value);
-        } else if (event.key == AdMetadata.AD_BREAKS) {
-
-            var metadataAdBreaks:Vector.<AdBreak> = event.value;
-            adBreaks = metadataAdBreaks;
         } else {
             AdMetaEvaluation(event.key);
         }
@@ -383,6 +376,7 @@ public class BatchEventServices extends ProxyElement {
         } else if (value == AdState.AD_BREAK_START) {
             if (cumulativeDurationMonitor.running) cumulativeDurationMonitor.stop();
             playingMainContent = false;
+          ////  contentViewingSequenceNumber = evaluateAdContentCount;
             contentViewingSequenceNumber++;
 
         } else if (typeof(value) == "object") {
@@ -414,6 +408,25 @@ public class BatchEventServices extends ProxyElement {
                 eventsManager.flushAll();
             }
         }
+    }
+
+    private function get evaluateAdContentCount():int {
+        var currentSection:int;
+        var adBreaks:Vector.<AdBreak> = adMetadata ? adMetadata.adBreaks : null;
+        if (adBreaks) {
+
+            for each (var breakItem:AdBreak in adBreaks) {
+
+              if (timeTrait.currentTime >= breakItem.startTime) {
+                    currentSection = currentSection +1;// since we are checking adBreaks, we need to increment twice (once for the ad, once into the current content...
+                }
+            }
+
+        } else if (timeTrait.currentTime <= 0)  {
+            currentSection = 1;
+        }
+        return currentSection;
+
     }
 
     private function autoFlush(event:TimerEvent):void {
@@ -566,6 +579,7 @@ public class BatchEventServices extends ProxyElement {
 
     private function evaluateMainContentCount(seekTime:Number = 0, seekTriggered:Boolean = false):int {
         var currentSection:int;
+        var adBreaks:Vector.<AdBreak> = adMetadata ? adMetadata.adBreaks : null;
         if (adBreaks) {
 
             for each (var breakItem:AdBreak in adBreaks) {
@@ -576,7 +590,7 @@ public class BatchEventServices extends ProxyElement {
                     {
                         currentSection = currentSection + 2; /// to ge the seek value as opposed to the current time......
                     }
-                } else if (timeTrait.currentTime >= breakItem.startTime) {
+                } else if (timeTrait && timeTrait.currentTime >= breakItem.startTime) {
                     currentSection = currentSection + 2;// since we are checking adBreaks, we need to increment twice (once for the ad, once into the current content...
                 }
             }

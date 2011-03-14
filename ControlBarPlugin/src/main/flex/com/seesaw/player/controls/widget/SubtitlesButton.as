@@ -74,8 +74,10 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
 
         addChild(subtitlesLabel);
 
+
         this.subtitlesLabel.visible = false;
     }
+
 
     override protected function processMediaElementChange(oldMediaElement:MediaElement):void {
         if (media) {
@@ -84,6 +86,10 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
                 metadata = new Metadata();
                 media.addMetadata(ControlBarConstants.CONTROL_BAR_METADATA, metadata);
             }
+
+                metadata.addEventListener(MetadataEvent.VALUE_ADD, metadataChange);
+
+
 
             var adMetadata:AdMetadata = media.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
             if (adMetadata) {
@@ -94,11 +100,17 @@ public class SubtitlesButton extends ButtonWidget implements IWidget {
         }
     }
 
+    private function metadataChange(event:MetadataEvent):void {
+        if (event.key == ControlBarConstants.SUBTITLE_BUTTON_ENABLED && event.value) {
+            this.subtitlesLabel.visible = true;
+            metadata.removeEventListener(MetadataEvent.VALUE_ADD, metadataChange);
+        }
+    }
 
     private function onAdMetadataChange(event:MetadataEvent):void {
         if (metadata.getValue(ControlBarConstants.SUBTITLE_BUTTON_ENABLED)) {
             if (event.key == AdMetadata.AD_STATE && event.value == AdState.AD_BREAK_COMPLETE) {
-                this.subtitlesLabel.visible = true
+                this.subtitlesLabel.visible = true;
             } else if (event.key == AdMetadata.AD_STATE && event.value == AdState.AD_BREAK_START) {
                 this.subtitlesLabel.visible = false;
             }
