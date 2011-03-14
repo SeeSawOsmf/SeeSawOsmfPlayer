@@ -37,9 +37,6 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
 
     private var captionValue:String = "";
 
-    private var captionSet:Boolean = false;
-    private var captionFormatted:Boolean = false;
-
     private var logger:ILogger = LoggerFactory.getClassLogger(CaptionDisplayObject);
 
     public function CaptionDisplayObject(layoutMetadata:LayoutMetadata = null) {
@@ -61,9 +58,6 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
         outline.quality = BitmapFilterQuality.MEDIUM;
 
         captionField.filters = [outline];
-
-        applyStandardTextSize();
-
         addChild(captionField);
     }
 
@@ -74,6 +68,7 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
         format.font = 'Arial';
         captionField.defaultTextFormat = format;
         captionField.htmlText = captionValue;
+        captionField.selectable = false;
     }
 
     private function applyLargeTextSize():void {
@@ -83,6 +78,7 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
         format.font = 'Arial';
         captionField.defaultTextFormat = format;
         captionField.htmlText = captionValue;
+        captionField.selectable = false;
     }
 
     override public function layout(availableWidth:Number, availableHeight:Number, deep:Boolean = true):void {
@@ -117,8 +113,6 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
     public function set text(value:String):void {
         if (captionField) {
             captionField.htmlText = captionValue = value;
-            captionSet = true;
-            logger.debug("CAPTION SET");
         }
     }
 }
