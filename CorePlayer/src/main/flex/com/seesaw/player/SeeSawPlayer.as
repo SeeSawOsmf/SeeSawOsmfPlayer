@@ -424,6 +424,16 @@ public class SeeSawPlayer extends Sprite {
     private function createBufferingPanel():void {
         //Create the Buffering Panel
         bufferingPanel = new BufferingPanel(bufferingContainer);
+
+        var layout:LayoutMetadata = new LayoutMetadata();
+
+        layout.x = contentWidth;
+        layout.y = contentHeight;
+        layout.horizontalAlign = HorizontalAlign.CENTER;
+        layout.verticalAlign = VerticalAlign.MIDDLE;
+
+        bufferingPanel.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+
         bufferingPanel.addEventListener(PlayerConstants.BUFFER_MESSAGE_HIDE, updateBufferMetaData)
         bufferingPanel.addEventListener(PlayerConstants.BUFFER_MESSAGE_SHOW, updateBufferMetaData);
         bufferingContainer.addMediaElement(bufferingPanel);
@@ -441,7 +451,7 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onBufferingChange(event:BufferEvent):void {
-        if (event.currentTarget.bufferLength < 0.1) {
+        if (event.currentTarget.bufferLength < 0.2) {
             (event.buffering) ? bufferingPanel.show() : bufferingPanel.hide();
         } else {
             bufferingPanel.hide();
@@ -576,7 +586,7 @@ public class SeeSawPlayer extends Sprite {
 
         // get the control bar to point at the main content
         setControlBarTarget(mainElement);
-        container.validateNow();
+
     }
 
 
@@ -740,6 +750,7 @@ public class SeeSawPlayer extends Sprite {
         logger.debug("onFullscreen: " + event.fullScreen);
         setContainerSize(contentWidth, contentHeight);
         container.validateNow();
+        bufferingPanel.playerResize(contentWidth, contentHeight);
     }
 
     private function setContainerSize(width:int, height:int):void {
@@ -811,7 +822,6 @@ public class SeeSawPlayer extends Sprite {
                 break;
         }
     }
-
 
 
     function updateMediaSize(event:Event):void {
