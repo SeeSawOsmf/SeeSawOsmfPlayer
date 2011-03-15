@@ -500,9 +500,9 @@ public class BatchEventServices extends ProxyElement {
         if (playingMainContent) {
             switch (event.playState) {
                 case PlayState.PAUSED:
-                          if (cumulativeDurationMonitor.running) {
-                    cumulativeDurationMonitor.stop();
-                          }
+                    if (cumulativeDurationMonitor.running) {
+                        cumulativeDurationMonitor.stop();
+                    }
                     break;
                 case PlayState.PLAYING:
                     if (!cumulativeDurationMonitor.running) {
