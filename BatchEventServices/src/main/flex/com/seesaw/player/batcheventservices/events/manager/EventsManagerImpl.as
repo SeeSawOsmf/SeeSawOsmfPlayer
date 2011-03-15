@@ -31,8 +31,11 @@ import com.seesaw.player.utils.SynchronousHTTPService;
 
 import flash.net.URLVariables;
 
-public class EventsManagerImpl implements EventsManager {
+import org.as3commons.logging.ILogger;
+import org.as3commons.logging.LoggerFactory;
 
+public class EventsManagerImpl implements EventsManager {
+    private var logger:ILogger = LoggerFactory.getClassLogger(EventsManagerImpl);
     private var batchEventId:int = 0;
     private var userEventId:int = 0;
 
@@ -79,6 +82,7 @@ public class EventsManagerImpl implements EventsManager {
         if(userEvent) {
         userEventCount++;
         userEvents.push(userEvent);
+          logUserEvent(userEvent);
         if (userEventCount >= 10) {
             if (!maxIsFlushing) {
                 maxIsFlushing = true;
@@ -91,12 +95,30 @@ public class EventsManagerImpl implements EventsManager {
     public function addContentEvent(contentEvent:ContentEvent):void {
         contentEventCount++;
         contentEvents.push(contentEvent);
+      logContentEvent(contentEvent);
         if (contentEventCount >= 10) {
             if (!maxIsFlushing) {
                 maxIsFlushing = true;
                 flushAll();
             }
         }
+    }
+
+    private function logContentEvent(contentEvent:ContentEvent):void {
+      logger.debug("contentEvent ID: {0}", contentEvent.contentEventId);
+      logger.debug("contentEvent currentAdBreakSequenceNumber: {0}", contentEvent.currentAdBreakSequenceNumber);
+      logger.debug("contentEvent contentViewingSequenceNumber: {0}", contentEvent.contentViewingSequenceNumber);
+      logger.debug("contentEvent eventOccured: {0}", contentEvent.eventOccured);
+      logger.debug("contentEvent getSectionType: {0}", contentEvent.getSectionType);
+      logger.debug("contentEvent userEventId: {0}", contentEvent.userEventId);
+    }
+
+
+      private function logUserEvent(userEvent:UserEvent):void {
+      logger.debug("userEvent EventType: {0}", userEvent.getEventType);
+      logger.debug("userEvent CVD: {0}", userEvent.getCulmulativeViewDuration);
+      logger.debug("userEvent Event Occured: {0}", userEvent.getEventOccured);
+
     }
 
     public function flushAll():void {

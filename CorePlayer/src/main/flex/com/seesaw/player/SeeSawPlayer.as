@@ -800,11 +800,11 @@ public class SeeSawPlayer extends Sprite {
     private function onMediaPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
         switch (event.state) {
             case MediaPlayerState.PLAYING:
+                addEventListener(Event.ENTER_FRAME, updateMediaSize);
                 bufferingPanel.hide();       // hide the buffering Panel if content is playing...
-                // This was the simplest fix I could find for FEEDBACK-2311.
                 container.validateNow();
                 toggleLights();
-                addEventListener(Event.ENTER_FRAME, updateMediaSize);
+
                 break;
             case MediaPlayerState.PAUSED:
                 toggleLights();
@@ -813,15 +813,17 @@ public class SeeSawPlayer extends Sprite {
     }
 
 
+
     function updateMediaSize(event:Event):void {
         var displayTrait:DisplayObjectTrait =
                 mainElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
         if (displayTrait) {
             if (displayTrait.mediaHeight > 0 && displayTrait.mediaWidth > 0) {
                 removeEventListener(Event.ENTER_FRAME, updateMediaSize);
+                mainContainer.layoutRenderer.validateNow();
+                container.validateNow();
             }
-            mainContainer.layoutRenderer.validateNow();
-            container.validateNow();
+
         }
 
     }
