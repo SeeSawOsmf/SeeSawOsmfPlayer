@@ -84,12 +84,13 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
     override public function layout(availableWidth:Number, availableHeight:Number, deep:Boolean = true):void {
         // needs rounding for some reason
         var roundedWidth:int = Math.round(width);
+        var roundedAvailableWidth:int = Math.round(availableWidth);
 
         // we are only interested in changing width
-        var changed:Boolean = availableWidth != roundedWidth;
+        var changed:Boolean = roundedAvailableWidth != roundedWidth;
 
         // check that we have expanded by a minimum of 100 pixels before enlarging
-        var expanded:Boolean = availableWidth > roundedWidth && availableWidth - roundedWidth > 100;
+        var expanded:Boolean = roundedAvailableWidth > roundedWidth && roundedAvailableWidth - roundedWidth > 100;
 
         super.layout(availableWidth, availableHeight, deep);
 
