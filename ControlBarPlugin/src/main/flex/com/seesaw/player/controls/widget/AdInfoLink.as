@@ -20,8 +20,6 @@
 
 package com.seesaw.player.controls.widget {
 import com.seesaw.player.ads.AdMetadata;
-import com.seesaw.player.external.PlayerExternalInterface;
-import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.ui.PlayerToolTip;
 import com.seesaw.player.ui.StyledTextField;
 
@@ -45,8 +43,6 @@ import org.osmf.traits.PlayTrait;
 public class AdInfoLink extends ButtonWidget implements IWidget {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(AdInfoLink);
-
-    private var xi:PlayerExternalInterface;
 
     private const DEFAULT_CAPTION:String = "Click for more information";
 
@@ -79,16 +75,14 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
         }
 
         adInfoLabel.text = linkCaption;
-
-        xi = ObjectProvider.getInstance().getObject(PlayerExternalInterface);
-        logger.debug("XI IS: " + xi.available);
+        adInfoLabel.visible = false;
 
         this.toolTip = new PlayerToolTip(this, linkCaption);
         this.formatLabelFont();
 
         this.addEventListener(Event.ADDED_TO_STAGE, this.onAddedToStage);
 
-        this.visible = false;
+        this.visible = true;
 
         this.useHandCursor = true;
         this.mouseChildren = false;
@@ -110,6 +104,7 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
         media.metadata.addEventListener(MetadataEvent.VALUE_ADD, onAdInfoMetadataChange);
         media.metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdInfoMetadataChange);
         media.metadata.addEventListener(MetadataEvent.VALUE_REMOVE, onAdInfoMetadataChange);
+        adInfoLabel.visible = false;
         updateFromAdMetadata();
     }
 
@@ -123,13 +118,12 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
         var adMetadata:AdMetadata = media.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
         if (adMetadata) {
             interactiveAdvertisingUrl = adMetadata.clickThru;
-            if(interactiveAdvertisingUrl) {
-                visible = true;
-                logger.debug("set url: {0}", interactiveAdvertisingUrl);
+            if (interactiveAdvertisingUrl) {
+                adInfoLabel.visible = true;
             }
         }
         else {
-            visible = false;
+            adInfoLabel.visible = false;
         }
     }
 
@@ -139,7 +133,7 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
             navigateToURL(request);
             pause();
         } catch (e:Error) {
-            trace("Error occurred!");
+            logger.error("navigateToURL: {0}", e.message);
         }
     }
 
