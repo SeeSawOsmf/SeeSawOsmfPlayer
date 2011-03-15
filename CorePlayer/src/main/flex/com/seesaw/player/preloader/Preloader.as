@@ -46,6 +46,7 @@ public class Preloader extends Sprite {
             loader.y = stage.stageHeight / 2 - loader.contentLoaderInfo.height / 2;
         }
         loader.visible = true;
+         dispatchEvent(new Event("preloaderLoaded"));
     }
 }
 }
