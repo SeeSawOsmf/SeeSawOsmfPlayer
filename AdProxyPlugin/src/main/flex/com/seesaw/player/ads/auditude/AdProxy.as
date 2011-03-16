@@ -224,6 +224,7 @@ public class AdProxy extends ProxyElement {
         // Is this the best way to get the breakTime
         currentAdBreak = metadataAdBreaks[event.data.breakIndex];
 
+        adMetadata.currentAdBreak = currentAdBreak;
         adMetadata.adState = AdState.AD_BREAK_START;
         adMetadata.adMode = AdMode.AD;
         setTraitsToBlock(MediaTraitType.SEEK, MediaTraitType.TIME);
@@ -234,6 +235,7 @@ public class AdProxy extends ProxyElement {
         setTraitsToBlock();
 
         adMetadata.adState = AdState.AD_BREAK_COMPLETE;
+        adMetadata.currentAdBreak = null;
         adMetadata.adMode = AdMode.MAIN_CONTENT;
 
         if (currentAdBreak) {
