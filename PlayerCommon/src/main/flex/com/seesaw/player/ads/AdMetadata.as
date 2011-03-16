@@ -35,6 +35,7 @@ public class AdMetadata extends Metadata {
     public static const CHANNEL_4_AD_TYPE:String = "channel4";
     public static const TRACK_BACK:String = "trackback";
     public static const POPUP_AD_URL:String = "popupAdvertisingUrl";
+    public static const CURRENT_AD_BREAK:String = "currentAdBreak";
 
     public function get adState():* {
         return getValue(AdMetadata.AD_STATE);
@@ -66,6 +67,14 @@ public class AdMetadata extends Metadata {
 
     public function set adMode(mode:String):void {
         addValue(AdMetadata.AD_MODE, mode);
+    }
+
+    public function set currentAdBreak(adBreak:AdBreak):void {
+        addValue(CURRENT_AD_BREAK, adBreak);
+    }
+
+    public function get currentAdBreak():AdBreak {
+        return getValue(CURRENT_AD_BREAK);
     }
 
     public function getAdBreakWithTime(time:Number):AdBreak {

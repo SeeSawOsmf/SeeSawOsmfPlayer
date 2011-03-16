@@ -54,7 +54,7 @@ public class AutoResumeProxy extends ProxyElement {
     private var seekTrait:SeekTrait;
     private var playTrait:PlayTrait;
     private var timeTrait:TimeTrait;
-    private var requestedSeekPoint:Number;
+    private var seekingToResumePoint:Boolean;
     private var resumeService:ResumeService;
     private var timer:Timer;
 
@@ -131,10 +131,13 @@ public class AutoResumeProxy extends ProxyElement {
 
     private function onAdMetadataChange(event:MetadataEvent):void {
         if (event.key == AdMetadata.AD_STATE) {
-            if (timeTrait) {
-                logger.debug("adState: {0}", event.value);
+            var adMetadata:AdMetadata = getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+            if (adMetadata && adMetadata.currentAdBreak) {
+                var currentAdBreak:AdBreak = adMetadata.currentAdBreak;
                 if (event.value == AdState.AD_BREAK_COMPLETE)
-                    writeResumePosition(timeTrait.currentTime + AD_BREAK_OFFSET);
+                    writeResumePosition(currentAdBreak.startTime + AD_BREAK_OFFSET, false);
+                else if (event.value == AdState.AD_BREAK_START)
+                    writeResumePosition(currentAdBreak.startTime - AD_BREAK_OFFSET, false);
             }
         }
     }
@@ -146,12 +149,13 @@ public class AutoResumeProxy extends ProxyElement {
     }
 
     private function onSeekingChange(event:SeekEvent):void {
+        logger.debug("seeking: {0}", event.seeking);
         if (!event.seeking) {
             // Don't write a resume point after we've made a seek request ourselves.
-            if (isNaN(requestedSeekPoint))
+            if (!seekingToResumePoint)
                 writeResumePosition(event.time);
 
-            requestedSeekPoint = NaN;
+            seekingToResumePoint = false;
         }
     }
 
@@ -163,9 +167,15 @@ public class AutoResumeProxy extends ProxyElement {
     }
 
     private function onPlayStateChanged(event:PlayEvent):void {
+        logger.debug("playState: {0}", event.playState);
         switch (event.playState) {
             case PlayState.PAUSED:
                 timer.stop();
+                // a pause may or may not be followed by a seek or an ad break both of which will
+                // write another resume position. However, there is no way we can detect a simple user activated
+                // pause without adding yet more metadata, so we have to write a position here just in case.
+                if(timeTrait)
+                    writeResumePosition(timeTrait.currentTime);
                 break;
             case PlayState.PLAYING:
                 timer.start();
@@ -183,30 +193,32 @@ public class AutoResumeProxy extends ProxyElement {
         if (resume > 0 && seekTrait && seekTrait.canSeekTo(resume)) {
             logger.debug("seeking to resume point at: {0}", resume);
             seekTrait.seek(resume);
-            requestedSeekPoint = resume;
+            seekingToResumePoint = true;
         }
     }
 
     private function onTimerTick(event:TimerEvent = null):void {
-        logger.debug("onTimerTick");
         if (timeTrait && playTrait && playTrait.playState == PlayState.PLAYING) {
             // if the video is playing attempt to write at TIMER_UPDATE_INTERVAL intervals
             writeResumePosition(timeTrait.currentTime);
         }
     }
 
-    private function writeResumePosition(time:Number):void {
+    private function writeResumePosition(time:Number, checkForBreak:Boolean = true):void {
         var timeToWrite:Number = time;
 
-        // Don't write resume points exactly on ad breaks since the resume points have to be
-        // offset from ad breaks a little depending on whether the break has been seen or not
-        var adBreak:AdBreak = getAdBreakAtTime(time);
-        if (adBreak) {
-            timeToWrite = adBreak.startTime + (adBreak.complete ? AD_BREAK_OFFSET : -AD_BREAK_OFFSET);
-            logger.debug("ad break at requested resume point {0}: complete = {1}", time, adBreak.complete);
+        if(checkForBreak) {
+            // we don't write resume points exactly on ad breaks since the resume points have to be
+            // offset from ad breaks a little depending on whether the break has been seen or not
+            var adBreak:AdBreak = getAdBreakAtTime(time);
+            if (adBreak) {
+                // the ad events take care of writing the actual resume points in this case
+                return;
+            }
         }
 
-        logger.debug("recording resume point: requested = {0}, written = {1}", time, timeToWrite);
+        timeToWrite = timeToWrite < 0 ? 0 : timeToWrite;
+        logger.debug("recording resume point: {0}", timeToWrite);
         resumeService.writeResumeCookie(timeToWrite);
     }
 
@@ -239,11 +251,9 @@ public class AutoResumeProxy extends ProxyElement {
 
     private function changeListeners(add:Boolean, traitType:String, event:String, listener:Function):void {
         if (add) {
-            logger.debug("trait added: {0}", traitType);
             getTrait(traitType).addEventListener(event, listener);
         }
         else if (hasTrait(traitType)) {
-            logger.debug("trait removed: {0}", traitType);
             getTrait(traitType).removeEventListener(event, listener);
         }
     }
