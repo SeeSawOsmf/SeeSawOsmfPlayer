@@ -25,6 +25,7 @@ import com.seesaw.player.batcheventservices.events.ContentEvent;
 import com.seesaw.player.batcheventservices.events.CumulativeDurationEvent;
 import com.seesaw.player.batcheventservices.events.UserEvent;
 import com.seesaw.player.batcheventservices.events.ViewEvent;
+import com.seesaw.player.batcheventservices.services.LogAllFlushData;
 import com.seesaw.player.utils.AjaxRequestType;
 import com.seesaw.player.utils.ServiceRequest;
 import com.seesaw.player.utils.SynchronousHTTPService;
@@ -105,19 +106,31 @@ public class EventsManagerImpl implements EventsManager {
     }
 
     private function logContentEvent(contentEvent:ContentEvent):void {
-      logger.debug("contentEvent ID: {0}", contentEvent.contentEventId);
-      logger.debug("contentEvent currentAdBreakSequenceNumber: {0}", contentEvent.currentAdBreakSequenceNumber);
-      logger.debug("contentEvent contentViewingSequenceNumber: {0}", contentEvent.contentViewingSequenceNumber);
-      logger.debug("contentEvent eventOccured: {0}", contentEvent.eventOccured);
-      logger.debug("contentEvent getSectionType: {0}", contentEvent.getSectionType);
-      logger.debug("contentEvent userEventId: {0}", contentEvent.userEventId);
+         logger.debug("\n")
+        logger.debug(" -----------------------------------------------------------------")
+        logger.debug("CONTENT EVENTS")
+        logger.debug("-----------------------------------------------------------------")
+      logger.debug("contentEventId: {0}", contentEvent.contentEventId);
+      logger.debug("currentAdBreakSequenceNumber: {0}", contentEvent.currentAdBreakSequenceNumber);
+      logger.debug("contentViewingSequenceNumber: {0}", contentEvent.contentViewingSequenceNumber);
+      logger.debug("eventOccured: {0}", contentEvent.eventOccured);
+      logger.debug("getSectionType: {0}", contentEvent.getSectionType);
+      logger.debug("userEventId: {0}", contentEvent.userEventId);
+      logger.debug(" -----------------------------------------------------------------")
+      logger.debug("\n")
     }
 
 
       private function logUserEvent(userEvent:UserEvent):void {
-      logger.debug("userEvent EventType: {0}", userEvent.getEventType);
-      logger.debug("userEvent CVD: {0}", userEvent.getCulmulativeViewDuration);
-      logger.debug("userEvent Event Occured: {0}", userEvent.getEventOccured);
+        logger.debug("\n")
+        logger.debug(" -----------------------------------------------------------------")
+        logger.debug("USER EVENTS")
+        logger.debug(" -----------------------------------------------------------------")
+      logger.debug("EventType: {0}", userEvent.getEventType);
+      logger.debug("CVD: {0}", userEvent.getCulmulativeViewDuration);
+      logger.debug("Event Occured: {0}", userEvent.getEventOccured);
+      logger.debug(" -----------------------------------------------------------------")
+           logger.debug("\n")
 
     }
 
@@ -132,6 +145,9 @@ public class EventsManagerImpl implements EventsManager {
             eventsArray[1] = userEvents;
             eventsArray[2] = contentEvents;
             eventsArray[3] = new BatchEvent(userEventCount, incrementAndGetBatchEventId(), contentEventCount);
+
+            var logAllFlushData:LogAllFlushData = new LogAllFlushData();
+            logAllFlushData.logEvents(eventsArray);
 
             var request:ServiceRequest = new ServiceRequest(batchEventURL, onSuccess, onFailed);
             var post_data:URLVariables = new URLVariables();

@@ -811,7 +811,6 @@ public class SeeSawPlayer extends Sprite {
     private function onMediaPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
         switch (event.state) {
             case MediaPlayerState.PLAYING:
-                addEventListener(Event.ENTER_FRAME, updateMediaSize);
                 bufferingPanel.hide();       // hide the buffering Panel if content is playing...
                 container.validateNow();
                 toggleLights();
@@ -820,6 +819,11 @@ public class SeeSawPlayer extends Sprite {
             case MediaPlayerState.PAUSED:
                 toggleLights();
                 break;
+
+            case MediaPlayerState.READY:
+                addEventListener(Event.ENTER_FRAME, updateMediaSize);
+                break;
+
         }
     }
 
@@ -827,6 +831,11 @@ public class SeeSawPlayer extends Sprite {
     function updateMediaSize(event:Event):void {
         var displayTrait:DisplayObjectTrait =
                 mainElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
+        /* if(player.canPause) {   //todo check the state, adMode etc assess this all and wait for the size of the media, before allowing the media to show.
+         player.pause();
+         displayTrait.displayObject.visible = false;
+         }*/
+
         if (displayTrait) {
             if (displayTrait.mediaHeight > 0 && displayTrait.mediaWidth > 0) {
                 removeEventListener(Event.ENTER_FRAME, updateMediaSize);
