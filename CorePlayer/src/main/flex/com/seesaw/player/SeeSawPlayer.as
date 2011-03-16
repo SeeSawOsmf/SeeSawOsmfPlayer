@@ -224,7 +224,7 @@ public class SeeSawPlayer extends Sprite {
         controlbarContainer.layoutMetadata.verticalAlign = VerticalAlign.BOTTOM;
         addChild(controlbarContainer);
 
-      //  container.layoutRenderer.addTarget(mainContainer);
+        //  container.layoutRenderer.addTarget(mainContainer);
         container.layoutRenderer.addTarget(adContainer);
         container.layoutRenderer.addTarget(bufferingContainer);
         container.layoutRenderer.addTarget(subtitlesContainer);
@@ -752,8 +752,8 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function resizeMainContent():void {
-       mainContainer.width = contentWidth;
-       mainContainer.height = contentHeight;
+        mainContainer.width = contentWidth;
+        mainContainer.height = contentHeight;
     }
 
     private function setContainerSize(width:int, height:int):void {
@@ -824,8 +824,8 @@ public class SeeSawPlayer extends Sprite {
                 break;
 
             case MediaPlayerState.READY:
-                    container.validateNow();
-                    resizeMainContent();
+                container.validateNow();
+                resizeMainContent();
                 break;
 
         }
@@ -837,16 +837,16 @@ public class SeeSawPlayer extends Sprite {
                 mainElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
         if (displayTrait) {
 
-             /* var displayTrait:DisplayObjectTrait =
-                mainElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
-        if (displayTrait) {
-            logger.debug("=========================== resizeMainContent");
-            displayTrait.displayObject.x = 0;
-            displayTrait.displayObject.y = 0;
-            displayTrait.displayObject.width = contentWidth;
-            displayTrait.displayObject.height = contentHeight;
-            container.validateNow();
-        }*/
+            /* var displayTrait:DisplayObjectTrait =
+             mainElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
+             if (displayTrait) {
+             logger.debug("=========================== resizeMainContent");
+             displayTrait.displayObject.x = 0;
+             displayTrait.displayObject.y = 0;
+             displayTrait.displayObject.width = contentWidth;
+             displayTrait.displayObject.height = contentHeight;
+             container.validateNow();
+             }*/
 
             if (displayTrait.mediaHeight > 0 && displayTrait.mediaWidth > 0) {
                 removeEventListener(Event.ENTER_FRAME, updateMediaSize);
