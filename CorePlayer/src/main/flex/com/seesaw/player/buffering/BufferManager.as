@@ -116,7 +116,8 @@ public class BufferManager extends ProxyElement {
         // playback starts quickly after the unpause.
         if (event.playState == PlayState.PAUSED) {
             var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
-            bufferTrait.bufferTime = initialBufferTime;
+            if(bufferTrait)
+                bufferTrait.bufferTime = initialBufferTime;
         }
     }
 }

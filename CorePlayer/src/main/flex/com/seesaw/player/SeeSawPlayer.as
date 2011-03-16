@@ -98,6 +98,7 @@ import org.osmf.traits.TimeTrait;
 import org.osmf.traits.TraitEventDispatcher;
 
 import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
+import uk.co.vodco.osmfDebugProxy.DebugProxyElement;
 
 public class SeeSawPlayer extends Sprite {
 
@@ -160,6 +161,7 @@ public class SeeSawPlayer extends Sprite {
 
         player = new MediaPlayer();
         player.autoPlay = false;
+        player.autoRewind = false;
 
         adPlayer = new MediaPlayer();
         adPlayer.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onAdPlayerStateChange);
