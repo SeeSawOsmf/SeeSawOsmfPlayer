@@ -574,6 +574,7 @@ public class BatchEventServices extends ProxyElement {
     }
 
     private function onComplete(event:TimeEvent):void {
+        if(!eventsManager) createView();
         eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.END));
         finalEventTriggered = true;
         eventsManager.flushAll();
@@ -616,6 +617,7 @@ public class BatchEventServices extends ProxyElement {
     }
 
     private function exitEvent():void {
+        if(!eventsManager) createView();
         eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.EXIT));
         finalEventTriggered = true;
         eventsManager.flushExitEvent();

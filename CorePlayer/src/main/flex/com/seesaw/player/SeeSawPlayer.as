@@ -188,8 +188,6 @@ public class SeeSawPlayer extends Sprite {
         mainContainer = new MediaContainer();
         mainContainer.y = 0;
         mainContainer.x = 0;
-        mainContainer.layoutMetadata.percentWidth = 100;
-        mainContainer.layoutMetadata.percentHeight = 100;
         addChild(mainContainer);
 
         adContainer = new MediaContainer();
@@ -226,7 +224,7 @@ public class SeeSawPlayer extends Sprite {
         controlbarContainer.layoutMetadata.verticalAlign = VerticalAlign.BOTTOM;
         addChild(controlbarContainer);
 
-        container.layoutRenderer.addTarget(mainContainer);
+      //  container.layoutRenderer.addTarget(mainContainer);
         container.layoutRenderer.addTarget(adContainer);
         container.layoutRenderer.addTarget(bufferingContainer);
         container.layoutRenderer.addTarget(subtitlesContainer);
@@ -238,6 +236,8 @@ public class SeeSawPlayer extends Sprite {
             loadPlugins();
         }
 
+        setContainerSize(contentWidth, contentHeight);
+
         mainContainer.addMediaElement(mainElement);
 
         //handler to show and hide the buffering panel
@@ -245,8 +245,6 @@ public class SeeSawPlayer extends Sprite {
         player.media = mainElement;
 
         player.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onMainPlayerStateChange);
-
-        setContainerSize(contentWidth, contentHeight);
 
         logger.debug("adding media container to stage");
         addChild(container);
@@ -748,8 +746,14 @@ public class SeeSawPlayer extends Sprite {
     private function onFullscreen(event:FullScreenEvent):void {
         logger.debug("onFullscreen: " + event.fullScreen);
         setContainerSize(contentWidth, contentHeight);
+        resizeMainContent();
         container.validateNow();
         bufferingPanel.playerResize(contentWidth, contentHeight);
+    }
+
+    private function resizeMainContent():void {
+       mainContainer.width = contentWidth;
+       mainContainer.height = contentHeight;
     }
 
     private function setContainerSize(width:int, height:int):void {
@@ -813,14 +817,15 @@ public class SeeSawPlayer extends Sprite {
                 bufferingPanel.hide();       // hide the buffering Panel if content is playing...
                 container.validateNow();
                 toggleLights();
-
+                resizeMainContent();
                 break;
             case MediaPlayerState.PAUSED:
                 toggleLights();
                 break;
 
             case MediaPlayerState.READY:
-                addEventListener(Event.ENTER_FRAME, updateMediaSize);
+                    container.validateNow();
+                    resizeMainContent();
                 break;
 
         }
@@ -830,16 +835,24 @@ public class SeeSawPlayer extends Sprite {
     function updateMediaSize(event:Event):void {
         var displayTrait:DisplayObjectTrait =
                 mainElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
-        /* if(player.canPause) {   //todo check the state, adMode etc assess this all and wait for the size of the media, before allowing the media to show.
-         player.pause();
-         displayTrait.displayObject.visible = false;
-         }*/
-
         if (displayTrait) {
+
+             /* var displayTrait:DisplayObjectTrait =
+                mainElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
+        if (displayTrait) {
+            logger.debug("=========================== resizeMainContent");
+            displayTrait.displayObject.x = 0;
+            displayTrait.displayObject.y = 0;
+            displayTrait.displayObject.width = contentWidth;
+            displayTrait.displayObject.height = contentHeight;
+            container.validateNow();
+        }*/
+
             if (displayTrait.mediaHeight > 0 && displayTrait.mediaWidth > 0) {
                 removeEventListener(Event.ENTER_FRAME, updateMediaSize);
                 mainContainer.layoutRenderer.validateNow();
-                container.validateNow();
+                resizeMainContent();
+
             }
 
         }

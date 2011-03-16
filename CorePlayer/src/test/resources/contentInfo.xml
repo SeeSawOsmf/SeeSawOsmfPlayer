@@ -64,7 +64,7 @@
         <whatsThisLinkURL>http://localhost:8080/watchingtv/aboutparentalcontrols</whatsThisLinkURL>
     </parentalControls>
     <unavailablePageUrl>http://localhost:8080/unavailable</unavailablePageUrl>
-    <videoInfoUrl>../src/test/resources/videoInfo.xml</videoInfoUrl>
+    <videoInfoUrl>../src/test/resources/videoInfo.mediaScale.xml</videoInfoUrl>
      <batchEventUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player/initinfo:registerbatchevent?t:ac=26772
     </batchEventUrl>
     <playIntervalEventUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player/initinfo:playintervalevent?t:ac=26772
