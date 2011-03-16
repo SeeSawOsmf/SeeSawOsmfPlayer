@@ -832,34 +832,6 @@ public class SeeSawPlayer extends Sprite {
     }
 
 
-    function updateMediaSize(event:Event):void {
-        var displayTrait:DisplayObjectTrait =
-                mainElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
-        if (displayTrait) {
-
-            /* var displayTrait:DisplayObjectTrait =
-             mainElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
-             if (displayTrait) {
-             logger.debug("=========================== resizeMainContent");
-             displayTrait.displayObject.x = 0;
-             displayTrait.displayObject.y = 0;
-             displayTrait.displayObject.width = contentWidth;
-             displayTrait.displayObject.height = contentHeight;
-             container.validateNow();
-             }*/
-
-            if (displayTrait.mediaHeight > 0 && displayTrait.mediaWidth > 0) {
-                removeEventListener(Event.ENTER_FRAME, updateMediaSize);
-                mainContainer.layoutRenderer.validateNow();
-                resizeMainContent();
-
-            }
-
-        }
-
-    }
-
-
     private function toggleLights():void {
         var lightsDown:Boolean = false;
 
