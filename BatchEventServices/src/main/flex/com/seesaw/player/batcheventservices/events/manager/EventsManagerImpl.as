@@ -80,23 +80,23 @@ public class EventsManagerImpl implements EventsManager {
 
 
     public function addUserEvent(userEvent:UserEvent):void {
-        if(userEvent) {
-        userEventCount++;
-        userEvents.push(userEvent);
-          logUserEvent(userEvent);
-        if (userEventCount >= 10) {
-            if (!maxIsFlushing) {
-                maxIsFlushing = true;
-                flushAll();
+        if (userEvent) {
+            userEventCount++;
+            userEvents.push(userEvent);
+            logUserEvent(userEvent);
+            if (userEventCount >= 10) {
+                if (!maxIsFlushing) {
+                    maxIsFlushing = true;
+                    flushAll();
+                }
             }
         }
-    }
     }
 
     public function addContentEvent(contentEvent:ContentEvent):void {
         contentEventCount++;
         contentEvents.push(contentEvent);
-      logContentEvent(contentEvent);
+        logContentEvent(contentEvent);
         if (contentEventCount >= 10) {
             if (!maxIsFlushing) {
                 maxIsFlushing = true;
@@ -106,31 +106,32 @@ public class EventsManagerImpl implements EventsManager {
     }
 
     private function logContentEvent(contentEvent:ContentEvent):void {
-         logger.debug("\n")
+        logger.debug("\n")
         logger.debug(" -----------------------------------------------------------------")
         logger.debug("CONTENT EVENTS")
         logger.debug("-----------------------------------------------------------------")
-      logger.debug("contentEventId: {0}", contentEvent.contentEventId);
-      logger.debug("currentAdBreakSequenceNumber: {0}", contentEvent.currentAdBreakSequenceNumber);
-      logger.debug("contentViewingSequenceNumber: {0}", contentEvent.contentViewingSequenceNumber);
-      logger.debug("eventOccured: {0}", contentEvent.eventOccured);
-      logger.debug("getSectionType: {0}", contentEvent.getSectionType);
-      logger.debug("userEventId: {0}", contentEvent.userEventId);
-      logger.debug(" -----------------------------------------------------------------")
-      logger.debug("\n")
+        logger.debug("contentEventId: {0}", contentEvent.contentEventId);
+        logger.debug("currentAdBreakSequenceNumber: {0}", contentEvent.currentAdBreakSequenceNumber);
+        logger.debug("contentViewingSequenceNumber: {0}", contentEvent.contentViewingSequenceNumber);
+        logger.debug("eventOccured: {0}", contentEvent.eventOccured);
+        logger.debug("getSectionType: {0}", contentEvent.getSectionType);
+        logger.debug("userEventId: {0}", contentEvent.userEventId);
+        logger.debug("-----------------------------------------------------------------")
+        logger.debug("\n")
     }
 
 
-      private function logUserEvent(userEvent:UserEvent):void {
+    private function logUserEvent(userEvent:UserEvent):void {
         logger.debug("\n")
         logger.debug(" -----------------------------------------------------------------")
         logger.debug("USER EVENTS")
         logger.debug(" -----------------------------------------------------------------")
-      logger.debug("EventType: {0}", userEvent.getEventType);
-      logger.debug("CVD: {0}", userEvent.getCulmulativeViewDuration);
-      logger.debug("Event Occured: {0}", userEvent.getEventOccured);
-      logger.debug(" -----------------------------------------------------------------")
-           logger.debug("\n")
+        logger.debug("EventType: {0}", userEvent.getEventType);
+        logger.debug("CVD: {0}", userEvent.getCulmulativeViewDuration);
+        logger.debug("Event Occured: {0}", userEvent.getEventOccured);
+        logger.debug("userEventId: {0}", userEvent.getUserEventId);
+        logger.debug("-----------------------------------------------------------------")
+        logger.debug("\n")
 
     }
 

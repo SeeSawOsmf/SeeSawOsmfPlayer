@@ -281,6 +281,8 @@ public class BatchEventServices extends ProxyElement {
             scrubbingActive = event.value;
         }
         if (userEventType != null) {
+           if(!eventsManager) createView();
+
             eventsManager.addUserEvent(buildAndReturnUserEvent(userEventType));
         }
     }
@@ -646,6 +648,8 @@ public class BatchEventServices extends ProxyElement {
     }
 
     private function generateAssociatedContentEvent():void {
+        if(!eventsManager) createView();
+
         playingMainContent ? eventsManager.addContentEvent(buildAndReturnMainContentEvent(ContentTypes.MAIN_CONTENT)) : eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.AD_BREAK));
     }
 
