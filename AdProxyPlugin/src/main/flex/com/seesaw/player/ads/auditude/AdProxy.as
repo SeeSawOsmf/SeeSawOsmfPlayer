@@ -221,19 +221,22 @@ public class AdProxy extends ProxyElement {
         logger.debug("AD BREAK BEGIN: time = {0}, index = {1}, duration = {2}, empty = {3}", event.data.startTime,
                 event.data.breakIndex, event.data.breakDuration, event.data.isEmpty);
 
-        pause();
-
         // Is this the best way to get the breakTime
         currentAdBreak = metadataAdBreaks[event.data.breakIndex];
 
         adMetadata.currentAdBreak = currentAdBreak;
         adMetadata.adState = AdState.AD_BREAK_START;
         adMetadata.adMode = AdMode.AD;
+
         setTraitsToBlock(MediaTraitType.SEEK, MediaTraitType.TIME);
+        logger.debug("seek and time traits blocked");
     }
 
     private function onBreakEnd(event:AdPluginEvent):void {
         logger.debug("AD BREAK END");
+
+        setTraitsToBlock();
+        logger.debug("all traits unblocked");
 
         adMetadata.adState = AdState.AD_BREAK_COMPLETE;
         adMetadata.currentAdBreak = null;
@@ -244,8 +247,6 @@ public class AdProxy extends ProxyElement {
             currentAdBreak.complete = true;
             logger.debug("ad break watched: {0}", currentAdBreak);
         }
-        setTraitsToBlock();
-        play();
     }
 
     private function onLinearAdBegin(event:LinearAdEvent):void {

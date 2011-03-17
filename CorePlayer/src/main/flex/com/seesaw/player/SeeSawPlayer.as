@@ -97,7 +97,6 @@ import org.osmf.traits.PlayTrait;
 import org.osmf.traits.TimeTrait;
 import org.osmf.traits.TraitEventDispatcher;
 
-import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
 import uk.co.vodco.osmfDebugProxy.DebugProxyElement;
 
 public class SeeSawPlayer extends Sprite {
@@ -161,7 +160,6 @@ public class SeeSawPlayer extends Sprite {
 
         player = new MediaPlayer();
         player.autoPlay = false;
-        player.autoRewind = false;
 
         adPlayer = new MediaPlayer();
         adPlayer.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onAdPlayerStateChange);
@@ -245,6 +243,7 @@ public class SeeSawPlayer extends Sprite {
         //handler to show and hide the buffering panel
         player.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
         player.media = mainElement;
+        player.autoRewind = true;
 
         player.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onMainPlayerStateChange);
 
@@ -396,7 +395,7 @@ public class SeeSawPlayer extends Sprite {
 
         factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
         factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
-        factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
+//        factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
 
@@ -547,9 +546,6 @@ public class SeeSawPlayer extends Sprite {
         factory.removeEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onSmilElementCreated);
 
         if (mediaElement) {
-            mainElement.addChild(new BufferManager(PlayerConstants.MIN_BUFFER_SIZE_SECONDS,
-                    PlayerConstants.MAX_BUFFER_SIZE_SECONDS, mediaElement));
-
             mediaElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
 
             var timelineMetadata:TimelineMetadata =
@@ -583,6 +579,9 @@ public class SeeSawPlayer extends Sprite {
             dispatcher.media = mediaElement;
             dispatcher.addEventListener(TimeEvent.COMPLETE, onComplete);
             dispatcher.addEventListener(SeekEvent.SEEKING_CHANGE, mainElementSeekChange);
+
+            mainElement.addChild(new BufferManager(PlayerConstants.MIN_BUFFER_SIZE_SECONDS,
+                    PlayerConstants.MAX_BUFFER_SIZE_SECONDS, new DebugProxyElement(mediaElement)));
         }
 
         // get the control bar to point at the main content
@@ -637,7 +636,7 @@ public class SeeSawPlayer extends Sprite {
      */
     private function onTraitAdd(event:MediaElementEvent) {
 
-        logger.debug("On Trait add");
+        logger.debug("On Trait add: {0}", event.traitType);
 
         if (event.traitType == MediaTraitType.DRM) {
             event.target.removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
