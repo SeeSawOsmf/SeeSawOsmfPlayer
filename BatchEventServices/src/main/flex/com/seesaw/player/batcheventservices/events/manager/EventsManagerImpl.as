@@ -47,6 +47,8 @@ public class EventsManagerImpl implements EventsManager {
     private var userEvents:Array;
     private var contentEvents:Array;
 
+    private var stashedUserEvents:Array;
+    private var stashedContentEvents:Array;
 
     private var batchEventURL:String;
     private var cumlativeDurationURL:String;
@@ -67,14 +69,23 @@ public class EventsManagerImpl implements EventsManager {
     }
 
     private function onFailed():void {
-        trace("onFailed")
+        for each(var unstashedContentEvent:ContentEvent in stashedContentEvents) {
+            contentEventCount++;
+            contentEvents.push(unstashedContentEvent);
+        }
+
+        for each(var unstashedUserEvent:UserEvent in stashedUserEvents) {
+            userEventCount++;
+            contentEvents.push(unstashedUserEvent);
+        }
+
+        stashedUserEvents = [];
+        stashedContentEvents = [];
     }
 
     private function onSuccess(response:Object):void {
-        userEvents = [];
-        contentEvents = [];
-        userEventCount = 0;
-        contentEventCount = 0;
+        stashedUserEvents = userEvents;
+        stashedContentEvents = contentEvents;
         maxIsFlushing = flushing = false;
     }
 
@@ -147,6 +158,11 @@ public class EventsManagerImpl implements EventsManager {
             eventsArray[2] = contentEvents;
             eventsArray[3] = new BatchEvent(userEventCount, incrementAndGetBatchEventId(), contentEventCount);
 
+            stashedUserEvents = userEvents;
+            stashedContentEvents = contentEvents;
+
+            wipeEventRecords();
+
             var logAllFlushData:LogAllFlushData = new LogAllFlushData();
             logAllFlushData.logEvents(eventsArray);
 
@@ -154,12 +170,18 @@ public class EventsManagerImpl implements EventsManager {
             var post_data:URLVariables = new URLVariables();
             post_data.data = JSON.encode(eventsArray);
             request.submit(post_data);
+
         } else if (!allowEvent) {
-            userEvents = [];
-            contentEvents = [];
-            userEventCount = 0;
-            contentEventCount = 0;
+            wipeEventRecords();
         }
+    }
+
+
+    private function wipeEventRecords():void {
+        userEvents = [];
+        contentEvents = [];
+        userEventCount = 0;
+        contentEventCount = 0;
     }
 
     public function flushExitEvent():void {

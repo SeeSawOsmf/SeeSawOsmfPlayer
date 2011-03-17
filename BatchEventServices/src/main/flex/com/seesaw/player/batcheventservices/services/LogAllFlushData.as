@@ -33,36 +33,38 @@ public class LogAllFlushData {
     }
 
     public function logEvents(eventsArray:Array):void {
-        logger.debug(" -----------------------------------------------------------------")
-        logger.debug("FLUSHING EVENTS")
-        logger.debug(" -----------------------------------------------------------------")
-        for each(var contentEvent:ContentEvent in eventsArray[2]) {
-            logger.debug("\n")
-            logger.debug(" ---------------------CONTENT EVENT---------------------------")
-            logger.debug("contentEventId: {0}", contentEvent.contentEventId);
-            logger.debug("currentAdBreakSequenceNumber: {0}", contentEvent.currentAdBreakSequenceNumber);
-            logger.debug("contentViewingSequenceNumber: {0}", contentEvent.contentViewingSequenceNumber);
-            logger.debug("eventOccured: {0}", contentEvent.eventOccured);
-            logger.debug("getSectionType: {0}", contentEvent.getSectionType);
-            logger.debug("userEventId: {0}", contentEvent.userEventId);
-            logger.debug(" --------------------------------------------------------------")
-            logger.debug("\n")
-        }
 
-        for each(var userEvent:UserEvent in eventsArray[1]) {
+            logger.debug(" -----------------------------------------------------------------")
+            logger.debug("FLUSHING EVENTS")
+            logger.debug(" -----------------------------------------------------------------")
+            for each(var contentEvent:ContentEvent in eventsArray[2]) {
+                logger.debug("\n")
+                logger.debug(" ---------------------CONTENT EVENT---------------------------")
+                logger.debug("contentEventId: {0}", contentEvent.contentEventId);
+                logger.debug("currentAdBreakSequenceNumber: {0}", contentEvent.currentAdBreakSequenceNumber);
+                logger.debug("contentViewingSequenceNumber: {0}", contentEvent.contentViewingSequenceNumber);
+                logger.debug("eventOccured: {0}", contentEvent.eventOccured);
+                logger.debug("getSectionType: {0}", contentEvent.getSectionType);
+                logger.debug("userEventId: {0}", contentEvent.userEventId);
+                logger.debug(" --------------------------------------------------------------")
+                logger.debug("\n")
+            }
+
+            for each(var userEvent:UserEvent in eventsArray[1]) {
+                logger.debug("\n")
+                logger.debug(" ---------------------USER EVENT-------------------------------")
+                logger.debug("EventType: {0}", userEvent.getEventType);
+                logger.debug("CVD: {0}", userEvent.getCulmulativeViewDuration);
+                logger.debug("Event Occured: {0}", userEvent.getEventOccured);
+                logger.debug("userEventId: {0}", userEvent.getUserEventId);
+                logger.debug(" ---------------------------------------------------------------")
+                logger.debug("\n")
+            }
             logger.debug("\n")
-            logger.debug(" ---------------------USER EVENT-------------------------------")
-            logger.debug("EventType: {0}", userEvent.getEventType);
-            logger.debug("CVD: {0}", userEvent.getCulmulativeViewDuration);
-            logger.debug("Event Occured: {0}", userEvent.getEventOccured);
-            logger.debug("userEventId: {0}", userEvent.getUserEventId);
-            logger.debug(" ---------------------------------------------------------------")
             logger.debug("\n")
+            logger.debug("\n")
+
         }
-        logger.debug("\n")
-        logger.debug("\n")
-        logger.debug("\n")
 
     }
-}
 }
