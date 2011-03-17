@@ -280,6 +280,10 @@ public class BatchEventServices extends ProxyElement {
         }  else if (event.key == UserEventTypes.USER_SCRUB_ACTIVATED) {
             scrubbingActive = event.value;
         }
+          else if (event.key == UserEventTypes.USER_CLICK_THRU) {
+           eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.CLICK));
+        }
+
         if (userEventType != null) {
            if(!eventsManager) createView();
 

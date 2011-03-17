@@ -56,5 +56,6 @@ public class UserEventTypes {
     public static const SUBTITLES_OFF:String = "SUBTITLES_OFF";
 
      public static const USER_SCRUB_ACTIVATED:String = "userScrubActivated";
+     public static const USER_CLICK_THRU:String = "userClickThru";
 }
 }
