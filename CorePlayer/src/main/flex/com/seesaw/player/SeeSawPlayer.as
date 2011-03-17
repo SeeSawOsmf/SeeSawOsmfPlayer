@@ -395,7 +395,6 @@ public class SeeSawPlayer extends Sprite {
 
         factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
         factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
-//        factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
 
