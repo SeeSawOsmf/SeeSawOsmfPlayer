@@ -185,6 +185,9 @@ public class SeeSawPlayer extends Sprite {
     public function init():void {
         logger.debug("initialising media player");
 
+        setContainerSize(contentWidth, contentHeight);
+
+
         mainContainer = new MediaContainer();
         mainContainer.y = 0;
         mainContainer.x = 0;
@@ -224,19 +227,20 @@ public class SeeSawPlayer extends Sprite {
         controlbarContainer.layoutMetadata.verticalAlign = VerticalAlign.BOTTOM;
         addChild(controlbarContainer);
 
-        //  container.layoutRenderer.addTarget(mainContainer);
+        container.layoutRenderer.addTarget(mainContainer);
         container.layoutRenderer.addTarget(adContainer);
         container.layoutRenderer.addTarget(bufferingContainer);
         container.layoutRenderer.addTarget(subtitlesContainer);
         container.layoutRenderer.addTarget(controlbarContainer);
 
         if (adsEnabled && adMode == AdMetadata.AUDITUDE_AD_TYPE) {
+            mainContainer.layoutMetadata.percentWidth = 100;
+            mainContainer.layoutMetadata.percentHeight = 100;
             loadAuditude();
         } else {
+            container.layoutRenderer.removeTarget(mainContainer);
             loadPlugins();
         }
-
-        setContainerSize(contentWidth, contentHeight);
 
         mainContainer.addMediaElement(mainElement);
 
@@ -752,8 +756,12 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function resizeMainContent():void {
-        mainContainer.width = contentWidth;
-        mainContainer.height = contentHeight;
+        if (adMode == AdMetadata.AUDITUDE_AD_TYPE) {
+              mainContainer.layoutRenderer.validateNow();
+        }
+         mainContainer.width = contentWidth;
+         mainContainer.height = contentHeight;
+        container.validateNow();
     }
 
     private function setContainerSize(width:int, height:int):void {
@@ -815,20 +823,47 @@ public class SeeSawPlayer extends Sprite {
         switch (event.state) {
             case MediaPlayerState.PLAYING:
                 bufferingPanel.hide();       // hide the buffering Panel if content is playing...
-                container.validateNow();
                 toggleLights();
                 resizeMainContent();
+                if (adsEnabled && adMode == AdMetadata.AUDITUDE_AD_TYPE)  addEventListener(Event.ENTER_FRAME, updateMediaSize);
                 break;
             case MediaPlayerState.PAUSED:
                 toggleLights();
                 break;
 
             case MediaPlayerState.READY:
-                container.validateNow();
                 resizeMainContent();
                 break;
 
         }
+    }
+
+
+    function updateMediaSize(event:Event):void {
+        var displayTrait:DisplayObjectTrait =
+                mainElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
+        if (displayTrait) {
+
+            /* var displayTrait:DisplayObjectTrait =
+             mainElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
+             if (displayTrait) {
+             logger.debug("=========================== resizeMainContent");
+             displayTrait.displayObject.x = 0;
+             displayTrait.displayObject.y = 0;
+             displayTrait.displayObject.width = contentWidth;
+             displayTrait.displayObject.height = contentHeight;
+             container.validateNow();
+             }*/
+
+            if (displayTrait.mediaHeight >= 0 && displayTrait.mediaWidth >= 0) {
+                removeEventListener(Event.ENTER_FRAME, updateMediaSize);
+
+
+
+            }
+
+        }
+
     }
 
 
