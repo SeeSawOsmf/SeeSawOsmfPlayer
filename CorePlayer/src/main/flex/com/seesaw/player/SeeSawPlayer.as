@@ -96,11 +96,10 @@ import org.osmf.traits.MediaTraitBase;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.PlayTrait;
-import org.osmf.traits.SeekTrait;
 import org.osmf.traits.TimeTrait;
 import org.osmf.traits.TraitEventDispatcher;
 
-import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
+import uk.co.vodco.osmfDebugProxy.DebugProxyElement;
 
 public class SeeSawPlayer extends Sprite {
 
@@ -137,7 +136,6 @@ public class SeeSawPlayer extends Sprite {
 
     private var currentAdBreak:AdBreak;
     private var controlBarMetadata:Metadata;
-
     private var resumeService:ResumeService;
 
     private var currentAdMode = "ad mode not set";
@@ -195,11 +193,12 @@ public class SeeSawPlayer extends Sprite {
     public function init():void {
         logger.debug("initialising media player");
 
+        setContainerSize(contentWidth, contentHeight);
+
+
         mainContainer = new MediaContainer();
         mainContainer.y = 0;
         mainContainer.x = 0;
-        mainContainer.layoutMetadata.percentWidth = 100;
-        mainContainer.layoutMetadata.percentHeight = 100;
         addChild(mainContainer);
 
         adContainer = new MediaContainer();
@@ -243,8 +242,11 @@ public class SeeSawPlayer extends Sprite {
         container.layoutRenderer.addTarget(controlbarContainer);
 
         if (adsEnabled && adMode == AdMetadata.AUDITUDE_AD_TYPE) {
+            mainContainer.layoutMetadata.percentWidth = 100;
+            mainContainer.layoutMetadata.percentHeight = 100;
             loadAuditude();
         } else {
+            container.layoutRenderer.removeTarget(mainContainer);     /// only use the layoutRendering if Auditude. Otherwise media size wont be propagated through the layout.
             loadPlugins();
         }
 
@@ -252,12 +254,10 @@ public class SeeSawPlayer extends Sprite {
 
         //handler to show and hide the buffering panel
         player.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
-
         player.media = mainElement;
+        player.autoRewind = true;
 
         player.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onMainPlayerStateChange);
-
-        setContainerSize(contentWidth, contentHeight);
 
         logger.debug("adding media container to stage");
         addChild(container);
@@ -301,12 +301,11 @@ public class SeeSawPlayer extends Sprite {
 
                     // Set the main content to ad mode just like liverail and auditude do
                     var adMetadata:AdMetadata = mainElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+                    adMetadata.currentAdBreak = currentAdBreak;
                     adMetadata.adState = AdState.AD_BREAK_START;
                     adMetadata.adMode = AdMode.AD;
 
-
                     adContainer.visible = true;
-
                 }
             }
         }
@@ -317,7 +316,9 @@ public class SeeSawPlayer extends Sprite {
         if (!currentAdBreak.complete) {
             if (event.playState == PlayState.STOPPED) {
                 var adMetadata:AdMetadata = mainElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
-                adMetadata.adState = AdState.STOPPED;
+                var dataObject:Object = new Object();
+                dataObject["state"] = AdState.STOPPED;
+                adMetadata.adState = dataObject;
             }
         }
     }
@@ -326,7 +327,10 @@ public class SeeSawPlayer extends Sprite {
         if (!currentAdBreak.complete) {
             if (event.type == TimeEvent.DURATION_CHANGE) {
                 var adMetadata:AdMetadata = mainElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
-                adMetadata.adState = AdState.STARTED;
+                var dataObject:Object = new Object();
+                dataObject["state"] = AdState.STARTED;
+                dataObject["contentUrl"] = URLResource(adPlayer.media.resource).url;
+                adMetadata.adState = dataObject;
             }
         }
     }
@@ -359,7 +363,7 @@ public class SeeSawPlayer extends Sprite {
             // Set the main content to ad mode just like liverail and auditude do
             var adMetadata:AdMetadata = mainElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
             adMetadata.adState = AdState.AD_BREAK_COMPLETE;
-
+            adMetadata.currentAdBreak = null;
 
             mainContainer.visible = true;
 
@@ -401,7 +405,6 @@ public class SeeSawPlayer extends Sprite {
 
         factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
         factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
-        factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
 
@@ -430,6 +433,16 @@ public class SeeSawPlayer extends Sprite {
     private function createBufferingPanel():void {
         //Create the Buffering Panel
         bufferingPanel = new BufferingPanel(bufferingContainer);
+
+        var layout:LayoutMetadata = new LayoutMetadata();
+
+        layout.x = 0;
+        layout.y = 0;
+        layout.horizontalAlign = HorizontalAlign.CENTER;
+        layout.verticalAlign = VerticalAlign.MIDDLE;
+
+        bufferingPanel.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+
         bufferingPanel.addEventListener(PlayerConstants.BUFFER_MESSAGE_HIDE, updateBufferMetaData)
         bufferingPanel.addEventListener(PlayerConstants.BUFFER_MESSAGE_SHOW, updateBufferMetaData);
         bufferingContainer.addMediaElement(bufferingPanel);
@@ -447,8 +460,7 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onBufferingChange(event:BufferEvent):void {
-        var seeking:SeekTrait = mainElement.getTrait(MediaTraitType.SEEK) as SeekTrait;
-        if (event.currentTarget.bufferLength < 0.1) {
+        if (event.currentTarget.bufferLength < 0.2) {
             (event.buffering) ? bufferingPanel.show() : bufferingPanel.hide();
         } else {
             bufferingPanel.hide();
@@ -486,8 +498,7 @@ public class SeeSawPlayer extends Sprite {
             subtitleElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
 
             layout.percentWidth = 100;
-            layout.height = 50;
-            layout.bottom = 100;
+            layout.height = 70;
             layout.horizontalAlign = HorizontalAlign.CENTER;
             layout.verticalAlign = VerticalAlign.BOTTOM;
             layout.index = 10;
@@ -500,6 +511,8 @@ public class SeeSawPlayer extends Sprite {
             loadTrait.addEventListener(LoadEvent.LOAD_STATE_CHANGE, onSubtitleLoadStateChange);
 
             mainElement.addChild(subtitleElement);
+        } else {
+            setSubtitlesButtonEnabled(false);
         }
     }
 
@@ -542,9 +555,6 @@ public class SeeSawPlayer extends Sprite {
         factory.removeEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onSmilElementCreated);
 
         if (mediaElement) {
-            mainElement.addChild(new BufferManager(PlayerConstants.MIN_BUFFER_SIZE_SECONDS,
-                    PlayerConstants.MAX_BUFFER_SIZE_SECONDS, mediaElement));
-
             mediaElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
 
             var timelineMetadata:TimelineMetadata =
@@ -577,18 +587,27 @@ public class SeeSawPlayer extends Sprite {
             var dispatcher:TraitEventDispatcher = new TraitEventDispatcher();
             dispatcher.media = mediaElement;
             dispatcher.addEventListener(TimeEvent.COMPLETE, onComplete);
+<<<<<<< HEAD
 
             var adMetadata:AdMetadata = mediaElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
             if(adMetadata) {
                 // adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdMetadataAdd);
                 adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdMetadataChange);
             }
+=======
+            dispatcher.addEventListener(SeekEvent.SEEKING_CHANGE, mainElementSeekChange);
+
+            mainElement.addChild(new BufferManager(PlayerConstants.MIN_BUFFER_SIZE_SECONDS,
+                    PlayerConstants.MAX_BUFFER_SIZE_SECONDS, new DebugProxyElement(mediaElement)));
+>>>>>>> 5a67f1b792abaf48fdbb1221cf8e3610a5469792
         }
 
         // get the control bar to point at the main content
         setControlBarTarget(mainElement);
+
     }
 
+<<<<<<< HEAD
     /*private function onAdMetadataAdd(event:MetadataEvent):void {
          if(event.key == AdMetadata.AD_MODE) {
               if(ExternalInterface.available) {
@@ -607,13 +626,15 @@ public class SeeSawPlayer extends Sprite {
             currentAdMode = event.value as String;
         }
     }
+=======
+>>>>>>> 5a67f1b792abaf48fdbb1221cf8e3610a5469792
 
     private function mainElementSeekChange(event:SeekEvent):void {
-       if(event.seeking){
+        if (event.seeking) {
             player.removeEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
-       }else if(!event.seeking){
+        } else if (!event.seeking) {
             player.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
-       }
+        }
     }
 
     private function onSmilElementCreated(event:MediaFactoryEvent):void {
@@ -641,6 +662,9 @@ public class SeeSawPlayer extends Sprite {
             }
             else if (contentType == PlayerConstants.MAIN_CONTENT_ID) {
                 setMediaLayout(event.mediaElement);
+
+            } else if (contentType == PlayerConstants.CLIP_CONTENT_ID) {
+                setMediaLayout(event.mediaElement);
             }
         }
     }
@@ -651,7 +675,7 @@ public class SeeSawPlayer extends Sprite {
      */
     private function onTraitAdd(event:MediaElementEvent) {
 
-        logger.debug("On Trait add");
+        logger.debug("On Trait add: {0}", event.traitType);
 
         if (event.traitType == MediaTraitType.DRM) {
             event.target.removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
@@ -701,6 +725,7 @@ public class SeeSawPlayer extends Sprite {
         layout.percentHeight = 100;
         layout.verticalAlign = VerticalAlign.MIDDLE;
         layout.horizontalAlign = HorizontalAlign.CENTER;
+
     }
 
     private function createAuditudeElement(mediaElement:MediaElement):MediaElement {
@@ -750,20 +775,34 @@ public class SeeSawPlayer extends Sprite {
 
     private function netStatusChanged(event:NetStatusEvent):void {
 
-            var metadata:Metadata = mainElement.getMetadata(NetStatusMetadata.NET_STATUS_METADATA);
-            if (metadata == null) {
-                metadata = new Metadata();
-                mainElement.addMetadata(NetStatusMetadata.NET_STATUS_METADATA, metadata);
-            }
+        var metadata:Metadata = mainElement.getMetadata(NetStatusMetadata.NET_STATUS_METADATA);
+        if (metadata == null) {
+            metadata = new Metadata();
+            mainElement.addMetadata(NetStatusMetadata.NET_STATUS_METADATA, metadata);
+        }
 
-            metadata.addValue(NetStatusMetadata.STATUS, event.info);
+        metadata.addValue(NetStatusMetadata.STATUS, event.info);
 
     }
 
     private function onFullscreen(event:FullScreenEvent):void {
         logger.debug("onFullscreen: " + event.fullScreen);
         setContainerSize(contentWidth, contentHeight);
+        resizeMainContent();
         container.validateNow();
+        bufferingPanel.playerResize(contentWidth, contentHeight);
+    }
+
+    private function resizeMainContent():void {
+        if (adsEnabled && adMode == AdMetadata.AUDITUDE_AD_TYPE)  {
+            mainContainer.layoutRenderer.validateNow();
+            container.validateNow();
+        }else{
+         mainContainer.width = contentWidth;
+         mainContainer.height = contentHeight;
+        }
+
+
     }
 
     private function setContainerSize(width:int, height:int):void {
@@ -793,8 +832,8 @@ public class SeeSawPlayer extends Sprite {
 
     private function generateUserEventMetadata(event:MetadataEvent):void {
         var metadata:Metadata = userEventMetaData as Metadata;
-        if(metadata){
-              metadata.addValue(event.key, event.value);
+        if (metadata) {
+            metadata.addValue(event.key, event.value);
         }
     }
 
@@ -825,16 +864,35 @@ public class SeeSawPlayer extends Sprite {
         switch (event.state) {
             case MediaPlayerState.PLAYING:
                 bufferingPanel.hide();       // hide the buffering Panel if content is playing...
-                // This was the simplest fix I could find for FEEDBACK-2311.
-                container.validateNow();
                 toggleLights();
+                resizeMainContent();
+                if (adsEnabled && adMode == AdMetadata.AUDITUDE_AD_TYPE)  addEventListener(Event.ENTER_FRAME, updateAuditudeMediaSize);
                 break;
             case MediaPlayerState.PAUSED:
                 toggleLights();
                 break;
 
+            case MediaPlayerState.READY:
+                resizeMainContent();
+                break;
+
         }
     }
+
+
+    function updateAuditudeMediaSize(event:Event):void {
+        var displayTrait:DisplayObjectTrait =
+                mainElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
+        if (displayTrait) {
+
+            if (displayTrait.mediaHeight > 0 && displayTrait.mediaWidth >= 0) {
+                removeEventListener(Event.ENTER_FRAME, updateAuditudeMediaSize);
+            }
+           resizeMainContent()
+        }
+
+    }
+
 
     private function toggleLights():void {
         var lightsDown:Boolean = false;

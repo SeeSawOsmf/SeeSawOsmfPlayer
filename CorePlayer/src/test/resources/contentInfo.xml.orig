@@ -20,7 +20,7 @@
 -->
 
 <contentInfo xmlns:ns2="http://www.w3.org/ns/SMIL" xmlns="http://www.seesaw.com/api/contentinfo/v1.0">
-    <primaryGenre>TV:DRAMA:CONTEMPORARY_BRITISH</primaryGenre>
+    <primaryGenre>TV:DRAMA:SCI-FI_AND_FANTASY</primaryGenre>
     <sourceId>CHANNEL4</sourceId>
     <firstPresentationBrand>4oD</firstPresentationBrand>
     <programmeId>bd4d51de-b655-4d75-aab1-c3b911306cd0</programmeId>
@@ -38,11 +38,6 @@
         <break>
             <breakOffset>00:05:00.00</breakOffset>
             <resumeOffset>00:05:00.00</resumeOffset>
-            <data>CEN:x01,x02,x92,x80,x81,x93</data>
-        </break>
-         <break>
-            <breakOffset>00:08:00.00</breakOffset>
-            <resumeOffset>00:08:00.00</resumeOffset>
             <data>CEN:x01,x02,x92,x80,x81,x93</data>
         </break>
         <!-- <break>
@@ -64,20 +59,19 @@
         <whatsThisLinkURL>http://localhost:8080/watchingtv/aboutparentalcontrols</whatsThisLinkURL>
     </parentalControls>
     <unavailablePageUrl>http://localhost:8080/unavailable</unavailablePageUrl>
-    <!-- <videoInfoUrl>../src/test/resources/videoInfo.c4ad.xml</videoInfoUrl> -->
-    <videoInfoUrl>../src/test/resources/videoInfo.xml</videoInfoUrl>
+    <videoInfoUrl>../src/test/resources/videoInfo.fa.xml</videoInfoUrl>
      <batchEventUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player/initinfo:registerbatchevent?t:ac=26772
     </batchEventUrl>
-    <playIntervalEventUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player/initinfo:playintervalevent?t:ac=26772
+    <playIntervalEventUrl>http://seesaw.stage.vodco.co.uk/player/initinfo:playintervalevent?t:ac=26772
     </playIntervalEventUrl>
-    <largeImageUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/i/ccp/00000120/12035.jpg
+    <largeImageUrl>http://seesaw.stage.vodco.co.uk/i/ccp/00000182/18284.jpg
     </largeImageUrl>
     <liverail>
         <version>4.1</version>
-        <publisherId>1332</publisherId>
+        <publisherId>4819</publisherId>
     </liverail>
-    <adMode>none</adMode>
-    <dogImage>http://kgd-red-test-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png
+    <adMode>liverail</adMode>
+    <dogImage>http://seesaw.stage.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png
     </dogImage>
     <programme>33535</programme>
     <userId>911112222</userId>

@@ -247,7 +247,7 @@ public class Player extends Sprite {
         // if playButtonMode is null, this indicates that the user has no entitlement to play the video
         if (playButtonMode != null) {
             if (playButtonMode != PlayStartButton.PREVIEW && resumeService.resumable) {
-                PlayStartButton.RESUME;
+                playButtonMode = PlayStartButton.RESUME;
             }
             playButton = new PlayStartButton(playButtonMode);
             playButton.addEventListener(PlayStartButton.PROCEED, onNextInitialisationState);

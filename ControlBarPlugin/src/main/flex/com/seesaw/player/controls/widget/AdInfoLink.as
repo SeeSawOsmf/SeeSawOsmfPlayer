@@ -20,8 +20,7 @@
 
 package com.seesaw.player.controls.widget {
 import com.seesaw.player.ads.AdMetadata;
-import com.seesaw.player.external.PlayerExternalInterface;
-import com.seesaw.player.ioc.ObjectProvider;
+import com.seesaw.player.controls.ControlBarConstants;
 import com.seesaw.player.ui.PlayerToolTip;
 import com.seesaw.player.ui.StyledTextField;
 
@@ -39,14 +38,13 @@ import org.as3commons.logging.LoggerFactory;
 import org.osmf.chrome.widgets.ButtonWidget;
 import org.osmf.events.MetadataEvent;
 import org.osmf.media.MediaElement;
+import org.osmf.metadata.Metadata;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayTrait;
 
 public class AdInfoLink extends ButtonWidget implements IWidget {
 
     private var logger:ILogger = LoggerFactory.getClassLogger(AdInfoLink);
-
-    private var xi:PlayerExternalInterface;
 
     private const DEFAULT_CAPTION:String = "Click for more information";
 
@@ -61,6 +59,8 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
     private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.AdInfoLink";
 
     private static const _requiredTraits:Vector.<String> = new Vector.<String>;
+    private var metadata:Metadata;
+
     _requiredTraits[0] = MediaTraitType.PLAY;
 
     public function AdInfoLink() {
@@ -79,16 +79,18 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
         }
 
         adInfoLabel.text = linkCaption;
-
-        xi = ObjectProvider.getInstance().getObject(PlayerExternalInterface);
-        logger.debug("XI IS: " + xi.available);
+        adInfoLabel.visible = false;
 
         this.toolTip = new PlayerToolTip(this, linkCaption);
         this.formatLabelFont();
 
         this.addEventListener(Event.ADDED_TO_STAGE, this.onAddedToStage);
 
-        this.visible = false;
+        this.visible = true;
+
+        this.useHandCursor = true;
+        this.mouseChildren = false;
+        this.buttonMode = true;
 
         addChild(adInfoLabel);
     }
@@ -106,6 +108,15 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
         media.metadata.addEventListener(MetadataEvent.VALUE_ADD, onAdInfoMetadataChange);
         media.metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdInfoMetadataChange);
         media.metadata.addEventListener(MetadataEvent.VALUE_REMOVE, onAdInfoMetadataChange);
+        adInfoLabel.visible = false;
+        updateFromAdMetadata();
+
+        metadata = media.getMetadata(ControlBarConstants.CONTROL_BAR_METADATA);
+        if (metadata == null) {
+            metadata = new Metadata();
+            media.addMetadata(ControlBarConstants.CONTROL_BAR_METADATA, metadata);
+        }
+
     }
 
     private function onAdInfoMetadataChange(event:MetadataEvent) {
@@ -115,23 +126,26 @@ public class AdInfoLink extends ButtonWidget implements IWidget {
     }
 
     private function updateFromAdMetadata():void {
-        var adMetadata:AdMetadata = media.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+        var adMetadata:AdMetadata= media.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
         if (adMetadata) {
             interactiveAdvertisingUrl = adMetadata.clickThru;
-            visible = interactiveAdvertisingUrl != null;
+            if (interactiveAdvertisingUrl) {
+                adInfoLabel.visible = true;
+            }
         }
         else {
-            visible = false;
+            adInfoLabel.visible = false;
         }
     }
 
     override protected function onMouseClick(event:MouseEvent):void {
         var request:URLRequest = new URLRequest(this.interactiveAdvertisingUrl);
+            metadata.addValue(ControlBarConstants.USER_CLICK_THRU, this.interactiveAdvertisingUrl);
         try {
             navigateToURL(request);
             pause();
         } catch (e:Error) {
-            trace("Error occurred!");
+            logger.error("navigateToURL: {0}", e.message);
         }
     }
 

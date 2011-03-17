@@ -1,0 +1,31 @@
+<videoInfo xmlns:ns2="http://www.w3.org/ns/SMIL" xmlns="http://www.seesaw.com/api/contentinfo/v1.0">
+	<ns2:smil>
+		<ns2:head />
+		<ns2:body>
+			<ns2:seq>
+				<ns2:video src="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703/mp4:e5/test/ccp/clips/00000022/2230.mp4?s=1299842186&amp;e=1299885686&amp;h=234293c207fd306b2e8a1998af62d83f" clipBegin="0">
+					<ns2:metadata>
+						<ns2:meta content="clip" name="contentType" />
+					</ns2:metadata>
+				</ns2:video>
+			</ns2:seq>
+		</ns2:body>
+	</ns2:smil>
+	<geoblocked>false</geoblocked>
+	<serverTimestamp>1299842486915</serverTimestamp>
+	<anonymousUserId>271209864997234</anonymousUserId>
+	<validTransaction>false</validTransaction>
+	<sectionCount>1</sectionCount>
+	<mainAssetId>31853</mainAssetId>
+	<availability>
+		<noAdsPlayable>false</noAdsPlayable>
+		<tvodPlayable>false</tvodPlayable>
+		<svodPlayable>false</svodPlayable>
+		<exceededDrmRule>false</exceededDrmRule>
+		<showPreview>true</showPreview>
+		<seriesEntitled>false</seriesEntitled>
+		<subscriptionEntitled>false</subscriptionEntitled>
+		<episodeEntitled>false</episodeEntitled>
+		<available>true</available>
+	</availability>
+</videoInfo>

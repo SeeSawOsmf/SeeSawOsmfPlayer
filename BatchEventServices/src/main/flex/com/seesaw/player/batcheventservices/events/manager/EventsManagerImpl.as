@@ -25,14 +25,18 @@ import com.seesaw.player.batcheventservices.events.ContentEvent;
 import com.seesaw.player.batcheventservices.events.CumulativeDurationEvent;
 import com.seesaw.player.batcheventservices.events.UserEvent;
 import com.seesaw.player.batcheventservices.events.ViewEvent;
+import com.seesaw.player.batcheventservices.services.LogAllFlushData;
 import com.seesaw.player.utils.AjaxRequestType;
 import com.seesaw.player.utils.ServiceRequest;
 import com.seesaw.player.utils.SynchronousHTTPService;
 
 import flash.net.URLVariables;
 
-public class EventsManagerImpl implements EventsManager {
+import org.as3commons.logging.ILogger;
+import org.as3commons.logging.LoggerFactory;
 
+public class EventsManagerImpl implements EventsManager {
+    private var logger:ILogger = LoggerFactory.getClassLogger(EventsManagerImpl);
     private var batchEventId:int = 0;
     private var userEventId:int = 0;
 
@@ -43,6 +47,8 @@ public class EventsManagerImpl implements EventsManager {
     private var userEvents:Array;
     private var contentEvents:Array;
 
+    private var stashedUserEvents:Array;
+    private var stashedContentEvents:Array;
 
     private var batchEventURL:String;
     private var cumlativeDurationURL:String;
@@ -63,40 +69,81 @@ public class EventsManagerImpl implements EventsManager {
     }
 
     private function onFailed():void {
-        trace("onFailed")
+        for each(var unstashedContentEvent:ContentEvent in stashedContentEvents) {
+            contentEventCount++;
+            contentEvents.push(unstashedContentEvent);
+        }
+
+        for each(var unstashedUserEvent:UserEvent in stashedUserEvents) {
+            userEventCount++;
+            contentEvents.push(unstashedUserEvent);
+        }
+
+        stashedUserEvents = [];
+        stashedContentEvents = [];
     }
 
     private function onSuccess(response:Object):void {
-        userEvents = [];
-        contentEvents = [];
-        userEventCount = 0;
-        contentEventCount = 0;
+        stashedUserEvents = userEvents;
+        stashedContentEvents = contentEvents;
         maxIsFlushing = flushing = false;
     }
 
 
     public function addUserEvent(userEvent:UserEvent):void {
-        if(userEvent) {
-        userEventCount++;
-        userEvents.push(userEvent);
-        if (userEventCount >= 10) {
-            if (!maxIsFlushing) {
-                maxIsFlushing = true;
-                flushAll();
+        if (userEvent) {
+            userEventCount++;
+            userEvents.push(userEvent);
+            logUserEvent(userEvent);
+            if (userEventCount >= 10) {
+                if (!maxIsFlushing) {
+                    maxIsFlushing = true;
+                    flushAll();
+                }
             }
         }
-    }
     }
 
     public function addContentEvent(contentEvent:ContentEvent):void {
         contentEventCount++;
         contentEvents.push(contentEvent);
+        logContentEvent(contentEvent);
         if (contentEventCount >= 10) {
             if (!maxIsFlushing) {
                 maxIsFlushing = true;
                 flushAll();
             }
         }
+    }
+
+    private function logContentEvent(contentEvent:ContentEvent):void {
+        logger.debug("\n")
+        logger.debug(" -----------------------------------------------------------------")
+        logger.debug("CONTENT EVENTS")
+        logger.debug("-----------------------------------------------------------------")
+        logger.debug("contentEventId: {0}", contentEvent.contentEventId);
+        logger.debug("currentAdBreakSequenceNumber: {0}", contentEvent.currentAdBreakSequenceNumber);
+        logger.debug("contentViewingSequenceNumber: {0}", contentEvent.contentViewingSequenceNumber);
+        logger.debug("eventOccured: {0}", contentEvent.eventOccured);
+        logger.debug("getSectionType: {0}", contentEvent.getSectionType);
+        logger.debug("userEventId: {0}", contentEvent.userEventId);
+        logger.debug("-----------------------------------------------------------------")
+        logger.debug("\n")
+    }
+
+
+    private function logUserEvent(userEvent:UserEvent):void {
+        logger.debug("\n")
+        logger.debug(" -----------------------------------------------------------------")
+        logger.debug("USER EVENTS")
+        logger.debug(" -----------------------------------------------------------------")
+        logger.debug("EventType: {0}", userEvent.getEventType);
+        logger.debug("CVD: {0}", userEvent.getCulmulativeViewDuration);
+        logger.debug("Event Occured: {0}", userEvent.getEventOccured);
+        logger.debug("userEventId: {0}", userEvent.getUserEventId);
+        logger.debug("-----------------------------------------------------------------")
+        logger.debug("\n")
+
     }
 
     public function flushAll():void {
@@ -111,16 +158,30 @@ public class EventsManagerImpl implements EventsManager {
             eventsArray[2] = contentEvents;
             eventsArray[3] = new BatchEvent(userEventCount, incrementAndGetBatchEventId(), contentEventCount);
 
+            stashedUserEvents = userEvents;
+            stashedContentEvents = contentEvents;
+
+            wipeEventRecords();
+
+            var logAllFlushData:LogAllFlushData = new LogAllFlushData();
+            logAllFlushData.logEvents(eventsArray);
+
             var request:ServiceRequest = new ServiceRequest(batchEventURL, onSuccess, onFailed);
             var post_data:URLVariables = new URLVariables();
             post_data.data = JSON.encode(eventsArray);
             request.submit(post_data);
+
         } else if (!allowEvent) {
-            userEvents = [];
-            contentEvents = [];
-            userEventCount = 0;
-            contentEventCount = 0;
+            wipeEventRecords();
         }
+    }
+
+
+    private function wipeEventRecords():void {
+        userEvents = [];
+        contentEvents = [];
+        userEventCount = 0;
+        contentEventCount = 0;
     }
 
     public function flushExitEvent():void {

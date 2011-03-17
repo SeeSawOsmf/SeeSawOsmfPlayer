@@ -209,8 +209,8 @@ public class BatchEventServices extends ProxyElement {
         if (number == 0) {
             userEvent = buildAndReturnUserEvent(UserEventTypes.AUTO_PLAY);
         } else {
-            userEvent = buildAndReturnUserEvent(UserEventTypes.AUTO_RESUME);
             playingMainContent = true;
+            userEvent = buildAndReturnUserEvent(UserEventTypes.AUTO_RESUME);
         }
         eventsManager.addUserEvent(userEvent);
         eventsManager.flushAll();
@@ -280,7 +280,13 @@ public class BatchEventServices extends ProxyElement {
         }  else if (event.key == UserEventTypes.USER_SCRUB_ACTIVATED) {
             scrubbingActive = event.value;
         }
+          else if (event.key == UserEventTypes.USER_CLICK_THRU) {
+           eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.CLICK));
+        }
+
         if (userEventType != null) {
+           if(!eventsManager) createView();
+
             eventsManager.addUserEvent(buildAndReturnUserEvent(userEventType));
         }
     }
@@ -356,8 +362,6 @@ public class BatchEventServices extends ProxyElement {
     private function onAdsMetaDataAdd(event:MetadataEvent):void {
         if (event.key == AdMetadata.AD_STATE) {
             AdMetaEvaluation(event.value);
-        } else if (event.key == AdMetadata.AD_BREAKS) {
-            adBreaks = event.key as Vector.<AdBreak>;
         } else {
             AdMetaEvaluation(event.key);
         }
@@ -366,10 +370,6 @@ public class BatchEventServices extends ProxyElement {
     private function onAdsMetaDataChange(event:MetadataEvent):void {
         if (event.key == AdMetadata.AD_STATE || event.key == AdMetadata.AD_MODE) {
             AdMetaEvaluation(event.value);
-        } else if (event.key == AdMetadata.AD_BREAKS) {
-
-            var metadataAdBreaks:Vector.<AdBreak> = event.value;
-            adBreaks = metadataAdBreaks;
         } else {
             AdMetaEvaluation(event.key);
         }
@@ -382,6 +382,7 @@ public class BatchEventServices extends ProxyElement {
         } else if (value == AdState.AD_BREAK_START) {
             if (cumulativeDurationMonitor.running) cumulativeDurationMonitor.stop();
             playingMainContent = false;
+          ////  contentViewingSequenceNumber = evaluateAdContentCount;
             contentViewingSequenceNumber++;
 
         } else if (typeof(value) == "object") {
@@ -413,6 +414,25 @@ public class BatchEventServices extends ProxyElement {
                 eventsManager.flushAll();
             }
         }
+    }
+
+    private function get evaluateAdContentCount():int {
+        var currentSection:int;
+        var adBreaks:Vector.<AdBreak> = adMetadata ? adMetadata.adBreaks : null;
+        if (adBreaks) {
+
+            for each (var breakItem:AdBreak in adBreaks) {
+
+              if (timeTrait.currentTime >= breakItem.startTime) {
+                    currentSection = currentSection +1;// since we are checking adBreaks, we need to increment twice (once for the ad, once into the current content...
+                }
+            }
+
+        } else if (timeTrait.currentTime <= 0)  {
+            currentSection = 1;
+        }
+        return currentSection;
+
     }
 
     private function autoFlush(event:TimerEvent):void {
@@ -486,9 +506,9 @@ public class BatchEventServices extends ProxyElement {
         if (playingMainContent) {
             switch (event.playState) {
                 case PlayState.PAUSED:
-                          if (cumulativeDurationMonitor.running) {
-                    cumulativeDurationMonitor.stop();
-                          }
+                    if (cumulativeDurationMonitor.running) {
+                        cumulativeDurationMonitor.stop();
+                    }
                     break;
                 case PlayState.PLAYING:
                     if (!cumulativeDurationMonitor.running) {
@@ -558,6 +578,7 @@ public class BatchEventServices extends ProxyElement {
     }
 
     private function onComplete(event:TimeEvent):void {
+        if(!eventsManager) createView();
         eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.END));
         finalEventTriggered = true;
         eventsManager.flushAll();
@@ -565,6 +586,7 @@ public class BatchEventServices extends ProxyElement {
 
     private function evaluateMainContentCount(seekTime:Number = 0, seekTriggered:Boolean = false):int {
         var currentSection:int;
+        var adBreaks:Vector.<AdBreak> = adMetadata ? adMetadata.adBreaks : null;
         if (adBreaks) {
 
             for each (var breakItem:AdBreak in adBreaks) {
@@ -575,7 +597,7 @@ public class BatchEventServices extends ProxyElement {
                     {
                         currentSection = currentSection + 2; /// to ge the seek value as opposed to the current time......
                     }
-                } else if (timeTrait.currentTime >= breakItem.startTime) {
+                } else if (timeTrait && timeTrait.currentTime >= breakItem.startTime) {
                     currentSection = currentSection + 2;// since we are checking adBreaks, we need to increment twice (once for the ad, once into the current content...
                 }
             }
@@ -599,6 +621,7 @@ public class BatchEventServices extends ProxyElement {
     }
 
     private function exitEvent():void {
+        if(!eventsManager) createView();
         eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.EXIT));
         finalEventTriggered = true;
         eventsManager.flushExitEvent();
@@ -631,6 +654,8 @@ public class BatchEventServices extends ProxyElement {
     }
 
     private function generateAssociatedContentEvent():void {
+        if(!eventsManager) createView();
+
         playingMainContent ? eventsManager.addContentEvent(buildAndReturnMainContentEvent(ContentTypes.MAIN_CONTENT)) : eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.AD_BREAK));
     }
 
