@@ -587,34 +587,22 @@ public class SeeSawPlayer extends Sprite {
             var dispatcher:TraitEventDispatcher = new TraitEventDispatcher();
             dispatcher.media = mediaElement;
             dispatcher.addEventListener(TimeEvent.COMPLETE, onComplete);
-<<<<<<< HEAD
+            dispatcher.addEventListener(SeekEvent.SEEKING_CHANGE, mainElementSeekChange);
 
             var adMetadata:AdMetadata = mediaElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
             if(adMetadata) {
                 // adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdMetadataAdd);
                 adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdMetadataChange);
             }
-=======
-            dispatcher.addEventListener(SeekEvent.SEEKING_CHANGE, mainElementSeekChange);
 
             mainElement.addChild(new BufferManager(PlayerConstants.MIN_BUFFER_SIZE_SECONDS,
                     PlayerConstants.MAX_BUFFER_SIZE_SECONDS, new DebugProxyElement(mediaElement)));
->>>>>>> 5a67f1b792abaf48fdbb1221cf8e3610a5469792
         }
 
         // get the control bar to point at the main content
         setControlBarTarget(mainElement);
 
     }
-
-<<<<<<< HEAD
-    /*private function onAdMetadataAdd(event:MetadataEvent):void {
-         if(event.key == AdMetadata.AD_MODE) {
-              if(ExternalInterface.available) {
-                   ExternalInterface.addCallback("getAdMode", getAdMode);
-              }
-         }
-    }*/
 
     private function getAdMode():String {
         return currentAdMode;
@@ -626,8 +614,6 @@ public class SeeSawPlayer extends Sprite {
             currentAdMode = event.value as String;
         }
     }
-=======
->>>>>>> 5a67f1b792abaf48fdbb1221cf8e3610a5469792
 
     private function mainElementSeekChange(event:SeekEvent):void {
         if (event.seeking) {
