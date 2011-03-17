@@ -238,7 +238,7 @@ public class SeeSawPlayer extends Sprite {
             mainContainer.layoutMetadata.percentHeight = 100;
             loadAuditude();
         } else {
-            container.layoutRenderer.removeTarget(mainContainer);
+            container.layoutRenderer.removeTarget(mainContainer);     /// only use the layoutRendering if Auditude. Otherwise media size wont be propagated through the layout.
             loadPlugins();
         }
 
