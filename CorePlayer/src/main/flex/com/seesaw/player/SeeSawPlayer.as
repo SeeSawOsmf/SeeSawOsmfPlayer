@@ -23,6 +23,7 @@ import com.auditude.ads.AuditudePlugin;
 import com.auditude.ads.osmf.IAuditudeMediaElement;
 import com.seesaw.player.ads.AdBreak;
 import com.seesaw.player.ads.AdMetadata;
+import com.seesaw.player.ads.AdMetadata;
 import com.seesaw.player.ads.AdMode;
 import com.seesaw.player.ads.AdState;
 import com.seesaw.player.ads.AuditudeConstants;
@@ -54,6 +55,7 @@ import flash.display.StageDisplayState;
 import flash.events.Event;
 import flash.events.FullScreenEvent;
 import flash.events.NetStatusEvent;
+import flash.external.ExternalInterface;
 import flash.utils.ByteArray;
 
 import org.as3commons.logging.ILogger;
@@ -138,6 +140,8 @@ public class SeeSawPlayer extends Sprite {
 
     private var resumeService:ResumeService;
 
+    private var currentAdMode = "ad mode not set";
+
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
 
@@ -171,6 +175,10 @@ public class SeeSawPlayer extends Sprite {
         container = new MediaContainer();
 
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+
+        if(ExternalInterface.available) {
+             ExternalInterface.addCallback("getAdMode", getAdMode);
+        }
     }
 
     private function onComplete(event:TimeEvent):void {
@@ -569,10 +577,35 @@ public class SeeSawPlayer extends Sprite {
             var dispatcher:TraitEventDispatcher = new TraitEventDispatcher();
             dispatcher.media = mediaElement;
             dispatcher.addEventListener(TimeEvent.COMPLETE, onComplete);
+
+            var adMetadata:AdMetadata = mediaElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+            if(adMetadata) {
+                // adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdMetadataAdd);
+                adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdMetadataChange);
+            }
         }
 
         // get the control bar to point at the main content
         setControlBarTarget(mainElement);
+    }
+
+    /*private function onAdMetadataAdd(event:MetadataEvent):void {
+         if(event.key == AdMetadata.AD_MODE) {
+              if(ExternalInterface.available) {
+                   ExternalInterface.addCallback("getAdMode", getAdMode);
+              }
+         }
+    }*/
+
+    private function getAdMode():String {
+        return currentAdMode;
+    }
+
+    // sets the ad mode for use in the external interface
+    private function onAdMetadataChange(event:MetadataEvent):void {
+        if(event.key == AdMetadata.AD_MODE) {
+            currentAdMode = event.value as String;
+        }
     }
 
     private function mainElementSeekChange(event:SeekEvent):void {
