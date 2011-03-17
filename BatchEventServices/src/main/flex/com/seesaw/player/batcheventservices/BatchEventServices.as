@@ -280,6 +280,10 @@ public class BatchEventServices extends ProxyElement {
         }  else if (event.key == UserEventTypes.USER_SCRUB_ACTIVATED) {
             scrubbingActive = event.value;
         }
+          else if (event.key == UserEventTypes.USER_CLICK_THRU) {
+           eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.CLICK));
+        }
+
         if (userEventType != null) {
            if(!eventsManager) createView();
 
@@ -574,6 +578,7 @@ public class BatchEventServices extends ProxyElement {
     }
 
     private function onComplete(event:TimeEvent):void {
+        if(!eventsManager) createView();
         eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.END));
         finalEventTriggered = true;
         eventsManager.flushAll();
@@ -616,6 +621,7 @@ public class BatchEventServices extends ProxyElement {
     }
 
     private function exitEvent():void {
+        if(!eventsManager) createView();
         eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.EXIT));
         finalEventTriggered = true;
         eventsManager.flushExitEvent();

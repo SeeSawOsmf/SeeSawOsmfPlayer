@@ -185,11 +185,12 @@ public class SeeSawPlayer extends Sprite {
     public function init():void {
         logger.debug("initialising media player");
 
+        setContainerSize(contentWidth, contentHeight);
+
+
         mainContainer = new MediaContainer();
         mainContainer.y = 0;
         mainContainer.x = 0;
-        mainContainer.layoutMetadata.percentWidth = 100;
-        mainContainer.layoutMetadata.percentHeight = 100;
         addChild(mainContainer);
 
         adContainer = new MediaContainer();
@@ -233,8 +234,11 @@ public class SeeSawPlayer extends Sprite {
         container.layoutRenderer.addTarget(controlbarContainer);
 
         if (adsEnabled && adMode == AdMetadata.AUDITUDE_AD_TYPE) {
+            mainContainer.layoutMetadata.percentWidth = 100;
+            mainContainer.layoutMetadata.percentHeight = 100;
             loadAuditude();
         } else {
+            container.layoutRenderer.removeTarget(mainContainer);     /// only use the layoutRendering if Auditude. Otherwise media size wont be propagated through the layout.
             loadPlugins();
         }
 
@@ -246,8 +250,6 @@ public class SeeSawPlayer extends Sprite {
         player.autoRewind = true;
 
         player.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onMainPlayerStateChange);
-
-        setContainerSize(contentWidth, contentHeight);
 
         logger.debug("adding media container to stage");
         addChild(container);
@@ -426,8 +428,8 @@ public class SeeSawPlayer extends Sprite {
 
         var layout:LayoutMetadata = new LayoutMetadata();
 
-        layout.x = contentWidth;
-        layout.y = contentHeight;
+        layout.x = 0;
+        layout.y = 0;
         layout.horizontalAlign = HorizontalAlign.CENTER;
         layout.verticalAlign = VerticalAlign.MIDDLE;
 
@@ -748,8 +750,21 @@ public class SeeSawPlayer extends Sprite {
     private function onFullscreen(event:FullScreenEvent):void {
         logger.debug("onFullscreen: " + event.fullScreen);
         setContainerSize(contentWidth, contentHeight);
+        resizeMainContent();
         container.validateNow();
         bufferingPanel.playerResize(contentWidth, contentHeight);
+    }
+
+    private function resizeMainContent():void {
+        if (adsEnabled && adMode == AdMetadata.AUDITUDE_AD_TYPE)  {
+            mainContainer.layoutRenderer.validateNow();
+            container.validateNow();
+        }else{
+         mainContainer.width = contentWidth;
+         mainContainer.height = contentHeight;
+        }
+
+
     }
 
     private function setContainerSize(width:int, height:int):void {
@@ -811,37 +826,31 @@ public class SeeSawPlayer extends Sprite {
         switch (event.state) {
             case MediaPlayerState.PLAYING:
                 bufferingPanel.hide();       // hide the buffering Panel if content is playing...
-                container.validateNow();
                 toggleLights();
-
+                resizeMainContent();
+                if (adsEnabled && adMode == AdMetadata.AUDITUDE_AD_TYPE)  addEventListener(Event.ENTER_FRAME, updateAuditudeMediaSize);
                 break;
             case MediaPlayerState.PAUSED:
                 toggleLights();
                 break;
 
             case MediaPlayerState.READY:
-                addEventListener(Event.ENTER_FRAME, updateMediaSize);
+                resizeMainContent();
                 break;
 
         }
     }
 
 
-    function updateMediaSize(event:Event):void {
+    function updateAuditudeMediaSize(event:Event):void {
         var displayTrait:DisplayObjectTrait =
                 mainElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
-        /* if(player.canPause) {   //todo check the state, adMode etc assess this all and wait for the size of the media, before allowing the media to show.
-         player.pause();
-         displayTrait.displayObject.visible = false;
-         }*/
-
         if (displayTrait) {
-            if (displayTrait.mediaHeight > 0 && displayTrait.mediaWidth > 0) {
-                removeEventListener(Event.ENTER_FRAME, updateMediaSize);
-                mainContainer.layoutRenderer.validateNow();
-                container.validateNow();
-            }
 
+            if (displayTrait.mediaHeight > 0 && displayTrait.mediaWidth >= 0) {
+                removeEventListener(Event.ENTER_FRAME, updateAuditudeMediaSize);
+            }
+           resizeMainContent()
         }
 
     }
