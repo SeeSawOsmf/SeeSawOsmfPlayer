@@ -97,11 +97,13 @@ public class PlayPauseButtonBase extends ButtonWidget {
             media.addMetadata(ControlBarConstants.CONTROL_BAR_METADATA, metadata);
         }
 
-        if(playTrait)  playTrait.removeEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
+        if(playTrait)
+            playTrait.removeEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
 
-        if(media.getTrait(MediaTraitType.PLAY)) playTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
+        playTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
 
-        if(playTrait) playTrait.addEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
+        if(playTrait)
+            playTrait.addEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
 
         updateVisibility();
     }
