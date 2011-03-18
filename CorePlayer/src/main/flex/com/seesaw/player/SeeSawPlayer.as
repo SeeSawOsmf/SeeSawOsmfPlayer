@@ -887,7 +887,6 @@ public class SeeSawPlayer extends Sprite {
     private function onMediaPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
         switch (event.state) {
             case MediaPlayerState.PLAYING:
-//                bufferingPanel.hide();
                 toggleLights();
                 resizeMainContent();
                 if (adsEnabled && adMode == AdMetadata.AUDITUDE_AD_TYPE)
