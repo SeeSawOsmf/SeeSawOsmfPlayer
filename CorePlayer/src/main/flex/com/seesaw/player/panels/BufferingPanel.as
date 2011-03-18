@@ -30,6 +30,8 @@ import flash.text.TextField;
 import flash.text.TextFormat;
 import flash.utils.Timer;
 
+import org.as3commons.logging.ILogger;
+import org.as3commons.logging.LoggerFactory;
 import org.osmf.containers.MediaContainer;
 import org.osmf.layout.HorizontalAlign;
 import org.osmf.layout.LayoutMetadata;
@@ -40,6 +42,9 @@ import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.MediaTraitType;
 
 public class BufferingPanel extends MediaElement {
+
+    private var logger:ILogger = LoggerFactory.getClassLogger(BufferingPanel);
+
     private const PANEL_WIDTH:Number = 260;
     private const PANEL_HEIGHT:Number = 110;
 
@@ -59,7 +64,7 @@ public class BufferingPanel extends MediaElement {
      * Takes: warning:String - the guidance warning that appears at the top of the panel
      *
      */
-    public function BufferingPanel(container:MediaContainer) {
+    public function BufferingPanel(delay:int, container:MediaContainer) {
         parentContainer = container;
 
         //set the private variables
@@ -73,7 +78,7 @@ public class BufferingPanel extends MediaElement {
         buildCSS();
         buildPanel();
 
-        tooSlowTimer = new Timer(2500, 1);
+        tooSlowTimer = new Timer(delay, 1);
         tooSlowTimer.addEventListener("timerComplete", showTooSlowMessage);
 
         _displayTrait = new DisplayObjectTrait(panel, PANEL_WIDTH, PANEL_HEIGHT);
@@ -91,11 +96,13 @@ public class BufferingPanel extends MediaElement {
     }
 
     public function show():void {
+        logger.debug("showing panel in {0}ms", tooSlowTimer.delay);
         tooSlowTimer.reset();
         tooSlowTimer.start();
     }
 
     public function hide():void {
+        logger.debug("hiding panel");
         parentContainer.layoutMetadata.includeInLayout = false;
         panel.visible = false;
         tooSlowTimer.stop();

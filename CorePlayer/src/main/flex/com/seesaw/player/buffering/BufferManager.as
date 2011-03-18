@@ -34,12 +34,6 @@ import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.TraitEventDispatcher;
 
-/**
- * Proxy class which sets the IBufferable.bufferTime property to
- * an initial value when the IBufferable trait is available, and
- * an expanded value when the proxied MediaElement first exits
- * the buffer state.
- **/
 public class BufferManager extends ProxyElement {
 
     private static const UPDATE_INTERVAL:uint = 100;
