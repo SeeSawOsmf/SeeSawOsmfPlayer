@@ -132,6 +132,7 @@ public class PlayStartButton extends Sprite {
         proceedButton.addEventListener(MouseEvent.CLICK, this.onProceedClick);
         if (ExternalInterface.available) {
             ExternalInterface.addCallback("playStart", this.onProceedClick);
+            ExternalInterface.addCallback("clickToSee", this.onProceedClick);
         }
 
         proceedButton.height = 169;
