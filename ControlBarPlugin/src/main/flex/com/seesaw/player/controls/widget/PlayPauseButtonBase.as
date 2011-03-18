@@ -23,8 +23,6 @@ import com.seesaw.player.controls.ControlBarConstants;
 import flash.events.Event;
 import flash.external.ExternalInterface;
 
-import flash.utils.getQualifiedClassName;
-
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.events.MediaElementEvent;
@@ -98,6 +96,14 @@ public class PlayPauseButtonBase extends ButtonWidget {
             metadata = new Metadata();
             media.addMetadata(ControlBarConstants.CONTROL_BAR_METADATA, metadata);
         }
+
+        if(playTrait)  playTrait.removeEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
+
+        if(media.getTrait(MediaTraitType.PLAY)) playTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
+
+        if(playTrait) playTrait.addEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
+
+        updateVisibility();
     }
 
     override protected function processRequiredTraitsAvailable(element:MediaElement):void {
