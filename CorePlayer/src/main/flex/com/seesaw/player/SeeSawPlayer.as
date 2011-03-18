@@ -593,6 +593,11 @@ public class SeeSawPlayer extends Sprite {
             if(adMetadata) {
                 // adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdMetadataAdd);
                 adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdMetadataChange);
+                currentAdMode = adMetadata.adMode;
+            }
+            else {
+                // if we don't have any ad metadata then we must be playing main content
+                currentAdMode = AdMode.MAIN_CONTENT;
             }
 
             mainElement.addChild(new BufferManager(PlayerConstants.MIN_BUFFER_SIZE_SECONDS,
