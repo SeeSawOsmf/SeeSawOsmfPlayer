@@ -149,7 +149,6 @@ public class AutoResumeProxy extends ProxyElement {
     }
 
     private function onSeekingChange(event:SeekEvent):void {
-        logger.debug("seeking: {0}", event.seeking);
         if (!event.seeking) {
             // Don't write a resume point after we've made a seek request ourselves.
             if (!seekingToResumePoint)
@@ -167,7 +166,6 @@ public class AutoResumeProxy extends ProxyElement {
     }
 
     private function onPlayStateChanged(event:PlayEvent):void {
-        logger.debug("playState: {0}", event.playState);
         switch (event.playState) {
             case PlayState.PAUSED:
                 timer.stop();

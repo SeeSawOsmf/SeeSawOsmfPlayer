@@ -227,12 +227,16 @@ public class AdProxy extends ProxyElement {
         adMetadata.currentAdBreak = currentAdBreak;
         adMetadata.adState = AdState.AD_BREAK_START;
         adMetadata.adMode = AdMode.AD;
+
         setTraitsToBlock(MediaTraitType.SEEK, MediaTraitType.TIME);
+        logger.debug("seek and time traits blocked");
     }
 
     private function onBreakEnd(event:AdPluginEvent):void {
         logger.debug("AD BREAK END");
+
         setTraitsToBlock();
+        logger.debug("all traits unblocked");
 
         adMetadata.adState = AdState.AD_BREAK_COMPLETE;
         adMetadata.currentAdBreak = null;

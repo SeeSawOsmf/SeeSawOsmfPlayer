@@ -1,215 +1,96 @@
-<!--
-  ~ The contents of this file are subject to the Mozilla Public License
-  ~   Version 1.1 (the "License"); you may not use this file except in
-  ~   compliance with the License. You may obtain a copy of the License at
-  ~   http://www.mozilla.org/MPL/
-  ~
-  ~   Software distributed under the License is distributed on an "AS IS"
-  ~   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
-  ~   License for the specific language governing rights and limitations
-  ~   under the License.
-  ~
-  ~   The Initial Developer of the Original Code is Arqiva Ltd.
-  ~   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
-  ~   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
-  ~ 	Systems Incorporated.
-  ~   All Rights Reserved.
-  ~
-  ~   Contributor(s):  Adobe Systems Incorporated
-  -->
-
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <videoInfo xmlns:ns2="http://www.w3.org/ns/SMIL" xmlns="http://www.seesaw.com/api/contentinfo/v1.0">
-    <ns2:smil>
-        <ns2:head>
-            <ns2:meta base="rtmpe://cdn-flash-blue-dev.vodco.co.uk/a2703"/>
-        </ns2:head>
-        <ns2:body>
-            <ns2:seq>
-                <ns2:video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/TEA-DYIM002-020_4OD.mp4">
-                    <ns2:metadata>
-                        <ns2:meta content="advert" name="contentType"/>
-                        <ns2:meta
-                                content="http://kgd-red-test-zxtm01.dev.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/1484763447/x12/4OD/WALT_DISNEY_STU_021511_14211_2/2712274/5532494162557958586b77414364414e"
-                                name="trackback"/>
-                        <ns2:meta
-                                content="http://realmedia.channel4.com/5c/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/484763447/x60/4OD/WALT_DISNEY_STU_021511_14211_2/WALT_DISNEY_STU_021511_14211_1_002.html/5532494162557958586b77414364414e"
-                                name="popupAdvertisingUrl"/>
-                    </ns2:metadata>
-                </ns2:video>
-                <ns2:video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Chase_040.mp4">
-                    <ns2:metadata>
-                        <ns2:meta content="advert" name="contentType"/>
-                        <ns2:meta
-                                content="http://kgd-red-test-zxtm01.dev.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/1562367930/x12/4OD/Mercury_Records_021411_14272_2/Mercury_Records_021411_14272_2_TRACK/5532494162557958586b77414364414e"
-                                name="trackback"/>
-                        <ns2:meta
-                                content="http://realmedia.channel4.com/5c/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/562367930/x61/4OD/Mercury_Records_021411_14272_2/Mercury_Records_021411_14272_2.html/5532494162557958586b77414364414e"
-                                name="popupAdvertisingUrl"/>
-                    </ns2:metadata>
-                </ns2:video>
-                <ns2:video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Seesaw_Recycling.mp4">
-                    <ns2:metadata>
-                        <ns2:meta content="advert" name="contentType"/>
-                        <ns2:meta
-                                content="http://kgd-red-test-zxtm01.dev.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L18/11958585864/x13/4OD/SS_IDENT_Feb10_x90/2362406/5532494162557958586b77414364414e"
-                                name="trackback"/>
-                    </ns2:metadata>
-                </ns2:video>
-                <ns2:par>
-                    <ns2:switch>
-                        <ns2:video clipEnd="277" clipBegin="0"
-                                   src="mp4:e4/test/ccp/p/LOW_RES/00000418/41804.mp4?s=1297940772&amp;e=1297984272&amp;h=fe9b9279224451c2b13cb405659cc33a"
-                                   system-bitrate="500000" dur="1319">
-                            <ns2:metadata>
-                                <ns2:meta content="mainContent" name="contentType"/>
-                            </ns2:metadata>
-                        </ns2:video>
-                    </ns2:switch>
-                    <ns2:img
-                            src="http://seesaw.stage.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png">
-                        <ns2:metadata>
-                            <ns2:meta content="dogImage" name="contentType"/>
-                        </ns2:metadata>
-                    </ns2:img>
-                </ns2:par>
-                <ns2:video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/JWT-DEBA144-030.mp4">
-                    <ns2:metadata>
-                        <ns2:meta content="advert" name="contentType"/>
-                        <ns2:meta
-                                content="http://kgd-red-test-zxtm01.dev.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/1728459101/x12/4OD/DEBENHAMS_021411_13654_2/2711889/5532494162557958586b77414364414e"
-                                name="trackback"/>
-                        <ns2:meta
-                                content="http://realmedia.channel4.com/5c/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/728459101/x80/4OD/DEBENHAMS_021411_13654_2/DEBENHAMS_021411_13654_1_144.html/5532494162557958586b77414364414e"
-                                name="popupAdvertisingUrl"/>
-                    </ns2:metadata>
-                </ns2:video>
-                <ns2:video
-                        src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/HTC_Desire_Waiting_Video_AMP-THTC004-020.mp4">
-                    <ns2:metadata>
-                        <ns2:meta content="advert" name="contentType"/>
-                        <ns2:meta
-                                content="http://kgd-red-test-zxtm01.dev.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/11829807384/x12/4OD/HTC_EUROPE_TELE_021411_14096_2/HTC_EUROPE_TELE_021411_14096_2_CP/5532494162557958586b77414364414e"
-                                name="trackback"/>
-                        <ns2:meta
-                                content="http://realmedia.channel4.com/5c/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/1829807384/x81/4OD/HTC_EUROPE_TELE_021411_14096_2/HTC_EUROPE_TELE_021411_14096_2_WAITING.html/5532494162557958586b77414364414e"
-                                name="popupAdvertisingUrl"/>
-                    </ns2:metadata>
-                </ns2:video>
-                <ns2:par>
-                    <ns2:switch>
-                        <ns2:video clipEnd="477" clipBegin="277"
-                                   src="mp4:e4/test/ccp/p/LOW_RES/00000418/41804.mp4?s=1297940772&amp;e=1297984272&amp;h=fe9b9279224451c2b13cb405659cc33a"
-                                   system-bitrate="500000" dur="1319">
-                            <ns2:metadata>
-                                <ns2:meta content="mainContent" name="contentType"/>
-                            </ns2:metadata>
-                        </ns2:video>
-                    </ns2:switch>
-                    <ns2:img
-                            src="http://seesaw.stage.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png">
-                        <ns2:metadata>
-                            <ns2:meta content="dogImage" name="contentType"/>
-                        </ns2:metadata>
-                    </ns2:img>
-                </ns2:par>
-
-
-                  <ns2:video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/JWT-DEBA144-030.mp4">
-                    <ns2:metadata>
-                        <ns2:meta content="advert" name="contentType"/>
-                        <ns2:meta
-                                content="http://kgd-red-test-zxtm01.dev.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/1728459101/x12/4OD/DEBENHAMS_021411_13654_2/2711889/5532494162557958586b77414364414e"
-                                name="trackback"/>
-                        <ns2:meta
-                                content="http://realmedia.channel4.com/5c/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/728459101/x80/4OD/DEBENHAMS_021411_13654_2/DEBENHAMS_021411_13654_1_144.html/5532494162557958586b77414364414e"
-                                name="popupAdvertisingUrl"/>
-                    </ns2:metadata>
-                </ns2:video>
-                <ns2:video
-                        src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/HTC_Desire_Waiting_Video_AMP-THTC004-020.mp4">
-                    <ns2:metadata>
-                        <ns2:meta content="advert" name="contentType"/>
-                        <ns2:meta
-                                content="http://kgd-red-test-zxtm01.dev.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/11829807384/x12/4OD/HTC_EUROPE_TELE_021411_14096_2/HTC_EUROPE_TELE_021411_14096_2_CP/5532494162557958586b77414364414e"
-                                name="trackback"/>
-                        <ns2:meta
-                                content="http://realmedia.channel4.com/5c/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/1829807384/x81/4OD/HTC_EUROPE_TELE_021411_14096_2/HTC_EUROPE_TELE_021411_14096_2_WAITING.html/5532494162557958586b77414364414e"
-                                name="popupAdvertisingUrl"/>
-                    </ns2:metadata>
-                </ns2:video>
-
-                  <ns2:par>
-                    <ns2:switch>
-                        <ns2:video clipEnd="677" clipBegin="477"
-                                   src="mp4:e4/test/ccp/p/LOW_RES/00000418/41804.mp4?s=1297940772&amp;e=1297984272&amp;h=fe9b9279224451c2b13cb405659cc33a"
-                                   system-bitrate="500000" dur="1319">
-                            <ns2:metadata>
-                                <ns2:meta content="mainContent" name="contentType"/>
-                            </ns2:metadata>
-                        </ns2:video>
-                    </ns2:switch>
-                    <ns2:img
-                            src="http://seesaw.stage.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png">
-                        <ns2:metadata>
-                            <ns2:meta content="dogImage" name="contentType"/>
-                        </ns2:metadata>
-                    </ns2:img>
-                </ns2:par>
-
-
-                  <ns2:video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/JWT-DEBA144-030.mp4">
-                    <ns2:metadata>
-                        <ns2:meta content="advert" name="contentType"/>
-                        <ns2:meta
-                                content="http://kgd-red-test-zxtm01.dev.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/1728459101/x12/4OD/DEBENHAMS_021411_13654_2/2711889/5532494162557958586b77414364414e"
-                                name="trackback"/>
-                        <ns2:meta
-                                content="http://realmedia.channel4.com/5c/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/728459101/x80/4OD/DEBENHAMS_021411_13654_2/DEBENHAMS_021411_13654_1_144.html/5532494162557958586b77414364414e"
-                                name="popupAdvertisingUrl"/>
-                    </ns2:metadata>
-                </ns2:video>
-                <ns2:video
-                        src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/HTC_Desire_Waiting_Video_AMP-THTC004-020.mp4">
-                    <ns2:metadata>
-                        <ns2:meta content="advert" name="contentType"/>
-                        <ns2:meta
-                                content="http://kgd-red-test-zxtm01.dev.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/11829807384/x12/4OD/HTC_EUROPE_TELE_021411_14096_2/HTC_EUROPE_TELE_021411_14096_2_CP/5532494162557958586b77414364414e"
-                                name="trackback"/>
-                        <ns2:meta
-                                content="http://realmedia.channel4.com/5c/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/1829807384/x81/4OD/HTC_EUROPE_TELE_021411_14096_2/HTC_EUROPE_TELE_021411_14096_2_WAITING.html/5532494162557958586b77414364414e"
-                                name="popupAdvertisingUrl"/>
-                    </ns2:metadata>
-                </ns2:video>
-
-                  <ns2:par>
-                    <ns2:switch>
-                        <ns2:video clipEnd="1319" clipBegin="677"
-                                   src="mp4:e4/test/ccp/p/LOW_RES/00000418/41804.mp4?s=1297940772&amp;e=1297984272&amp;h=fe9b9279224451c2b13cb405659cc33a"
-                                   system-bitrate="500000" dur="1319">
-                            <ns2:metadata>
-                                <ns2:meta content="mainContent" name="contentType"/>
-                            </ns2:metadata>
-                        </ns2:video>
-                    </ns2:switch>
-                    <ns2:img
-                            src="http://seesaw.stage.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png">
-                        <ns2:metadata>
-                            <ns2:meta content="dogImage" name="contentType"/>
-                        </ns2:metadata>
-                    </ns2:img>
-                </ns2:par>
-            </ns2:seq>
-        </ns2:body>
-    </ns2:smil>
-    <geoblocked>false</geoblocked>
-    <serverTimestamp>1297941072543</serverTimestamp>
-    <anonymousUserId>271209864997234</anonymousUserId>
-    <sectionCount>4</sectionCount>
-    <availability>
-        <availabilityType>AVOD</availabilityType>
-        <noAdsPlayable>false</noAdsPlayable>
-        <tvodPlayable>false</tvodPlayable>
-        <svodPlayable>false</svodPlayable>
-        <exceededDrmRule>false</exceededDrmRule>
-    </availability>
+  <ns2:smil>
+    <ns2:head>
+      <ns2:meta base="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703"/>
+      <ns2:meta content="http://kgd-red-test-zxtm01.dev.vodco.co.uk/s/ccp/00000045/4520.smi" name="subtitleLocation"/>
+      <ns2:meta base="rtmpe://cdn-flash-red-dev.vodco.co.uk/a2703"/>
+      <ns2:meta content="http://kgd-red-test-zxtm01.dev.vodco.co.uk/s/ccp/00000045/4520.smi" name="subtitleLocation"/>
+    </ns2:head>
+    <ns2:body>
+      <ns2:seq>
+        <ns2:video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/MCE-VAAS034-030.mp4">
+          <ns2:metadata>
+            <ns2:meta content="advert" name="contentType"/>
+            <ns2:meta content="http://kgd-red-test-zxtm01.dev.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/12142495189/x12/4OD/VAUXHALL_MOTORS_020111_14007_2/2707510/5532494162553243514c344141687031" name="trackback"/>
+            <ns2:meta content="http://realmedia.channel4.com/5c/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/2142495189/x60/4OD/VAUXHALL_MOTORS_020111_14007_2/VAUXHALL_MOTORS_020111_14007_1_034.html/5532494162553243514c344141687031" name="popupAdvertisingUrl"/>
+          </ns2:metadata>
+        </ns2:video>
+        <ns2:video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/RKY-CPTP127-030.mp4">
+          <ns2:metadata>
+            <ns2:meta content="advert" name="contentType"/>
+            <ns2:meta content="http://kgd-red-test-zxtm01.dev.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/11152631113/x12/4OD/COLGATE_PALMOLI_030711_14155_2/COLGATE_PALMOLI_030711_14155_2_CP/5532494162553243514c344141687031" name="trackback"/>
+            <ns2:meta content="http://realmedia.channel4.com/5c/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/1152631113/x61/4OD/COLGATE_PALMOLI_030711_14155_2/COLGATE_PALMOLI_030711_14155_2.html/5532494162553243514c344141687031" name="popupAdvertisingUrl"/>
+          </ns2:metadata>
+        </ns2:video>
+        <ns2:video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/Seesaw_Aeroplane.mp4">
+          <ns2:metadata>
+            <ns2:meta content="advert" name="contentType"/>
+            <ns2:meta content="http://kgd-red-test-zxtm01.dev.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L18/11515410396/x13/4OD/SS_IDENT_Feb10_x90/2362406/5532494162553243514c344141687031" name="trackback"/>
+          </ns2:metadata>
+        </ns2:video>
+        <ns2:par>
+          <ns2:switch>
+            <ns2:video system-bitrate="500000" dur="1319" src="mp4:e5/test/ccp/p/LOW_RES/test/test_asset.mp4?s=1300381598&amp;e=1300425098&amp;h=e744f86d4c22978ffe5d4854cc49c317" clipEnd="68" clipBegin="0">
+              <ns2:metadata>
+                <ns2:meta content="mainContent" name="contentType"/>
+              </ns2:metadata>
+            </ns2:video>
+          </ns2:switch>
+          <ns2:img src="http://kgd-red-test-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png">
+            <ns2:metadata>
+              <ns2:meta content="dogImage" name="contentType"/>
+            </ns2:metadata>
+          </ns2:img>
+        </ns2:par>
+        <ns2:video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/MCE-VAAS035-010.mp4">
+          <ns2:metadata>
+            <ns2:meta content="advert" name="contentType"/>
+            <ns2:meta content="http://kgd-red-test-zxtm01.dev.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/1300289270/x12/4OD/VAUXHALL_MOTORS_020111_14007_2/VAUXHALL_MOTORS_020111_14007_1_cp/5532494162553243514c344141687031" name="trackback"/>
+            <ns2:meta content="http://realmedia.channel4.com/5c/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/300289270/x80/4OD/VAUXHALL_MOTORS_020111_14007_2/VAUXHALL_MOTORS_020111_14007_1_035.html/5532494162553243514c344141687031" name="popupAdvertisingUrl"/>
+          </ns2:metadata>
+        </ns2:video>
+        <ns2:video src="rtmp://cp53221.edgefcs.net/ondemand/mp4:h264/RKY-LTMM213-030.mp4">
+          <ns2:metadata>
+            <ns2:meta content="advert" name="contentType"/>
+            <ns2:meta content="http://kgd-red-test-zxtm01.dev.vodco.co.uk/cp/c4/RealMedia/ads/adstream_lx.ads/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/11196912291/x12/4OD/LLOYDS_TSB_GROU_030711_14249_2/LLOYDS_TSB_GROU_030711_14249_2_CP/5532494162553243514c344141687031" name="trackback"/>
+            <ns2:meta content="http://realmedia.channel4.com/5c/kprod.channel4.com/channel4/e4/tv/entertainment/reality_shows/26068/50328/001/L61/1196912291/x81/4OD/LLOYDS_TSB_GROU_030711_14249_2/LLOYDS_TSB_GROU_030711_14249_2.html/5532494162553243514c344141687031" name="popupAdvertisingUrl"/>
+          </ns2:metadata>
+        </ns2:video>
+        <ns2:par>
+          <ns2:switch>
+            <ns2:video system-bitrate="500000" dur="1319" src="mp4:e5/test/ccp/p/LOW_RES/test/test_asset.mp4?s=1300381598&amp;e=1300425098&amp;h=e744f86d4c22978ffe5d4854cc49c317" clipEnd="1319" clipBegin="68">
+              <ns2:metadata>
+                <ns2:meta content="mainContent" name="contentType"/>
+              </ns2:metadata>
+            </ns2:video>
+          </ns2:switch>
+          <ns2:img src="http://kgd-red-test-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png">
+            <ns2:metadata>
+              <ns2:meta content="dogImage" name="contentType"/>
+            </ns2:metadata>
+          </ns2:img>
+        </ns2:par>
+      </ns2:seq>
+    </ns2:body>
+  </ns2:smil>
+  <geoblocked>false</geoblocked>
+  <serverTimestamp>1300381898486</serverTimestamp>
+  <anonymousUserId>211526986556259</anonymousUserId>
+  <validTransaction>true</validTransaction>
+  <transactionItemId>5171001</transactionItemId>
+  <sectionCount>4</sectionCount>
+  <mainAssetId>29901</mainAssetId>
+  <availability>
+    <availabilityType>AVOD</availabilityType>
+    <noAdsPlayable>false</noAdsPlayable>
+    <tvodPlayable>false</tvodPlayable>
+    <svodPlayable>false</svodPlayable>
+    <exceededDrmRule>false</exceededDrmRule>
+    <showPreview>false</showPreview>
+    <seriesEntitled>false</seriesEntitled>
+    <subscriptionEntitled>false</subscriptionEntitled>
+    <episodeEntitled>true</episodeEntitled>
+    <available>true</available>
+  </availability>
 </videoInfo>

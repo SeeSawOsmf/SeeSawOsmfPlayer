@@ -64,6 +64,7 @@
         <whatsThisLinkURL>http://localhost:8080/watchingtv/aboutparentalcontrols</whatsThisLinkURL>
     </parentalControls>
     <unavailablePageUrl>http://localhost:8080/unavailable</unavailablePageUrl>
+    <!-- <videoInfoUrl>../src/test/resources/videoInfo.c4ad.xml</videoInfoUrl> -->
     <videoInfoUrl>../src/test/resources/videoInfo.xml</videoInfoUrl>
      <batchEventUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player/initinfo:registerbatchevent?t:ac=26772
     </batchEventUrl>
@@ -73,7 +74,7 @@
     </largeImageUrl>
     <liverail>
         <version>4.1</version>
-        <publisherId>4819</publisherId>
+        <publisherId>1332</publisherId>
     </liverail>
     <adMode>none</adMode>
     <dogImage>http://kgd-red-test-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png
