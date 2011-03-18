@@ -74,7 +74,7 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
     private function applyLargeTextSize():void {
         var format:TextFormat = new TextFormat();
         format.align = TextFormatAlign.CENTER;
-        format.size = 23;
+        format.size = 43;
         format.font = 'Arial';
         captionField.defaultTextFormat = format;
         captionField.htmlText = captionValue;
@@ -103,10 +103,14 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
 
         if (expanded) {
             logger.debug("applying expanded size");
+            logger.debug("height: " + this.height);
+            captionField.y = 10;
             applyLargeTextSize();
         }
         else if (changed) {
             logger.debug("applying standard size");
+            logger.debug("height: " + this.height);
+            captionField.y = 80;
             applyStandardTextSize();
         }
     }
