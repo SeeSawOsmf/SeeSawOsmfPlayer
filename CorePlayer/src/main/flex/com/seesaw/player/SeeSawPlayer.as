@@ -508,7 +508,7 @@ public class SeeSawPlayer extends Sprite {
             subtitleElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
 
             layout.percentWidth = 100;
-            layout.height = 70;
+            layout.height = 150;
             layout.horizontalAlign = HorizontalAlign.CENTER;
             layout.verticalAlign = VerticalAlign.BOTTOM;
             layout.index = 10;
@@ -605,6 +605,11 @@ public class SeeSawPlayer extends Sprite {
             if (adMetadata) {
                 // adMetadata.addEventListener(MetadataEvent.VALUE_ADD, onAdMetadataAdd);
                 adMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, onAdMetadataChange);
+                currentAdMode = adMetadata.adMode;
+            }
+            else {
+                // if we don't have any ad metadata then we must be playing main content
+                currentAdMode = AdMode.MAIN_CONTENT;
             }
 
             mainElement.addChild(new DualThresholdBufferingProxyElement(PlayerConstants.MIN_BUFFER_SIZE_SECONDS,

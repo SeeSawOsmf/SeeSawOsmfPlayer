@@ -50,6 +50,10 @@ public class Volume extends ButtonWidget implements IWidget {
         cookie = new CookieHelper(PlayerConstants.PLAYER_VOLUME_COOKIE);
     }
 
+     override public function set media(value:MediaElement):void {
+           super.media = value;
+       }
+
     override protected function get requiredTraits():Vector.<String> {
         return _requiredTraits;
     }
@@ -57,11 +61,14 @@ public class Volume extends ButtonWidget implements IWidget {
     override protected function processRequiredTraitsAvailable(element:MediaElement):void {
         visible = true;
         audible = element.getTrait(MediaTraitType.AUDIO) as AudioTrait;
-        audible.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
-        if(cookie.localSharedObject.data.volume == null)
-        cookie.localSharedObject.data.volume = PlayerConstants.DEFAULT_VOLUME;
+        if (audible) {
+            audible.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
+            if (cookie.localSharedObject.data.volume == null)
+                cookie.localSharedObject.data.volume = PlayerConstants.DEFAULT_VOLUME;
 
-        audible.volume = cookie.localSharedObject.data.volume;
+            audible.volume = cookie.localSharedObject.data.volume;
+        }
+
     }
 
     override protected function processRequiredTraitsUnavailable(element:MediaElement):void {
@@ -71,6 +78,19 @@ public class Volume extends ButtonWidget implements IWidget {
             audible = null;
         }
         cookie.flush();
+    }
+
+     override protected function processMediaElementChange(oldMediaElement:MediaElement):void {
+        if (oldMediaElement) {
+          audible = media.getTrait(MediaTraitType.AUDIO) as AudioTrait;
+             if (audible) {
+            audible.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
+            if (cookie.localSharedObject.data.volume == null)
+                cookie.localSharedObject.data.volume = PlayerConstants.DEFAULT_VOLUME;
+
+            audible.volume = cookie.localSharedObject.data.volume;
+        }
+        }
     }
 
     override protected function onMouseClick(event:MouseEvent):void {
