@@ -252,7 +252,7 @@ public class SeeSawPlayer extends Sprite {
             mainContainer.layoutMetadata.percentHeight = 100;
             loadAuditude();
         } else {
-            container.layoutRenderer.removeTarget(mainContainer);     /// only use the layoutRendering if Auditude. Otherwise media size wont be propagated through the layout.
+          container.layoutRenderer.removeTarget(mainContainer);     /// only use the layoutRendering if Auditude. Otherwise media size wont be propagated through the layout.
             loadPlugins();
         }
 
@@ -507,13 +507,13 @@ public class SeeSawPlayer extends Sprite {
             var layout:LayoutMetadata = new LayoutMetadata();
             subtitleElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
 
-            layout.percentWidth = 100;
+          ///  layout.percentWidth = 100;
             layout.height = 150;
+            layout.width = contentWidth;
             layout.horizontalAlign = HorizontalAlign.CENTER;
             layout.verticalAlign = VerticalAlign.BOTTOM;
             layout.index = 10;
             layout.bottom = 20;
-
             // The subtitle element needs to check and set visibility every time it sets a new display object
             subtitleElement.addEventListener(MediaElementEvent.TRAIT_ADD, onSubtitleTraitAdd);
 
@@ -818,18 +818,18 @@ public class SeeSawPlayer extends Sprite {
         logger.debug("onFullscreen: " + event.fullScreen);
         setContainerSize(contentWidth, contentHeight);
         resizeMainContent();
-        container.validateNow();
-        bufferingPanel.playerResize(contentWidth, contentHeight);
     }
 
     private function resizeMainContent():void {
         if (adsEnabled && adMode == AdMetadata.AUDITUDE_AD_TYPE) {
             mainContainer.layoutRenderer.validateNow();
-            container.validateNow();
+
         } else {
             mainContainer.width = contentWidth;
             mainContainer.height = contentHeight;
         }
+        updateSubtitlePosition();
+        container.validateNow();
 
 
     }
@@ -842,11 +842,11 @@ public class SeeSawPlayer extends Sprite {
     private function onControlBarMetadataChange(event:MetadataEvent):void {
         switch (event.key) {
             case ControlBarConstants.CONTROL_BAR_HIDDEN:
-                updateSubtitlePosition();
+              updateSubtitlePosition();
                 break;
             case ControlBarConstants.SUBTITLES_VISIBLE:
                 if (subtitleElement) {
-                    updateSubtitlePosition();
+            updateSubtitlePosition();
 
                     var displayTrait:DisplayObjectTrait =
                             subtitleElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;

@@ -110,14 +110,6 @@ public class BufferingPanel extends MediaElement {
     }
 
 
-    public function playerResize(width:Number, height:Number):void {
-        var metadata:LayoutMetadata = getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
-        if (metadata) {
-            metadata.x = width;
-            metadata.y = height;
-        }
-    }
-
     private function showTooSlowMessage(event:Event):void {
 
         parentContainer.backgroundAlpha = 0.8;
