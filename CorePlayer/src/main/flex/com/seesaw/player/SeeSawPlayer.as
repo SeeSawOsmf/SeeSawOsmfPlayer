@@ -253,7 +253,7 @@ public class SeeSawPlayer extends Sprite {
 
             loadAuditude();
         } else {
-      ///    container.layoutRenderer.removeTarget(mainContainer);     /// only use the layoutRendering if Auditude. Otherwise media size wont be propagated through the layout.
+            ///    container.layoutRenderer.removeTarget(mainContainer);     /// only use the layoutRendering if Auditude. Otherwise media size wont be propagated through the layout.
             loadPlugins();
         }
 
@@ -813,15 +813,15 @@ public class SeeSawPlayer extends Sprite {
 
     private function resizeMainContent():void {
         updateSubtitlePosition();
-/*
-        if (adsEnabled && adMode == AdMetadata.AUDITUDE_AD_TYPE) {
-            mainContainer.layoutRenderer.validateNow();
+        /*
+         if (adsEnabled && adMode == AdMetadata.AUDITUDE_AD_TYPE) {
+         mainContainer.layoutRenderer.validateNow();
 
-        } else {
-            mainContainer.width = contentWidth;
-            mainContainer.height = contentHeight;
-        }
-*/
+         } else {
+         mainContainer.width = contentWidth;
+         mainContainer.height = contentHeight;
+         }
+         */
 
         container.validateNow();
 
@@ -875,7 +875,7 @@ public class SeeSawPlayer extends Sprite {
 
             if (layoutMetadata) {
                 layoutMetadata.bottom = controlBarVisible ? controlBarHeight : 20;
-                 layoutMetadata.percentWidth = 100;
+                layoutMetadata.percentWidth = 100;
             }
         }
     }
@@ -885,8 +885,8 @@ public class SeeSawPlayer extends Sprite {
             case MediaPlayerState.PLAYING:
                 toggleLights();
                 resizeMainContent();
-            /*   if (adsEnabled && adMode == AdMetadata.AUDITUDE_AD_TYPE)*/
-                    addEventListener(Event.ENTER_FRAME, updateAuditudeMediaSize);
+                /*   if (adsEnabled && adMode == AdMetadata.AUDITUDE_AD_TYPE)*/
+                addEventListener(Event.ENTER_FRAME, updateAuditudeMediaSize);
                 break;
             case MediaPlayerState.PAUSED:
                 bufferingPanel.hide();
