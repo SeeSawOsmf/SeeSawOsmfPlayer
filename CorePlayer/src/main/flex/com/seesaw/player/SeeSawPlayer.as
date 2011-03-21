@@ -101,6 +101,7 @@ import org.osmf.traits.PlayTrait;
 import org.osmf.traits.TimeTrait;
 import org.osmf.traits.TraitEventDispatcher;
 
+import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
 import uk.co.vodco.osmfDebugProxy.DebugProxyElement;
 
 public class SeeSawPlayer extends Sprite {
@@ -407,6 +408,7 @@ public class SeeSawPlayer extends Sprite {
 
         factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
         factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
 
@@ -607,7 +609,7 @@ public class SeeSawPlayer extends Sprite {
             }
 
             mainElement.addChild(new DualThresholdBufferingProxyElement(PlayerConstants.MIN_BUFFER_SIZE_SECONDS,
-                    PlayerConstants.MAX_BUFFER_SIZE_SECONDS, new DebugProxyElement(mediaElement)));
+                    PlayerConstants.MAX_BUFFER_SIZE_SECONDS, mediaElement));
         }
 
         // get the control bar to point at the main content
