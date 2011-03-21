@@ -205,6 +205,8 @@ public class SeeSawPlayer extends Sprite {
         mainContainer = new MediaContainer();
         mainContainer.y = 0;
         mainContainer.x = 0;
+        mainContainer.layoutMetadata.percentWidth = 100;
+        mainContainer.layoutMetadata.percentHeight = 100;
         addChild(mainContainer);
 
         adContainer = new MediaContainer();
@@ -248,11 +250,10 @@ public class SeeSawPlayer extends Sprite {
         container.layoutRenderer.addTarget(controlbarContainer);
 
         if (adsEnabled && adMode == AdMetadata.AUDITUDE_AD_TYPE) {
-            mainContainer.layoutMetadata.percentWidth = 100;
-            mainContainer.layoutMetadata.percentHeight = 100;
+
             loadAuditude();
         } else {
-          container.layoutRenderer.removeTarget(mainContainer);     /// only use the layoutRendering if Auditude. Otherwise media size wont be propagated through the layout.
+      ///    container.layoutRenderer.removeTarget(mainContainer);     /// only use the layoutRendering if Auditude. Otherwise media size wont be propagated through the layout.
             loadPlugins();
         }
 
@@ -504,16 +505,6 @@ public class SeeSawPlayer extends Sprite {
 
             subtitleElement = factory.createMediaElement(new URLResource(subtitleLocation));
 
-            var layout:LayoutMetadata = new LayoutMetadata();
-            subtitleElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
-
-          ///  layout.percentWidth = 100;
-            layout.height = 150;
-            layout.width = contentWidth;
-            layout.horizontalAlign = HorizontalAlign.CENTER;
-            layout.verticalAlign = VerticalAlign.BOTTOM;
-            layout.index = 10;
-            layout.bottom = 20;
             // The subtitle element needs to check and set visibility every time it sets a new display object
             subtitleElement.addEventListener(MediaElementEvent.TRAIT_ADD, onSubtitleTraitAdd);
 
@@ -652,7 +643,6 @@ public class SeeSawPlayer extends Sprite {
         if (metadata) {
             var contentType:String = metadata.getValue(SMILConstants.CONTENT_TYPE) as String;
             if (contentType == PlayerConstants.DOG_CONTENT_ID) {
-                // Layout the DOG image in the top left corner
                 var layout:LayoutMetadata = new LayoutMetadata();
                 layout.x = 5;
                 layout.y = 5;
@@ -818,9 +808,12 @@ public class SeeSawPlayer extends Sprite {
         logger.debug("onFullscreen: " + event.fullScreen);
         setContainerSize(contentWidth, contentHeight);
         resizeMainContent();
+
     }
 
     private function resizeMainContent():void {
+        updateSubtitlePosition();
+/*
         if (adsEnabled && adMode == AdMetadata.AUDITUDE_AD_TYPE) {
             mainContainer.layoutRenderer.validateNow();
 
@@ -828,9 +821,9 @@ public class SeeSawPlayer extends Sprite {
             mainContainer.width = contentWidth;
             mainContainer.height = contentHeight;
         }
-        updateSubtitlePosition();
-        container.validateNow();
+*/
 
+        container.validateNow();
 
     }
 
@@ -842,12 +835,10 @@ public class SeeSawPlayer extends Sprite {
     private function onControlBarMetadataChange(event:MetadataEvent):void {
         switch (event.key) {
             case ControlBarConstants.CONTROL_BAR_HIDDEN:
-              updateSubtitlePosition();
+                updateSubtitlePosition();
                 break;
             case ControlBarConstants.SUBTITLES_VISIBLE:
                 if (subtitleElement) {
-            updateSubtitlePosition();
-
                     var displayTrait:DisplayObjectTrait =
                             subtitleElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
                     if (displayTrait) {
@@ -870,7 +861,6 @@ public class SeeSawPlayer extends Sprite {
         if (subtitleElement) {
             var layoutMetadata:LayoutMetadata =
                     subtitleElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
-
             var controlBarHeight:int = 0;
             var controlBarVisible:Boolean = false;
 
@@ -885,6 +875,7 @@ public class SeeSawPlayer extends Sprite {
 
             if (layoutMetadata) {
                 layoutMetadata.bottom = controlBarVisible ? controlBarHeight : 20;
+                 layoutMetadata.percentWidth = 100;
             }
         }
     }
@@ -894,7 +885,7 @@ public class SeeSawPlayer extends Sprite {
             case MediaPlayerState.PLAYING:
                 toggleLights();
                 resizeMainContent();
-                if (adsEnabled && adMode == AdMetadata.AUDITUDE_AD_TYPE)
+            /*   if (adsEnabled && adMode == AdMetadata.AUDITUDE_AD_TYPE)*/
                     addEventListener(Event.ENTER_FRAME, updateAuditudeMediaSize);
                 break;
             case MediaPlayerState.PAUSED:

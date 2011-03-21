@@ -180,7 +180,7 @@ public class BatchEventServices extends ProxyElement {
                 batchEventURL = contentInfo.batchEventUrl;
                 cumulativeDurationURL = contentInfo.playIntervalEventUrl;
                 sectionCount = videoInfo.sectionCount;
-                userId = contentInfo.userId;
+                userId = videoInfo.userId;
                 anonymousUserId = videoInfo.anonymousUserId;
                 programmeId = contentInfo.programme;
                 adMode = contentInfo.adMode;
