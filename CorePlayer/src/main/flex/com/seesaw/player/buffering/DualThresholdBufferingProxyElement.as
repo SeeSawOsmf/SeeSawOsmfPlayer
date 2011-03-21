@@ -20,6 +20,8 @@
  * Incorporated. All Rights Reserved.
  */
 package com.seesaw.player.buffering {
+import org.as3commons.logging.ILogger;
+import org.as3commons.logging.LoggerFactory;
 import org.osmf.elements.ProxyElement;
 import org.osmf.events.BufferEvent;
 import org.osmf.events.MediaElementEvent;
@@ -29,6 +31,7 @@ import org.osmf.media.MediaElement;
 import org.osmf.traits.BufferTrait;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
+import org.osmf.traits.PlayTrait;
 import org.osmf.traits.TraitEventDispatcher;
 
 /**
@@ -38,6 +41,8 @@ import org.osmf.traits.TraitEventDispatcher;
  * the buffer state.
  **/
 public class DualThresholdBufferingProxyElement extends ProxyElement {
+
+    private var logger:ILogger = LoggerFactory.getClassLogger(DualThresholdBufferingProxyElement);
 
     public function DualThresholdBufferingProxyElement(initialBufferTime:Number, expandedBufferTime:Number, wrappedElement:MediaElement) {
         super(wrappedElement);
@@ -52,7 +57,6 @@ public class DualThresholdBufferingProxyElement extends ProxyElement {
         dispatcher.addEventListener(BufferEvent.BUFFERING_CHANGE, processBufferingChange);
         dispatcher.addEventListener(SeekEvent.SEEKING_CHANGE, processSeekingChange);
         dispatcher.addEventListener(PlayEvent.PLAY_STATE_CHANGE, processPlayStateChange);
-
     }
 
     private function processTraitAdd(traitType:String):void {
@@ -60,6 +64,7 @@ public class DualThresholdBufferingProxyElement extends ProxyElement {
             // As soon as we can buffer, set the initial buffer time.
             var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
             bufferTrait.bufferTime = initialBufferTime;
+            logger.debug("processTraitAdd: initial buffer time set {0}", initialBufferTime);
         }
     }
 
@@ -67,17 +72,23 @@ public class DualThresholdBufferingProxyElement extends ProxyElement {
         // As soon as we stop buffering, make sure our buffer time is
         // set to the maximum.
         if (event.buffering == false) {
-            var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
-            bufferTrait.bufferTime = expandedBufferTime;
+            // only expand the buffer while playing
+            var playTrait:PlayTrait = getTrait(MediaTraitType.PLAY) as PlayTrait;
+            if (playTrait && playTrait.playState == PlayState.PLAYING) {
+                var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
+                bufferTrait.bufferTime = expandedBufferTime;
+                logger.debug("processBufferingChange: expanded buffer time set {0}", expandedBufferTime);
+            }
         }
     }
 
     private function processSeekingChange(event:SeekEvent):void {
         // Whenever we seek, reset our buffer time to the minimum so that
         // playback starts quickly after the seek.
-        if (event.seeking == true) {
-            var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
+        var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
+        if(bufferTrait) {
             bufferTrait.bufferTime = initialBufferTime;
+            logger.debug("processSeekingChange: initial buffer time set {0}", initialBufferTime);
         }
     }
 
@@ -86,7 +97,10 @@ public class DualThresholdBufferingProxyElement extends ProxyElement {
         // playback starts quickly after the unpause.
         if (event.playState == PlayState.PAUSED) {
             var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
-            bufferTrait.bufferTime = initialBufferTime;
+            if(bufferTrait) {
+                bufferTrait.bufferTime = initialBufferTime;
+                logger.debug("processPlayStateChange: initial buffer time set {0}", initialBufferTime);
+            }
         }
     }
 
