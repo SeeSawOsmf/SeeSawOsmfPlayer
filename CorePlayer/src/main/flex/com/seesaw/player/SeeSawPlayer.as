@@ -466,14 +466,8 @@ public class SeeSawPlayer extends Sprite {
         if (bufferTrait.buffering && bufferTrait.bufferTime > PlayerConstants.MIN_BUFFER_SIZE_SECONDS) {
             // if we are in this state for longer than 4 seconds the panel will show
             bufferingPanel.show();
-            if (bufferTimer) {
-                bufferTimer.start();
-            }
         } else {
             bufferingPanel.hide();
-            if (bufferTimer) {
-                bufferTimer.stop();
-            }
         }
     }
 
@@ -693,13 +687,17 @@ public class SeeSawPlayer extends Sprite {
         else if (event.traitType == MediaTraitType.BUFFER) {
             bufferTrait = (event.target as MediaElement).getTrait(MediaTraitType.BUFFER) as BufferTrait;
 
-            // this is just used for logging purposes
-            if (bufferTimer) bufferTimer.stop();
-
+            // this is just used for debugging
             if (logger.debugEnabled) {
+                if (bufferTimer) {
+                    bufferTimer.stop();
+                    bufferTimer = null;
+                }
+
                 bufferTimer = new Timer(1000);
                 bufferTimer.addEventListener(TimerEvent.TIMER, function(event:TimerEvent):void {
-                    logger.debug("buffer state: length = {0}s, time = {1}s, buffering = {2}",
+                    if(bufferTrait.buffering)
+                        logger.debug("buffer state: length = {0}s, time = {1}s, buffering = {2}",
                             bufferTrait.bufferLength, bufferTrait.bufferTime, bufferTrait.buffering);
                 });
                 bufferTimer.start();
