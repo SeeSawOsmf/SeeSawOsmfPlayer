@@ -86,8 +86,10 @@ public class DualThresholdBufferingProxyElement extends ProxyElement {
         // Whenever we seek, reset our buffer time to the minimum so that
         // playback starts quickly after the seek.
         var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
-        bufferTrait.bufferTime = initialBufferTime;
-        logger.debug("processSeekingChange: initial buffer time set {0}", initialBufferTime);
+        if(bufferTrait) {
+            bufferTrait.bufferTime = initialBufferTime;
+            logger.debug("processSeekingChange: initial buffer time set {0}", initialBufferTime);
+        }
     }
 
     private function processPlayStateChange(event:PlayEvent):void {
@@ -95,8 +97,10 @@ public class DualThresholdBufferingProxyElement extends ProxyElement {
         // playback starts quickly after the unpause.
         if (event.playState == PlayState.PAUSED) {
             var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
-            bufferTrait.bufferTime = initialBufferTime;
-            logger.debug("processPlayStateChange: initial buffer time set {0}", initialBufferTime);
+            if(bufferTrait) {
+                bufferTrait.bufferTime = initialBufferTime;
+                logger.debug("processPlayStateChange: initial buffer time set {0}", initialBufferTime);
+            }
         }
     }
 
