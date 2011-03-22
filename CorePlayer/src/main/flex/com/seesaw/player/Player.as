@@ -271,6 +271,13 @@ public class Player extends Sprite {
             if (guidanceBar) {
                 guidanceBar.visible = false;
             }
+            // All previews are 0 age rated (the main app enforces this) so if we're viewing a
+            // preview clip, we don't need to worry about guidance panels and all the rest.
+            if (userInit.showPreview) {
+                nextInitialisationStage();
+                return;
+            }
+
             if (userInit.ageBlockUrl.toString()) {
                 logger.debug("URL: " + userInit.ageBlockUrl.toString());
                 var request:URLRequest = new URLRequest(userInit.ageBlockUrl);
@@ -281,8 +288,8 @@ public class Player extends Sprite {
                 }
                 return;
             }
-            if (userInit.showGuidance == true) {
 
+            if (userInit.showGuidance) {
                 if (ExternalInterface.available) {
                     var hashedPassword:String = ParentalControlsPanel.getHashedPassword();
                     logger.debug("COOKIE PASSWORD: " + hashedPassword);
@@ -326,7 +333,6 @@ public class Player extends Sprite {
             } else {
                 nextInitialisationStage();
             }
-
         }
         else {
             nextInitialisationStage();
