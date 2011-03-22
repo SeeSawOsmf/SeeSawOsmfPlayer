@@ -273,7 +273,7 @@ public class Player extends Sprite {
             }
             // All previews are 0 age rated (the main app enforces this) so if we're viewing a
             // preview clip, we don't need to worry about guidance panels and all the rest.
-            if (userInit.showPreview) {
+            if (userInit.availability.showPreview == true) {
                 nextInitialisationStage();
                 return;
             }
@@ -289,7 +289,7 @@ public class Player extends Sprite {
                 return;
             }
 
-            if (userInit.showGuidance) {
+            if (userInit.showGuidance == true) {
                 if (ExternalInterface.available) {
                     var hashedPassword:String = ParentalControlsPanel.getHashedPassword();
                     logger.debug("COOKIE PASSWORD: " + hashedPassword);
