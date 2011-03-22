@@ -102,7 +102,6 @@ import org.osmf.traits.TimeTrait;
 import org.osmf.traits.TraitEventDispatcher;
 
 import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
-import uk.co.vodco.osmfDebugProxy.DebugProxyElement;
 
 public class SeeSawPlayer extends Sprite {
 
@@ -506,7 +505,6 @@ public class SeeSawPlayer extends Sprite {
 
             var loadTrait:LoadTrait = subtitleElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
             loadTrait.addEventListener(LoadEvent.LOAD_STATE_CHANGE, onSubtitleLoadStateChange);
-
             mainElement.addChild(subtitleElement);
         } else {
             setSubtitlesButtonEnabled(false);
@@ -688,9 +686,9 @@ public class SeeSawPlayer extends Sprite {
 
                 bufferTimer = new Timer(1000);
                 bufferTimer.addEventListener(TimerEvent.TIMER, function(event:TimerEvent):void {
-                    if(bufferTrait.buffering)
+                    if (bufferTrait.buffering)
                         logger.debug("buffer state: length = {0}s, time = {1}s, buffering = {2}",
-                            bufferTrait.bufferLength, bufferTrait.bufferTime, bufferTrait.buffering);
+                                bufferTrait.bufferLength, bufferTrait.bufferTime, bufferTrait.buffering);
                 });
                 bufferTimer.start();
             }
@@ -808,23 +806,15 @@ public class SeeSawPlayer extends Sprite {
         logger.debug("onFullscreen: " + event.fullScreen);
         setContainerSize(contentWidth, contentHeight);
         resizeMainContent();
-
     }
 
     private function resizeMainContent():void {
         updateSubtitlePosition();
-        /*
-         if (adsEnabled && adMode == AdMetadata.AUDITUDE_AD_TYPE) {
-         mainContainer.layoutRenderer.validateNow();
-
-         } else {
-         mainContainer.width = contentWidth;
-         mainContainer.height = contentHeight;
-         }
-         */
-
         container.validateNow();
-
+/*        var layoutMetadata:LayoutMetadata =
+        mainElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
+        layoutMetadata.percentWidth = 100;
+        layoutMetadata.percentHeight = 100;*/
     }
 
     private function setContainerSize(width:int, height:int):void {
@@ -907,7 +897,7 @@ public class SeeSawPlayer extends Sprite {
             if (displayTrait.mediaHeight > 0 && displayTrait.mediaWidth >= 0) {
                 removeEventListener(Event.ENTER_FRAME, updateAuditudeMediaSize);
             }
-            resizeMainContent()
+            resizeMainContent();
         }
 
     }

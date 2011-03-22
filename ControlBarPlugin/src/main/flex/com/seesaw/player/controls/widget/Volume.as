@@ -29,6 +29,7 @@ import flash.events.MouseEvent;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.events.AudioEvent;
+import org.osmf.events.MediaElementEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.traits.AudioTrait;
 import org.osmf.traits.MediaTraitType;
@@ -50,9 +51,9 @@ public class Volume extends ButtonWidget implements IWidget {
         cookie = new CookieHelper(PlayerConstants.PLAYER_VOLUME_COOKIE);
     }
 
-     override public function set media(value:MediaElement):void {
-           super.media = value;
-       }
+    override public function set media(value:MediaElement):void {
+        super.media = value;
+    }
 
     override protected function get requiredTraits():Vector.<String> {
         return _requiredTraits;
@@ -60,6 +61,7 @@ public class Volume extends ButtonWidget implements IWidget {
 
     override protected function processRequiredTraitsAvailable(element:MediaElement):void {
         visible = true;
+
         audible = element.getTrait(MediaTraitType.AUDIO) as AudioTrait;
         if (audible) {
             audible.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
@@ -68,7 +70,25 @@ public class Volume extends ButtonWidget implements IWidget {
 
             audible.volume = cookie.localSharedObject.data.volume;
         }
+    }
 
+    override protected function onMediaElementTraitAdd(event:MediaElementEvent):void {
+        if (event.traitType == MediaTraitType.AUDIO) {
+            audible = media.getTrait(MediaTraitType.AUDIO) as AudioTrait;
+            if (audible) {
+                audible.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
+                if (cookie.localSharedObject.data.volume == null)
+                    cookie.localSharedObject.data.volume = PlayerConstants.DEFAULT_VOLUME;
+
+                audible.volume = cookie.localSharedObject.data.volume;
+            }
+        }
+    }
+
+    override protected function onMediaElementTraitRemove(event:MediaElementEvent):void {
+        if (event.traitType == MediaTraitType.AUDIO) {
+            audible.removeEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
+        }
     }
 
     override protected function processRequiredTraitsUnavailable(element:MediaElement):void {
@@ -80,16 +100,16 @@ public class Volume extends ButtonWidget implements IWidget {
         cookie.flush();
     }
 
-     override protected function processMediaElementChange(oldMediaElement:MediaElement):void {
+    override protected function processMediaElementChange(oldMediaElement:MediaElement):void {
         if (oldMediaElement) {
-          audible = media.getTrait(MediaTraitType.AUDIO) as AudioTrait;
-             if (audible) {
-            audible.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
-            if (cookie.localSharedObject.data.volume == null)
-                cookie.localSharedObject.data.volume = PlayerConstants.DEFAULT_VOLUME;
+            audible = media.getTrait(MediaTraitType.AUDIO) as AudioTrait;
+            if (audible) {
+                audible.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
+                if (cookie.localSharedObject.data.volume == null)
+                    cookie.localSharedObject.data.volume = PlayerConstants.DEFAULT_VOLUME;
 
-            audible.volume = cookie.localSharedObject.data.volume;
-        }
+                audible.volume = cookie.localSharedObject.data.volume;
+            }
         }
     }
 
