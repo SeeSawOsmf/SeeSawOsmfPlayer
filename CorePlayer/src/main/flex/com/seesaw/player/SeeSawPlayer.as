@@ -811,10 +811,6 @@ public class SeeSawPlayer extends Sprite {
     private function resizeMainContent():void {
         updateSubtitlePosition();
         container.validateNow();
-/*        var layoutMetadata:LayoutMetadata =
-        mainElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
-        layoutMetadata.percentWidth = 100;
-        layoutMetadata.percentHeight = 100;*/
     }
 
     private function setContainerSize(width:int, height:int):void {
