@@ -463,14 +463,16 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onBufferingChange(event:BufferEvent):void {
-        logger.debug("buffering: {0}, time = {1}", bufferTrait.buffering, bufferTrait.bufferTime);
-        // the panel needs to show for a reasonable amount of time so only show it if the amount
-        // of buffer to fill is greater than 5 seconds worth
-        if (bufferTrait.buffering && Math.abs(bufferTrait.bufferLength - bufferTrait.bufferTime) > 5) {
-            // if we are in this state for longer than 4 seconds the panel will show
-            bufferingPanel.show();
-        } else {
-            bufferingPanel.hide();
+        if(bufferTrait) {
+            logger.debug("buffering: {0}, time = {1}", bufferTrait.buffering, bufferTrait.bufferTime);
+            // the panel needs to show for a reasonable amount of time so only show it if the amount
+            // of buffer to fill is greater than 5 seconds worth
+            if (bufferTrait.buffering && Math.abs(bufferTrait.bufferLength - bufferTrait.bufferTime) > 5) {
+                // if we are in this state for longer than 4 seconds the panel will show
+                bufferingPanel.show();
+            } else {
+                bufferingPanel.hide();
+            }
         }
     }
 
