@@ -54,10 +54,8 @@ import flash.display.StageDisplayState;
 import flash.events.Event;
 import flash.events.FullScreenEvent;
 import flash.events.NetStatusEvent;
-import flash.events.TimerEvent;
 import flash.external.ExternalInterface;
 import flash.utils.ByteArray;
-import flash.utils.Timer;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -102,7 +100,6 @@ import org.osmf.traits.TimeTrait;
 import org.osmf.traits.TraitEventDispatcher;
 
 import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
-import uk.co.vodco.osmfDebugProxy.DebugProxyElement;
 
 public class SeeSawPlayer extends Sprite {
 
@@ -205,6 +202,8 @@ public class SeeSawPlayer extends Sprite {
         mainContainer = new MediaContainer();
         mainContainer.y = 0;
         mainContainer.x = 0;
+        mainContainer.layoutMetadata.percentWidth = 100;
+        mainContainer.layoutMetadata.percentHeight = 100;
         addChild(mainContainer);
 
         adContainer = new MediaContainer();
@@ -248,11 +247,10 @@ public class SeeSawPlayer extends Sprite {
         container.layoutRenderer.addTarget(controlbarContainer);
 
         if (adsEnabled && adMode == AdMetadata.AUDITUDE_AD_TYPE) {
-            mainContainer.layoutMetadata.percentWidth = 100;
-            mainContainer.layoutMetadata.percentHeight = 100;
+
             loadAuditude();
         } else {
-            container.layoutRenderer.removeTarget(mainContainer);     /// only use the layoutRendering if Auditude. Otherwise media size wont be propagated through the layout.
+            ///    container.layoutRenderer.removeTarget(mainContainer);     /// only use the layoutRendering if Auditude. Otherwise media size wont be propagated through the layout.
             loadPlugins();
         }
 
@@ -406,7 +404,8 @@ public class SeeSawPlayer extends Sprite {
         setupAdProvider();
 
         factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
-        factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
+      if(!HelperUtils.getBoolean(playerInit.showPreview))
+          factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
@@ -502,16 +501,6 @@ public class SeeSawPlayer extends Sprite {
             factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
 
             subtitleElement = factory.createMediaElement(new URLResource(subtitleLocation));
-
-            var layout:LayoutMetadata = new LayoutMetadata();
-            subtitleElement.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
-
-            layout.percentWidth = 100;
-            layout.height = 150;
-            layout.horizontalAlign = HorizontalAlign.CENTER;
-            layout.verticalAlign = VerticalAlign.BOTTOM;
-            layout.index = 10;
-            layout.bottom = 20;
 
             // The subtitle element needs to check and set visibility every time it sets a new display object
             subtitleElement.addEventListener(MediaElementEvent.TRAIT_ADD, onSubtitleTraitAdd);
@@ -803,20 +792,11 @@ public class SeeSawPlayer extends Sprite {
         logger.debug("onFullscreen: " + event.fullScreen);
         setContainerSize(contentWidth, contentHeight);
         resizeMainContent();
-        container.validateNow();
-        bufferingPanel.playerResize(contentWidth, contentHeight);
     }
 
     private function resizeMainContent():void {
-        if (adsEnabled && adMode == AdMetadata.AUDITUDE_AD_TYPE) {
-            mainContainer.layoutRenderer.validateNow();
-            container.validateNow();
-        } else {
-            mainContainer.width = contentWidth;
-            mainContainer.height = contentHeight;
-        }
-
-
+        updateSubtitlePosition();
+        container.validateNow();
     }
 
     private function setContainerSize(width:int, height:int):void {
@@ -831,8 +811,6 @@ public class SeeSawPlayer extends Sprite {
                 break;
             case ControlBarConstants.SUBTITLES_VISIBLE:
                 if (subtitleElement) {
-                    updateSubtitlePosition();
-
                     var displayTrait:DisplayObjectTrait =
                             subtitleElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
                     if (displayTrait) {
@@ -870,17 +848,20 @@ public class SeeSawPlayer extends Sprite {
 
             if (layoutMetadata) {
                 layoutMetadata.bottom = controlBarVisible ? controlBarHeight : 20;
+                layoutMetadata.percentWidth = 100;
             }
         }
     }
 
     private function onMediaPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
+        if(controlBarMetadata)
+            controlBarMetadata.addValue(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, event.state);       //// Auto triggers metadata change on the controlBar, forces the layoutMetadata to update on the MediaContainer..
+
         switch (event.state) {
             case MediaPlayerState.PLAYING:
                 toggleLights();
                 resizeMainContent();
-                if (adsEnabled && adMode == AdMetadata.AUDITUDE_AD_TYPE)
-                    addEventListener(Event.ENTER_FRAME, updateAuditudeMediaSize);
+                addEventListener(Event.ENTER_FRAME, updateAuditudeMediaSize);
                 break;
             case MediaPlayerState.PAUSED:
                 bufferingPanel.hide();
@@ -898,14 +879,13 @@ public class SeeSawPlayer extends Sprite {
                 mainElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
         if (displayTrait) {
 
-            if (displayTrait.mediaHeight > 0 && displayTrait.mediaWidth >= 0) {
+            if (displayTrait.mediaHeight > 0 && displayTrait.mediaWidth > 0) {
                 removeEventListener(Event.ENTER_FRAME, updateAuditudeMediaSize);
             }
-            resizeMainContent()
+            resizeMainContent();
         }
 
     }
-
 
     private function toggleLights():void {
         var lightsDown:Boolean = false;
