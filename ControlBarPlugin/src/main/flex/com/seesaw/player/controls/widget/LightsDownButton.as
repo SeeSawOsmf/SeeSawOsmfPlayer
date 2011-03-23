@@ -48,6 +48,7 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
 
     private var xi:PlayerExternalInterface;
 
+    private var fullScreen:Boolean = false;
     private var lightsDownOn:Boolean = false;
     private var lightsDownLabel:TextField;
 
@@ -147,8 +148,10 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
     private function onFullScreen(event:FullScreenEvent):void {
         if (event.fullScreen) {
             lightsDownLabel.text = "";
+            this.fullScreen = true;
         }
         else {
+            this.fullScreen = false;
             if (lightsDownOn) {
                 lightsDownLabel.text = "Turn lights up";
                 this.formatLabelFont();
@@ -210,16 +213,19 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
     }
 
     private function updateLabel(value:Boolean):void {
-        if (value == true) {
-            lightsDownLabel.text = "Turn lights up";
-            this.toolTip.updateToolTip("Turn lights up");
-        } else {
-            lightsDownLabel.text = "Turn lights down";
-            this.toolTip.updateToolTip("Turn lights down");
-        }
-        this.formatLabelFont();
-        if (this.mouseOverLabel == true) {
-            this.formatLabelHoverFont();
+        logger.debug("Lights down - FULLSCREEN IS " + fullScreen);
+        if(fullScreen == false) {
+            if (value == true) {
+                lightsDownLabel.text = "Turn lights up";
+                this.toolTip.updateToolTip("Turn lights up");
+            } else {
+                lightsDownLabel.text = "Turn lights down";
+                this.toolTip.updateToolTip("Turn lights down");
+            }
+            this.formatLabelFont();
+            if (this.mouseOverLabel == true) {
+                this.formatLabelHoverFont();
+            }
         }
     }
 
@@ -229,7 +235,9 @@ public class LightsDownButton extends ButtonWidget implements IWidget {
             xi.callLightsUp();
             metadata.addValue(ExternalInterfaceMetadata.LIGHTS_DOWN, false);
         }
-        this.updateLabel(false);
+        if(fullScreen == false) {
+            this.updateLabel(false);
+        }
         this.formatLabelFont();
         if (this.mouseOverLabel == true) {
             this.formatLabelHoverFont();
