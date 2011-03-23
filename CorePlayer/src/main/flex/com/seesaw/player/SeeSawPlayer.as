@@ -871,11 +871,12 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onMediaPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
+        controlBarMetadata.addValue(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, event.state);       //// Auto triggers metadata change on the controlBar, forces the layoutMetadata to update on the MediaContainer..
+
         switch (event.state) {
             case MediaPlayerState.PLAYING:
                 toggleLights();
                 resizeMainContent();
-                /*   if (adsEnabled && adMode == AdMetadata.AUDITUDE_AD_TYPE)*/
                 addEventListener(Event.ENTER_FRAME, updateAuditudeMediaSize);
                 break;
             case MediaPlayerState.PAUSED:
@@ -901,7 +902,6 @@ public class SeeSawPlayer extends Sprite {
         }
 
     }
-
 
     private function toggleLights():void {
         var lightsDown:Boolean = false;
