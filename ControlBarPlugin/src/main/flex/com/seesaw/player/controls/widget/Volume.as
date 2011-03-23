@@ -20,10 +20,12 @@
 
 package com.seesaw.player.controls.widget {
 import com.seesaw.player.PlayerConstants;
+import com.seesaw.player.ui.PlayerToolTip;
 import com.seesaw.player.utils.CookieHelper;
 
 import controls.seesaw.widget.interfaces.IWidget;
 
+import flash.events.Event;
 import flash.events.MouseEvent;
 
 import org.as3commons.logging.ILogger;
@@ -37,6 +39,8 @@ import org.osmf.traits.MediaTraitType;
 public class Volume extends ButtonWidget implements IWidget {
     private var logger:ILogger = LoggerFactory.getClassLogger(Volume);
 
+    private var toolTip:PlayerToolTip;
+
     /* static */
     private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.Volume";
     private static const _requiredTraits:Vector.<String> = new Vector.<String>;
@@ -49,6 +53,13 @@ public class Volume extends ButtonWidget implements IWidget {
 
     public function Volume() {
         cookie = new CookieHelper(PlayerConstants.PLAYER_VOLUME_COOKIE);
+        this.toolTip = new PlayerToolTip(this, "Sound on");
+        logger.debug("Volume - tooltip = Sound on");
+        this.addEventListener(Event.ADDED_TO_STAGE, this.onAddedToStage);
+    }
+
+    private function onAddedToStage(event:Event) {
+        stage.addChild(this.toolTip);
     }
 
     override public function set media(value:MediaElement):void {
@@ -125,10 +136,14 @@ public class Volume extends ButtonWidget implements IWidget {
             audible.volume = 0;
             cookie.localSharedObject.data.volume = audible.volume;
             enabled = false;
+            logger.debug("toggleMuteState - tooltip = Sound on");
+            this.toolTip.updateToolTip("Sound on");
         } else {
             audible.volume = mutedVolume;
             cookie.localSharedObject.data.volume = audible.volume;
             enabled = true;
+            logger.debug("toggleMuteState - tooltip = Sound off");
+            this.toolTip.updateToolTip("Sound off");
         }
     }
 
@@ -140,8 +155,12 @@ public class Volume extends ButtonWidget implements IWidget {
         cookie.localSharedObject.data.volume = audible.volume;
         if (audible.volume < 0.05) {
             enabled = false;
+            logger.debug("onVolumeChange - tooltip = Sound on");
+            this.toolTip.updateToolTip("Sound on");
         } else {
             enabled = true;
+            logger.debug("onVolumeChange - tooltip = Sound off");
+            this.toolTip.updateToolTip("Sound off");
         }
 
         super.processEnabledChange();
