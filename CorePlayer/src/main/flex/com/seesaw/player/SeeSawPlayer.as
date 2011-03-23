@@ -407,7 +407,8 @@ public class SeeSawPlayer extends Sprite {
         setupAdProvider();
 
         factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
-        factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
+      if(!HelperUtils.getBoolean(playerInit.showPreview))
+          factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
@@ -867,7 +868,8 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onMediaPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
-        controlBarMetadata.addValue(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, event.state);       //// Auto triggers metadata change on the controlBar, forces the layoutMetadata to update on the MediaContainer..
+        if(controlBarMetadata)
+            controlBarMetadata.addValue(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, event.state);       //// Auto triggers metadata change on the controlBar, forces the layoutMetadata to update on the MediaContainer..
 
         switch (event.state) {
             case MediaPlayerState.PLAYING:
@@ -891,7 +893,7 @@ public class SeeSawPlayer extends Sprite {
                 mainElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
         if (displayTrait) {
 
-            if (displayTrait.mediaHeight > 0 && displayTrait.mediaWidth >= 0) {
+            if (displayTrait.mediaHeight > 0 && displayTrait.mediaWidth > 0) {
                 removeEventListener(Event.ENTER_FRAME, updateAuditudeMediaSize);
             }
             resizeMainContent();
