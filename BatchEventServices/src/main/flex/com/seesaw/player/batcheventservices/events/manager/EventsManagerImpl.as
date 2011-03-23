@@ -217,7 +217,6 @@ public class EventsManagerImpl implements EventsManager {
             var post_data:URLVariables = new URLVariables();
             post_data.data = JSON.encode(cumulativeDuration);
             request.submit(post_data);
-            flushAll();
         }
     }
 
