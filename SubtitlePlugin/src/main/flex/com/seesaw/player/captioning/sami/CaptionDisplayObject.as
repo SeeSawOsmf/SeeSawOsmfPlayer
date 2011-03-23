@@ -92,10 +92,6 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
         // check that we have expanded by a minimum of 100 pixels before enlarging
         var expanded:Boolean = roundedAvailableWidth > roundedWidth && roundedAvailableWidth - roundedWidth > 100 && roundedWidth != 100;
 
-        logger.debug("roundedAvailableWidth: " + roundedAvailableWidth);
-        logger.debug("roundedWidth: " + roundedWidth);
-        logger.debug("roundedAvailableWidth - roundedWidth: " + (roundedAvailableWidth - roundedWidth));
-
         super.layout(availableWidth, availableHeight, deep);
 
         captionField.width = availableWidth;
@@ -103,13 +99,11 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
 
         if (expanded) {
             logger.debug("applying expanded size");
-            logger.debug("height: " + this.height);
             captionField.y = 10;
             applyLargeTextSize();
         }
         else if (changed) {
             logger.debug("applying standard size");
-            logger.debug("height: " + this.height);
             captionField.y = 80;
             applyStandardTextSize();
         }

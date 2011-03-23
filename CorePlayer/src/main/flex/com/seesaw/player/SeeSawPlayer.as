@@ -30,7 +30,7 @@ import com.seesaw.player.ads.auditude.AdProxy;
 import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.batcheventservices.BatchEventServicePlugin;
-import com.seesaw.player.buffering.DualThresholdBufferingProxyElement;
+import com.seesaw.player.buffering.BufferingManagerProxy;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.controls.ControlBarConstants;
 import com.seesaw.player.controls.ControlBarPlugin;
@@ -54,10 +54,8 @@ import flash.display.StageDisplayState;
 import flash.events.Event;
 import flash.events.FullScreenEvent;
 import flash.events.NetStatusEvent;
-import flash.events.TimerEvent;
 import flash.external.ExternalInterface;
 import flash.utils.ByteArray;
-import flash.utils.Timer;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -142,7 +140,6 @@ public class SeeSawPlayer extends Sprite {
 
     private var currentAdMode = "ad mode not set";
 
-    private var bufferTimer:Timer;
     private var dispatcher:TraitEventDispatcher;
     private var bufferTrait:BufferTrait;
 
@@ -466,7 +463,9 @@ public class SeeSawPlayer extends Sprite {
 
     private function onBufferingChange(event:BufferEvent):void {
         logger.debug("buffering: {0}, time = {1}", bufferTrait.buffering, bufferTrait.bufferTime);
-        if (bufferTrait.buffering && bufferTrait.bufferTime > PlayerConstants.MIN_BUFFER_SIZE_SECONDS) {
+        // the panel needs to show for a reasonable amount of time so only show it if the amount
+        // of buffer to fill is greater than 5 seconds worth
+        if (bufferTrait.buffering && Math.abs(bufferTrait.bufferLength - bufferTrait.bufferTime) > 5) {
             // if we are in this state for longer than 4 seconds the panel will show
             bufferingPanel.show();
         } else {
@@ -506,6 +505,7 @@ public class SeeSawPlayer extends Sprite {
 
             var loadTrait:LoadTrait = subtitleElement.getTrait(MediaTraitType.LOAD) as LoadTrait;
             loadTrait.addEventListener(LoadEvent.LOAD_STATE_CHANGE, onSubtitleLoadStateChange);
+
             mainElement.addChild(subtitleElement);
         } else {
             setSubtitlesButtonEnabled(false);
@@ -598,8 +598,10 @@ public class SeeSawPlayer extends Sprite {
                 currentAdMode = AdMode.MAIN_CONTENT;
             }
 
-            mainElement.addChild(new DualThresholdBufferingProxyElement(PlayerConstants.MIN_BUFFER_SIZE_SECONDS,
-                    PlayerConstants.MAX_BUFFER_SIZE_SECONDS, mediaElement));
+            mainElement.addChild(new BufferingManagerProxy(
+                    PlayerConstants.MIN_BUFFER_SIZE_SECONDS,
+                    PlayerConstants.MIN_EXPANDED_BUFFER_SIZE_SECONDS,
+                    PlayerConstants.EXPANDED_BUFFER_SIZE_SECONDS, mediaElement));
         }
 
         // get the control bar to point at the main content
@@ -638,6 +640,7 @@ public class SeeSawPlayer extends Sprite {
         if (metadata) {
             var contentType:String = metadata.getValue(SMILConstants.CONTENT_TYPE) as String;
             if (contentType == PlayerConstants.DOG_CONTENT_ID) {
+                // Layout the DOG image in the top left corner
                 var layout:LayoutMetadata = new LayoutMetadata();
                 layout.x = 5;
                 layout.y = 5;
@@ -677,31 +680,11 @@ public class SeeSawPlayer extends Sprite {
         }
         else if (event.traitType == MediaTraitType.BUFFER) {
             bufferTrait = (event.target as MediaElement).getTrait(MediaTraitType.BUFFER) as BufferTrait;
-
-            // this is just used for debugging
-            if (logger.debugEnabled) {
-                if (bufferTimer) {
-                    bufferTimer.stop();
-                    bufferTimer = null;
-                }
-
-                bufferTimer = new Timer(1000);
-                bufferTimer.addEventListener(TimerEvent.TIMER, function(event:TimerEvent):void {
-                    if (bufferTrait.buffering)
-                        logger.debug("buffer state: length = {0}s, time = {1}s, buffering = {2}",
-                                bufferTrait.bufferLength, bufferTrait.bufferTime, bufferTrait.buffering);
-                });
-                bufferTimer.start();
-            }
         }
     }
 
     private function onTraitRemove(event:MediaElementEvent):void {
         if (event.traitType == MediaTraitType.BUFFER) {
-            if (bufferTimer) {
-                bufferTimer.stop();
-                bufferTimer = null;
-            }
             bufferTrait = null;
         }
     }
@@ -848,6 +831,7 @@ public class SeeSawPlayer extends Sprite {
         if (subtitleElement) {
             var layoutMetadata:LayoutMetadata =
                     subtitleElement.getMetadata(LayoutMetadata.LAYOUT_NAMESPACE) as LayoutMetadata;
+
             var controlBarHeight:int = 0;
             var controlBarVisible:Boolean = false;
 

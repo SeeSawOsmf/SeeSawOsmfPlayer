@@ -64,8 +64,8 @@ public class DebugProxyElement extends ProxyElement {
             // Clear our old listeners.
             proxiedElement.removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
             proxiedElement.removeEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
-            proxiedElement.removeEventListener(MediaElementEvent.METADATA_ADD, onMetadataAdd);
-            proxiedElement.removeEventListener(MediaElementEvent.METADATA_ADD, onMetadataRemove);
+//            proxiedElement.removeEventListener(MediaElementEvent.METADATA_ADD, onMetadataAdd);
+//            proxiedElement.removeEventListener(MediaElementEvent.METADATA_ADD, onMetadataRemove);
 
             for each (traitType in value.traitTypes) {
                 processTrait(traitType, false);
@@ -81,8 +81,8 @@ public class DebugProxyElement extends ProxyElement {
             // Listen for traits being added and removed.
             proxiedElement.addEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
             proxiedElement.addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
-            proxiedElement.addEventListener(MediaElementEvent.METADATA_ADD, onMetadataAdd);
-            proxiedElement.addEventListener(MediaElementEvent.METADATA_ADD, onMetadataRemove);
+//            proxiedElement.addEventListener(MediaElementEvent.METADATA_ADD, onMetadataAdd);
+//            proxiedElement.addEventListener(MediaElementEvent.METADATA_ADD, onMetadataRemove);
 
             for each (traitType in value.traitTypes) {
                 processTrait(traitType, true);
@@ -291,12 +291,12 @@ public class DebugProxyElement extends ProxyElement {
 
     private function onBufferingChange(event:BufferEvent):void {
         logger.debug("{0}: Buffering Change: Buffering: {1}, Time: {2}, Length: {3}",
-                proxiedElementName, event.buffering, event.bufferTime, event.currentTarget.bufferLength);
+                proxiedElementName, event.buffering, event.currentTarget.bufferTime, event.currentTarget.bufferLength);
     }
 
     private function onBufferTimeChange(event:BufferEvent):void {
         logger.debug("{0}: Buffer Time Change: Buffering: {1}, Time: {2}, Length: {3}",
-                proxiedElementName, event.buffering, event.bufferTime, event.currentTarget.bufferLength);
+                proxiedElementName, event.buffering, event.currentTarget.bufferTime, event.currentTarget.bufferLength);
     }
 
     private function togglePlayListeners(added:Boolean):void {
