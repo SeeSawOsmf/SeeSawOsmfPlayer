@@ -134,10 +134,14 @@ public class AutoResumeProxy extends ProxyElement {
             var adMetadata:AdMetadata = getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
             if (adMetadata && adMetadata.currentAdBreak) {
                 var currentAdBreak:AdBreak = adMetadata.currentAdBreak;
-                if (event.value == AdState.AD_BREAK_COMPLETE)
+                if (event.value == AdState.AD_BREAK_COMPLETE) {
+                    changeListeners(true, MediaTraitType.PLAY, PlayEvent.PLAY_STATE_CHANGE, onPlayStateChanged);
                     writeResumePosition(currentAdBreak.startTime + AD_BREAK_OFFSET, false);
-                else if (event.value == AdState.AD_BREAK_START)
-                    writeResumePosition(currentAdBreak.startTime - AD_BREAK_OFFSET, false);
+                }
+                else if (event.value == AdState.AD_BREAK_START) {
+                    changeListeners(false, MediaTraitType.PLAY, PlayEvent.PLAY_STATE_CHANGE, onPlayStateChanged);
+                    writeResumePosition(currentAdBreak.startTime - currentAdBreak.seekOffset - AD_BREAK_OFFSET, false);
+                }
             }
         }
     }
@@ -160,7 +164,7 @@ public class AutoResumeProxy extends ProxyElement {
 
     private function onComplete(event:TimeEvent):void {
         /*Due to the seek timer stangeness in OSMF we would get the seekChanges after the asset has completed/STOP etc..
-        so lets remove the listener the write the resume cookie as 0*/
+         so lets remove the listener the write the resume cookie as 0*/
         changeListeners(false, MediaTraitType.SEEK, SeekEvent.SEEKING_CHANGE, onSeekingChange);
         resumeService.writeResumeCookie(0);
     }
@@ -172,7 +176,7 @@ public class AutoResumeProxy extends ProxyElement {
                 // a pause may or may not be followed by a seek or an ad break both of which will
                 // write another resume position. However, there is no way we can detect a simple user activated
                 // pause without adding yet more metadata, so we have to write a position here just in case.
-                if(timeTrait)
+                if (timeTrait)
                     writeResumePosition(timeTrait.currentTime);
                 break;
             case PlayState.PLAYING:
@@ -205,7 +209,7 @@ public class AutoResumeProxy extends ProxyElement {
     private function writeResumePosition(time:Number, checkForBreak:Boolean = true):void {
         var timeToWrite:Number = time;
 
-        if(checkForBreak) {
+        if (checkForBreak) {
             // we don't write resume points exactly on ad breaks since the resume points have to be
             // offset from ad breaks a little depending on whether the break has been seen or not
             var adBreak:AdBreak = getAdBreakAtTime(time);
@@ -233,7 +237,7 @@ public class AutoResumeProxy extends ProxyElement {
             case MediaTraitType.SEEK:
                 changeListeners(add, traitType, SeekEvent.SEEKING_CHANGE, onSeekingChange);
                 seekTrait = getTrait(MediaTraitType.SEEK) as SeekTrait;
-                seekToResumePosition();
+                seekToResumePosition();     ////todo need to listen to the load trait... otherwise http streaming will fail...
                 break;
             case MediaTraitType.PLAY:
                 changeListeners(add, traitType, PlayEvent.PLAY_STATE_CHANGE, onPlayStateChanged);
@@ -243,6 +247,9 @@ public class AutoResumeProxy extends ProxyElement {
                 changeListeners(add, traitType, TimeEvent.COMPLETE, onComplete);
                 changeListeners(add, traitType, TimeEvent.DURATION_CHANGE, onDurationChange);
                 timeTrait = getTrait(MediaTraitType.TIME) as TimeTrait;
+                break;
+            case MediaTraitType.LOAD:
+
                 break;
         }
     }
