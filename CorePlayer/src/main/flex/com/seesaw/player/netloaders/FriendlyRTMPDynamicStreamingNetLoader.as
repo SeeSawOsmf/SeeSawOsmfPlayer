@@ -19,11 +19,16 @@
  */
 
 package com.seesaw.player.netloaders {
+import com.seesaw.player.events.BandwidthEvent;
+
 import flash.events.NetStatusEvent;
+import flash.events.TimerEvent;
 import flash.net.NetConnection;
 import flash.net.NetStream;
+import flash.utils.Timer;
 
 import org.osmf.media.URLResource;
+import org.osmf.net.DynamicStreamingItem;
 import org.osmf.net.DynamicStreamingResource;
 import org.osmf.net.NetClient;
 import org.osmf.net.NetStreamSwitchManager;
@@ -36,26 +41,61 @@ import org.osmf.net.rtmpstreaming.RTMPNetStreamMetrics;
 import org.osmf.net.rtmpstreaming.SufficientBandwidthRule;
 
 public class FriendlyRTMPDynamicStreamingNetLoader extends RTMPDynamicStreamingNetLoader {
+
+    private var rtmpMetrics:RTMPNetStreamMetrics;
+    private var inInsufficientBandwidthState:Boolean;
+    private var metricsTimer:Timer;
+
     public function FriendlyRTMPDynamicStreamingNetLoader() {
     }
 
     override protected function createNetStream(connection:NetConnection, resource:URLResource):NetStream {
-        var ns:NetStream = new NetStream(connection);
-        ns.client = new NetClient();
+        var netStream:NetStream = new NetStream(connection);
+
+        var netClient:NetClient = new NetClient();
+        netStream.client = netClient;
 
         connection.addEventListener(NetStatusEvent.NET_STATUS, onNetStreamNetStatusEvent);
-        ns.addEventListener(NetStatusEvent.NET_STATUS, onNetStreamNetStatusEvent);
+        netStream.addEventListener(NetStatusEvent.NET_STATUS, onNetStreamNetStatusEvent);
 
-        return ns;
+        metricsTimer = new Timer(1000);
+        metricsTimer.addEventListener(TimerEvent.TIMER, onMetricsTimerEvent);
+
+        return netStream;
     }
-
 
     override protected function createNetStreamSwitchManager(connection:NetConnection, netStream:NetStream, dsResource:DynamicStreamingResource):NetStreamSwitchManagerBase {
         if (dsResource != null) {
-            var metrics:RTMPNetStreamMetrics = new RTMPNetStreamMetrics(netStream);
-            return new NetStreamSwitchManager(connection, netStream, dsResource, metrics, getDefaultSwitchingRules(metrics));
+            rtmpMetrics = new RTMPNetStreamMetrics(netStream);
+            metricsTimer.start();
+            return new NetStreamSwitchManager(connection, netStream, dsResource, rtmpMetrics, getDefaultSwitchingRules(rtmpMetrics));
         }
         return null;
+    }
+
+    private function onMetricsTimerEvent(event:TimerEvent):void {
+        var measuredBitrate:Number = rtmpMetrics.averageMaxBytesPerSecond * 8 / 1024;
+        if (measuredBitrate > 0) {
+            var requiredBitrate:Number = getLowestSupportedBitrate();
+            var insufficientBandwidth:Boolean = measuredBitrate < requiredBitrate;
+            if (insufficientBandwidth && !inInsufficientBandwidthState) {
+                dispatchEvent(new BandwidthEvent(BandwidthEvent.BANDWITH_STATUS, false, false, measuredBitrate, requiredBitrate));
+                inInsufficientBandwidthState = true;
+            }
+            else if (!insufficientBandwidth && inInsufficientBandwidthState) {
+                dispatchEvent(new BandwidthEvent(BandwidthEvent.BANDWITH_STATUS, false, false, measuredBitrate, requiredBitrate));
+                inInsufficientBandwidthState = false;
+            }
+        }
+    }
+
+    private function getLowestSupportedBitrate():Number {
+        var bitrate:Number = Number.MAX_VALUE;
+        for each(var item:DynamicStreamingItem in rtmpMetrics.resource.streamItems) {
+            if (item.bitrate < bitrate)
+                bitrate = item.bitrate;
+        }
+        return bitrate;
     }
 
     private function getDefaultSwitchingRules(metrics:RTMPNetStreamMetrics):Vector.<SwitchingRuleBase> {

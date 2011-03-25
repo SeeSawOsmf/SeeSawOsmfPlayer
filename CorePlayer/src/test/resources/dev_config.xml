@@ -20,6 +20,6 @@
   ~ Incorporated. All Rights Reserved.
   -->
 <config>
-    <userInitUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player/userinitinfo/13012</userInitUrl>
-    <playerInitUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player/initinfo/13012</playerInitUrl>
+    <userInitUrl>../src/test/resources/userInfo.xml</userInitUrl>
+    <playerInitUrl>../src/test/resources/contentInfo.xml</playerInitUrl>
 </config>
