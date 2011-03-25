@@ -20,6 +20,7 @@
 
 package com.seesaw.player.netloaders {
 import com.seesaw.player.events.BandwidthEvent;
+import com.seesaw.player.utils.DynamicStreamingUtils;
 
 import flash.events.NetStatusEvent;
 import flash.events.TimerEvent;
@@ -28,7 +29,6 @@ import flash.net.NetStream;
 import flash.utils.Timer;
 
 import org.osmf.media.URLResource;
-import org.osmf.net.DynamicStreamingItem;
 import org.osmf.net.DynamicStreamingResource;
 import org.osmf.net.NetClient;
 import org.osmf.net.NetStreamSwitchManager;
@@ -76,26 +76,19 @@ public class FriendlyRTMPDynamicStreamingNetLoader extends RTMPDynamicStreamingN
     private function onMetricsTimerEvent(event:TimerEvent):void {
         var measuredBitrate:Number = rtmpMetrics.averageMaxBytesPerSecond * 8 / 1024;
         if (measuredBitrate > 0) {
-            var requiredBitrate:Number = getLowestSupportedBitrate();
-            var insufficientBandwidth:Boolean = measuredBitrate < requiredBitrate;
-            if (insufficientBandwidth && !inInsufficientBandwidthState) {
-                dispatchEvent(new BandwidthEvent(BandwidthEvent.BANDWITH_STATUS, false, false, measuredBitrate, requiredBitrate));
+            var requiredBitrate:Number = DynamicStreamingUtils.lowestBitrate(rtmpMetrics.resource.streamItems);
+            var sufficientBandwidth:Boolean = measuredBitrate >= requiredBitrate;
+            if (!sufficientBandwidth && !inInsufficientBandwidthState) {
+                dispatchEvent(new BandwidthEvent(BandwidthEvent.BANDWITH_STATUS, false, false,
+                        sufficientBandwidth, measuredBitrate, requiredBitrate));
                 inInsufficientBandwidthState = true;
             }
-            else if (!insufficientBandwidth && inInsufficientBandwidthState) {
-                dispatchEvent(new BandwidthEvent(BandwidthEvent.BANDWITH_STATUS, false, false, measuredBitrate, requiredBitrate));
+            else if (sufficientBandwidth && inInsufficientBandwidthState) {
+                dispatchEvent(new BandwidthEvent(BandwidthEvent.BANDWITH_STATUS, false, false,
+                        sufficientBandwidth, measuredBitrate, requiredBitrate));
                 inInsufficientBandwidthState = false;
             }
         }
-    }
-
-    private function getLowestSupportedBitrate():Number {
-        var bitrate:Number = Number.MAX_VALUE;
-        for each(var item:DynamicStreamingItem in rtmpMetrics.resource.streamItems) {
-            if (item.bitrate < bitrate)
-                bitrate = item.bitrate;
-        }
-        return bitrate;
     }
 
     private function getDefaultSwitchingRules(metrics:RTMPNetStreamMetrics):Vector.<SwitchingRuleBase> {
@@ -103,7 +96,7 @@ public class FriendlyRTMPDynamicStreamingNetLoader extends RTMPDynamicStreamingN
         rules.push(new SufficientBandwidthRule(metrics));
         rules.push(new InsufficientBandwidthRule(metrics));
         rules.push(new DroppedFramesRule(metrics));
-        // We grow the buffer dynamically from a very small size which seems to conflict with this rule
+        // this rule switches all the way to the bottom which is not what we want
 //        rules.push(new InsufficientBufferRule(metrics, PlayerConstants.MIN_BUFFER_SIZE_SECONDS));
         return rules;
     }

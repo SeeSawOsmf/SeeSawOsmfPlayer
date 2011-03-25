@@ -20,6 +20,7 @@
 
 package com.seesaw.player {
 import com.seesaw.player.events.BandwidthEvent;
+import com.seesaw.player.netloaders.FriendlyHTTPStreamingNetLoader;
 import com.seesaw.player.netloaders.FriendlyNetLoader;
 import com.seesaw.player.netloaders.FriendlyRTMPDynamicStreamingNetLoader;
 
@@ -54,6 +55,9 @@ public class FriendlyMediaFactory extends MediaFactory {
 
         netLoader.addEventListener(NetStatusEvent.NET_STATUS, onNetStreamNetStatusEvent);
         netLoader.addEventListener(BandwidthEvent.BANDWITH_STATUS, onBandwidthStatus);
+
+        httpStreamingNetLoader.addEventListener(NetStatusEvent.NET_STATUS, onNetStreamNetStatusEvent);
+        httpStreamingNetLoader.addEventListener(BandwidthEvent.BANDWITH_STATUS, onBandwidthStatus);
 
         if (smoothingEnabled)
             addEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onMediaElementCreate);
@@ -101,7 +105,7 @@ public class FriendlyMediaFactory extends MediaFactory {
 
 
         {
-            httpStreamingNetLoader = new HTTPStreamingNetLoader();
+            httpStreamingNetLoader = new FriendlyHTTPStreamingNetLoader();
             addItem
                     (new MediaFactoryItem
                             ("org.osmf.elements.video.httpstreaming"

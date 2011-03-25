@@ -36,15 +36,21 @@ public class BandwidthEvent extends Event {
 
     private var _measuredBandwidth:Number;
     private var _requiredBandwidth:Number;
+    private var _sufficientBandwidth:Boolean;
+    private var _httpDownloadRatio:Number;
 
-    public function BandwidthEvent(type:String, bubbles:Boolean = false, cancelable:Boolean = false, measuredBandwidth:Number = NaN, requiredBandwidth:Number = NaN) {
+    public function BandwidthEvent(type:String, bubbles:Boolean = false, cancelable:Boolean = false,
+                                   sufficientBandwidth:Boolean = true, measuredBandwidth:Number = NaN,
+                                   requiredBandwidth:Number = NaN, httpDownloadRatio:Number = NaN) {
         super(type, bubbles, cancelable);
+        _sufficientBandwidth = sufficientBandwidth;
         _measuredBandwidth = measuredBandwidth;
         _requiredBandwidth = requiredBandwidth;
+        _httpDownloadRatio = httpDownloadRatio;
     }
 
     override public function clone():Event {
-        return new BandwidthEvent(type, bubbles, cancelable, measuredBandwidth, requiredBandwidth);
+        return new BandwidthEvent(type, bubbles, cancelable, sufficientBandwidth, measuredBandwidth, requiredBandwidth, httpDownloadRatio);
     }
 
     public function get measuredBandwidth():Number {
@@ -56,9 +62,12 @@ public class BandwidthEvent extends Event {
     }
 
     public function get sufficientBandwidth():Boolean {
-        return measuredBandwidth >= requiredBandwidth;
+        return _sufficientBandwidth;
     }
 
+    public function get httpDownloadRatio():Number {
+        return _httpDownloadRatio;
+    }
 
 }
 }

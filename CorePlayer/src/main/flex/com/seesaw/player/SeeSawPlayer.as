@@ -467,7 +467,7 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onBandwidthStatus(event:BandwidthEvent):void {
-        logger.debug("onBandwidthStatus: measured = {0} - lowest = {1}, sufficient = {2}",
+        logger.debug("onBandwidthStatus: measured = {0}, lowest = {1}, sufficient = {2}",
                 event.measuredBandwidth, event.requiredBandwidth, event.sufficientBandwidth);
         sufficientBandwidth = event.sufficientBandwidth;
     }
