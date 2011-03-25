@@ -41,6 +41,12 @@ public class Volume extends ButtonWidget implements IWidget {
 
     private var toolTip:PlayerToolTip;
 
+    [Embed(source="/volume.png")]
+    private static const VOLUME_UP:Class;
+
+    [Embed(source="/volumeOff.png")]
+    private static const VOLUME_DISABLED:Class;
+
     /* static */
     private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.Volume";
     private static const _requiredTraits:Vector.<String> = new Vector.<String>;
@@ -127,6 +133,7 @@ public class Volume extends ButtonWidget implements IWidget {
     override protected function onMouseClick(event:MouseEvent):void {
         toggleMuteState();
         super.processEnabledChange();
+        super.onMouseOver();
     }
 
     private function toggleMuteState():void {
