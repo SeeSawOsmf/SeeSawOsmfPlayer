@@ -117,33 +117,17 @@ public class EventsManagerImpl implements EventsManager {
     }
 
     private function logContentEvent(contentEvent:ContentEvent):void {
-        logger.debug("\n")
-        logger.debug(" -----------------------------------------------------------------")
-        logger.debug("CONTENT EVENTS")
-        logger.debug("-----------------------------------------------------------------")
-        logger.debug("contentEventId: {0}", contentEvent.contentEventId);
-        logger.debug("currentAdBreakSequenceNumber: {0}", contentEvent.currentAdBreakSequenceNumber);
-        logger.debug("contentViewingSequenceNumber: {0}", contentEvent.contentViewingSequenceNumber);
-        logger.debug("eventOccured: {0}", contentEvent.eventOccured);
-        logger.debug("getSectionType: {0}", contentEvent.getSectionType);
-        logger.debug("userEventId: {0}", contentEvent.userEventId);
-        logger.debug("-----------------------------------------------------------------")
-        logger.debug("\n")
+        logger.debug("-----------------------------------------------------------------");
+        logger.debug("CONTENT EVENTS --- contentEventId: {0} -- currentAdBreakSequenceNumber: {1} -- contentViewingSequenceNumber: {2}  --  eventOccured: {3}  -- getSectionType: {4}  -- userEventId: {5} -- CVD: {6}",
+               contentEvent.contentEventId,contentEvent.currentAdBreakSequenceNumber, contentEvent.contentViewingSequenceNumber, contentEvent.eventOccured, contentEvent.getSectionType, contentEvent.userEventId, contentEvent.getMainContentTimer);
+        logger.debug("-----------------------------------------------------------------");
     }
 
 
     private function logUserEvent(userEvent:UserEvent):void {
-        logger.debug("\n")
-        logger.debug(" -----------------------------------------------------------------")
-        logger.debug("USER EVENTS")
-        logger.debug(" -----------------------------------------------------------------")
-        logger.debug("EventType: {0}", userEvent.getEventType);
-        logger.debug("CVD: {0}", userEvent.getCulmulativeViewDuration);
-        logger.debug("Event Occured: {0}", userEvent.getEventOccured);
-        logger.debug("userEventId: {0}", userEvent.getUserEventId);
-        logger.debug("-----------------------------------------------------------------")
-        logger.debug("\n")
-
+        logger.debug("-----------------------------------------------------------------");
+        logger.debug("USER EVENTS ----  EventType: {0}  -- Event Occured: {2}  -- userEventId: {3}  -- CVD: {1}", userEvent.getEventType, userEvent.getCulmulativeViewDuration, userEvent.getEventOccured, userEvent.getUserEventId)
+        logger.debug(" -----------------------------------------------------------------");
     }
 
     public function flushAll():void {
@@ -217,7 +201,6 @@ public class EventsManagerImpl implements EventsManager {
             var post_data:URLVariables = new URLVariables();
             post_data.data = JSON.encode(cumulativeDuration);
             request.submit(post_data);
-            flushAll();
         }
     }
 

@@ -36,6 +36,7 @@ public class ButtonWidget extends Widget {
     protected var up:DisplayObject;
     protected var down:DisplayObject;
     protected var disabled:DisplayObject;
+    protected var disabledDown:DisplayObject;
 
     public function ButtonWidget() {
         mouseEnabled = true;
@@ -52,6 +53,7 @@ public class ButtonWidget extends Widget {
         up = assetManager.getDisplayObject(xml.@upFace);
         down = assetManager.getDisplayObject(xml.@downFace);
         disabled = assetManager.getDisplayObject(xml.@disabledFace);
+        disabledDown = assetManager.getDisplayObject(xml.@disabledDownFace);
 
         super.configure(xml, assetManager);
     }
@@ -59,14 +61,30 @@ public class ButtonWidget extends Widget {
     // Internals
     //
 
-    private function onMouseOver(event:MouseEvent):void {
+    protected function onMouseOver(event:MouseEvent = null):void {
         mouseOver = true;
-        setFace(enabled ? down : disabled);
+        var nextFace:DisplayObject;
+        if (enabled) {
+            nextFace = down;
+        } else {
+            if (disabledDown) {
+                nextFace = disabledDown;
+            } else {
+                nextFace = disabled;
+            }
+        }
+        setFace(nextFace);
     }
 
     private function onMouseOut(event:MouseEvent):void {
         mouseOver = false;
-        setFace(enabled ? up : disabled);
+        var nextFace:DisplayObject;
+        if (enabled) {
+            nextFace = up;
+        } else {
+            nextFace = disabled;
+        }
+        setFace(nextFace);
     }
 
     private function setFace(face:DisplayObject):void {
@@ -87,6 +105,7 @@ public class ButtonWidget extends Widget {
     }
 
     protected function onMouseClick_internal(event:MouseEvent):void {
+        this.onMouseOver();
         if (enabled == false) {
             event.stopImmediatePropagation();
         }

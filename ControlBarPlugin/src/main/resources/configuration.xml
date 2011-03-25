@@ -99,8 +99,9 @@
                     id="com.seesaw.player.controls.widget.Volume"
                     type="com.seesaw.player.controls.widget.Volume"
                     upFace="volumeUp"
-                    downFace="volumeUp"
+                    downFace="volumeDisabled"
                     disabledFace="volumeDisabled"
+                    disabledDownFace="volumeUp"
                     left="520"
                     top="24"
                     />
