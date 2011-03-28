@@ -19,6 +19,7 @@
  */
 
 package com.seesaw.player.captioning.sami {
+import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.loaders.captioning.CaptionLoader;
 import com.seesaw.player.parsers.captioning.CaptionSync;
 import com.seesaw.player.traits.captioning.CaptionLoadTrait;
@@ -26,6 +27,7 @@ import com.seesaw.player.traits.captioning.CaptionLoadTrait;
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.events.MediaElementEvent;
+import org.osmf.events.MetadataEvent;
 import org.osmf.events.TimelineMetadataEvent;
 import org.osmf.layout.HorizontalAlign;
 import org.osmf.layout.LayoutMetadata;
@@ -36,6 +38,7 @@ import org.osmf.media.MediaResourceBase;
 import org.osmf.media.URLResource;
 import org.osmf.metadata.CuePoint;
 import org.osmf.metadata.CuePointType;
+import org.osmf.metadata.Metadata;
 import org.osmf.metadata.TimelineMetadata;
 import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.LoadTrait;
@@ -49,6 +52,8 @@ public class SAMIElement extends LoadableElementBase {
     private var loadTrait:CaptionLoadTrait;
     private var _target:MediaElement;
     private var displayTrait:DisplayObjectTrait;
+    private var userMetadata:Metadata;
+    private var userEventMetadata:Metadata;
 
     public function SAMIElement(resource:URLResource = null, loader:CaptionLoader = null) {
         if (loader == null) {
@@ -72,6 +77,13 @@ public class SAMIElement extends LoadableElementBase {
     override protected function processReadyState():void {
         loadTrait = getTrait(MediaTraitType.LOAD) as CaptionLoadTrait;
 
+        userMetadata = getMetadata(PlayerConstants.USEREVENTS_METADATA_NAMESPACE) as Metadata;
+        if (userMetadata) {
+            userMetadata.addEventListener(MetadataEvent.VALUE_CHANGE, userMetaChanged);
+            userMetadata.addEventListener(MetadataEvent.VALUE_ADD, userMetaChanged);
+            userMetadata.addEventListener(MediaElementEvent.METADATA_ADD, userMetaChanged);
+        }
+
         if (target) {
             var timelineMetadata:TimelineMetadata = getMetadata(CuePoint.DYNAMIC_CUEPOINTS_NAMESPACE) as TimelineMetadata;
             if (timelineMetadata == null) {
@@ -88,6 +100,13 @@ public class SAMIElement extends LoadableElementBase {
             timelineMetadata.addEventListener(TimelineMetadataEvent.MARKER_TIME_REACHED, onCuePoint);
         }
 
+    }
+
+    private function userMetaChanged(event:MetadataEvent):void {
+        if (event.key == "fullScreen" && event.type != MetadataEvent.VALUE_ADD) {
+            var captionDisplayObject:CaptionDisplayObject = displayTrait.displayObject as CaptionDisplayObject;
+            captionDisplayObject.fullScreenMode = event.value;
+        }
     }
 
     private function onMediaTraitsChange(event:MediaElementEvent):void {

@@ -38,16 +38,17 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
     private var captionValue:String = "";
 
     private var logger:ILogger = LoggerFactory.getClassLogger(CaptionDisplayObject);
+    private var _fullScreenMode:Boolean;
 
     public function CaptionDisplayObject(layoutMetadata:LayoutMetadata = null) {
         super(layoutMetadata);
-
+        mouseEnabled = false;
+        buttonMode = false;
         captionField = new TextField();
         captionField.htmlText = "";
         captionField.multiline = true;
         captionField.wordWrap = true;
         captionField.selectable = false;
-
         var format:TextFormat = new TextFormat();
         format.align = TextFormatAlign.CENTER;
         format.size = 16;
@@ -61,7 +62,7 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
         addChild(captionField);
     }
 
-    private function applyStandardTextSize():void {
+    public function applyStandardTextSize():void {
         var format:TextFormat = new TextFormat();
         format.align = TextFormatAlign.CENTER;
         format.size = 16;
@@ -71,7 +72,7 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
         captionField.selectable = false;
     }
 
-    private function applyLargeTextSize():void {
+    public function applyLargeTextSize():void {
         var format:TextFormat = new TextFormat();
         format.align = TextFormatAlign.CENTER;
         format.size = 43;
@@ -96,14 +97,11 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
 
         captionField.width = availableWidth;
         captionField.height = availableHeight;
-
-        if (expanded) {
-            logger.debug("applying expanded size");
+        logger.debug("layout expanded  == {0}", expanded);
+        if (fullScreenMode) {
             captionField.y = 10;
             applyLargeTextSize();
-        }
-        else if (changed) {
-            logger.debug("applying standard size");
+        } else {
             captionField.y = 80;
             applyStandardTextSize();
         }
@@ -117,6 +115,14 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
         if (captionField) {
             captionField.htmlText = captionValue = value;
         }
+    }
+
+    public function set fullScreenMode(value:Boolean):void {
+        _fullScreenMode = value;
+    }
+
+    public function get fullScreenMode():Boolean {
+        return _fullScreenMode;
     }
 }
 }

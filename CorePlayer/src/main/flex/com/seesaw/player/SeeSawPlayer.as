@@ -99,8 +99,6 @@ import org.osmf.traits.PlayTrait;
 import org.osmf.traits.TimeTrait;
 import org.osmf.traits.TraitEventDispatcher;
 
-import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
-
 public class SeeSawPlayer extends Sprite {
 
     use namespace contentinfo;
@@ -404,9 +402,9 @@ public class SeeSawPlayer extends Sprite {
         setupAdProvider();
 
         factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
-      if(!HelperUtils.getBoolean(playerInit.showPreview))
-          factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
-        factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
+        if (!HelperUtils.getBoolean(playerInit.showPreview))
+            factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
+        ///factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
 
@@ -462,7 +460,7 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onBufferingChange(event:BufferEvent):void {
-        if(bufferTrait) {
+        if (bufferTrait) {
             logger.debug("buffering: {0}, time = {1}", bufferTrait.buffering, bufferTrait.bufferTime);
             // the panel needs to show for a reasonable amount of time so only show it if the amount
             // of buffer to fill is greater than 5 seconds worth
@@ -501,6 +499,12 @@ public class SeeSawPlayer extends Sprite {
             factory.loadPlugin(new PluginInfoResource(new SAMIPluginInfo()));
 
             subtitleElement = factory.createMediaElement(new URLResource(subtitleLocation));
+
+            var metadata:Metadata = userEventMetaData as Metadata;
+            if (metadata) {
+                subtitleElement.addMetadata(PlayerConstants.USEREVENTS_METADATA_NAMESPACE, metadata);
+            }
+
 
             // The subtitle element needs to check and set visibility every time it sets a new display object
             subtitleElement.addEventListener(MediaElementEvent.TRAIT_ADD, onSubtitleTraitAdd);
@@ -796,7 +800,7 @@ public class SeeSawPlayer extends Sprite {
 
     private function resizeMainContent():void {
         updateSubtitlePosition();
-        container.validateNow();
+        mainContainer.layout(contentWidth, contentHeight, true);
     }
 
     private function setContainerSize(width:int, height:int):void {
@@ -854,14 +858,11 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onMediaPlayerStateChange(event:MediaPlayerStateChangeEvent):void {
-        if(controlBarMetadata)
-            controlBarMetadata.addValue(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, event.state);       //// Auto triggers metadata change on the controlBar, forces the layoutMetadata to update on the MediaContainer..
-
         switch (event.state) {
             case MediaPlayerState.PLAYING:
                 toggleLights();
                 resizeMainContent();
-                addEventListener(Event.ENTER_FRAME, updateAuditudeMediaSize);
+                addEventListener(Event.ENTER_FRAME, updateMediaSize);
                 break;
             case MediaPlayerState.PAUSED:
                 bufferingPanel.hide();
@@ -874,17 +875,16 @@ public class SeeSawPlayer extends Sprite {
     }
 
 
-    function updateAuditudeMediaSize(event:Event):void {
+    function updateMediaSize(event:Event):void {
         var displayTrait:DisplayObjectTrait =
                 mainElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait;
         if (displayTrait) {
 
-            if (displayTrait.mediaHeight > 0 && displayTrait.mediaWidth > 0) {
-                removeEventListener(Event.ENTER_FRAME, updateAuditudeMediaSize);
+            if (displayTrait.displayObject.width > 0 && displayTrait.displayObject.height > 0) {
+                removeEventListener(Event.ENTER_FRAME, updateMediaSize);
             }
             resizeMainContent();
         }
-
     }
 
     private function toggleLights():void {
