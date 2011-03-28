@@ -30,10 +30,10 @@ import com.seesaw.player.ads.auditude.AdProxy;
 import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.batcheventservices.BatchEventServicePlugin;
-import com.seesaw.player.buffering.BufferingManagerProxy;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.controls.ControlBarConstants;
 import com.seesaw.player.controls.ControlBarPlugin;
+import com.seesaw.player.events.BandwidthEvent;
 import com.seesaw.player.external.ExternalInterfaceMetadata;
 import com.seesaw.player.external.PlayerExternalInterface;
 import com.seesaw.player.ioc.ObjectProvider;
@@ -54,8 +54,10 @@ import flash.display.StageDisplayState;
 import flash.events.Event;
 import flash.events.FullScreenEvent;
 import flash.events.NetStatusEvent;
+import flash.events.TimerEvent;
 import flash.external.ExternalInterface;
 import flash.utils.ByteArray;
+import flash.utils.Timer;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -99,6 +101,8 @@ import org.osmf.traits.PlayTrait;
 import org.osmf.traits.TimeTrait;
 import org.osmf.traits.TraitEventDispatcher;
 
+import uk.co.vodco.osmfDebugProxy.DebugPluginInfo;
+
 public class SeeSawPlayer extends Sprite {
 
     use namespace contentinfo;
@@ -139,7 +143,9 @@ public class SeeSawPlayer extends Sprite {
     private var currentAdMode = "ad mode not set";
 
     private var dispatcher:TraitEventDispatcher;
-    private var bufferTrait:BufferTrait;
+    private var mediaElement:MediaElement;
+    private var sufficientBandwidth:Boolean = true;
+    private var bufferLoggingTimer:Timer;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
@@ -162,6 +168,7 @@ public class SeeSawPlayer extends Sprite {
         factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
         factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadFailed);
         factory.addEventListener(NetStatusEvent.NET_STATUS, netStatusChanged);
+        factory.addEventListener(BandwidthEvent.BANDWITH_STATUS, onBandwidthStatus);
 
         player = new MediaPlayer();
         player.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onMainPlayerStateChange);
@@ -404,7 +411,7 @@ public class SeeSawPlayer extends Sprite {
         factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
         if (!HelperUtils.getBoolean(playerInit.showPreview))
             factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
-        ///factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
+        factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
 
@@ -459,17 +466,36 @@ public class SeeSawPlayer extends Sprite {
         }
     }
 
+    private function onBandwidthStatus(event:BandwidthEvent):void {
+        logger.debug("onBandwidthStatus: measured = {0}, lowest = {1}, sufficient = {2}",
+                event.measuredBandwidth, event.requiredBandwidth, event.sufficientBandwidth);
+        sufficientBandwidth = event.sufficientBandwidth;
+    }
+
     private function onBufferingChange(event:BufferEvent):void {
+        var bufferTrait:BufferTrait = mediaElement.getTrait(MediaTraitType.BUFFER) as BufferTrait;
+        logger.debug("buffering: {0}, time = {1}", bufferTrait.buffering, bufferTrait.bufferTime);
+
+        if (sufficientBandwidth) {
+            bufferTrait.bufferTime = PlayerConstants.SHORT_BUFFER_TIME;
+        }
+        else {
+            bufferTrait.bufferTime = PlayerConstants.LONG_BUFFER_TIME;
+        }
+
+        if (bufferTrait.buffering && !sufficientBandwidth) {
+            // if we are in this state for longer than 2 seconds the panel will show
+            bufferingPanel.show();
+        } else {
+            bufferingPanel.hide();
+        }
+    }
+
+    private function onBufferTimerEvent(event:TimerEvent):void {
+        var bufferTrait:BufferTrait = mediaElement.getTrait(MediaTraitType.BUFFER) as BufferTrait;
         if (bufferTrait) {
-            logger.debug("buffering: {0}, time = {1}", bufferTrait.buffering, bufferTrait.bufferTime);
-            // the panel needs to show for a reasonable amount of time so only show it if the amount
-            // of buffer to fill is greater than 5 seconds worth
-            if (bufferTrait.buffering && Math.abs(bufferTrait.bufferLength - bufferTrait.bufferTime) > 5) {
-                // if we are in this state for longer than 4 seconds the panel will show
-                bufferingPanel.show();
-            } else {
-                bufferingPanel.hide();
-            }
+            logger.debug("buffer state: length = {0}, time = {1}, buffering = {2}",
+                    bufferTrait.bufferLength, bufferTrait.bufferTime, bufferTrait.buffering)
         }
     }
 
@@ -552,7 +578,7 @@ public class SeeSawPlayer extends Sprite {
 
         factory.addEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onSmilElementCreated);
 
-        var mediaElement:MediaElement = factory.createMediaElement(config.resource);
+        mediaElement = factory.createMediaElement(config.resource);
 
         factory.removeEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onSmilElementCreated);
 
@@ -604,10 +630,7 @@ public class SeeSawPlayer extends Sprite {
                 currentAdMode = AdMode.MAIN_CONTENT;
             }
 
-            mainElement.addChild(new BufferingManagerProxy(
-                    PlayerConstants.MIN_BUFFER_SIZE_SECONDS,
-                    PlayerConstants.MIN_EXPANDED_BUFFER_SIZE_SECONDS,
-                    PlayerConstants.EXPANDED_BUFFER_SIZE_SECONDS, mediaElement));
+            mainElement.addChild(mediaElement);
         }
 
         // get the control bar to point at the main content
@@ -615,12 +638,9 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onSeekingChange(event:SeekEvent):void {
-        // stop the buffer panel from displaying during seeks
-        if (event.seeking) {
-            dispatcher.removeEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
-        }
-        else {
-            dispatcher.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
+        // at low bandwidth seek takes an extremely long time so show the buffer panel in this case
+        if (!event.seeking && !sufficientBandwidth) {
+            bufferingPanel.show();
         }
     }
 
@@ -676,22 +696,23 @@ public class SeeSawPlayer extends Sprite {
         logger.debug("On Trait add: {0}", event.traitType);
 
         if (event.traitType == MediaTraitType.DRM) {
-            event.target.removeEventListener(MediaElementEvent.TRAIT_ADD, onTraitAdd);
-
             logger.debug("Adding DRM trait listener");
 
             // Add a listener to the DRM trait so we know what is going on
             var drmTrait:MediaTraitBase = (event.target as MediaElement).getTrait(MediaTraitType.DRM);
             drmTrait.addEventListener(DRMEvent.DRM_STATE_CHANGE, onDRMStateChange);
         }
-        else if (event.traitType == MediaTraitType.BUFFER) {
-            bufferTrait = (event.target as MediaElement).getTrait(MediaTraitType.BUFFER) as BufferTrait;
+        else if(event.traitType == MediaTraitType.BUFFER) {
+            bufferLoggingTimer = new Timer(2000);
+            bufferLoggingTimer.addEventListener(TimerEvent.TIMER, onBufferTimerEvent);
+            bufferLoggingTimer.start();
         }
     }
 
     private function onTraitRemove(event:MediaElementEvent):void {
-        if (event.traitType == MediaTraitType.BUFFER) {
-            bufferTrait = null;
+        if(event.traitType == MediaTraitType.BUFFER) {
+            bufferLoggingTimer.stop();
+            bufferLoggingTimer = null;
         }
     }
 
@@ -781,6 +802,7 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function netStatusChanged(event:NetStatusEvent):void {
+        logger.debug("NET STATUS: {0}", event.info);
 
         var metadata:Metadata = mainElement.getMetadata(NetStatusMetadata.NET_STATUS_METADATA);
         if (metadata == null) {
