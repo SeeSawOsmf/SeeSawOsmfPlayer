@@ -30,7 +30,6 @@
 package com.seesaw.player.netloaders {
 import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.events.BandwidthEvent;
-import com.seesaw.player.utils.DynamicStreamingUtils;
 
 import flash.events.NetStatusEvent;
 import flash.events.TimerEvent;
@@ -38,10 +37,9 @@ import flash.net.NetConnection;
 import flash.net.NetStream;
 import flash.utils.Timer;
 
+import org.as3commons.logging.ILogger;
+import org.as3commons.logging.LoggerFactory;
 import org.osmf.media.URLResource;
-import org.osmf.net.DynamicStreamingResource;
-import org.osmf.net.NetStreamSwitchManager;
-import org.osmf.net.NetStreamSwitchManagerBase;
 import org.osmf.net.SwitchingRuleBase;
 import org.osmf.net.httpstreaming.DownloadRatioRule;
 import org.osmf.net.httpstreaming.HTTPNetStream;
@@ -51,9 +49,11 @@ import org.osmf.net.rtmpstreaming.DroppedFramesRule;
 
 public class FriendlyHTTPStreamingNetLoader extends HTTPStreamingNetLoader {
 
-    private var httpMetrics:HTTPNetStreamMetrics;
+    private var logger:ILogger = LoggerFactory.getClassLogger(FriendlyHTTPStreamingNetLoader);
+
     private var inInsufficientBandwidthState:Boolean;
     private var metricsTimer:Timer;
+    private var netStream:HTTPNetStream;
 
     public function FriendlyHTTPStreamingNetLoader() {
         super();
@@ -63,25 +63,14 @@ public class FriendlyHTTPStreamingNetLoader extends HTTPStreamingNetLoader {
     }
 
     override protected function createNetStream(connection:NetConnection, resource:URLResource):NetStream {
-        var netStream:NetStream = super.createNetStream(connection, resource);
+        netStream = super.createNetStream(connection, resource) as HTTPNetStream;
         netStream.maxPauseBufferTime = PlayerConstants.PAUSE_BUFFER_TIME;
 
         connection.addEventListener(NetStatusEvent.NET_STATUS, onNetStreamNetStatusEvent);
         netStream.addEventListener(NetStatusEvent.NET_STATUS, onNetStreamNetStatusEvent);
 
+        metricsTimer.start();
         return netStream;
-    }
-
-    override protected function createNetStreamSwitchManager(connection:NetConnection, netStream:NetStream, dsResource:DynamicStreamingResource):NetStreamSwitchManagerBase {
-        // Only generate the switching manager if the resource is truly
-        // switchable.
-        if (dsResource != null) {
-            httpMetrics = new HTTPNetStreamMetrics(netStream as HTTPNetStream);
-            httpMetrics.resource = dsResource;
-            metricsTimer.start();
-            return new NetStreamSwitchManager(connection, netStream, dsResource, httpMetrics, getDefaultSwitchingRules(httpMetrics));
-        }
-        return null;
     }
 
     private function getDefaultSwitchingRules(metrics:HTTPNetStreamMetrics):Vector.<SwitchingRuleBase> {
@@ -92,18 +81,20 @@ public class FriendlyHTTPStreamingNetLoader extends HTTPStreamingNetLoader {
     }
 
     private function onMetricsTimerEvent(event:TimerEvent):void {
-        var requiredBitrate:Number = DynamicStreamingUtils.lowestBitrate(httpMetrics.resource.streamItems);
-        var downloadRatio:Number = httpMetrics.downloadRatio;
-        if (downloadRatio > 0) {
+        var downloadRatio:Number = netStream.downloadRatio;
+        logger.debug("ratio {0}", downloadRatio);
+        // large download ratios will give a false positive on bandwidth because fragments are probably
+        // cached locally
+        if (downloadRatio > 0 && downloadRatio < 50) {
             var sufficientBandwidth:Boolean = downloadRatio > 1.15;
             if (!sufficientBandwidth && !inInsufficientBandwidthState) {
                 dispatchEvent(new BandwidthEvent(BandwidthEvent.BANDWITH_STATUS,
-                        false, false, sufficientBandwidth, NaN, requiredBitrate, downloadRatio));
+                        false, false, sufficientBandwidth, NaN, NaN, downloadRatio));
                 inInsufficientBandwidthState = true;
             }
             else if (sufficientBandwidth && inInsufficientBandwidthState) {
                 dispatchEvent(new BandwidthEvent(BandwidthEvent.BANDWITH_STATUS,
-                        false, false, sufficientBandwidth, NaN, requiredBitrate, downloadRatio));
+                        false, false, sufficientBandwidth, NaN, NaN, downloadRatio));
                 inInsufficientBandwidthState = false;
             }
         }
