@@ -19,6 +19,7 @@
  */
 
 package com.seesaw.player.netloaders {
+import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.events.BandwidthEvent;
 import com.seesaw.player.utils.DynamicStreamingUtils;
 
@@ -30,7 +31,6 @@ import flash.utils.Timer;
 
 import org.osmf.media.URLResource;
 import org.osmf.net.DynamicStreamingResource;
-import org.osmf.net.NetClient;
 import org.osmf.net.NetStreamSwitchManager;
 import org.osmf.net.NetStreamSwitchManagerBase;
 import org.osmf.net.SwitchingRuleBase;
@@ -47,19 +47,16 @@ public class FriendlyRTMPDynamicStreamingNetLoader extends RTMPDynamicStreamingN
     private var metricsTimer:Timer;
 
     public function FriendlyRTMPDynamicStreamingNetLoader() {
+        metricsTimer = new Timer(1000);
+        metricsTimer.addEventListener(TimerEvent.TIMER, onMetricsTimerEvent);
     }
 
     override protected function createNetStream(connection:NetConnection, resource:URLResource):NetStream {
-        var netStream:NetStream = new NetStream(connection);
-
-        var netClient:NetClient = new NetClient();
-        netStream.client = netClient;
+        var netStream:NetStream = super.createNetStream(connection, resource);
+        netStream.maxPauseBufferTime = PlayerConstants.PAUSE_BUFFER_TIME;
 
         connection.addEventListener(NetStatusEvent.NET_STATUS, onNetStreamNetStatusEvent);
         netStream.addEventListener(NetStatusEvent.NET_STATUS, onNetStreamNetStatusEvent);
-
-        metricsTimer = new Timer(1000);
-        metricsTimer.addEventListener(TimerEvent.TIMER, onMetricsTimerEvent);
 
         return netStream;
     }
@@ -97,7 +94,7 @@ public class FriendlyRTMPDynamicStreamingNetLoader extends RTMPDynamicStreamingN
         rules.push(new InsufficientBandwidthRule(metrics));
         rules.push(new DroppedFramesRule(metrics));
         // this rule switches all the way to the bottom which is not what we want
-//        rules.push(new InsufficientBufferRule(metrics, PlayerConstants.MIN_BUFFER_SIZE_SECONDS));
+        // rules.push(new InsufficientBufferRule(metrics, PlayerConstants.MIN_BUFFER_SIZE_SECONDS));
         return rules;
     }
 

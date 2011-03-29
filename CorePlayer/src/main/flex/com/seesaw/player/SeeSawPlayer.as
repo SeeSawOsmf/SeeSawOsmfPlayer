@@ -28,17 +28,17 @@ import com.seesaw.player.ads.AdState;
 import com.seesaw.player.ads.AuditudeConstants;
 import com.seesaw.player.ads.auditude.AdProxy;
 import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
-import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.batcheventservices.BatchEventServicePlugin;
+import com.seesaw.player.buffering.BufferManagerProxy;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.controls.ControlBarConstants;
 import com.seesaw.player.controls.ControlBarPlugin;
+import com.seesaw.player.events.BufferManagerEvent;
 import com.seesaw.player.external.ExternalInterfaceMetadata;
 import com.seesaw.player.external.PlayerExternalInterface;
 import com.seesaw.player.ioc.ObjectProvider;
 import com.seesaw.player.namespaces.contentinfo;
 import com.seesaw.player.namespaces.smil;
-import com.seesaw.player.events.BandwidthEvent;
 import com.seesaw.player.netstatus.NetStatusMetadata;
 import com.seesaw.player.panels.BufferingPanel;
 import com.seesaw.player.preventscrub.ScrubPreventionProxyPluginInfo;
@@ -64,7 +64,6 @@ import org.as3commons.logging.LoggerFactory;
 import org.osmf.containers.MediaContainer;
 import org.osmf.elements.ParallelElement;
 import org.osmf.elements.SerialElement;
-import org.osmf.events.BufferEvent;
 import org.osmf.events.DRMEvent;
 import org.osmf.events.LoadEvent;
 import org.osmf.events.MediaElementEvent;
@@ -144,8 +143,8 @@ public class SeeSawPlayer extends Sprite {
 
     private var dispatcher:TraitEventDispatcher;
     private var mediaElement:MediaElement;
-    private var sufficientBandwidth:Boolean = true;
     private var bufferLoggingTimer:Timer;
+    private var bufferManager:BufferManagerProxy;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
@@ -168,7 +167,6 @@ public class SeeSawPlayer extends Sprite {
         factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD, onPluginLoaded);
         factory.addEventListener(MediaFactoryEvent.PLUGIN_LOAD_ERROR, onPluginLoadFailed);
         factory.addEventListener(NetStatusEvent.NET_STATUS, netStatusChanged);
-        factory.addEventListener(BandwidthEvent.BANDWITH_STATUS, onBandwidthStatus);
 
         player = new MediaPlayer();
         player.addEventListener(MediaPlayerStateChangeEvent.MEDIA_PLAYER_STATE_CHANGE, onMainPlayerStateChange);
@@ -409,8 +407,8 @@ public class SeeSawPlayer extends Sprite {
         setupAdProvider();
 
         factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
-        if (!HelperUtils.getBoolean(playerInit.showPreview))
-            factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
+//        if (!HelperUtils.getBoolean(playerInit.showPreview))
+//            factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
@@ -463,31 +461,6 @@ public class SeeSawPlayer extends Sprite {
             } else if (event.type == PlayerConstants.BUFFER_MESSAGE_HIDE) {
                 metadata.addValue(PlayerConstants.BUFFER_MESSAGE_SHOW, false);
             }
-        }
-    }
-
-    private function onBandwidthStatus(event:BandwidthEvent):void {
-        logger.debug("onBandwidthStatus: measured = {0}, lowest = {1}, sufficient = {2}",
-                event.measuredBandwidth, event.requiredBandwidth, event.sufficientBandwidth);
-        sufficientBandwidth = event.sufficientBandwidth;
-    }
-
-    private function onBufferingChange(event:BufferEvent):void {
-        var bufferTrait:BufferTrait = mediaElement.getTrait(MediaTraitType.BUFFER) as BufferTrait;
-        logger.debug("buffering: {0}, time = {1}", bufferTrait.buffering, bufferTrait.bufferTime);
-
-        if (sufficientBandwidth) {
-            bufferTrait.bufferTime = PlayerConstants.SHORT_BUFFER_TIME;
-        }
-        else {
-            bufferTrait.bufferTime = PlayerConstants.LONG_BUFFER_TIME;
-        }
-
-        if (bufferTrait.buffering && !sufficientBandwidth) {
-            // if we are in this state for longer than 2 seconds the panel will show
-            bufferingPanel.show();
-        } else {
-            bufferingPanel.hide();
         }
     }
 
@@ -610,7 +583,6 @@ public class SeeSawPlayer extends Sprite {
             dispatcher = new TraitEventDispatcher();
             dispatcher.media = mediaElement;
             dispatcher.addEventListener(TimeEvent.COMPLETE, onComplete);
-            dispatcher.addEventListener(BufferEvent.BUFFERING_CHANGE, onBufferingChange);
             dispatcher.addEventListener(SeekEvent.SEEKING_CHANGE, onSeekingChange);
 
             var adMetadata:AdMetadata = mediaElement.getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
@@ -624,16 +596,28 @@ public class SeeSawPlayer extends Sprite {
                 currentAdMode = AdMode.MAIN_CONTENT;
             }
 
-            mainElement.addChild(mediaElement);
+            bufferManager = new BufferManagerProxy(PlayerConstants.SHORT_BUFFER_TIME,
+                    PlayerConstants.LONG_BUFFER_TIME, mediaElement, factory);
+            bufferManager.addEventListener(BufferManagerEvent.CONNECTION_STATUS, onConnectionStatus);
+            mainElement.addChild(bufferManager);
         }
 
         // get the control bar to point at the main content
         setControlBarTarget(mainElement);
     }
 
+    private function onConnectionStatus(event:BufferManagerEvent):void {
+        if (event.connectionTooSlow) {
+            bufferingPanel.show();
+        }
+        else {
+            bufferingPanel.hide();
+        }
+    }
+
     private function onSeekingChange(event:SeekEvent):void {
         // at low bandwidth seek takes an extremely long time so show the buffer panel in this case
-        if (!event.seeking && !sufficientBandwidth) {
+        if (!event.seeking && !bufferManager.sufficientBandwidth) {
             bufferingPanel.show();
         }
     }
@@ -696,7 +680,7 @@ public class SeeSawPlayer extends Sprite {
             var drmTrait:MediaTraitBase = (event.target as MediaElement).getTrait(MediaTraitType.DRM);
             drmTrait.addEventListener(DRMEvent.DRM_STATE_CHANGE, onDRMStateChange);
         }
-        else if(event.traitType == MediaTraitType.BUFFER) {
+        else if (event.traitType == MediaTraitType.BUFFER) {
             bufferLoggingTimer = new Timer(2000);
             bufferLoggingTimer.addEventListener(TimerEvent.TIMER, onBufferTimerEvent);
             bufferLoggingTimer.start();
@@ -704,7 +688,7 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onTraitRemove(event:MediaElementEvent):void {
-        if(event.traitType == MediaTraitType.BUFFER) {
+        if (event.traitType == MediaTraitType.BUFFER) {
             bufferLoggingTimer.stop();
             bufferLoggingTimer = null;
         }

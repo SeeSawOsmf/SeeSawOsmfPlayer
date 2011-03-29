@@ -28,14 +28,17 @@
  * To change this template use File | Settings | File Templates.
  */
 package com.seesaw.player.netloaders {
+import com.seesaw.player.PlayerConstants;
 import com.seesaw.player.events.BandwidthEvent;
 import com.seesaw.player.utils.DynamicStreamingUtils;
 
+import flash.events.NetStatusEvent;
 import flash.events.TimerEvent;
 import flash.net.NetConnection;
 import flash.net.NetStream;
 import flash.utils.Timer;
 
+import org.osmf.media.URLResource;
 import org.osmf.net.DynamicStreamingResource;
 import org.osmf.net.NetStreamSwitchManager;
 import org.osmf.net.NetStreamSwitchManagerBase;
@@ -59,11 +62,23 @@ public class FriendlyHTTPStreamingNetLoader extends HTTPStreamingNetLoader {
         metricsTimer.addEventListener(TimerEvent.TIMER, onMetricsTimerEvent);
     }
 
+    override protected function createNetStream(connection:NetConnection, resource:URLResource):NetStream {
+        var netStream:NetStream = super.createNetStream(connection, resource);
+        netStream.maxPauseBufferTime = PlayerConstants.PAUSE_BUFFER_TIME;
+
+        connection.addEventListener(NetStatusEvent.NET_STATUS, onNetStreamNetStatusEvent);
+        netStream.addEventListener(NetStatusEvent.NET_STATUS, onNetStreamNetStatusEvent);
+
+        return netStream;
+    }
+
     override protected function createNetStreamSwitchManager(connection:NetConnection, netStream:NetStream, dsResource:DynamicStreamingResource):NetStreamSwitchManagerBase {
         // Only generate the switching manager if the resource is truly
         // switchable.
         if (dsResource != null) {
             httpMetrics = new HTTPNetStreamMetrics(netStream as HTTPNetStream);
+            httpMetrics.resource = dsResource;
+            metricsTimer.start();
             return new NetStreamSwitchManager(connection, netStream, dsResource, httpMetrics, getDefaultSwitchingRules(httpMetrics));
         }
         return null;
@@ -78,15 +93,24 @@ public class FriendlyHTTPStreamingNetLoader extends HTTPStreamingNetLoader {
 
     private function onMetricsTimerEvent(event:TimerEvent):void {
         var requiredBitrate:Number = DynamicStreamingUtils.lowestBitrate(httpMetrics.resource.streamItems);
-        var sufficientBandwidth:Boolean = httpMetrics.downloadRatio >= 1;
-        if (!sufficientBandwidth && !inInsufficientBandwidthState) {
-            dispatchEvent(new BandwidthEvent(BandwidthEvent.BANDWITH_STATUS, false, false, sufficientBandwidth, NaN, requiredBitrate));
-            inInsufficientBandwidthState = true;
+        var downloadRatio:Number = httpMetrics.downloadRatio;
+        if (downloadRatio > 0) {
+            var sufficientBandwidth:Boolean = downloadRatio > 1.0;
+            if (!sufficientBandwidth && !inInsufficientBandwidthState) {
+                dispatchEvent(new BandwidthEvent(BandwidthEvent.BANDWITH_STATUS,
+                        false, false, sufficientBandwidth, NaN, requiredBitrate, downloadRatio));
+                inInsufficientBandwidthState = true;
+            }
+            else if (sufficientBandwidth && inInsufficientBandwidthState) {
+                dispatchEvent(new BandwidthEvent(BandwidthEvent.BANDWITH_STATUS,
+                        false, false, sufficientBandwidth, NaN, requiredBitrate, downloadRatio));
+                inInsufficientBandwidthState = false;
+            }
         }
-        else if (sufficientBandwidth && inInsufficientBandwidthState) {
-            dispatchEvent(new BandwidthEvent(BandwidthEvent.BANDWITH_STATUS, false, false, NaN, requiredBitrate));
-            inInsufficientBandwidthState = false;
-        }
+    }
+
+    private function onNetStreamNetStatusEvent(event:NetStatusEvent):void {
+        dispatchEvent(new NetStatusEvent(event.type, true, true, event.info));
     }
 }
 }
