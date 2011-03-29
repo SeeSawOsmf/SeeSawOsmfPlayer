@@ -19,9 +19,14 @@
  */
 
 package com.seesaw.player.netloaders {
+import com.seesaw.player.events.BandwidthEvent;
+import com.seesaw.player.utils.DynamicStreamingUtils;
+
 import flash.events.NetStatusEvent;
+import flash.events.TimerEvent;
 import flash.net.NetConnection;
 import flash.net.NetStream;
+import flash.utils.Timer;
 
 import org.osmf.media.URLResource;
 import org.osmf.net.DynamicStreamingResource;
@@ -36,26 +41,54 @@ import org.osmf.net.rtmpstreaming.RTMPNetStreamMetrics;
 import org.osmf.net.rtmpstreaming.SufficientBandwidthRule;
 
 public class FriendlyRTMPDynamicStreamingNetLoader extends RTMPDynamicStreamingNetLoader {
+
+    private var rtmpMetrics:RTMPNetStreamMetrics;
+    private var inInsufficientBandwidthState:Boolean;
+    private var metricsTimer:Timer;
+
     public function FriendlyRTMPDynamicStreamingNetLoader() {
     }
 
     override protected function createNetStream(connection:NetConnection, resource:URLResource):NetStream {
-        var ns:NetStream = new NetStream(connection);
-        ns.client = new NetClient();
+        var netStream:NetStream = new NetStream(connection);
+
+        var netClient:NetClient = new NetClient();
+        netStream.client = netClient;
 
         connection.addEventListener(NetStatusEvent.NET_STATUS, onNetStreamNetStatusEvent);
-        ns.addEventListener(NetStatusEvent.NET_STATUS, onNetStreamNetStatusEvent);
+        netStream.addEventListener(NetStatusEvent.NET_STATUS, onNetStreamNetStatusEvent);
 
-        return ns;
+        metricsTimer = new Timer(1000);
+        metricsTimer.addEventListener(TimerEvent.TIMER, onMetricsTimerEvent);
+
+        return netStream;
     }
-
 
     override protected function createNetStreamSwitchManager(connection:NetConnection, netStream:NetStream, dsResource:DynamicStreamingResource):NetStreamSwitchManagerBase {
         if (dsResource != null) {
-            var metrics:RTMPNetStreamMetrics = new RTMPNetStreamMetrics(netStream);
-            return new NetStreamSwitchManager(connection, netStream, dsResource, metrics, getDefaultSwitchingRules(metrics));
+            rtmpMetrics = new RTMPNetStreamMetrics(netStream);
+            metricsTimer.start();
+            return new NetStreamSwitchManager(connection, netStream, dsResource, rtmpMetrics, getDefaultSwitchingRules(rtmpMetrics));
         }
         return null;
+    }
+
+    private function onMetricsTimerEvent(event:TimerEvent):void {
+        var measuredBitrate:Number = rtmpMetrics.averageMaxBytesPerSecond * 8 / 1024;
+        if (measuredBitrate > 0) {
+            var requiredBitrate:Number = DynamicStreamingUtils.lowestBitrate(rtmpMetrics.resource.streamItems);
+            var sufficientBandwidth:Boolean = measuredBitrate >= requiredBitrate;
+            if (!sufficientBandwidth && !inInsufficientBandwidthState) {
+                dispatchEvent(new BandwidthEvent(BandwidthEvent.BANDWITH_STATUS, false, false,
+                        sufficientBandwidth, measuredBitrate, requiredBitrate));
+                inInsufficientBandwidthState = true;
+            }
+            else if (sufficientBandwidth && inInsufficientBandwidthState) {
+                dispatchEvent(new BandwidthEvent(BandwidthEvent.BANDWITH_STATUS, false, false,
+                        sufficientBandwidth, measuredBitrate, requiredBitrate));
+                inInsufficientBandwidthState = false;
+            }
+        }
     }
 
     private function getDefaultSwitchingRules(metrics:RTMPNetStreamMetrics):Vector.<SwitchingRuleBase> {
@@ -63,7 +96,7 @@ public class FriendlyRTMPDynamicStreamingNetLoader extends RTMPDynamicStreamingN
         rules.push(new SufficientBandwidthRule(metrics));
         rules.push(new InsufficientBandwidthRule(metrics));
         rules.push(new DroppedFramesRule(metrics));
-        // We grow the buffer dynamically from a very small size which seems to conflict with this rule
+        // this rule switches all the way to the bottom which is not what we want
 //        rules.push(new InsufficientBufferRule(metrics, PlayerConstants.MIN_BUFFER_SIZE_SECONDS));
         return rules;
     }
