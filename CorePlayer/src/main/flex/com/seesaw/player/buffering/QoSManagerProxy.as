@@ -20,13 +20,6 @@
  * Incorporated. All Rights Reserved.
  */
 
-/**
- * Created by IntelliJ IDEA.
- * User: ibhana
- * Date: 28/03/11
- * Time: 15:56
- * To change this template use File | Settings | File Templates.
- */
 package com.seesaw.player.buffering {
 import com.seesaw.player.events.BandwidthEvent;
 import com.seesaw.player.events.BufferManagerEvent;
@@ -44,15 +37,16 @@ import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
 import org.osmf.net.NetStreamCodes;
 import org.osmf.traits.BufferTrait;
+import org.osmf.traits.DynamicStreamTrait;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.TraitEventDispatcher;
 
-public class BufferManagerProxy extends ProxyElement {
+public class QoSManagerProxy extends ProxyElement {
 
-    private var logger:ILogger = LoggerFactory.getClassLogger(BufferManagerProxy);
+    private var logger:ILogger = LoggerFactory.getClassLogger(QoSManagerProxy);
 
-    public function BufferManagerProxy(initialBufferTime:Number, expandedBufferTime:Number, wrappedElement:MediaElement, factory:MediaFactory) {
+    public function QoSManagerProxy(initialBufferTime:Number, expandedBufferTime:Number, wrappedElement:MediaElement, factory:MediaFactory) {
         super(wrappedElement);
 
         this.initialBufferTime = initialBufferTime;
@@ -70,22 +64,26 @@ public class BufferManagerProxy extends ProxyElement {
         dispatcher.addEventListener(PlayEvent.PLAY_STATE_CHANGE, processPlayStateChange);
     }
 
-    private function onBandwidthStatus(event:BandwidthEvent):void {
-        logger.debug("onBandwidthStatus: measured kbps = {0}, required kbps = {1}, " +
-                "http download ratio = {2}, sufficient bandwidth = {3}",
-                event.measuredBandwidth, event.requiredBandwidth, event.httpDownloadRatio, event.sufficientBandwidth);
-        _sufficientBandwidth = event.sufficientBandwidth;
-        var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
-        if (!_sufficientBandwidth && bufferTrait && bufferTrait.buffering) {
-            dispatchEvent(new BufferManagerEvent(BufferManagerEvent.CONNECTION_STATUS, false, false, true));
-        }
-    }
-
-    private function processTraitAdd(traitType:String):void {
-        if (traitType == MediaTraitType.BUFFER) {
+    private function processTraitAdd(event:MediaElementEvent):void {
+        if (event.traitType == MediaTraitType.BUFFER) {
             // As soon as we can buffer, set the initial buffer time.
             var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
             bufferTrait.bufferTime = initialBufferTime;
+        }
+    }
+
+    private function onBandwidthStatus(event:BandwidthEvent):void {
+        _sufficientBandwidth = event.sufficientBandwidth;
+        logger.debug("CONNECTION TOO SLOW: {0}", !_sufficientBandwidth);
+
+        if (!_sufficientBandwidth) {
+            var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
+
+            // If this comes in while we are buffering and there is more than 5 seconds to buffer
+            // then notify
+            if(bufferTrait && bufferTrait.buffering && bufferTrait.bufferTime - bufferTrait.bufferLength > 5) {
+                dispatchEvent(new BufferManagerEvent(BufferManagerEvent.CONNECTION_STATUS, false, false, true));
+            }
         }
     }
 

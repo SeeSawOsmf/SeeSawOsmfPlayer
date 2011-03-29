@@ -30,7 +30,7 @@ import com.seesaw.player.ads.auditude.AdProxy;
 import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
 import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.batcheventservices.BatchEventServicePlugin;
-import com.seesaw.player.buffering.BufferManagerProxy;
+import com.seesaw.player.buffering.QoSManagerProxy;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.controls.ControlBarConstants;
 import com.seesaw.player.controls.ControlBarPlugin;
@@ -145,7 +145,7 @@ public class SeeSawPlayer extends Sprite {
     private var dispatcher:TraitEventDispatcher;
     private var mediaElement:MediaElement;
     private var bufferLoggingTimer:Timer;
-    private var bufferManager:BufferManagerProxy;
+    private var bufferManager:QoSManagerProxy;
 
     public function SeeSawPlayer(playerConfig:PlayerConfiguration) {
         logger.debug("creating player");
@@ -597,7 +597,7 @@ public class SeeSawPlayer extends Sprite {
                 currentAdMode = AdMode.MAIN_CONTENT;
             }
 
-            bufferManager = new BufferManagerProxy(PlayerConstants.SHORT_BUFFER_TIME,
+            bufferManager = new QoSManagerProxy(PlayerConstants.SHORT_BUFFER_TIME,
                     PlayerConstants.LONG_BUFFER_TIME, mediaElement, factory);
             bufferManager.addEventListener(BufferManagerEvent.CONNECTION_STATUS, onConnectionStatus);
             mainElement.addChild(bufferManager);
