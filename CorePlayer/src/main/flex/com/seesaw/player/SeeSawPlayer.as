@@ -716,11 +716,11 @@ public class SeeSawPlayer extends Sprite {
                 logger.debug("DRM Authentication error: " + event.mediaError.message);
                 logger.debug("DRM Authentication error: " + event.mediaError.getStackTrace());
                 break;
-              case DRMState.AUTHENTICATION_COMPLETE:
-                    var DRMMetadata:Metadata = new Metadata();
-                    mediaElement.addMetadata("http://www.seesaw.com/drm/metadata", DRMMetadata );
-                    DRMInit = true;
-               break;
+            case DRMState.AUTHENTICATION_COMPLETE:
+                var DRMMetadata:Metadata = new Metadata();
+                mediaElement.addMetadata("http://www.seesaw.com/drm/metadata", DRMMetadata);
+                DRMInit = true;
+                break;
             default:
                 logger.debug("DRM Some other DRM state: " + event.drmState);
                 break;
@@ -871,7 +871,7 @@ public class SeeSawPlayer extends Sprite {
             case MediaPlayerState.PLAYING:
                 toggleLights();
                 resizeMainContent();
-                    if(DRMInit) passSeekable(event.target.canSeek);
+                if (DRMInit) passSeekable(event.target.canSeek);
                 addEventListener(Event.ENTER_FRAME, updateAuditudeMediaSize);
                 break;
             case MediaPlayerState.PAUSED:
@@ -885,13 +885,13 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function passSeekable(canSeek:Boolean):void {
-          if(canSeek){
+        if (canSeek) {
             DRMInit = false;
-             var DRMMetadata:Metadata =  mediaElement.getMetadata("http://www.seesaw.com/drm/metadata");
-            if(DRMMetadata){
-                   DRMMetadata.addValue("CanSeek", canSeek);
+            var DRMMetadata:Metadata = mediaElement.getMetadata("http://www.seesaw.com/drm/metadata");
+            if (DRMMetadata) {
+                DRMMetadata.addValue("CanSeek", canSeek);
             }
-          }
+        }
     }
 
 
