@@ -28,6 +28,7 @@ import com.seesaw.player.ads.AdState;
 import com.seesaw.player.ads.AuditudeConstants;
 import com.seesaw.player.ads.auditude.AdProxy;
 import com.seesaw.player.ads.liverail.AdProxyPluginInfo;
+import com.seesaw.player.autoresume.AutoResumeProxyPluginInfo;
 import com.seesaw.player.batcheventservices.BatchEventServicePlugin;
 import com.seesaw.player.buffering.BufferManagerProxy;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
@@ -407,8 +408,8 @@ public class SeeSawPlayer extends Sprite {
         setupAdProvider();
 
         factory.loadPlugin(new PluginInfoResource(new BatchEventServicePlugin()));
-//        if (!HelperUtils.getBoolean(playerInit.showPreview))
-//            factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
+        if (!HelperUtils.getBoolean(playerInit.showPreview))
+            factory.loadPlugin(new PluginInfoResource(new AutoResumeProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new DebugPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new ScrubPreventionProxyPluginInfo()));
         factory.loadPlugin(new PluginInfoResource(new SMILContentCapabilitiesPluginInfo()));
