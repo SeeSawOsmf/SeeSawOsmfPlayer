@@ -73,7 +73,7 @@ public class FriendlyRTMPDynamicStreamingNetLoader extends RTMPDynamicStreamingN
     private function onMetricsTimerEvent(event:TimerEvent):void {
         var measuredBitrate:Number = rtmpMetrics.averageMaxBytesPerSecond * 8 / 1024;
         if (measuredBitrate > 0) {
-            var requiredBitrate:Number = DynamicStreamingUtils.lowestBitrate(rtmpMetrics.resource.streamItems);
+            var requiredBitrate:Number = DynamicStreamingUtils.lowestBitrate(rtmpMetrics.resource.streamItems) * 1.15;
             var sufficientBandwidth:Boolean = measuredBitrate >= requiredBitrate;
             if (!sufficientBandwidth && !inInsufficientBandwidthState) {
                 dispatchEvent(new BandwidthEvent(BandwidthEvent.BANDWITH_STATUS, false, false,

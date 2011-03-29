@@ -95,7 +95,7 @@ public class FriendlyHTTPStreamingNetLoader extends HTTPStreamingNetLoader {
         var requiredBitrate:Number = DynamicStreamingUtils.lowestBitrate(httpMetrics.resource.streamItems);
         var downloadRatio:Number = httpMetrics.downloadRatio;
         if (downloadRatio > 0) {
-            var sufficientBandwidth:Boolean = downloadRatio > 1.0;
+            var sufficientBandwidth:Boolean = downloadRatio > 1.15;
             if (!sufficientBandwidth && !inInsufficientBandwidthState) {
                 dispatchEvent(new BandwidthEvent(BandwidthEvent.BANDWITH_STATUS,
                         false, false, sufficientBandwidth, NaN, requiredBitrate, downloadRatio));
