@@ -46,7 +46,7 @@ public class PlayerConstants {
 
     public static const PAUSE_BUFFER_TIME:Number = 5;
     public static const SHORT_BUFFER_TIME:Number = 0.5;
-    public static const LONG_BUFFER_TIME:Number = 60;
+    public static const LONG_BUFFER_TIME:Number = 30;
 
     public static const DEFAULT_VOLUME:Number = 0.6;
 }

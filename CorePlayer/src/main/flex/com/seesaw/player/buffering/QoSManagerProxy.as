@@ -22,7 +22,7 @@
 
 package com.seesaw.player.buffering {
 import com.seesaw.player.events.BandwidthEvent;
-import com.seesaw.player.events.BufferManagerEvent;
+import com.seesaw.player.events.QoSManagerEvent;
 
 import flash.events.NetStatusEvent;
 
@@ -79,10 +79,10 @@ public class QoSManagerProxy extends ProxyElement {
         if (!_sufficientBandwidth) {
             var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
 
-            // If this comes in while we are buffering and there is more than 5 seconds to buffer
-            // then notify
-            if(bufferTrait && bufferTrait.buffering && bufferTrait.bufferTime - bufferTrait.bufferLength > 5) {
-                dispatchEvent(new BufferManagerEvent(BufferManagerEvent.CONNECTION_STATUS, false, false, true));
+            // If this comes in while we are buffering set the expanded time and notify
+            if(bufferTrait && bufferTrait.buffering) {
+                bufferTrait.bufferTime = expandedBufferTime;
+                dispatchEvent(new QoSManagerEvent(QoSManagerEvent.CONNECTION_STATUS, false, false, true));
             }
         }
     }
@@ -95,16 +95,16 @@ public class QoSManagerProxy extends ProxyElement {
             // If the bandwidth is ok and we're buffering again increase the initial buffer
             bufferTrait.bufferTime = bufferTrait.buffering ? initialBufferTime : expandedBufferTime;
             // Connection is never too slow in this case so ensure the message gets through
-            dispatchEvent(new BufferManagerEvent(BufferManagerEvent.CONNECTION_STATUS, false, false, false));
+            dispatchEvent(new QoSManagerEvent(QoSManagerEvent.CONNECTION_STATUS, false, false, false));
         }
         else {
             bufferTrait.bufferTime = expandedBufferTime;
 
             // Connection is too slow but we only want to show the message while the video has stopped/buffering
             if (bufferTrait.buffering) {
-                dispatchEvent(new BufferManagerEvent(BufferManagerEvent.CONNECTION_STATUS, false, false, true));
+                dispatchEvent(new QoSManagerEvent(QoSManagerEvent.CONNECTION_STATUS, false, false, true));
             } else {
-                dispatchEvent(new BufferManagerEvent(BufferManagerEvent.CONNECTION_STATUS, false, false, false));
+                dispatchEvent(new QoSManagerEvent(QoSManagerEvent.CONNECTION_STATUS, false, false, false));
             }
         }
 
