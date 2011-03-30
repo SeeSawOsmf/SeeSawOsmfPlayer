@@ -42,15 +42,14 @@ import org.osmf.traits.DisplayObjectTrait;
 import org.osmf.traits.MediaTraitType;
 
 public class BufferingPanel extends MediaElement {
-    private const PANEL_WIDTH:Number = 260;
-    private const PANEL_HEIGHT:Number = 110;
 
     private var logger:ILogger = LoggerFactory.getClassLogger(BufferingPanel);
 
+    private const PANEL_WIDTH:Number = 260;
+    private const PANEL_HEIGHT:Number = 110;
+
     private var parentContainer:MediaContainer;
-    private var _rootSprite:Sprite;
     private var panel:Sprite;
-    private var contentContainer:Sprite;
     private var bufferingMessage:String;
     private var findOutWhyLink:String;
     private var preloader:Preloader;
@@ -65,21 +64,21 @@ public class BufferingPanel extends MediaElement {
      * Takes: warning:String - the guidance warning that appears at the top of the panel
      *
      */
-    public function BufferingPanel(container:MediaContainer) {
+    public function BufferingPanel(delay:int, container:MediaContainer) {
         parentContainer = container;
 
         //set the private variables
-        this.bufferingMessage = "<p><font color='#FFFFFF'>Your internet connection speed is too slow.</font></p>";
-        this.findOutWhyLink = "<font color='#00A88E'><a href='/help'>Find out why</a></font>.";
+        bufferingMessage = "<p><font color='#FFFFFF'>Your internet connection speed is too slow.</font></p>";
+        findOutWhyLink = "<font color='#00A88E'><a href='/help'>Find out why</a></font>.";
 
         Security.allowDomain("*");
         super();
 
         //Build the css
-        this.buildCSS();
-        this.buildPanel();
+        buildCSS();
+        buildPanel();
 
-        tooSlowTimer = new Timer(2500, 1);
+        tooSlowTimer = new Timer(delay, 1);
         tooSlowTimer.addEventListener("timerComplete", showTooSlowMessage);
 
         _displayTrait = new DisplayObjectTrait(panel, PANEL_WIDTH, PANEL_HEIGHT);
@@ -91,24 +90,28 @@ public class BufferingPanel extends MediaElement {
         layoutMetadata.horizontalAlign = HorizontalAlign.CENTER;
         layoutMetadata.verticalAlign = VerticalAlign.MIDDLE;
 
-        this.addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layoutMetadata);
+        addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layoutMetadata);
 
         hide();
     }
 
     public function show():void {
+        logger.debug("showing panel in {0}ms", tooSlowTimer.delay);
         tooSlowTimer.reset();
         tooSlowTimer.start();
     }
 
     public function hide():void {
+        logger.debug("hiding panel");
         parentContainer.layoutMetadata.includeInLayout = false;
         panel.visible = false;
         tooSlowTimer.stop();
         hideTooSlowMessage();
     }
 
+
     private function showTooSlowMessage(event:Event):void {
+
         parentContainer.backgroundAlpha = 0.8;
         parentContainer.layoutMetadata.includeInLayout = true;
         panel.visible = true;
@@ -142,25 +145,25 @@ public class BufferingPanel extends MediaElement {
         panel.addEventListener(Event.ADDED_TO_STAGE, positionPreloader);
         panel.addChild(preloader);
 
-        panel.addChild(this.buildWarning());
-        panel.addChild(this.buildFindOutMoreLink());
+        panel.addChild(buildWarning);
+        panel.addChild(buildFindOutMoreLink);
 
         return panel;
     }
 
     private function positionPreloader(event:Event):void {
         preloader.x = (PANEL_WIDTH / 2) - (preloader.width / 2);
-        preloader.y = 0;
+
     }
 
-    private function buildWarning():TextField {
+    private function get buildWarning():TextField {
         var warningLabel = new TextField();
         warningLabel.width = PANEL_WIDTH;
         warningLabel.height = 20;
         warningLabel.multiline = true;
         warningLabel.wordWrap = true;
-        warningLabel.htmlText = this.bufferingMessage;
-
+        warningLabel.htmlText = bufferingMessage;
+        warningLabel.selectable = false;
         warningLabel.y = 70;
 
         this.applyWarningFormat(warningLabel);
@@ -168,13 +171,14 @@ public class BufferingPanel extends MediaElement {
         return warningLabel;
     }
 
-    private function buildFindOutMoreLink():TextField {
+    private function get buildFindOutMoreLink():TextField {
         var findOutMoreLink = new TextField();
         findOutMoreLink.width = PANEL_WIDTH;
         findOutMoreLink.height = 20;
         findOutMoreLink.wordWrap = true;
-        findOutMoreLink.htmlText = this.findOutWhyLink;
+        findOutMoreLink.htmlText = findOutWhyLink;
         findOutMoreLink.y = 90;
+        findOutMoreLink.selectable = false;
 
         this.applyLinkFormat(findOutMoreLink);
         //var formattedWarningLabel:TextField = this.applyWarningFormat(warningLabel);
@@ -184,7 +188,7 @@ public class BufferingPanel extends MediaElement {
 
     private function applyWarningFormat(textToFormat:TextField):TextField {
         var textFormat:TextFormat = new TextFormat();
-        textFormat.size = 10;
+        textFormat.size = 11;
         textFormat.font = "Arial";
         textFormat.color = 0xFFFFFF;
         textFormat.align = "center";
@@ -198,7 +202,7 @@ public class BufferingPanel extends MediaElement {
 
     private function applyLinkFormat(textToFormat:TextField):TextField {
         var textFormat:TextFormat = new TextFormat();
-        textFormat.size = 10;
+        textFormat.size = 11;
         textFormat.font = "Arial";
         textFormat.color = 0x00A88E;
         textFormat.align = "center";

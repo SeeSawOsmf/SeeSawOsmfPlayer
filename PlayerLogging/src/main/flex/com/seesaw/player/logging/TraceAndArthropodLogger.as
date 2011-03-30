@@ -39,17 +39,18 @@ public class TraceAndArthropodLogger extends AbstractLogger {
         var colours:Vector.<ColourMap> = new Vector.<ColourMap>;
 
         colours.push(new ColourMap("com.seesaw.player.ads", 0x07ff13));
-        colours.push(new ColourMap("uk.co.vodco.osmfDebugProxy", 0xff00f0));
+        colours.push(new ColourMap("uk.co.vodco.osmfDebugProxy", 0xfdb3f7));
         colours.push(new ColourMap("com.seesaw.player.control", 0xfffc00));
         colours.push(new ColourMap("com.seesaw.player.scrubPrevention", 0xadf8ff));
         colours.push(new ColourMap("com.seesaw.player.autoresume", 0xff0000));
+        colours.push(new ColourMap("com.seesaw.player.batcheventservices.events.manager", 0x00eaff));
+        colours.push(new ColourMap("com.seesaw.player.batcheventservices.services", 0x8ef6ff));
 
         for each (var map:ColourMap in colours) {
             if (name.search(map.category) == 0) {
                 _colour = map.colour;
             }
         }
-
     }
 
     public function set level(value:int):void {

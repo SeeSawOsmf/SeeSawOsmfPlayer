@@ -49,17 +49,17 @@ public class OverUsePanel extends Sprite {
 
     private var nonStopTitle:String = "<b>We're sorry...</b><br>You've exceeded your maximum daily viewing allowance for NonStop.";
     private var nonStopText:String = "Your NonStop subscription is for individual use only. " +
-            "This means you can watch programmes without adverts for a maximum of 24 hours a day. See our " +
-            "<a href='event:" + termsAndConditionsLinkURL + "'><font color=\"#00A88E\">Terms and Conditions.</font></a>" +
+            "This means you can watch programmes without adverts for a maximum of 24 hours a day. See our <br>" +
             "<br>" +
             "<br>" +
             "Would you like to continue watching programmes with adverts?";
+
+    private var termsLinkLabel:String = "<a href='event:" + termsAndConditionsLinkURL + "'><font color=\"#00A88E\">Terms and Conditions.</font></a>";
 
     private var subsTitle:String = "<b>We're sorry...</b><br>You've now exceeded the maximum daily viewing allowance for this Pack.";
 
     private var subsText:String = "Your subscription is for individual use only. This means you can watch programmes" +
             " in this Pack for a maximum of 24 hours a day. See our " +
-            "<a href='event:" + termsAndConditionsLinkURL + "'><font color=\"#00A88E\">Terms and Conditions.</font></a>" +
             "<br>";
 
     //components which need tooltips
@@ -168,6 +168,7 @@ public class OverUsePanel extends Sprite {
         contentContainer.addChild(this.buildWarning());
         contentContainer.addChild(this.buildWarningIcon());
         contentContainer.addChild(this.buildExplanation());
+        contentContainer.addChild(this.buildTermsLink());
         if (this.errorType == NO_ADS) {
             contentContainer.addChild(this.buildAcceptButton("Accept"));
             contentContainer.addChild(this.buildDeclineButton("Decline"));
@@ -233,6 +234,25 @@ public class OverUsePanel extends Sprite {
         var formattedWarningLabel:TextField = this.applyInfoFormat(explanationLabel);
 
         return explanationLabel;
+    }
+
+    private function buildTermsLink():TextField {
+
+        var termsLink = new StyledTextField();
+        termsLink.width = 150;
+        termsLink.wordWrap = true;
+        termsLink.multiline = true;
+        termsLink.htmlText = this.termsLinkLabel;
+        termsLink.styleSheet = this.css;
+
+        if (this.errorType == NO_ADS) {
+            termsLink.y = 110;
+        } else {
+            termsLink.y = 92;
+            termsLink.x = 301;
+        }
+
+        return termsLink;
     }
 
     private function applyWarningFormat(textToFormat:TextField):TextField {

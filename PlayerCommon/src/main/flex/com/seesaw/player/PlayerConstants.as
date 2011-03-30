@@ -23,8 +23,6 @@ public class PlayerConstants {
     public static const ID:String = "ID";
     public static const METADATA_NAMESPACE:String = "http://www.seesaw.com/player/1.0";
     public static const USEREVENTS_METADATA_NAMESPACE:String = "http://www.seesaw.com/userevents/1.0";
-    public static const SMIL_METADATA_NS:String = "http://www.w3.org/ns/SMIL/metadata";
-    public static const CONTROL_BAR_METADATA:String = "http://www.osmf.org/samples/controlbar/metadata";
     public static const CONTENT_INFO:String = "contentInfo";
     public static const USER_INFO:String = "userInfo";
     public static const CONTENT_ID:String = "contentId";
@@ -38,16 +36,18 @@ public class PlayerConstants {
     public static const MAIN_CONTENT_ID:String = "mainContent";
     public static const AD_CONTENT_ID:String = "advert";
     public static const STING_CONTENT_ID:String = "sting";
+    public static const CLIP_CONTENT_ID:String = "clip";
     public static const DOG_CONTENT_ID:String = "dogImage";
 
-    public static const MAIN_CONTENT_DURATION:String = "mainContentDuration";
-     public static const PLAYER_VOLUME_COOKIE:String = "seesaw.player.volume";
+    public static const PLAYER_VOLUME_COOKIE:String = "seesaw.player.volume";
     public static const PROCEED_BUTTON_NAME:String = "PlayerStartButton.proceedButton";
     public static const GUIDANCE_PANEL_ACCEPT_BUTTON_NAME:String = "GuidancePanel.acceptButton";
     public static const GUIDANCE_PANEL_CANCEL_BUTTON_NAME:String = "GuidancePanel.cancelButton";
 
-    public static const MIN_BUFFER_SIZE_SECONDS:Number = 0.05;
-    public static const MAX_BUFFER_SIZE_SECONDS:Number = 40;
-    public static const  DEFAULT_VOLUME:Number = 0.6;
+    public static const PAUSE_BUFFER_TIME:Number = 5;
+    public static const SHORT_BUFFER_TIME:Number = 0.5;
+    public static const LONG_BUFFER_TIME:Number = 30;
+
+    public static const DEFAULT_VOLUME:Number = 0.6;
 }
 }

@@ -20,21 +20,32 @@
 
 package com.seesaw.player.controls.widget {
 import com.seesaw.player.PlayerConstants;
+import com.seesaw.player.ui.PlayerToolTip;
 import com.seesaw.player.utils.CookieHelper;
 
 import controls.seesaw.widget.interfaces.IWidget;
 
+import flash.events.Event;
 import flash.events.MouseEvent;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.events.AudioEvent;
+import org.osmf.events.MediaElementEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.traits.AudioTrait;
 import org.osmf.traits.MediaTraitType;
 
 public class Volume extends ButtonWidget implements IWidget {
     private var logger:ILogger = LoggerFactory.getClassLogger(Volume);
+
+    private var toolTip:PlayerToolTip;
+
+    [Embed(source="/volume.png")]
+    private static const VOLUME_UP:Class;
+
+    [Embed(source="/volumeOff.png")]
+    private static const VOLUME_DISABLED:Class;
 
     /* static */
     private static const QUALIFIED_NAME:String = "com.seesaw.player.controls.widget.Volume";
@@ -48,6 +59,17 @@ public class Volume extends ButtonWidget implements IWidget {
 
     public function Volume() {
         cookie = new CookieHelper(PlayerConstants.PLAYER_VOLUME_COOKIE);
+        this.toolTip = new PlayerToolTip(this, "Sound on");
+        logger.debug("Volume - tooltip = Sound on");
+        this.addEventListener(Event.ADDED_TO_STAGE, this.onAddedToStage);
+    }
+
+    private function onAddedToStage(event:Event) {
+        stage.addChild(this.toolTip);
+    }
+
+    override public function set media(value:MediaElement):void {
+        super.media = value;
     }
 
     override protected function get requiredTraits():Vector.<String> {
@@ -56,12 +78,34 @@ public class Volume extends ButtonWidget implements IWidget {
 
     override protected function processRequiredTraitsAvailable(element:MediaElement):void {
         visible = true;
-        audible = element.getTrait(MediaTraitType.AUDIO) as AudioTrait;
-        audible.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
-        if(cookie.localSharedObject.data.volume == null)
-        cookie.localSharedObject.data.volume = PlayerConstants.DEFAULT_VOLUME;
 
-        audible.volume = cookie.localSharedObject.data.volume;
+        audible = element.getTrait(MediaTraitType.AUDIO) as AudioTrait;
+        if (audible) {
+            audible.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
+            if (cookie.localSharedObject.data.volume == null)
+                cookie.localSharedObject.data.volume = PlayerConstants.DEFAULT_VOLUME;
+
+            audible.volume = cookie.localSharedObject.data.volume;
+        }
+    }
+
+    override protected function onMediaElementTraitAdd(event:MediaElementEvent):void {
+        if (event.traitType == MediaTraitType.AUDIO) {
+            audible = media.getTrait(MediaTraitType.AUDIO) as AudioTrait;
+            if (audible) {
+                audible.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
+                if (cookie.localSharedObject.data.volume == null)
+                    cookie.localSharedObject.data.volume = PlayerConstants.DEFAULT_VOLUME;
+
+                audible.volume = cookie.localSharedObject.data.volume;
+            }
+        }
+    }
+
+    override protected function onMediaElementTraitRemove(event:MediaElementEvent):void {
+        if (event.traitType == MediaTraitType.AUDIO) {
+            audible.removeEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
+        }
     }
 
     override protected function processRequiredTraitsUnavailable(element:MediaElement):void {
@@ -73,9 +117,23 @@ public class Volume extends ButtonWidget implements IWidget {
         cookie.flush();
     }
 
+    override protected function processMediaElementChange(oldMediaElement:MediaElement):void {
+        if (oldMediaElement) {
+            audible = media.getTrait(MediaTraitType.AUDIO) as AudioTrait;
+            if (audible) {
+                audible.addEventListener(AudioEvent.VOLUME_CHANGE, onVolumeChange);
+                if (cookie.localSharedObject.data.volume == null)
+                    cookie.localSharedObject.data.volume = PlayerConstants.DEFAULT_VOLUME;
+
+                audible.volume = cookie.localSharedObject.data.volume;
+            }
+        }
+    }
+
     override protected function onMouseClick(event:MouseEvent):void {
         toggleMuteState();
         super.processEnabledChange();
+        super.onMouseOver();
     }
 
     private function toggleMuteState():void {
@@ -85,10 +143,14 @@ public class Volume extends ButtonWidget implements IWidget {
             audible.volume = 0;
             cookie.localSharedObject.data.volume = audible.volume;
             enabled = false;
+            logger.debug("toggleMuteState - tooltip = Sound on");
+            this.toolTip.updateToolTip("Sound on");
         } else {
             audible.volume = mutedVolume;
             cookie.localSharedObject.data.volume = audible.volume;
             enabled = true;
+            logger.debug("toggleMuteState - tooltip = Sound off");
+            this.toolTip.updateToolTip("Sound off");
         }
     }
 
@@ -100,8 +162,12 @@ public class Volume extends ButtonWidget implements IWidget {
         cookie.localSharedObject.data.volume = audible.volume;
         if (audible.volume < 0.05) {
             enabled = false;
+            logger.debug("onVolumeChange - tooltip = Sound on");
+            this.toolTip.updateToolTip("Sound on");
         } else {
             enabled = true;
+            logger.debug("onVolumeChange - tooltip = Sound off");
+            this.toolTip.updateToolTip("Sound off");
         }
 
         super.processEnabledChange();

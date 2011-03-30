@@ -45,7 +45,8 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
         captionField = new TextField();
         captionField.htmlText = "";
         captionField.multiline = true;
-        //captionField.autoSize = TextFieldAutoSize.CENTER;
+        captionField.wordWrap = true;
+        captionField.selectable = false;
 
         var format:TextFormat = new TextFormat();
         format.align = TextFormatAlign.CENTER;
@@ -67,43 +68,46 @@ public class CaptionDisplayObject extends LayoutTargetSprite {
         format.font = 'Arial';
         captionField.defaultTextFormat = format;
         captionField.htmlText = captionValue;
+        captionField.selectable = false;
     }
 
     private function applyLargeTextSize():void {
         var format:TextFormat = new TextFormat();
         format.align = TextFormatAlign.CENTER;
-        format.size = 23;
+        format.size = 43;
         format.font = 'Arial';
         captionField.defaultTextFormat = format;
         captionField.htmlText = captionValue;
+        captionField.selectable = false;
     }
 
     override public function layout(availableWidth:Number, availableHeight:Number, deep:Boolean = true):void {
+        // needs rounding for some reason
+        var roundedWidth:int = Math.round(width);
+        var roundedAvailableWidth:int = Math.round(availableWidth);
+
+        // we are only interested in changing width
+        var changed:Boolean = roundedAvailableWidth != roundedWidth;
+
+        // check that we have expanded by a minimum of 100 pixels before enlarging
+        var expanded:Boolean = roundedAvailableWidth > roundedWidth && roundedAvailableWidth - roundedWidth > 100 && roundedWidth != 100;
+
         super.layout(availableWidth, availableHeight, deep);
 
-        logger.debug("CAPTION: " + captionField.htmlText);
+        captionField.width = availableWidth;
+        captionField.height = availableHeight;
 
-        logger.debug("availableWidth: " + availableWidth + " captionFieldWidth: " + captionField.width);
-
-        //we check the captionField.html to make sure the subtitles have arrived - this prevents random resizing during stings etc
-        if ((availableWidth != captionField.width) && (captionField.htmlText.length > 0)) {
-
-            var goLarge:Boolean = availableWidth >= captionField.width;
-
-            captionField.width = availableWidth;
-            captionField.height = availableHeight;
-
-            if (goLarge) {
-                applyLargeTextSize();
-                logger.debug("APPLY LARGE SIZE");
-            } else {
-                applyStandardTextSize();
-                logger.debug("APPLY STANDARD SIZE");
-            }
-
+        if (expanded) {
+            logger.debug("applying expanded size");
+            captionField.y = 10;
+            applyLargeTextSize();
+        }
+        else if (changed) {
+            logger.debug("applying standard size");
+            captionField.y = 80;
+            applyStandardTextSize();
         }
     }
-
 
     private function positionSubtitles(event:Event):void {
         event.target.y = height - (event.target.height + 27);

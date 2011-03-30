@@ -35,7 +35,7 @@
     <parent>
         <artifactId>player</artifactId>
         <groupId>com.seesaw</groupId>
-        <version>7.2.0</version>
+        <version>7.3.0</version>
     </parent>
 
     <build>

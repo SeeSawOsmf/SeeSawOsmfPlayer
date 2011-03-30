@@ -27,6 +27,9 @@ import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
 import org.osmf.events.MediaElementEvent;
 import org.osmf.events.TimelineMetadataEvent;
+import org.osmf.layout.HorizontalAlign;
+import org.osmf.layout.LayoutMetadata;
+import org.osmf.layout.VerticalAlign;
 import org.osmf.media.LoadableElementBase;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaResourceBase;
@@ -84,6 +87,7 @@ public class SAMIElement extends LoadableElementBase {
 
             timelineMetadata.addEventListener(TimelineMetadataEvent.MARKER_TIME_REACHED, onCuePoint);
         }
+
     }
 
     private function onMediaTraitsChange(event:MediaElementEvent):void {
@@ -99,6 +103,15 @@ public class SAMIElement extends LoadableElementBase {
             captionDisplayObject.visible = false;
             displayTrait = new DisplayObjectTrait(captionDisplayObject);
             addTrait(MediaTraitType.DISPLAY_OBJECT, displayTrait);
+
+            var layout:LayoutMetadata = new LayoutMetadata();
+            addMetadata(LayoutMetadata.LAYOUT_NAMESPACE, layout);
+
+            layout.height = 150;
+            layout.horizontalAlign = HorizontalAlign.CENTER;
+            layout.verticalAlign = VerticalAlign.BOTTOM;
+            layout.index = 10;
+
         }
         else if (hasTrait(MediaTraitType.DISPLAY_OBJECT) && !target.hasTrait(MediaTraitType.TIME)) {
             logger.debug("removing display object trait");

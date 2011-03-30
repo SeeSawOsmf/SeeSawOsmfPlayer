@@ -73,11 +73,21 @@ public class PlayPauseButtonBase extends ButtonWidget {
     }
 
     override protected function onMediaElementTraitAdd(event:MediaElementEvent):void {
-        updateVisibility();
+        if (event.traitType == MediaTraitType.PLAY) {
+            playTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
+            playTrait.addEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
+            playTrait.addEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
+            updateVisibility();
+        }
     }
 
     override protected function onMediaElementTraitRemove(event:MediaElementEvent):void {
-        updateVisibility();
+        if (playTrait && event.traitType == MediaTraitType.PLAY) {
+            playTrait.removeEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
+            playTrait.removeEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
+            playTrait = null;
+            updateVisibility();
+        }
     }
 
     override protected function processMediaElementChange(oldMediaElement:MediaElement):void {
@@ -86,21 +96,23 @@ public class PlayPauseButtonBase extends ButtonWidget {
             metadata = new Metadata();
             media.addMetadata(ControlBarConstants.CONTROL_BAR_METADATA, metadata);
         }
+
+        if(playTrait)
+            playTrait.removeEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
+
+        playTrait = media.getTrait(MediaTraitType.PLAY) as PlayTrait;
+
+        if(playTrait)
+            playTrait.addEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
+
+        updateVisibility();
     }
 
     override protected function processRequiredTraitsAvailable(element:MediaElement):void {
-        playTrait = element.getTrait(MediaTraitType.PLAY) as PlayTrait;
-        playTrait.addEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
-        playTrait.addEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
         updateVisibility();
     }
 
     override protected function processRequiredTraitsUnavailable(element:MediaElement):void {
-        if (playTrait) {
-            playTrait.removeEventListener(PlayEvent.CAN_PAUSE_CHANGE, visibilityDeterminingEventHandler);
-            playTrait.removeEventListener(PlayEvent.PLAY_STATE_CHANGE, visibilityDeterminingEventHandler);
-            playTrait = null;
-        }
         updateVisibility();
     }
 

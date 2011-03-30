@@ -38,6 +38,7 @@ import org.osmf.events.SeekEvent;
 import org.osmf.events.TimeEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.metadata.Metadata;
+import org.osmf.traits.LoadTrait;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.PlayTrait;
@@ -54,9 +55,11 @@ public class AutoResumeProxy extends ProxyElement {
     private var seekTrait:SeekTrait;
     private var playTrait:PlayTrait;
     private var timeTrait:TimeTrait;
-    private var requestedSeekPoint:Number;
+    private var seekingToResumePoint:Boolean;
     private var resumeService:ResumeService;
     private var timer:Timer;
+    private var loadTrait:LoadTrait;
+    private var drmMetadata:Metadata;
 
     public function AutoResumeProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -87,10 +90,13 @@ public class AutoResumeProxy extends ProxyElement {
             addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
             addEventListener(MediaElementEvent.METADATA_ADD, onMetadataAdd);
             addEventListener(MediaElementEvent.METADATA_REMOVE, onMetadataRemove);
-
             var adMetadata:AdMetadata = getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
             if (adMetadata) {
                 setupAdEventListener(adMetadata, true);
+            }
+            var DRMMetadata:Metadata = getMetadata("http://www.seesaw.com/drm/metadata") as Metadata;
+            if (DRMMetadata) {
+                setupDRMEventListener(DRMMetadata, true);
             }
         }
     }
@@ -117,9 +123,26 @@ public class AutoResumeProxy extends ProxyElement {
         }
     }
 
+
+    private function setupDRMEventListener(metadata:Metadata, add:Boolean):void {
+        if (add) {
+            metadata.addEventListener(MetadataEvent.VALUE_ADD, onDRMMetadataChange);
+            metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onDRMMetadataChange);
+            metadata.addEventListener(MetadataEvent.VALUE_REMOVE, onDRMMetadataChange);
+        }
+        else {
+            metadata.removeEventListener(MetadataEvent.VALUE_ADD, onDRMMetadataChange);
+            metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onDRMMetadataChange);
+            metadata.removeEventListener(MetadataEvent.VALUE_REMOVE, onDRMMetadataChange);
+        }
+    }
+
     private function onMetadataRemove(event:MediaElementEvent):void {
         if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
             setupAdEventListener(event.metadata, false);
+        }
+        if (event.namespaceURL == "http://www.seesaw.com/drm/metadata") {
+            setupDRMEventListener(event.metadata, false);
         }
     }
 
@@ -127,14 +150,30 @@ public class AutoResumeProxy extends ProxyElement {
         if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
             setupAdEventListener(event.metadata, true);
         }
+        if (event.namespaceURL == "http://www.seesaw.com/drm/metadata") {
+            setupDRMEventListener(event.metadata, true);
+        }
+    }
+
+    private function onDRMMetadataChange(event:MetadataEvent):void {
+        if (event.key == "CanSeek" && event.value == true) {
+            seekToResumePosition();
+        }
     }
 
     private function onAdMetadataChange(event:MetadataEvent):void {
         if (event.key == AdMetadata.AD_STATE) {
-            if (timeTrait) {
-                logger.debug("adState: {0}", event.value);
-                if (event.value == AdState.AD_BREAK_COMPLETE)
-                    writeResumePosition(timeTrait.currentTime + AD_BREAK_OFFSET);
+            var adMetadata:AdMetadata = getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
+            if (adMetadata && adMetadata.currentAdBreak) {
+                var currentAdBreak:AdBreak = adMetadata.currentAdBreak;
+                if (event.value == AdState.AD_BREAK_COMPLETE) {
+                    changeListeners(true, MediaTraitType.PLAY, PlayEvent.PLAY_STATE_CHANGE, onPlayStateChanged);
+                    writeResumePosition(currentAdBreak.startTime + AD_BREAK_OFFSET, false);
+                }
+                else if (event.value == AdState.AD_BREAK_START) {
+                    changeListeners(false, MediaTraitType.PLAY, PlayEvent.PLAY_STATE_CHANGE, onPlayStateChanged);
+                    writeResumePosition(currentAdBreak.startTime - currentAdBreak.seekOffset - AD_BREAK_OFFSET, false);
+                }
             }
         }
     }
@@ -148,16 +187,16 @@ public class AutoResumeProxy extends ProxyElement {
     private function onSeekingChange(event:SeekEvent):void {
         if (!event.seeking) {
             // Don't write a resume point after we've made a seek request ourselves.
-            if (isNaN(requestedSeekPoint))
+            if (!seekingToResumePoint)
                 writeResumePosition(event.time);
 
-            requestedSeekPoint = NaN;
+            seekingToResumePoint = false;
         }
     }
 
     private function onComplete(event:TimeEvent):void {
         /*Due to the seek timer stangeness in OSMF we would get the seekChanges after the asset has completed/STOP etc..
-        so lets remove the listener the write the resume cookie as 0*/
+         so lets remove the listener the write the resume cookie as 0*/
         changeListeners(false, MediaTraitType.SEEK, SeekEvent.SEEKING_CHANGE, onSeekingChange);
         resumeService.writeResumeCookie(0);
     }
@@ -166,6 +205,11 @@ public class AutoResumeProxy extends ProxyElement {
         switch (event.playState) {
             case PlayState.PAUSED:
                 timer.stop();
+                // a pause may or may not be followed by a seek or an ad break both of which will
+                // write another resume position. However, there is no way we can detect a simple user activated
+                // pause without adding yet more metadata, so we have to write a position here just in case.
+                if (timeTrait)
+                    writeResumePosition(timeTrait.currentTime);
                 break;
             case PlayState.PLAYING:
                 timer.start();
@@ -180,33 +224,52 @@ public class AutoResumeProxy extends ProxyElement {
 
     private function seekToResumePosition():void {
         var resume:Number = resumeService.getResumeCookie();
-        if (resume > 0 && seekTrait && seekTrait.canSeekTo(resume)) {
+        if (!checkDRMContent && resume > 0 && seekTrait && seekTrait.canSeekTo(resume)) {
             logger.debug("seeking to resume point at: {0}", resume);
             seekTrait.seek(resume);
-            requestedSeekPoint = resume;
+            seekingToResumePoint = true;
+        }
+    }
+
+    private function get checkDRMContent():Boolean {
+        if (hasTrait(MediaTraitType.DRM)) {
+            var DRMMetadata:Metadata = getMetadata("http://www.seesaw.com/drm/metadata") as Metadata;
+            if (DRMMetadata) {
+                if (DRMMetadata.getValue("CanSeek")) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                return true;
+            }
+        } else {
+            return false;
         }
     }
 
     private function onTimerTick(event:TimerEvent = null):void {
-        logger.debug("onTimerTick");
         if (timeTrait && playTrait && playTrait.playState == PlayState.PLAYING) {
             // if the video is playing attempt to write at TIMER_UPDATE_INTERVAL intervals
             writeResumePosition(timeTrait.currentTime);
         }
     }
 
-    private function writeResumePosition(time:Number):void {
+    private function writeResumePosition(time:Number, checkForBreak:Boolean = true):void {
         var timeToWrite:Number = time;
 
-        // Don't write resume points exactly on ad breaks since the resume points have to be
-        // offset from ad breaks a little depending on whether the break has been seen or not
-        var adBreak:AdBreak = getAdBreakAtTime(time);
-        if (adBreak) {
-            timeToWrite = adBreak.startTime + (adBreak.complete ? AD_BREAK_OFFSET : -AD_BREAK_OFFSET);
-            logger.debug("ad break at requested resume point {0}: complete = {1}", time, adBreak.complete);
+        if (checkForBreak) {
+            // we don't write resume points exactly on ad breaks since the resume points have to be
+            // offset from ad breaks a little depending on whether the break has been seen or not
+            var adBreak:AdBreak = getAdBreakAtTime(time);
+            if (adBreak) {
+                // the ad events take care of writing the actual resume points in this case
+                return;
+            }
         }
 
-        logger.debug("recording resume point: requested = {0}, written = {1}", time, timeToWrite);
+        timeToWrite = timeToWrite < 0 ? 0 : timeToWrite;
+        logger.debug("recording resume point: {0}", timeToWrite);
         resumeService.writeResumeCookie(timeToWrite);
     }
 
@@ -234,16 +297,17 @@ public class AutoResumeProxy extends ProxyElement {
                 changeListeners(add, traitType, TimeEvent.DURATION_CHANGE, onDurationChange);
                 timeTrait = getTrait(MediaTraitType.TIME) as TimeTrait;
                 break;
+            case MediaTraitType.LOAD:
+                loadTrait = getTrait(MediaTraitType.LOAD) as LoadTrait;
+                break;
         }
     }
 
     private function changeListeners(add:Boolean, traitType:String, event:String, listener:Function):void {
         if (add) {
-            logger.debug("trait added: {0}", traitType);
             getTrait(traitType).addEventListener(event, listener);
         }
         else if (hasTrait(traitType)) {
-            logger.debug("trait removed: {0}", traitType);
             getTrait(traitType).removeEventListener(event, listener);
         }
     }

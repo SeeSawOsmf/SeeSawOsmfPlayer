@@ -19,6 +19,8 @@
  */
 
 package com.seesaw.player {
+import com.seesaw.player.events.BandwidthEvent;
+import com.seesaw.player.netloaders.FriendlyHTTPStreamingNetLoader;
 import com.seesaw.player.netloaders.FriendlyNetLoader;
 import com.seesaw.player.netloaders.FriendlyRTMPDynamicStreamingNetLoader;
 
@@ -49,7 +51,13 @@ public class FriendlyMediaFactory extends MediaFactory {
         init();
 
         rtmpStreamingNetLoader.addEventListener(NetStatusEvent.NET_STATUS, onNetStreamNetStatusEvent);
+        rtmpStreamingNetLoader.addEventListener(BandwidthEvent.BANDWITH_STATUS, onBandwidthStatus);
+
         netLoader.addEventListener(NetStatusEvent.NET_STATUS, onNetStreamNetStatusEvent);
+        netLoader.addEventListener(BandwidthEvent.BANDWITH_STATUS, onBandwidthStatus);
+
+        httpStreamingNetLoader.addEventListener(NetStatusEvent.NET_STATUS, onNetStreamNetStatusEvent);
+        httpStreamingNetLoader.addEventListener(BandwidthEvent.BANDWITH_STATUS, onBandwidthStatus);
 
         if (smoothingEnabled)
             addEventListener(MediaFactoryEvent.MEDIA_ELEMENT_CREATE, onMediaElementCreate);
@@ -97,7 +105,7 @@ public class FriendlyMediaFactory extends MediaFactory {
 
 
         {
-            httpStreamingNetLoader = new HTTPStreamingNetLoader();
+            httpStreamingNetLoader = new FriendlyHTTPStreamingNetLoader();
             addItem
                     (new MediaFactoryItem
                             ("org.osmf.elements.video.httpstreaming"
@@ -201,9 +209,11 @@ public class FriendlyMediaFactory extends MediaFactory {
     }
 
     private function onNetStreamNetStatusEvent(event:NetStatusEvent):void {
-
         dispatchEvent(new NetStatusEvent(NetStatusEvent.NET_STATUS, false, false, event.info.code));
+    }
 
+    private function onBandwidthStatus(event:BandwidthEvent):void {
+        dispatchEvent(event);
     }
 }
 }

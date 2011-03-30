@@ -22,6 +22,8 @@ package com.seesaw.player.smil {
 import com.seesaw.player.ads.AdBreak;
 import com.seesaw.player.ads.AdMetadata;
 
+import com.seesaw.player.ads.AdMode;
+
 import org.osmf.elements.ParallelElement;
 import org.osmf.media.MediaElement;
 import org.osmf.media.MediaFactory;
@@ -53,6 +55,7 @@ public class MainContentElement extends ParallelElement {
                     var adBreaks:Vector.<AdBreak> = parser.parseAdBreaks();
                     var adMetadata:AdMetadata = new AdMetadata();
                     adMetadata.adBreaks = adBreaks;
+                    adMetadata.adMode = AdMode.MAIN_CONTENT;
                     addMetadata(AdMetadata.AD_NAMESPACE, adMetadata);
 
                     setupAdBreaks(mediaElement, adBreaks);

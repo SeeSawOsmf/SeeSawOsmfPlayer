@@ -19,13 +19,21 @@
  */
 
 package com.seesaw.player.netloaders {
+import com.seesaw.player.PlayerConstants;
+import com.seesaw.player.events.BandwidthEvent;
+import com.seesaw.player.netloaders.switchingrules.BandwidthTooLowRule;
+import com.seesaw.player.utils.DynamicStreamingUtils;
+
 import flash.events.NetStatusEvent;
+import flash.events.TimerEvent;
 import flash.net.NetConnection;
 import flash.net.NetStream;
+import flash.utils.Timer;
 
+import org.as3commons.logging.ILogger;
+import org.as3commons.logging.LoggerFactory;
 import org.osmf.media.URLResource;
 import org.osmf.net.DynamicStreamingResource;
-import org.osmf.net.NetClient;
 import org.osmf.net.NetStreamSwitchManager;
 import org.osmf.net.NetStreamSwitchManagerBase;
 import org.osmf.net.SwitchingRuleBase;
@@ -36,35 +44,64 @@ import org.osmf.net.rtmpstreaming.RTMPNetStreamMetrics;
 import org.osmf.net.rtmpstreaming.SufficientBandwidthRule;
 
 public class FriendlyRTMPDynamicStreamingNetLoader extends RTMPDynamicStreamingNetLoader {
+
+    private var logger:ILogger = LoggerFactory.getClassLogger(FriendlyRTMPDynamicStreamingNetLoader);
+
+    private var rtmpMetrics:RTMPNetStreamMetrics;
+    private var inInsufficientBandwidthState:Boolean;
+    private var metricsTimer:Timer;
+
     public function FriendlyRTMPDynamicStreamingNetLoader() {
+        metricsTimer = new Timer(1000);
+        metricsTimer.addEventListener(TimerEvent.TIMER, onMetricsTimerEvent);
     }
 
     override protected function createNetStream(connection:NetConnection, resource:URLResource):NetStream {
-        var ns:NetStream = new NetStream(connection);
-        ns.client = new NetClient();
+        var netStream:NetStream = super.createNetStream(connection, resource);
+        netStream.maxPauseBufferTime = PlayerConstants.PAUSE_BUFFER_TIME;
 
         connection.addEventListener(NetStatusEvent.NET_STATUS, onNetStreamNetStatusEvent);
-        ns.addEventListener(NetStatusEvent.NET_STATUS, onNetStreamNetStatusEvent);
+        netStream.addEventListener(NetStatusEvent.NET_STATUS, onNetStreamNetStatusEvent);
 
-        return ns;
+        return netStream;
     }
-
 
     override protected function createNetStreamSwitchManager(connection:NetConnection, netStream:NetStream, dsResource:DynamicStreamingResource):NetStreamSwitchManagerBase {
         if (dsResource != null) {
-            var metrics:RTMPNetStreamMetrics = new RTMPNetStreamMetrics(netStream);
-            return new NetStreamSwitchManager(connection, netStream, dsResource, metrics, getDefaultSwitchingRules(metrics));
+            rtmpMetrics = new RTMPNetStreamMetrics(netStream);
+            metricsTimer.start();
+            return new NetStreamSwitchManager(connection, netStream, dsResource, rtmpMetrics, getDefaultSwitchingRules(rtmpMetrics));
         }
         return null;
+    }
+
+    private function onMetricsTimerEvent(event:TimerEvent):void {
+        var measuredBitrate:Number = rtmpMetrics.averageMaxBytesPerSecond * 8 / 1024;
+        if (measuredBitrate > 0) {
+            logger.debug("bitrate: {0}", measuredBitrate);
+            var requiredBitrate:Number = DynamicStreamingUtils.lowestBitrate(rtmpMetrics.resource.streamItems) * 1.15;
+            var sufficientBandwidth:Boolean = measuredBitrate >= requiredBitrate;
+            if (!sufficientBandwidth && !inInsufficientBandwidthState) {
+                dispatchEvent(new BandwidthEvent(BandwidthEvent.BANDWITH_STATUS, false, false,
+                        sufficientBandwidth, measuredBitrate, requiredBitrate));
+                inInsufficientBandwidthState = true;
+            }
+            else if (sufficientBandwidth && inInsufficientBandwidthState) {
+                dispatchEvent(new BandwidthEvent(BandwidthEvent.BANDWITH_STATUS, false, false,
+                        sufficientBandwidth, measuredBitrate, requiredBitrate));
+                inInsufficientBandwidthState = false;
+            }
+        }
     }
 
     private function getDefaultSwitchingRules(metrics:RTMPNetStreamMetrics):Vector.<SwitchingRuleBase> {
         var rules:Vector.<SwitchingRuleBase> = new Vector.<SwitchingRuleBase>();
         rules.push(new SufficientBandwidthRule(metrics));
         rules.push(new InsufficientBandwidthRule(metrics));
+        rules.push(new BandwidthTooLowRule(metrics));
         rules.push(new DroppedFramesRule(metrics));
-        // We grow the buffer dynamically from a very small size which seems to conflict with this rule
-//        rules.push(new InsufficientBufferRule(metrics, PlayerConstants.MIN_BUFFER_SIZE_SECONDS));
+        // this rule switches all the way to the bottom which is not what we want
+//        switchingrules.push(new InsufficientBufferRule(metrics, PlayerConstants.SHORT_BUFFER_TIME));
         return rules;
     }
 

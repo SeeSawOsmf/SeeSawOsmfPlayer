@@ -318,9 +318,10 @@ public class AdProxy extends ProxyElement {
 
     private function adbreakStart(event:Object):void {
         logger.debug("adbreakStart");
+        currentAdBreak = adMetadata.getAdBreakWithTime(event.data.breakTime);
+        adMetadata.currentAdBreak = currentAdBreak;
         adMetadata.adState = AdState.AD_BREAK_START;
         adMetadata.adMode = AdMode.AD;
-        currentAdBreak = adMetadata.getAdBreakWithTime(event.data.breakTime);
 
         setTraitsToBlock(MediaTraitType.SEEK, MediaTraitType.TIME);
         // Perhaps this is needed for mid-rolls
@@ -348,6 +349,7 @@ public class AdProxy extends ProxyElement {
         removeTrait(MediaTraitType.TIME);
 
         adMetadata.adState = AdState.AD_BREAK_COMPLETE;
+        adMetadata.currentAdBreak = null;
         adMetadata.adMode = AdMode.MAIN_CONTENT;
 
         if (currentAdBreak) {

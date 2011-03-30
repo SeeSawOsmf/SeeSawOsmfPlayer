@@ -180,12 +180,12 @@ public class BatchEventServices extends ProxyElement {
                 batchEventURL = contentInfo.batchEventUrl;
                 cumulativeDurationURL = contentInfo.playIntervalEventUrl;
                 sectionCount = videoInfo.sectionCount;
-                userId = contentInfo.userId;
+                userId = videoInfo.userId;
                 anonymousUserId = videoInfo.anonymousUserId;
                 programmeId = contentInfo.programme;
                 adMode = contentInfo.adMode;
                 availabilityType = videoInfo.availabilityType;
-                previewMode = contentInfo.preview;
+                previewMode = videoInfo.availability.showPreview;
 
                 if (!adsEnabled) createView();
 
@@ -220,7 +220,7 @@ public class BatchEventServices extends ProxyElement {
         // This has been expanded to make it easy to debug as e4x can't be expanded in the debugger
         var tvVodPlayable:Boolean = HelperUtils.getBoolean(playerMetadata.getValue("videoInfo").availability.tvodPlayable);
         var svodPlayable:Boolean = HelperUtils.getBoolean(playerMetadata.getValue("videoInfo").availability.svodPlayable);
-        var preview:Boolean = HelperUtils.getBoolean(playerMetadata.getValue("contentInfo").preview);
+        var preview:Boolean = HelperUtils.getBoolean(playerMetadata.getValue("videoInfo").availability.showPreview);
         var noAds:Boolean = HelperUtils.getBoolean(playerMetadata.getValue("videoInfo").availability.noAdsPlayable);
         var exceededDrm:Boolean = HelperUtils.getBoolean(playerMetadata.getValue("videoInfo").availability.exceededDrmRule);
         if (tvVodPlayable) {
@@ -277,10 +277,16 @@ public class BatchEventServices extends ProxyElement {
         } else if (event.key == PlayerConstants.BUFFER_MESSAGE_SHOW && event.value) {
             userEventType = UserEventTypes.BUFFERING;
 
-        }  else if (event.key == UserEventTypes.USER_SCRUB_ACTIVATED) {
+        } else if (event.key == UserEventTypes.USER_SCRUB_ACTIVATED) {
             scrubbingActive = event.value;
         }
+        else if (event.key == UserEventTypes.USER_CLICK_THRU) {
+            eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.CLICK));
+        }
+
         if (userEventType != null) {
+            if (!eventsManager) createView();
+
             eventsManager.addUserEvent(buildAndReturnUserEvent(userEventType));
         }
     }
@@ -312,7 +318,9 @@ public class BatchEventServices extends ProxyElement {
         cumulativeDurationCount += CUMULATIVE_DURATION_MONITOR_TIMER_DELAY_INTERVAL;
         if ((cumulativeDurationCount - cumulativeFlushCounter) >= CUMULATIVE_DURATION_FLUSH_TIMER_MAX) {
             cumulativeFlushCounter = cumulativeDurationCount;
-            eventsManager.flushCumulativeDuration(new CumulativeDurationEvent(programmeId, transactionItemId));
+            if (anonymousUserId == 0)
+                eventsManager.flushCumulativeDuration(new CumulativeDurationEvent(programmeId, transactionItemId));
+            eventsManager.flushAll();
         }
     }
 
@@ -346,7 +354,7 @@ public class BatchEventServices extends ProxyElement {
     private function onNetstatusMetadataChange(event:MetadataEvent):void {
         if (event.value == "NetConnection.Connect.NetworkChange")
             eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.CONNECTION_CLOSED));
-            eventsManager.flushAll();
+        eventsManager.flushAll();
         if (event.value == "NetConnection.Connect.Reconnection") {
             eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.CONNECTION_RESTART));
             eventsManager.flushAll();        /// since we have just lost connection and reconnected we want to force an event record..
@@ -376,7 +384,7 @@ public class BatchEventServices extends ProxyElement {
         } else if (value == AdState.AD_BREAK_START) {
             if (cumulativeDurationMonitor.running) cumulativeDurationMonitor.stop();
             playingMainContent = false;
-          ////  contentViewingSequenceNumber = evaluateAdContentCount;
+            ////  contentViewingSequenceNumber = evaluateAdContentCount;
             contentViewingSequenceNumber++;
 
         } else if (typeof(value) == "object") {
@@ -417,12 +425,12 @@ public class BatchEventServices extends ProxyElement {
 
             for each (var breakItem:AdBreak in adBreaks) {
 
-              if (timeTrait.currentTime >= breakItem.startTime) {
-                    currentSection = currentSection +1;// since we are checking adBreaks, we need to increment twice (once for the ad, once into the current content...
+                if (timeTrait.currentTime >= breakItem.startTime) {
+                    currentSection = currentSection + 1;// since we are checking adBreaks, we need to increment twice (once for the ad, once into the current content...
                 }
             }
 
-        } else if (timeTrait.currentTime <= 0)  {
+        } else if (timeTrait.currentTime <= 0) {
             currentSection = 1;
         }
         return currentSection;
@@ -500,9 +508,9 @@ public class BatchEventServices extends ProxyElement {
         if (playingMainContent) {
             switch (event.playState) {
                 case PlayState.PAUSED:
-                          if (cumulativeDurationMonitor.running) {
-                    cumulativeDurationMonitor.stop();
-                          }
+                    if (cumulativeDurationMonitor.running) {
+                        cumulativeDurationMonitor.stop();
+                    }
                     break;
                 case PlayState.PLAYING:
                     if (!cumulativeDurationMonitor.running) {
@@ -552,11 +560,11 @@ public class BatchEventServices extends ProxyElement {
                     if (cumulativeDurationMonitor.running) cumulativeDurationMonitor.stop();
                     contentViewingSequenceNumber = evaluateMainContentCount(event.time, true);
 
-                 scrubbingActive ? eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.SCRUB)) : null;
+                    scrubbingActive ? eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.SCRUB)) : null;
 
                 }
-            }else{
-                 if (!cumulativeDurationMonitor.running) cumulativeDurationMonitor.start();
+            } else {
+                if (!cumulativeDurationMonitor.running) cumulativeDurationMonitor.start();
             }
             seeking = event.seeking;
         }
@@ -572,6 +580,7 @@ public class BatchEventServices extends ProxyElement {
     }
 
     private function onComplete(event:TimeEvent):void {
+        if (!eventsManager) createView();
         eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.END));
         finalEventTriggered = true;
         eventsManager.flushAll();
@@ -586,11 +595,10 @@ public class BatchEventServices extends ProxyElement {
 
                 if (seekTriggered) {
 
-                    if (seekTime >= breakItem.startTime)
-                    {
+                    if (seekTime >= breakItem.startTime) {
                         currentSection = currentSection + 2; /// to ge the seek value as opposed to the current time......
                     }
-                } else if (timeTrait.currentTime >= breakItem.startTime) {
+                } else if (timeTrait && timeTrait.currentTime >= breakItem.startTime) {
                     currentSection = currentSection + 2;// since we are checking adBreaks, we need to increment twice (once for the ad, once into the current content...
                 }
             }
@@ -614,6 +622,7 @@ public class BatchEventServices extends ProxyElement {
     }
 
     private function exitEvent():void {
+        if (!eventsManager) createView();
         eventsManager.addUserEvent(buildAndReturnUserEvent(UserEventTypes.EXIT));
         finalEventTriggered = true;
         eventsManager.flushExitEvent();
@@ -646,6 +655,8 @@ public class BatchEventServices extends ProxyElement {
     }
 
     private function generateAssociatedContentEvent():void {
+        if (!eventsManager) createView();
+
         playingMainContent ? eventsManager.addContentEvent(buildAndReturnMainContentEvent(ContentTypes.MAIN_CONTENT)) : eventsManager.addContentEvent(buildAndReturnContentEvent(ContentTypes.AD_BREAK));
     }
 

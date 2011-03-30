@@ -43,19 +43,20 @@
 </div>
 <div id="playerControls">
     <ul>
+        <li><a href="#" id="proceed" title="Proceed">Click To See (proceed)</a></li>
         <li><a href="#" id="playPause">Play / Pause</a></li>
+        <li><a href="#" id="getAdMode">Get Ad Mode</a></li>
         <li><a href="#" id="currentItemPosition">Get Current Item Position (in seconds)</a></li>
         <li><a href="#" id="currentItemDuration">Get Current Item Duration (in seconds)</a></li>
         <li><a href="#" id="currentItemTitle">Get Current Item Title</a></li>
         <li><a href="#" id="setVolume">Set Volume</a></li>
         <li><a href="#" id="getVolume">Get Volume</a></li>
         <li><a href="#" id="seekTo">Seek (offset in seconds)</a></li>
-        <li><a href="#" id="proceed" title="Proceed">Click To See (proceed)</a></li>
         <li><a href="#" id="getGuidance">Get Guidance</a></li>
         <li><a href="#" id="acceptGuidance">Accept Guidance</a></li>
         <li><a href="#" id="rejectGuidance">Reject Guidance</a></li>
         <li><a href="#" id="getEntitlement">Get Entitlement</a></li>
-    </ul>
+     </ul>
 </div>
 <script type="text/javascript">
 	if( undefined === SEESAW ){
@@ -153,6 +154,11 @@
 			$("corePlayer").playPause();
 		}
 	});
+    $("getAdMode").observe('click', function(event) {
+        event.stop();
+        var adMode = $("corePlayer").getAdMode();
+        alert(adMode);
+    });
     $("getVolume").observe('click', function(event) {
 		event.stop();
 		if ($("corePlayer").getVolume) {
