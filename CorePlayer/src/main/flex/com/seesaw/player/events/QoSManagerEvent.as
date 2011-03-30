@@ -30,19 +30,32 @@
 package com.seesaw.player.events {
 import flash.events.Event;
 
-public class BufferManagerEvent extends Event {
+public class QoSManagerEvent extends Event {
 
     public static const CONNECTION_STATUS:String = "connectionStatus";
 
     private var _connectionTooSlow:Boolean;
+    private var _bufferTime:Number;
+    private var _bufferLength:Number;
 
-    public function BufferManagerEvent(type:String, bubbles:Boolean = false, cancelable:Boolean = false, connectionTooSlow:Boolean = true) {
+    public function QoSManagerEvent(type:String, bubbles:Boolean = false, cancelable:Boolean = false, connectionTooSlow:Boolean = false,
+            bufferTime:Number = NaN, bufferLength:Number = NaN) {
         super(type, bubbles, cancelable);
         _connectionTooSlow = connectionTooSlow;
+        _bufferTime = bufferTime;
+        _bufferLength = bufferLength;
     }
 
     public function get connectionTooSlow():Boolean {
         return _connectionTooSlow;
+    }
+
+    public function get bufferTime():Number {
+        return _bufferTime;
+    }
+
+    public function get bufferLength():Number {
+        return _bufferLength;
     }
 }
 }

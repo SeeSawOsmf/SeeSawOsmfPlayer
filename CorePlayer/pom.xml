@@ -127,6 +127,11 @@
             <artifactId>osmf</artifactId>
             <type>swc</type>
         </dependency>
+        <dependency>
+            <groupId>org.osmf</groupId>
+            <artifactId>osmftest</artifactId>
+            <type>swc</type>
+        </dependency>
 
         <dependency>
             <groupId>com.seesaw</groupId>

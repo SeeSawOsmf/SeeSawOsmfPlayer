@@ -34,7 +34,7 @@ import com.seesaw.player.buffering.QoSManagerProxy;
 import com.seesaw.player.captioning.sami.SAMIPluginInfo;
 import com.seesaw.player.controls.ControlBarConstants;
 import com.seesaw.player.controls.ControlBarPlugin;
-import com.seesaw.player.events.BufferManagerEvent;
+import com.seesaw.player.events.QoSManagerEvent;
 import com.seesaw.player.external.ExternalInterfaceMetadata;
 import com.seesaw.player.external.PlayerExternalInterface;
 import com.seesaw.player.ioc.ObjectProvider;
@@ -600,7 +600,7 @@ public class SeeSawPlayer extends Sprite {
 
             bufferManager = new QoSManagerProxy(PlayerConstants.SHORT_BUFFER_TIME,
                     PlayerConstants.LONG_BUFFER_TIME, mediaElement, factory);
-            bufferManager.addEventListener(BufferManagerEvent.CONNECTION_STATUS, onConnectionStatus);
+            bufferManager.addEventListener(QoSManagerEvent.CONNECTION_STATUS, onConnectionStatus);
             mainElement.addChild(bufferManager);
         }
 
@@ -608,7 +608,8 @@ public class SeeSawPlayer extends Sprite {
         setControlBarTarget(mainElement);
     }
 
-    private function onConnectionStatus(event:BufferManagerEvent):void {
+    private function onConnectionStatus(event:QoSManagerEvent):void {
+        logger.debug("onConnectionStatus: too slow = {0}", event.connectionTooSlow);
         if (event.connectionTooSlow) {
             bufferingPanel.show();
         }
