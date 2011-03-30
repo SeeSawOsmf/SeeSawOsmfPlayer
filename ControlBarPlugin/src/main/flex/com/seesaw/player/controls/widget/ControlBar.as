@@ -85,6 +85,8 @@ public class ControlBar extends Widget {
     private function showControlsListener(event:MouseEvent):void {
         //set mouseOnStage to be true
         this.mouseOnStage = true;
+        /// update the metadata to force a change on the controlBar visibility metaData, for the subtitles.....
+        updateMetadata();
         //show the control bar
         this.visible = true;
         //Show the mouse
@@ -99,6 +101,7 @@ public class ControlBar extends Widget {
         if (this.mouseOnStage == true) {
             //Show the control bar
             this.visible = true;
+            updateMetadata();
             //Show the mouse
             Mouse.show();
             //Restart the timer and start it again
