@@ -35,7 +35,6 @@ import com.seesaw.player.events.QoSManagerEvent;
 import org.hamcrest.assertThat;
 import org.hamcrest.object.equalTo;
 import org.osmf.traits.MediaTraitType;
-import org.osmf.traits.PlayTrait;
 import org.osmf.utils.DynamicBufferTrait;
 import org.osmf.utils.DynamicMediaElement;
 import org.osmf.utils.DynamicPlayTrait;
@@ -150,30 +149,6 @@ public class QosManagerProxyTest {
 
         // this will increase the buffer to the long size
         bufferTrait.buffering = true;
-
-        assertThat(connectionTooSlow, equalTo(true));
-        assertThat(bufferTrait.bufferTime, equalTo(LONG_BUFFER));
-
-        qosManager.removeEventListener(QoSManagerEvent.CONNECTION_STATUS, onConnectionStatus);
-    }
-
-    [Test]
-    public function notifiesWhenConnectionIsTooSlowDuringBuffering():void {
-        var connectionTooSlow:Boolean = false;
-
-        function onConnectionStatus(e:QoSManagerEvent):void {
-            connectionTooSlow = e.connectionTooSlow;
-        }
-
-        qosManager.addEventListener(QoSManagerEvent.CONNECTION_STATUS, onConnectionStatus);
-
-        bufferTrait.bufferTime = SHORT_BUFFER;
-        bufferTrait.bufferLength = 0;
-
-        // this will increase the buffer to the long size
-        bufferTrait.buffering = true;
-
-        doBandwidthLow();
 
         assertThat(connectionTooSlow, equalTo(true));
         assertThat(bufferTrait.bufferTime, equalTo(LONG_BUFFER));

@@ -609,6 +609,7 @@ public class SeeSawPlayer extends Sprite {
     }
 
     private function onConnectionStatus(event:QoSManagerEvent):void {
+        logger.debug("onConnectionStatus: too slow = {0}", event.connectionTooSlow);
         if (event.connectionTooSlow) {
             bufferingPanel.show();
         }

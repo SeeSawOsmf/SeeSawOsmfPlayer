@@ -81,8 +81,8 @@ public class QoSManagerProxy extends ProxyElement {
 
             // If this comes in while we are buffering set the expanded time and notify
             if(bufferTrait && bufferTrait.buffering) {
-                bufferTrait.bufferTime = expandedBufferTime;
-                dispatchEvent(new QoSManagerEvent(QoSManagerEvent.CONNECTION_STATUS, false, false, true));
+                dispatchEvent(new QoSManagerEvent(QoSManagerEvent.CONNECTION_STATUS,
+                        false, false, true, bufferTrait.bufferTime, bufferTrait.bufferLength));
             }
         }
     }
@@ -95,16 +95,19 @@ public class QoSManagerProxy extends ProxyElement {
             // If the bandwidth is ok and we're buffering again increase the initial buffer
             bufferTrait.bufferTime = bufferTrait.buffering ? initialBufferTime : expandedBufferTime;
             // Connection is never too slow in this case so ensure the message gets through
-            dispatchEvent(new QoSManagerEvent(QoSManagerEvent.CONNECTION_STATUS, false, false, false));
+            dispatchEvent(new QoSManagerEvent(QoSManagerEvent.CONNECTION_STATUS,
+                    false, false, false, bufferTrait.bufferTime, bufferTrait.bufferLength));
         }
         else {
             bufferTrait.bufferTime = expandedBufferTime;
 
             // Connection is too slow but we only want to show the message while the video has stopped/buffering
             if (bufferTrait.buffering) {
-                dispatchEvent(new QoSManagerEvent(QoSManagerEvent.CONNECTION_STATUS, false, false, true));
+                dispatchEvent(new QoSManagerEvent(QoSManagerEvent.CONNECTION_STATUS,
+                        false, false, true, bufferTrait.bufferTime, bufferTrait.bufferLength));
             } else {
-                dispatchEvent(new QoSManagerEvent(QoSManagerEvent.CONNECTION_STATUS, false, false, false));
+                dispatchEvent(new QoSManagerEvent(QoSManagerEvent.CONNECTION_STATUS,
+                        false, false, false, bufferTrait.bufferTime, bufferTrait.bufferLength));
             }
         }
 
