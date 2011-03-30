@@ -79,8 +79,10 @@ public class QoSManagerProxy extends ProxyElement {
         if (!_sufficientBandwidth) {
             var bufferTrait:BufferTrait = getTrait(MediaTraitType.BUFFER) as BufferTrait;
 
+            // TODO: we may need to set the buffer time to the expanded value here
+
             // If this comes in while we are buffering set the expanded time and notify
-            if(bufferTrait && bufferTrait.buffering) {
+            if(bufferTrait && bufferTrait.buffering && bufferTrait.bufferTime - bufferTrait.bufferLength > 5) {
                 dispatchEvent(new QoSManagerEvent(QoSManagerEvent.CONNECTION_STATUS,
                         false, false, true, bufferTrait.bufferTime, bufferTrait.bufferLength));
             }
