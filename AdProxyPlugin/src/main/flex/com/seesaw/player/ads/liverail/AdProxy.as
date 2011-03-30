@@ -268,6 +268,7 @@ public class AdProxy extends ProxyElement {
         liverailResponse = true;
         if (resumePosition <= 0) {
             adManager.onContentStart();
+            raceWon = true;
         } else {
             setTraitsToBlock();
             playTraitRaceChecker();
