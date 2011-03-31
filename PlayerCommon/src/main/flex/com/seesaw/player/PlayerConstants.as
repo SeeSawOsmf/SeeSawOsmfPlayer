@@ -44,8 +44,9 @@ public class PlayerConstants {
     public static const GUIDANCE_PANEL_ACCEPT_BUTTON_NAME:String = "GuidancePanel.acceptButton";
     public static const GUIDANCE_PANEL_CANCEL_BUTTON_NAME:String = "GuidancePanel.cancelButton";
 
-    public static const SHORT_BUFFER_TIME:Number = 0.1;
-    public static const LONG_BUFFER_TIME:Number = 10;
+    public static const PAUSE_BUFFER_TIME:Number = 5;
+    public static const SHORT_BUFFER_TIME:Number = 0.5;
+    public static const LONG_BUFFER_TIME:Number = 30;
 
     public static const DEFAULT_VOLUME:Number = 0.6;
 }

@@ -38,6 +38,7 @@ import org.osmf.events.SeekEvent;
 import org.osmf.events.TimeEvent;
 import org.osmf.media.MediaElement;
 import org.osmf.metadata.Metadata;
+import org.osmf.traits.LoadTrait;
 import org.osmf.traits.MediaTraitType;
 import org.osmf.traits.PlayState;
 import org.osmf.traits.PlayTrait;
@@ -57,6 +58,8 @@ public class AutoResumeProxy extends ProxyElement {
     private var seekingToResumePoint:Boolean;
     private var resumeService:ResumeService;
     private var timer:Timer;
+    private var loadTrait:LoadTrait;
+    private var drmMetadata:Metadata;
 
     public function AutoResumeProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -87,10 +90,13 @@ public class AutoResumeProxy extends ProxyElement {
             addEventListener(MediaElementEvent.TRAIT_REMOVE, onTraitRemove);
             addEventListener(MediaElementEvent.METADATA_ADD, onMetadataAdd);
             addEventListener(MediaElementEvent.METADATA_REMOVE, onMetadataRemove);
-
             var adMetadata:AdMetadata = getMetadata(AdMetadata.AD_NAMESPACE) as AdMetadata;
             if (adMetadata) {
                 setupAdEventListener(adMetadata, true);
+            }
+            var DRMMetadata:Metadata = getMetadata("http://www.seesaw.com/drm/metadata") as Metadata;
+            if (DRMMetadata) {
+                setupDRMEventListener(DRMMetadata, true);
             }
         }
     }
@@ -117,15 +123,41 @@ public class AutoResumeProxy extends ProxyElement {
         }
     }
 
+
+    private function setupDRMEventListener(metadata:Metadata, add:Boolean):void {
+        if (add) {
+            metadata.addEventListener(MetadataEvent.VALUE_ADD, onDRMMetadataChange);
+            metadata.addEventListener(MetadataEvent.VALUE_CHANGE, onDRMMetadataChange);
+            metadata.addEventListener(MetadataEvent.VALUE_REMOVE, onDRMMetadataChange);
+        }
+        else {
+            metadata.removeEventListener(MetadataEvent.VALUE_ADD, onDRMMetadataChange);
+            metadata.removeEventListener(MetadataEvent.VALUE_CHANGE, onDRMMetadataChange);
+            metadata.removeEventListener(MetadataEvent.VALUE_REMOVE, onDRMMetadataChange);
+        }
+    }
+
     private function onMetadataRemove(event:MediaElementEvent):void {
         if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
             setupAdEventListener(event.metadata, false);
+        }
+        if (event.namespaceURL == "http://www.seesaw.com/drm/metadata") {
+            setupDRMEventListener(event.metadata, false);
         }
     }
 
     private function onMetadataAdd(event:MediaElementEvent):void {
         if (event.namespaceURL == AdMetadata.AD_NAMESPACE) {
             setupAdEventListener(event.metadata, true);
+        }
+        if (event.namespaceURL == "http://www.seesaw.com/drm/metadata") {
+            setupDRMEventListener(event.metadata, true);
+        }
+    }
+
+    private function onDRMMetadataChange(event:MetadataEvent):void {
+        if (event.key == "CanSeek" && event.value == true) {
+            seekToResumePosition();
         }
     }
 
@@ -192,10 +224,27 @@ public class AutoResumeProxy extends ProxyElement {
 
     private function seekToResumePosition():void {
         var resume:Number = resumeService.getResumeCookie();
-        if (resume > 0 && seekTrait && seekTrait.canSeekTo(resume)) {
+        if (!checkDRMContent && resume > 0 && seekTrait && seekTrait.canSeekTo(resume)) {
             logger.debug("seeking to resume point at: {0}", resume);
             seekTrait.seek(resume);
             seekingToResumePoint = true;
+        }
+    }
+
+    private function get checkDRMContent():Boolean {
+        if (hasTrait(MediaTraitType.DRM)) {
+            var DRMMetadata:Metadata = getMetadata("http://www.seesaw.com/drm/metadata") as Metadata;
+            if (DRMMetadata) {
+                if (DRMMetadata.getValue("CanSeek")) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                return true;
+            }
+        } else {
+            return false;
         }
     }
 
@@ -237,7 +286,7 @@ public class AutoResumeProxy extends ProxyElement {
             case MediaTraitType.SEEK:
                 changeListeners(add, traitType, SeekEvent.SEEKING_CHANGE, onSeekingChange);
                 seekTrait = getTrait(MediaTraitType.SEEK) as SeekTrait;
-                seekToResumePosition();     ////todo need to listen to the load trait... otherwise http streaming will fail...
+                seekToResumePosition();
                 break;
             case MediaTraitType.PLAY:
                 changeListeners(add, traitType, PlayEvent.PLAY_STATE_CHANGE, onPlayStateChanged);
@@ -249,7 +298,7 @@ public class AutoResumeProxy extends ProxyElement {
                 timeTrait = getTrait(MediaTraitType.TIME) as TimeTrait;
                 break;
             case MediaTraitType.LOAD:
-
+                loadTrait = getTrait(MediaTraitType.LOAD) as LoadTrait;
                 break;
         }
     }

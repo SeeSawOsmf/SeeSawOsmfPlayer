@@ -69,7 +69,7 @@ public class BufferingPanel extends MediaElement {
 
         //set the private variables
         bufferingMessage = "<p><font color='#FFFFFF'>Your internet connection speed is too slow.</font></p>";
-        findOutWhyLink = "<font color='#00A88E'><a href='/help'>Find out why</a></font>.";
+        findOutWhyLink = "<font color='#00A88E'><a href='/gettingstarted/internetconnection'>Find out why</a></font>.";
 
         Security.allowDomain("*");
         super();

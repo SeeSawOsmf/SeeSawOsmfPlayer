@@ -26,12 +26,13 @@
 
  */
 package com.seesaw.player.netloaders {
+import com.seesaw.player.PlayerConstants;
+
 import flash.events.NetStatusEvent;
 import flash.net.NetConnection;
 import flash.net.NetStream;
 
 import org.osmf.media.URLResource;
-import org.osmf.net.NetClient;
 import org.osmf.net.NetConnectionFactory;
 import org.osmf.net.NetLoader;
 
@@ -45,7 +46,8 @@ public class FriendlyNetLoader extends NetLoader {
      **/
     override protected function createNetStream(connection:NetConnection, resource:URLResource):NetStream {
         var ns:NetStream = new NetStream(connection);
-        ns.client = new NetClient();
+        ns.maxPauseBufferTime = PlayerConstants.PAUSE_BUFFER_TIME;
+
         connection.addEventListener(NetStatusEvent.NET_STATUS, onNetStreamNetStatusEvent);
         return ns;
     }

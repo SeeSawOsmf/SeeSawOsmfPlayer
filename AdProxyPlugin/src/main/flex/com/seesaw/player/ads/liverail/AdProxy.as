@@ -76,6 +76,8 @@ public class AdProxy extends ProxyElement {
     private var currentAdBreak:AdBreak;
     private var resumeService:ResumeService;
     private var cookie:CookieHelper;
+    private var liverailResponse:Boolean;
+    private var raceWon:Boolean;
 
     public function AdProxy(proxiedElement:MediaElement = null) {
         super(proxiedElement);
@@ -135,7 +137,7 @@ public class AdProxy extends ProxyElement {
             // block these until the liverail events kick in
             setTraitsToBlock(MediaTraitType.PLAY, MediaTraitType.TIME, MediaTraitType.DISPLAY_OBJECT);
 
-            // After calling initAds(config), the main video playerÃ¯Â¿Â½s controls should be disabled and any requests to
+            // After calling initAds(config), the main video playerÃƒÂ¯Ã‚Â¿Ã‚Â½s controls should be disabled and any requests to
             // play a movie should be cancelled or delayed until the initComplete (or the initError) event is received
             // from the ad manager. If initComplete has been received, first call lrAdManager.onContentStart() and only
             // resume your main video after prerollComplete event is triggered.
@@ -263,18 +265,21 @@ public class AdProxy extends ProxyElement {
 
         // section count need to occur before we start the adContent. as this is required for the first view to be registered.
         playerMetadata.addValue(AdMetadata.SECTION_COUNT, metadataAdBreaks.length);
+        liverailResponse = true;
         if (resumePosition <= 0) {
             adManager.onContentStart();
+            raceWon = true;
         } else {
             setTraitsToBlock();
-            play();
+            playTraitRaceChecker();
         }
     }
 
     private function onInitError(ev:Object):void {
         logger.debug("onInitError");
         setTraitsToBlock();
-        play();
+        liverailResponse = true;
+        playTraitRaceChecker();
     }
 
     private function onClickThru(event:Object):void {
@@ -431,6 +436,7 @@ public class AdProxy extends ProxyElement {
         switch (traitType) {
             case MediaTraitType.PLAY:
                 changeListeners(element, add, traitType, PlayEvent.PLAY_STATE_CHANGE, onPlayStateChange);
+                    if(add) playTraitRaceChecker();
                 break;
             case MediaTraitType.AUDIO:
                 changeListeners(element, add, traitType, AudioEvent.VOLUME_CHANGE, onVolumeChange);
@@ -442,6 +448,13 @@ public class AdProxy extends ProxyElement {
             case MediaTraitType.SEEK:
                 if (resumePosition > 0)    changeListeners(element, add, traitType, SeekEvent.SEEKING_CHANGE, onSeekChange);
                 break;
+        }
+    }
+
+    private function playTraitRaceChecker():void {
+        if(getTrait(MediaTraitType.PLAY) && liverailResponse && !raceWon){
+            raceWon = true;
+            play();
         }
     }
 

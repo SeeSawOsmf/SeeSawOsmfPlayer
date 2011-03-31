@@ -51,7 +51,6 @@ public class TraceAndArthropodLogger extends AbstractLogger {
                 _colour = map.colour;
             }
         }
-
     }
 
     public function set level(value:int):void {

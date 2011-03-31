@@ -178,11 +178,11 @@ public class DebugProxyElement extends ProxyElement {
         var trait:DynamicStreamTrait = proxiedElement.getTrait(MediaTraitType.DYNAMIC_STREAM) as DynamicStreamTrait;
         if (trait) {
             if (trait.switching) {
-                logger.debug("{0}: Switching dynamic stream from bitrate = {1}",
+                logger.info("{0}: Switching dynamic stream from bitrate = {1}",
                         proxiedElementName, trait.getBitrateForIndex(trait.currentIndex));
             }
             else {
-                logger.debug("{0}: Completed dynamic stream switch to bitrate = {1}",
+                logger.info("{0}: Completed dynamic stream switch to bitrate = {1}",
                         proxiedElementName, trait.getBitrateForIndex(trait.currentIndex));
             }
         }
@@ -221,7 +221,7 @@ public class DebugProxyElement extends ProxyElement {
     }
 
     private function onMediaSizeChange(event:DisplayObjectEvent):void {
-        logger.debug("{0}: Media Size Change old: {1}x{2} new: {3}x{4}",
+        logger.info("{0}: Media Size Change old: {1}x{2} new: {3}x{4}",
                 proxiedElementName, event.oldHeight, event.oldWidth, event.newHeight, event.newWidth);
     }
 
@@ -290,12 +290,12 @@ public class DebugProxyElement extends ProxyElement {
     }
 
     private function onBufferingChange(event:BufferEvent):void {
-        logger.debug("{0}: Buffering Change: Buffering: {1}, Time: {2}, Length: {3}",
+        logger.info("{0}: Buffering Change: Buffering: {1}, Time: {2}, Length: {3}",
                 proxiedElementName, event.buffering, event.currentTarget.bufferTime, event.currentTarget.bufferLength);
     }
 
     private function onBufferTimeChange(event:BufferEvent):void {
-        logger.debug("{0}: Buffer Time Change: Buffering: {1}, Time: {2}, Length: {3}",
+        logger.info("{0}: Buffer Time Change: Buffering: {1}, Time: {2}, Length: {3}",
                 proxiedElementName, event.buffering, event.currentTarget.bufferTime, event.currentTarget.bufferLength);
     }
 
