@@ -61,12 +61,14 @@
         <dependency>
             <groupId>org.osmf</groupId>
             <artifactId>osmf</artifactId>
+            <version>1.6.3</version>
             <type>swc</type>
         </dependency>
 
         <dependency>
             <groupId>org.osmf</groupId>
             <artifactId>chrome</artifactId>
+            <version>1.6</version>
             <type>swc</type>
         </dependency>
 

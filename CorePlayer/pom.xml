@@ -44,6 +44,7 @@
                     <accessible>true</accessible>
                     <configurationReport>true</configurationReport>
                     <sourceFile>com/seesaw/player/Player.as</sourceFile>
+                    <debug>${player.dev_mode}</debug>
                     <definesDeclaration>
                         <property>
                             <name>PLAYER::Width</name>

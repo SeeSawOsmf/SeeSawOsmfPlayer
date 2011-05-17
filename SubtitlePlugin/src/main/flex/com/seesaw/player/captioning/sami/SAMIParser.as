@@ -39,7 +39,10 @@ public class SAMIParser implements CaptionParser {
     public function parse(strSubs:String):CaptionDocument {
         strSubs = strSubs.replace(/<span/ig, "<font");
         strSubs = strSubs.replace(/<\/span>/ig, "</font>");
-        strSubs = strSubs.replace(/style=([^>]*)/ig, "style=\"$1\"");
+
+        if (strSubs.indexOf("style=\"") == -1) { // Only wrap the style attribute in quotes if needed. Assume only one instance of styling
+          strSubs = strSubs.replace(/style=([^>]*)/ig, "style=\"$1\"");
+        }
 
         strSubs = strSubs.replace(/style="color:\s*yellow\s*;"/ig, "color=\"#FFFF00\"");
         strSubs = strSubs.replace(/style="color:\s*cyan\s*;"/ig, "color=\"#00FFFF\"");
