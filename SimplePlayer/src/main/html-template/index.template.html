@@ -1,0 +1,51 @@
+<!--
+  ~ Copyright 2010 ioko365 Ltd.  All Rights Reserved.
+  ~
+  ~    The contents of this file are subject to the Mozilla Public License
+  ~    Version 1.1 (the "License"); you may not use this file except in
+  ~    compliance with the License. You may obtain a copy of the
+  ~    License athttp://www.mozilla.org/MPL/
+  ~
+  ~    Software distributed under the License is distributed on an "AS IS"
+  ~    basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+  ~    License for the specific language governing rights and limitations
+  ~    under the License.
+  ~
+  ~    The Initial Developer of the Original Code is ioko365 Ltd.
+  ~    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
+  ~    Incorporated. All Rights Reserved.
+  ~
+  ~    The Initial Developer of the Original Code is ioko365 Ltd.
+  ~    Portions created by ioko365 Ltd are Copyright (C) 2010 ioko365 Ltd
+  ~    Incorporated. All Rights Reserved.
+  -->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <title>Simple Player Embed</title>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+
+</head>
+<body>
+<script type="text/javascript">
+
+    var flashvars = {
+        url: "http://kgd-red-delivery01.dev.vodco.co.uk/packaged/big_train_28_v2.f4m",
+        title: "Big Train",
+        picture: "http://kgd-red-test-zxtm01.dev.vodco.co.uk/i/ccp/0000T0120/12035.jp",
+        dog: "http://kgd-red-test-zxtm01.dev.vodco.co.uk/i/cms/images/presentationBrand/CHANNEL4_DOG.png"
+
+    };
+    var params = {};
+    var attributes = {};
+
+    swfobject.embedSWF("${swf}.swf", "player", "672", "370", "10.1.0", "expressInstall.swf", flashvars, params, attributes);
+
+</script>
+
+
+<div id="player"/>
+</body>
+</html>

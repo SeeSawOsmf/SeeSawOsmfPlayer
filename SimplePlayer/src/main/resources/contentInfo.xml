@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+~ The contents of this file are subject to the Mozilla Public License
+~   Version 1.1 (the "License"); you may not use this file except in
+~   compliance with the License. You may obtain a copy of the License at
+~   http://www.mozilla.org/MPL/
+~
+~   Software distributed under the License is distributed on an "AS IS"
+~   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+~   License for the specific language governing rights and limitations
+~   under the License.
+~
+~   The Initial Developer of the Original Code is Arqiva Ltd.
+~   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+~   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+~ 	Systems Incorporated.
+~   All Rights Reserved.
+~
+~   Contributor(s):  Adobe Systems Incorporated
+-->
+
+<contentInfo xmlns:ns2="http://www.w3.org/ns/SMIL" xmlns="http://www.seesaw.com/api/contentinfo/v1.0">
+    <primaryGenre>TV:DRAMA:CONTEMPORARY_BRITISH</primaryGenre>
+    <sourceId>CHANNEL4</sourceId>
+    <firstPresentationBrand>4oD</firstPresentationBrand>
+    <programmeId>bd4d51de-b655-4d75-aab1-c3b911306cd0</programmeId>
+    <programmeTitle>Sintel</programmeTitle>
+    <tvAgeRating>18</tvAgeRating>
+    <duration>852</duration>
+    <adRule>ALWAYS</adRule>
+    <catchup>true</catchup>
+    <loggingSheet>
+        <break>
+            <breakOffset>00:00:00.00</breakOffset>
+            <resumeOffset>00:00:00.00</resumeOffset>
+            <data>PRE:x01,x02,x60,x61,x90,x91</data>
+        </break>
+        <break>
+            <breakOffset>00:05:00.00</breakOffset>
+            <resumeOffset>00:05:00.00</resumeOffset>
+            <data>CEN:x01,x02,x92,x80,x81,x93</data>
+        </break>
+         <break>
+            <breakOffset>00:08:00.00</breakOffset>
+            <resumeOffset>00:08:00.00</resumeOffset>
+            <data>CEN:x01,x02,x92,x80,x81,x93</data>
+        </break>
+        <!-- <break>
+            <breakOffset>00:08:00.00</breakOffset>
+            <resumeOffset>00:08:00.00</resumeOffset>
+            <data>CEN:x01,x02,x92,x80,x81,x93</data>
+        </break>-->
+    </loggingSheet>
+    <guidance>
+        <age>16</age>
+        <message>May contain content unsuitable for young viewers.</message>
+        <type>TV</type>
+    </guidance>
+    <parentalControls>
+        <parentalControlsPageURL>http://localhost:8080/ParentalControls</parentalControlsPageURL>
+        <termsAndConditionsLinkURL>http://localhost:8080/TermsAndConditions</termsAndConditionsLinkURL>
+        <helpSectionLinkURL>http://localhost:8080/watchingtv/aboutparentalcontrols</helpSectionLinkURL>
+        <lostPinLinkURL>http://localhost:8080/technicalproblems/parentalcontrolpassword</lostPinLinkURL>
+        <whatsThisLinkURL>http://localhost:8080/watchingtv/aboutparentalcontrols</whatsThisLinkURL>
+    </parentalControls>
+    <unavailablePageUrl>http://localhost:8080/unavailable</unavailablePageUrl>
+    <!-- <videoInfoUrl>../src/test/resources/videoInfo.c4ad.xml</videoInfoUrl> -->
+    <videoInfoUrl>../src/main/resources/videoInfo.xml</videoInfoUrl>
+     <batchEventUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player/initinfo:registerbatchevent?t:ac=26772
+    </batchEventUrl>
+    <playIntervalEventUrl>http://kgd-red-test-zxtm01.dev.vodco.co.uk/player/initinfo:playintervalevent?t:ac=26772
+    </playIntervalEventUrl>
+    <largeImageUrl>
+    </largeImageUrl>
+    <liverail>
+        <version>4.1</version>
+        <publisherId>1332</publisherId>
+    </liverail>
+    <adMode>none</adMode>
+    <dogImage>
+    </dogImage>
+    <programme>33535</programme>
+    <userId>911112222</userId>
+    <anonymousUserId>0000</anonymousUserId>
+</contentInfo>

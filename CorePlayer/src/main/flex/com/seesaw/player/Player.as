@@ -60,6 +60,7 @@ import flash.net.URLVariables;
 import flash.net.navigateToURL;
 import flash.ui.ContextMenu;
 import flash.ui.ContextMenuItem;
+import flash.xml.XMLDocument;
 
 import org.as3commons.logging.ILogger;
 import org.as3commons.logging.LoggerFactory;
@@ -77,6 +78,7 @@ public class Player extends Sprite {
 
     private static const PLAYER_WIDTH:int = PLAYER::Width;
     private static const PLAYER_HEIGHT:int = PLAYER::Height;
+    private static const DEV_MODE:Boolean = PLAYER::DEV_MODE;
 
     private static var loggerSetup:* = (LoggerFactory.loggerFactory = new TraceAndArthropodLoggerFactory());
     private static var osmfLoggerSetup:* = (Log.loggerFactory = new CommonsOsmfLoggerFactory());
@@ -136,17 +138,23 @@ public class Player extends Sprite {
             contextMenu = menu;
         }
 
-        if (PLAYER::DEV_MODE) {
-            loadDevConfiguration();
-        }
-        else {
-            userInitUrl = loaderParams.userInitUrl;
-            playerInitUrl = loaderParams.playerInitUrl;
-            initialisePlayer();
-        }
+        initialisePlayer()
+
+
     }
 
-    private function initialisePlayer():void {
+    protected function initialisePlayer():void {
+        if (DEV_MODE) {
+            loadDevConfiguration();
+        } else {
+            userInitUrl = loaderParams.userInitUrl;
+            playerInitUrl = loaderParams.playerInitUrl;
+            loadInitData();
+        }
+
+    }
+
+    private function loadInitData():void {
         if (!userInitUrl) {
             throw new ArgumentError("userInitUrl is undefined");
         }
@@ -309,7 +317,7 @@ public class Player extends Sprite {
                             playerInit.guidance.age,
                             playerInit.parentalControls.parentalControlsPageURL,
                             playerInit.parentalControls.whatsThisLinkURL
-                            );
+                    );
 
                     parentalControlsPanel.addEventListener(ParentalControlsPanel.PARENTAL_CHECK_PASSED, onNextInitialisationState);
                     parentalControlsPanel.addEventListener(ParentalControlsPanel.PARENTAL_CHECK_FAILED, onResetInitialisationState);
@@ -323,7 +331,7 @@ public class Player extends Sprite {
                             playerInit.parentalControls.parentalControlsPageURL,
                             playerInit.parentalControls.whatsThisLinkURL,
                             playerInit.parentalControls.termsAndConditionsLinkURL
-                            );
+                    );
 
                     guidancePanel.addEventListener(GuidancePanel.GUIDANCE_ACCEPTED, onNextInitialisationState);
                     guidancePanel.addEventListener(GuidancePanel.GUIDANCE_DECLINED, onResetInitialisationState);
@@ -364,12 +372,21 @@ public class Player extends Sprite {
     }
 
     private function onSuccessFromUserInit(response:Object):void {
+
         logger.debug("received user init data");
 
         var xmlDoc:XML = new XML(response);
         xmlDoc.ignoreWhitespace = true;
+        processUserInit(xmlDoc);
+        // Note that if none of the conditions above are met, we should not show
+        // the play button at all.  Leave playButtonMode as null in this case.
 
-        userInit = xmlDoc;
+        requestPlayerInitData(playerInitUrl);
+    }
+
+    protected function processUserInit(userInit:XML):void {
+
+        this.userInit = userInit;
         var availability:XMLList = userInit.availability;
 
         if (availability.showPreview == "true") {
@@ -389,10 +406,6 @@ public class Player extends Sprite {
                 playButtonMode = PlayStartButton.PLAY;
             }
         }
-        // Note that if none of the conditions above are met, we should not show
-        // the play button at all.  Leave playButtonMode as null in this case.
-
-        requestPlayerInitData(playerInitUrl);
     }
 
     private function requestPlayerInitData(playerInitUrl:String):void {
@@ -403,13 +416,16 @@ public class Player extends Sprite {
 
     private function onSuccessFromPlayerInit(response:Object):void {
         logger.debug("received player init data");
-
-        removePreloader();
-
         var xmlDoc:XML = new XML(response);
         xmlDoc.ignoreWhitespace = true;
+        processPlayerInit(xmlDoc);
+    }
 
-        playerInit = xmlDoc;
+    protected function processPlayerInit(playerInit:XML):void {
+        logger.debug("processing player init data");
+
+        removePreloader();
+        this.playerInit = playerInit;
         setupExternalInterface();
 
         resumeService.programmeId = playerInit.programmeId;
@@ -418,9 +434,15 @@ public class Player extends Sprite {
             resetInitialisationStages();
             nextInitialisationStage();
         }
+
+        logger.debug("Completed Player init");
     }
 
-    private function requestProgrammeData(videoInfoUrl:String):void {
+    /**
+     * Load the videoInfo object and validate the entitlements
+     * @param videoInfoUrl video info URL from contentInfo. Implementations can ignore this if desireable.
+     */
+    protected function requestProgrammeData(videoInfoUrl:String):void {
         logger.debug("requesting video info data: " + videoInfoUrl);
         var request:ServiceRequest = new ServiceRequest(videoInfoUrl, onSuccessFromVideoInfo, onFailFromVideoInfo);
         // For C4 ads we POST the ASX we receive from the ad script. For liverail and auditude, there's no need
@@ -439,7 +461,12 @@ public class Player extends Sprite {
         var xmlDoc:XML = new XML(response);
         xmlDoc.ignoreWhitespace = true;
 
-        videoInfo = xmlDoc;
+        processVideoInit(xmlDoc);
+    }
+
+
+    protected function processVideoInit(videoInfo:XML) {
+        this.videoInfo = videoInfo;
         var availability:XMLList = videoInfo.availability;
 
         // we need to evaluate if ads are not required for SVOD, TVOD and NO_ADS and adjust the
@@ -468,7 +495,6 @@ public class Player extends Sprite {
             this.showOverUsePanel("TVOD");
             return;
         }
-
         nextInitialisationStage();
     }
 
@@ -678,7 +704,7 @@ public class Player extends Sprite {
             userInitUrl = devConfig.userInitUrl;
             playerInitUrl = devConfig.playerInitUrl;
             logger.debug("** USING DEVELOPMENT CONFIGURATION **");
-            initialisePlayer();
+            loadInitData();
         }
 
         var request:ServiceRequest = new ServiceRequest("../src/test/resources/dev_config.xml",

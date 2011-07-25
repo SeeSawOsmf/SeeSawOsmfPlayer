@@ -1,0 +1,47 @@
+<videoInfo xmlns:ns2="http://www.w3.org/ns/SMIL" xmlns="http://www.seesaw.com/api/contentinfo/v1.0">
+    <!--
+      ~ The contents of this file are subject to the Mozilla Public License
+      ~   Version 1.1 (the "License"); you may not use this file except in
+      ~   compliance with the License. You may obtain a copy of the License at
+      ~   http://www.mozilla.org/MPL/
+      ~
+      ~   Software distributed under the License is distributed on an "AS IS"
+      ~   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+      ~   License for the specific language governing rights and limitations
+      ~   under the License.
+      ~
+      ~   The Initial Developer of the Original Code is Arqiva Ltd.
+      ~   Portions created by Arqiva Limited are Copyright (C) 2010, 2011 Arqiva Limited.
+      ~   Portions created by Adobe Systems Incorporated are Copyright (C) 2010 Adobe
+      ~ 	Systems Incorporated.
+      ~   All Rights Reserved.
+      ~
+      ~   Contributor(s):  Adobe Systems Incorporated
+      -->
+    <ns2:smil>
+        <ns2:head/>
+        <ns2:body>
+            <ns2:seq>
+                <ns2:video src="http://www.google.com/"
+                           >
+                    <ns2:metadata>
+                        <ns2:meta content="mainContent" name="contentType"/>
+                    </ns2:metadata>
+                </ns2:video>
+            </ns2:seq>
+        </ns2:body>
+    </ns2:smil>
+    <entitlement>Thu 2011 Mar 10 10:00:00 GMT,Fri 2012 Mar 11 10:00:00 GMT</entitlement>
+    <signature>71 e9 95 c9 f2 19 a6 e1 a5 0f 7b 2e aa 83 4d 29 9c b8 48 70 a6 5b 49 fe 77 bd 08 de 45 87 3f 0e c9 65 69 c1 ba 1d 61 8c d0 e8 ef bd 82 65 23 cc f0 ee 7b 5e bd f3 2e c1 98 42 c5 3e b4 c3 61 e3 0e 44 1c 1e 1e a4 83 2c df b7 20 4e f5 8b 61 e9 ed 0c e1 25 5d 6a 22 ef 48 1e 2b 16 a4 97 8a df c7 d6 55 9f 63 92 e3 78 2f d4 55 11 dd c7 df 29 8b c6 58 8f b0 76 79 eb 0b 71 c7 45 b7 04 b3 bb 01 c9 0d cd 80 be e4 b7 e6 42 32 06 6a ec 6c 0e 75 19 3b 52 18 1e 73 6e 14 80 cc 7c 4d 55 16 c4 0f bf 6c 1f de 62 60 7e a2 3f f0 2a 50 7b d8 e4 f0 fa de a5 37 24 51 9e 29 22 ca ad e4 f7 94 e8 16 30 3a 1c 70 a1 97 6c 5e 8e 5d c3 a4 3b e1 6e e8 28 df 64 9d 9d 29 12 8a 17 41 f5 5b 24 7f 70 a6 3a 7a 62 7d 1e b1 ee bf 1c 7e 2f 55 52 41 b2 d4 f7 7f bf 22 a9 57 19 52 eb 7c e3 1b 9c fd 6a</signature>
+    <geoblocked>false</geoblocked>
+    <serverTimestamp>1297941866204</serverTimestamp>
+    <anonymousUserId>263413396338109</anonymousUserId>
+    <sectionCount>2</sectionCount>
+    <availability>
+        <availabilityType>AVOD</availabilityType>
+        <noAdsPlayable>false</noAdsPlayable>
+        <tvodPlayable>false</tvodPlayable>
+        <svodPlayable>false</svodPlayable>
+        <exceededDrmRule>false</exceededDrmRule>
+    </availability>
+</videoInfo>
