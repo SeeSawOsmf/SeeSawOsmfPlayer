@@ -22,3 +22,4 @@ activemq-data*
 *temp_flex_main_class_config.xml
 *temp_flexunit_config.xml
 .DS_Store
+/tags
