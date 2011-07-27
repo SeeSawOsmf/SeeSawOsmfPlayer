@@ -49,6 +49,7 @@
         <module>ExternalInterface</module>
         <module>BatchEventServices</module>
         <module>SimplePlayer</module>
+        <module>SeeSawPlayer</module>
     </modules>
 
     <developers>
@@ -337,7 +338,7 @@
 
     <properties>
         <flex.sdk.version>4.5.0.17855</flex.sdk.version>
-        <osmf.version>1.6.3</osmf.version>
+        <osmf.version>1.6.5</osmf.version>
     </properties>
 
     <repositories>
@@ -345,11 +346,6 @@
             <id>3rdParty</id>
             <name>3rd Party</name>
             <url>http://seesawosmf.github.com/SeeSawOsmfPlayer/3rdPartyRepository</url>
-        </repository>
-        <repository>
-            <id>FlexMojos</id>
-            <name>Flex Mojos</name>
-            <url>http://svn.sonatype.org/flexmojos/repository</url>
         </repository>
         <repository>
             <id>Flex Group</id>
